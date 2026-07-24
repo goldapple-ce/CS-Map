@@ -54,7 +54,7 @@
 
 ## Interaction discipline
 
-- Node body click enters its child scene.
+- Node body click moves and zooms the persistent world camera to its nested child scene; it must not replace the canvas.
 - Hover or keyboard focus may show a short preview; essential content cannot exist only there.
 - Long-form content belongs in the explanation panel.
 - Back navigation restores scene, focus, panel state, and reading position.

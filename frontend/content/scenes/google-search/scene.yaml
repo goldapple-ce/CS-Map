@@ -4,10 +4,8 @@ scenarioId: google-search
 title: 구글 검색
 summary: 사용자의 검색어가 브라우저와 네트워크를 거쳐 검색 결과로 돌아와 화면에 표시되는 전체 흐름입니다.
 status: published
-canvas:
-  width: 1280
-  height: 720
-  ariaLabel: 사용자 입력에서 브라우저, 네트워크, 검색 서비스, 결과 응답과 브라우저 렌더링으로 이어지는 흐름
+ariaLabel: 사용자 입력에서 브라우저, 네트워크, 검색 서비스, 결과 응답과 브라우저 렌더링으로 이어지는 흐름
+layoutHint: horizontal
 contentRef: content.ko.md
 author:
   id: cs-map-team

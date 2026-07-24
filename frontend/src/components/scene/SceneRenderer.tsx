@@ -13,11 +13,16 @@ import type {
 
 type SceneRendererProps = {
   scene: Scene
+  selectedElementId?: string
   navigationDisabled?: boolean
-  onEnterScene?: (sceneId: string) => void
+  onEnterScene?: (sceneId: string, elementId: string) => void
 }
 
-function nodeState(element: SceneNodeElement): SceneNodeState {
+function nodeState(
+  element: SceneNodeElement,
+  selectedElementId?: string
+): SceneNodeState {
+  if (element.id === selectedElementId) return "selected"
   if (element.targetSceneId && element.status === "published")
     return "interactive"
   if (element.status === "planned") return "planned"
@@ -26,6 +31,7 @@ function nodeState(element: SceneNodeElement): SceneNodeState {
 
 export function SceneRenderer({
   scene,
+  selectedElementId,
   navigationDisabled = false,
   onEnterScene,
 }: SceneRendererProps) {
@@ -47,14 +53,14 @@ export function SceneRenderer({
   return (
     <figure className="flex size-full min-h-0 items-center justify-center overflow-hidden p-5">
       <svg
-        viewBox={`0 0 ${scene.canvas.width} ${scene.canvas.height}`}
+        viewBox={`0 0 ${layout.width} ${layout.height}`}
         preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-labelledby="scene-diagram-title scene-diagram-description"
         className="block size-full rounded-xl border border-border bg-background shadow-sm"
       >
         <title id="scene-diagram-title">{scene.title}</title>
-        <desc id="scene-diagram-description">{scene.canvas.ariaLabel}</desc>
+        <desc id="scene-diagram-description">{scene.ariaLabel}</desc>
         <defs>
           <marker
             id="scene-arrowhead"
@@ -102,7 +108,7 @@ export function SceneRenderer({
               key={element.id}
               element={element}
               layout={elementLayout}
-              state={nodeState(element)}
+              state={nodeState(element, selectedElementId)}
               navigationDisabled={navigationDisabled}
               onEnterScene={onEnterScene}
             />

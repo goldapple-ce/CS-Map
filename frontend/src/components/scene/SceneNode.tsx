@@ -5,35 +5,48 @@ import type { SceneNodeElement } from "@/domain/content-types"
 import { cn } from "@/lib/utils"
 
 export type SceneNodeState = "interactive" | "planned" | "static" | "selected"
+export type SceneNodeDensity = "far" | "medium" | "near"
 
 const sceneNodeVariants = cva(
-  "flex size-full flex-col items-start justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-[border-color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
+  "flex size-full flex-col items-center justify-center gap-0.5 rounded-lg px-2 text-center transition-[background-color,color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
   {
     variants: {
       state: {
-        interactive: "border-primary/50 hover:border-primary",
-        planned: "border-dashed border-border bg-muted/40",
-        static: "border-border",
-        selected: "border-primary ring-3 ring-ring/30",
+        interactive:
+          "cursor-pointer font-medium hover:bg-muted/70 hover:text-foreground",
+        planned: "text-muted-foreground",
+        static: "text-foreground",
+        selected: "bg-muted font-medium ring-2 ring-ring/30",
       },
     },
     defaultVariants: { state: "static" },
   }
 )
 
-const sceneNodeBadgeVariants = cva(
-  "rounded-md border px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase",
+const sceneNodeLabelVariants = cva(
+  "leading-none font-medium whitespace-nowrap",
   {
     variants: {
-      state: {
-        interactive: "border-primary/30 text-foreground",
-        planned: "border-border text-muted-foreground",
-        static: "border-border text-muted-foreground",
-        selected: "border-primary/30 text-foreground",
+      density: {
+        far: "text-3xl",
+        medium: "text-2xl",
+        near: "text-xl",
       },
     },
+    defaultVariants: { density: "near" },
   }
 )
+
+const sceneNodeStatusVariants = cva("text-muted-foreground", {
+  variants: {
+    density: {
+      far: "text-lg",
+      medium: "text-base",
+      near: "text-sm",
+    },
+  },
+  defaultVariants: { density: "near" },
+})
 
 const stateLabels: Record<SceneNodeState, string> = {
   interactive: "탐색 대상",
@@ -46,14 +59,16 @@ type SceneNodeProps = {
   element: SceneNodeElement
   layout: LayoutBox
   state: SceneNodeState
+  density?: SceneNodeDensity
   navigationDisabled?: boolean
-  onEnterScene?: (sceneId: string) => void
+  onEnterScene?: (sceneId: string, elementId: string) => void
 }
 
 export function SceneNode({
   element,
   layout,
   state,
+  density = "near",
   navigationDisabled = false,
   onEnterScene,
 }: SceneNodeProps) {
@@ -62,12 +77,10 @@ export function SceneNode({
   const targetSceneId = element.targetSceneId
   const content = (
     <>
-      <span className="text-sm leading-snug font-semibold text-foreground">
-        {label}
-      </span>
-      <span className={cn(sceneNodeBadgeVariants({ state }))}>
-        {stateLabels[state]}
-      </span>
+      <span className={sceneNodeLabelVariants({ density })}>{label}</span>
+      {state === "planned" ? (
+        <span className={sceneNodeStatusVariants({ density })}>준비 중</span>
+      ) : null}
     </>
   )
 
@@ -76,15 +89,17 @@ export function SceneNode({
       {targetSceneId && onEnterScene ? (
         <button
           type="button"
+          data-scene-node-id={element.id}
           disabled={navigationDisabled}
           aria-label={`${label} 하위 장면 열기`}
           className={cn(sceneNodeVariants({ state }))}
-          onClick={() => onEnterScene(targetSceneId)}
+          onClick={() => onEnterScene(targetSceneId, element.id)}
         >
           {content}
         </button>
       ) : (
         <div
+          data-scene-node-id={element.id}
           tabIndex={state === "planned" ? 0 : undefined}
           role="group"
           aria-label={`${label}, ${stateLabels[state]}`}

@@ -14,11 +14,15 @@ const knownLabels: Record<string, string> = {
 
 type ExplorerHeaderProps = {
   panelCollapsed: boolean
+  navigationDisabled: boolean
+  onBack: () => void
   onOpenPanel: () => void
 }
 
 export function ExplorerHeader({
   panelCollapsed,
+  navigationDisabled,
+  onBack,
   onOpenPanel,
 }: ExplorerHeaderProps) {
   const location = useLocation()
@@ -33,7 +37,8 @@ export function ExplorerHeader({
           variant="ghost"
           size="icon"
           aria-label="이전 장면으로 돌아가기"
-          onClick={() => navigate(-1)}
+          disabled={navigationDisabled}
+          onClick={onBack}
         >
           <ArrowLeft aria-hidden="true" />
         </Button>

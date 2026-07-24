@@ -128,6 +128,14 @@ const relationshipSchema = z.discriminatedUnion("type", [
     .strict(),
   z
     .object({
+      type: z.enum(["related", "prerequisite", "used-by"]),
+      sourceSceneId: contentIdSchema,
+      targetSceneId: contentIdSchema,
+      summary: z.string().min(1).optional(),
+    })
+    .strict(),
+  z
+    .object({
       type: z.literal("implemented-by"),
       occurrenceId: contentIdSchema,
       targetSceneId: contentIdSchema,
@@ -144,13 +152,8 @@ export const sceneSchema = z
     title: z.string().min(1),
     summary: z.string().min(1),
     status: statusSchema,
-    canvas: z
-      .object({
-        width: z.number().positive(),
-        height: z.number().positive(),
-        ariaLabel: z.string().min(1),
-      })
-      .strict(),
+    ariaLabel: z.string().min(1),
+    layoutHint: z.enum(["horizontal", "branch"]).optional(),
     elements: z.array(sceneElementSchema).default([]),
     contentRef: contentRefSchema,
     contexts: z.array(contextSchema).default([]),

@@ -5,10 +5,8 @@ parentId: google-search-root
 title: 네트워크
 summary: 브라우저가 검색 서비스에 요청을 보내기 위해 이름을 주소로 확인하고 전송 경로를 준비하는 장면입니다.
 status: published
-canvas:
-  width: 1280
-  height: 720
-  ariaLabel: 브라우저 요청에서 DNS 이름 확인, 연결 준비, 검색 서비스 도착으로 이어지는 네트워크 흐름
+ariaLabel: 브라우저 요청에서 DNS 이름 확인, 연결 준비, 검색 서비스 도착으로 이어지는 네트워크 흐름
+layoutHint: horizontal
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
 updatedAt: 2026-07-24

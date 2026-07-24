@@ -1,124 +1,284 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { SceneRenderer } from "@/components/scene/SceneRenderer"
+import { WorldRenderer } from "@/components/scene/WorldRenderer"
+import {
+  createWorldLayout,
+  type WorldLayout,
+} from "@/components/scene/world-layout"
 import { Button } from "@/components/ui/button"
 import { contentRepository } from "@/content/content-repository"
-import type { Scene } from "@/domain/content-types"
+import {
+  cameraForBounds,
+  type CameraState,
+  type ViewportSize,
+} from "@/features/explorer/camera"
+import {
+  getSceneSnapshot,
+  type SceneNavigationRequest,
+} from "@/features/explorer/exploration-memory"
 
-type SceneLoadState =
+type WorldLoadState =
   | { status: "loading" }
-  | { status: "loaded"; scene: Scene }
+  | { status: "loaded"; layout: WorldLayout }
   | { status: "error"; message: string }
-  | { status: "not-found" }
 
 type SceneViewportProps = {
   sceneId?: string
   routeNotFound: boolean
   navigationDisabled: boolean
-  onEnterScene: (sceneId: string) => void
+  reducedMotion: boolean
+  onEnterScene: (request: SceneNavigationRequest) => void
+  onSceneReady: (sceneId: string, title: string) => void
+  onCameraChange: (camera: CameraState) => void
+  onAnimationChange: (animating: boolean) => void
 }
+
+const DEFAULT_CAMERA: CameraState = { centerX: 640, centerY: 360, scale: 1 }
 
 export function SceneViewport({
   sceneId,
   routeNotFound,
   navigationDisabled,
+  reducedMotion,
   onEnterScene,
+  onSceneReady,
+  onCameraChange,
+  onAnimationChange,
 }: SceneViewportProps) {
   const navigate = useNavigate()
-  const [loadState, setLoadState] = useState<SceneLoadState>({
-    status: routeNotFound ? "not-found" : "loading",
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const animationFrameRef = useRef<number | undefined>(undefined)
+  const cameraRef = useRef(DEFAULT_CAMERA)
+  const initializedRef = useRef(false)
+  const [viewport, setViewport] = useState<ViewportSize>({
+    width: 1,
+    height: 1,
   })
+  const [camera, setCamera] = useState(DEFAULT_CAMERA)
+  const [worldState, setWorldState] = useState<WorldLoadState>({
+    status: "loading",
+  })
+  const [animating, setAnimating] = useState(false)
 
   useEffect(() => {
-    if (routeNotFound || !sceneId) {
-      return
-    }
-
     let active = true
-
-    contentRepository
-      .loadScene(sceneId)
-      .then(({ scene }) => {
-        if (active) setLoadState({ status: "loaded", scene })
+    Promise.all(
+      contentRepository
+        .listRoutes()
+        .map(({ id }) => contentRepository.loadScene(id))
+    )
+      .then((loaded) => {
+        if (!active) return
+        setWorldState({
+          status: "loaded",
+          layout: createWorldLayout(loaded.map(({ scene }) => scene)),
+        })
       })
       .catch((error: unknown) => {
         if (!active) return
-        setLoadState({
+        setWorldState({
           status: "error",
           message:
             error instanceof Error
               ? error.message
-              : "장면을 불러오지 못했습니다.",
+              : "지식 공간을 불러오지 못했습니다.",
         })
       })
-
     return () => {
       active = false
     }
-  }, [routeNotFound, sceneId])
+  }, [])
 
-  const scene = loadState.status === "loaded" ? loadState.scene : undefined
+  useEffect(() => {
+    const element = viewportRef.current
+    if (!element) return
+    const observer = new ResizeObserver(([entry]) => {
+      if (!entry) return
+      setViewport({
+        width: Math.max(entry.contentRect.width, 1),
+        height: Math.max(entry.contentRect.height, 1),
+      })
+    })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
+
+  const updateCamera = useCallback(
+    (next: CameraState) => {
+      cameraRef.current = next
+      setCamera(next)
+      onCameraChange(next)
+    },
+    [onCameraChange]
+  )
+
+  const animateCamera = useCallback(
+    (target: CameraState, immediate: boolean) => {
+      if (animationFrameRef.current)
+        cancelAnimationFrame(animationFrameRef.current)
+      if (immediate || reducedMotion) {
+        updateCamera(target)
+        setAnimating(false)
+        onAnimationChange(false)
+        return
+      }
+
+      const start = cameraRef.current
+      const viewportCenterX = viewport.width / 2
+      const viewportCenterY = viewport.height / 2
+      const startTranslateX = viewportCenterX - start.centerX * start.scale
+      const startTranslateY = viewportCenterY - start.centerY * start.scale
+      const targetTranslateX = viewportCenterX - target.centerX * target.scale
+      const targetTranslateY = viewportCenterY - target.centerY * target.scale
+      const startedAt = performance.now()
+      const duration = 620
+      setAnimating(true)
+      onAnimationChange(true)
+
+      const frame = (now: number) => {
+        const progress = Math.min((now - startedAt) / duration, 1)
+        const eased = 1 - Math.pow(1 - progress, 3)
+        const scale = start.scale + (target.scale - start.scale) * eased
+        const translateX =
+          startTranslateX + (targetTranslateX - startTranslateX) * eased
+        const translateY =
+          startTranslateY + (targetTranslateY - startTranslateY) * eased
+        updateCamera({
+          centerX: (viewportCenterX - translateX) / scale,
+          centerY: (viewportCenterY - translateY) / scale,
+          scale,
+        })
+        if (progress < 1) {
+          animationFrameRef.current = requestAnimationFrame(frame)
+        } else {
+          animationFrameRef.current = undefined
+          setAnimating(false)
+          onAnimationChange(false)
+        }
+      }
+      animationFrameRef.current = requestAnimationFrame(frame)
+    },
+    [onAnimationChange, reducedMotion, updateCamera, viewport]
+  )
+
+  useEffect(() => {
+    if (
+      routeNotFound ||
+      !sceneId ||
+      worldState.status !== "loaded" ||
+      viewport.width <= 1 ||
+      viewport.height <= 1
+    )
+      return
+    const positioned = worldState.layout.scenes.get(sceneId)
+    if (!positioned) return
+    const savedCamera = getSceneSnapshot(sceneId)?.camera
+    const target = savedCamera ?? cameraForBounds(positioned.bounds, viewport)
+    animateCamera(target, !initializedRef.current)
+    initializedRef.current = true
+    onSceneReady(sceneId, positioned.scene.title)
+  }, [
+    animateCamera,
+    onSceneReady,
+    routeNotFound,
+    sceneId,
+    viewport,
+    worldState,
+  ])
+
+  useEffect(
+    () => () => {
+      if (animationFrameRef.current)
+        cancelAnimationFrame(animationFrameRef.current)
+    },
+    []
+  )
+
+  const enterScene = (targetSceneId: string, elementId: string) => {
+    if (animating) return
+    onEnterScene({
+      sceneId: targetSceneId,
+      elementId,
+      camera: cameraRef.current,
+    })
+  }
+
+  const focusedScene =
+    worldState.status === "loaded" && sceneId
+      ? worldState.layout.scenes.get(sceneId)?.scene
+      : undefined
+  const rootPositioned =
+    worldState.status === "loaded"
+      ? worldState.layout.scenes.get(worldState.layout.rootSceneId)
+      : undefined
+  const rootCamera = rootPositioned
+    ? cameraForBounds(rootPositioned.bounds, viewport)
+    : undefined
+  const relativeZoom = rootCamera
+    ? Math.round((camera.scale / rootCamera.scale) * 100)
+    : 100
 
   return (
     <section
       aria-labelledby="scene-title"
+      aria-busy={worldState.status === "loading" || animating}
       className="flex size-full min-h-0 flex-col bg-muted/20"
     >
       <div className="flex items-center justify-between border-b border-border px-5 py-3">
         <div>
           <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-            Scene viewport
+            World viewport
           </p>
-          <h1 id="scene-title" className="text-lg font-semibold">
-            {scene?.title ??
-              (loadState.status === "not-found"
-                ? "장면을 찾을 수 없음"
-                : "장면 로딩")}
+          <h1
+            id="scene-title"
+            tabIndex={-1}
+            className="text-lg font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            {routeNotFound
+              ? "Topic을 찾을 수 없음"
+              : (focusedScene?.title ?? "지식 공간 로딩")}
           </h1>
         </div>
-        <p className="rounded-md border border-border bg-background px-2.5 py-1 text-xs text-muted-foreground">
-          {scene ? `${scene.elements.length}개 요소` : loadState.status}
-        </p>
+        {focusedScene ? (
+          <p className="text-xs text-muted-foreground">{relativeZoom}%</p>
+        ) : null}
       </div>
 
-      <div className="min-h-0 flex-1">
-        {loadState.status === "loading" ? (
-          <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
-            장면 데이터를 불러오는 중입니다.
-          </div>
-        ) : null}
-        {loadState.status === "not-found" ? (
+      <div
+        ref={viewportRef}
+        className="relative min-h-0 flex-1 overflow-hidden"
+      >
+        {routeNotFound ? (
           <div className="flex size-full items-center justify-center p-8">
             <div className="flex max-w-md flex-col items-start gap-4 rounded-xl border border-border bg-background p-6">
-              <p className="text-sm font-medium text-muted-foreground">404</p>
-              <h2 className="text-xl font-semibold">게시된 장면이 없습니다.</h2>
-              <p className="text-sm leading-6 text-muted-foreground">
-                주소가 잘못되었거나 아직 게시되지 않은 탐색 경로입니다.
-              </p>
+              <h2 className="text-xl font-semibold">
+                게시된 Topic이 없습니다.
+              </h2>
               <Button onClick={() => navigate("/explore/google-search")}>
-                구글 검색 루트로
+                루트로
               </Button>
             </div>
           </div>
         ) : null}
-        {loadState.status === "error" ? (
-          <div className="flex size-full items-center justify-center p-8">
-            <div className="max-w-md rounded-xl border border-destructive/40 bg-background p-5">
-              <h2 className="font-medium text-destructive">
-                장면을 표시할 수 없습니다.
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {loadState.message}
-              </p>
-            </div>
+        {worldState.status === "loading" ? (
+          <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
+            논리적 지식 공간을 구성하는 중입니다.
           </div>
         ) : null}
-        {scene ? (
-          <SceneRenderer
-            scene={scene}
-            navigationDisabled={navigationDisabled}
-            onEnterScene={onEnterScene}
+        {worldState.status === "error" ? (
+          <div className="flex size-full items-center justify-center p-8 text-sm text-destructive">
+            {worldState.message}
+          </div>
+        ) : null}
+        {worldState.status === "loaded" && sceneId && !routeNotFound ? (
+          <WorldRenderer
+            layout={worldState.layout}
+            camera={camera}
+            viewport={viewport}
+            focusedSceneId={sceneId}
+            navigationDisabled={navigationDisabled || animating}
+            onEnterScene={enterScene}
           />
         ) : null}
       </div>

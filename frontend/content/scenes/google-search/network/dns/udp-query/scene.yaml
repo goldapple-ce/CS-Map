@@ -5,10 +5,8 @@ parentId: google-search-dns
 title: UDP DNS 질의
 summary: DNS 질의 메시지가 UDP datagram의 payload가 되어 IP 계층으로 전달되는 흐름입니다.
 status: published
-canvas:
-  width: 1280
-  height: 720
-  ariaLabel: DNS 질의 메시지가 Socket API, UDP datagram, IP 계층과 네트워크 인터페이스를 거쳐 이름 서버로 전송되는 흐름
+ariaLabel: DNS 질의 메시지가 Socket API, UDP datagram, IP 계층과 네트워크 인터페이스를 거쳐 이름 서버로 전송되는 흐름
+layoutHint: horizontal
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
 updatedAt: 2026-07-24

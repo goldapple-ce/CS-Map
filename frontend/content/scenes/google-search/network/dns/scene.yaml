@@ -5,10 +5,8 @@ parentId: google-search-network
 title: DNS 이름 확인
 summary: resolver가 도메인 이름에 필요한 리소스 레코드를 질의하고 응답을 애플리케이션에 돌려주는 흐름입니다.
 status: published
-canvas:
-  width: 1280
-  height: 720
-  ariaLabel: 애플리케이션의 이름 확인 요청이 resolver, DNS 캐시, 이름 서버 질의와 응답으로 이어지는 흐름
+ariaLabel: 애플리케이션의 이름 확인 요청이 resolver, DNS 캐시, 이름 서버 질의와 응답으로 이어지는 흐름
+layoutHint: branch
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
 updatedAt: 2026-07-24

@@ -434,9 +434,12 @@ function validateRelationship(
   } else if (relationship.type === "implemented-by") {
     check(occurrences, relationship.occurrenceId, "occurrence")
     check(scenes, relationship.targetSceneId, "scene")
-  } else {
+  } else if (relationship.type === "related-to") {
     check(concepts, relationship.sourceConceptId, "concept")
     check(concepts, relationship.targetConceptId, "concept")
+  } else {
+    check(scenes, relationship.sourceSceneId, "scene")
+    check(scenes, relationship.targetSceneId, "scene")
   }
 }
 

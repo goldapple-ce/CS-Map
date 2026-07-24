@@ -5,10 +5,8 @@ parentId: google-search-dns-udp-query
 title: Socket과 Kernel
 summary: 사용자 프로세스가 Socket API로 UDP 전송을 요청하고 커널 네트워크 스택이 datagram을 처리하는 경계입니다.
 status: published
-canvas:
-  width: 1280
-  height: 720
-  ariaLabel: 사용자 프로세스의 socket file descriptor와 전송 system call이 커널 socket 계층, UDP, IP와 네트워크 드라이버로 이어지는 흐름
+ariaLabel: 사용자 프로세스의 socket file descriptor와 전송 system call이 커널 socket 계층, UDP, IP와 네트워크 드라이버로 이어지는 흐름
+layoutHint: horizontal
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
 updatedAt: 2026-07-24

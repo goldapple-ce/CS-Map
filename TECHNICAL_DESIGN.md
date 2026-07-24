@@ -45,7 +45,7 @@
 ### 2.2 중요한 제한
 
 - React Flow 등 특정 그래프 라이브러리의 노드 모델을 도메인 모델로 사용하지 않는다.
-- 모든 장면을 하나의 거대한 DOM이나 SVG로 렌더링하지 않는다.
+- 모든 장면은 하나의 논리적 월드에 존재하되, Viewport와 LOD에 필요한 부분만 DOM/SVG로 가상화한다.
 - 장면 깊이를 URL 세그먼트 개수나 타입의 숫자 단계로 제한하지 않는다.
 - MVP에 사용자 DB, 인증, CMS를 도입하지 않는다.
 - Markdown/MDX에서 임의 JavaScript 실행을 허용하지 않는다.
@@ -202,6 +202,9 @@ project/
 | ---------------- | --------------------- | -----------------: | -------------: |
 | `contains`       | 내부 장면으로 확대    |             아니오 |             예 |
 | `flows-to`       | 실제 데이터·제어 흐름 | 장면 내부에서 가능 |             예 |
+| `related`        | 관련 지식 연결        |                 예 |  구분된 연결선 |
+| `prerequisite`   | 선수 지식 연결        |                 예 |  구분된 연결선 |
+| `used-by`        | 사용 관계 연결        |                 예 |  구분된 연결선 |
 | `uses-concept`   | 공통 원리 참조        |                 예 |      패널 중심 |
 | `related-to`     | 비교·인과·최적화 관계 |                 예 |      패널 중심 |
 | `implemented-by` | 맥락별 구현체         |             아니오 |             예 |
@@ -221,7 +224,8 @@ type Scene = {
   title: string;
   summary: string;
   status: "draft" | "review" | "published" | "planned";
-  canvas: CanvasDefinition;
+  ariaLabel: string;
+  layoutHint?: "horizontal" | "branch";
   elements: SceneElement[];
   contentRef: string;
   conceptRefs: ConceptUsage[];
@@ -390,31 +394,32 @@ type HistoryEntry = {
 
 ### 9.1 렌더링 전략
 
-- 현재 장면 하나와 전환에 필요한 이전·다음 장면만 DOM에 둔다.
-- 장면의 논리 좌표계는 고정된 viewBox 좌표를 사용한다.
+- 루트부터 모든 하위 장면을 하나의 재귀적 논리 좌표계에 배치한다.
+- 각 하위 장면은 부모의 확대 대상 노드 영역 안에 로컬 좌표계로 중첩된다.
 - SVG는 연결선과 도형을 담당한다.
 - 클릭 가능한 텍스트·버튼은 SVG 접근 가능 요소 또는 위치가 동기화된 HTML overlay로 표현한다.
 - 장면 데이터는 좌표를 저장하지 않고 노드 순서, 그룹 소속과 `flows-to` 관계만 저장한다.
-- renderer의 계층형 자동 배치가 논리 좌표, 그룹 경계와 edge 경로를 계산한다.
+- renderer의 결정적 재귀 자동 배치가 로컬 좌표, 월드 bounds, 그룹 경계와 edge 경로를 계산한다.
 - 자동 배치 구현은 도메인 모델 밖에 두어 향후 다른 layout 전략으로 교체할 수 있게 한다.
+- 화면 투영 크기에 따른 LOD와 Viewport 교차 검사로 실제 DOM 렌더링 범위를 제한한다.
 
 ### 9.2 진입 전환
 
 ```text
-1. 클릭 요소의 화면 좌표 측정
-2. 현재 장면 history snapshot 저장
-3. target scene 선로드 여부 확인
-4. 클릭 요소를 중심으로 scale/translate 전환
-5. 다음 장면을 같은 중심에서 표시
-6. URL과 현재 scene state 확정
-7. 장면 제목 또는 첫 노드로 포커스 이동
+1. 클릭 Topic의 월드 bounds 조회
+2. 현재 카메라와 패널 history snapshot 저장
+3. target Topic과 필요한 조상/자식 데이터 선로드
+4. bounds가 Viewport 중앙에 맞도록 목표 camera 계산
+5. 하나의 World transform을 scale/translate
+6. URL과 focused Topic 확정
+7. 배율에 맞는 하위 콘텐츠 LOD 공개와 포커스 이동
 ```
 
 프로토타입은 CSS transform으로 시작한다. 요소 간 정확한 shared layout 연결이 필요할 때만 Motion의 layout 기능을 도입한다. 라이브러리를 쓰더라도 탐색 상태 머신은 라이브러리 밖에 둔다.
 
 ### 9.3 동작 감소
 
-`prefers-reduced-motion: reduce`에서는 scale 이동을 제거하고 짧은 불투명도 전환 또는 즉시 교체한다. 정보와 포커스 이동은 동일하게 유지한다.
+`prefers-reduced-motion: reduce`에서는 보간 애니메이션 없이 목표 카메라 위치와 배율을 즉시 적용한다. 월드는 유지하며 정보와 포커스 이동도 동일하게 유지한다.
 
 ## 10. 설명 패널
 

@@ -13,11 +13,7 @@ export type Source = {
   type: "official" | "primary" | "secondary"
 }
 
-export type CanvasDefinition = {
-  width: number
-  height: number
-  ariaLabel: string
-}
+export type LayoutHint = "horizontal" | "branch"
 
 type SceneElementBase = {
   id: ContentId
@@ -88,6 +84,12 @@ export type Relationship =
       summary: string
     }
   | {
+      type: "related" | "prerequisite" | "used-by"
+      sourceSceneId: ContentId
+      targetSceneId: ContentId
+      summary?: string
+    }
+  | {
       type: "implemented-by"
       occurrenceId: ContentId
       targetSceneId: ContentId
@@ -101,7 +103,8 @@ export type Scene = {
   title: string
   summary: string
   status: ContentStatus
-  canvas: CanvasDefinition
+  ariaLabel: string
+  layoutHint?: LayoutHint
   elements: SceneElement[]
   contentRef: string
   contexts: Context[]

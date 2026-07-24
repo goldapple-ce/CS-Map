@@ -7,30 +7,19 @@ type SceneGroupProps = {
 }
 
 export function SceneGroup({ element, layout }: SceneGroupProps) {
-  const { x, y, width, height } = layout
+  const { x, y, width } = layout
 
   return (
     <g aria-label={element.label} role={element.label ? "group" : undefined}>
-      <rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        rx="20"
-        fill="var(--muted)"
-        fillOpacity="0.28"
-        stroke="var(--border)"
-        strokeWidth="1"
-        strokeDasharray="6 8"
-        vectorEffect="non-scaling-stroke"
-      />
       {element.label ? (
         <text
-          x={x + 20}
-          y={y + 32}
+          x={x + width / 2}
+          y={y + 24}
+          textAnchor="middle"
           fill="var(--muted-foreground)"
-          fontSize="13"
-          fontWeight="600"
+          fontSize="20"
+          fontWeight="500"
+          opacity="0.7"
         >
           {element.label}
         </text>
