@@ -25,7 +25,6 @@ AI는 실제 구현이 끝난 항목만 `[x]`로 바꾼다. 테스트 실행과 
 |    6 | 줌 전환과 뒤로 가기 복원       | 완료   |
 |    7 | 긴 설명·공통 개념·준비 중 노드 | 완료   |
 |    8 | 접근성·최종 테스트             | ▶ 현재 |
-|    9 | 성능 최적화                    | 대기   |
 
 ---
 
@@ -270,30 +269,6 @@ feat: add long-form content and concept reuse
 
 ```text
 test: complete mvp acceptance coverage
-```
-
----
-
-## 9단계 — 성능 최적화
-
-상태: **대기 — 실제 콘텐츠 규모와 측정 결과를 확인한 뒤 진행**
-
-- [ ] 현재 장면 중심 lazy loading
-- [ ] 인접 장면 prefetch
-- [ ] 화면 밖 장면 제거
-- [ ] Scene·Concept 중복 로드 방지와 cache 정책
-- [ ] 실제 콘텐츠 규모에서 렌더링·메모리 측정
-
-완료하면 눈으로 확인할 결과:
-
-- 콘텐츠가 늘어나도 초기 화면에 불필요한 Scene을 모두 로드하지 않는다.
-- 현재 Topic 주변을 탐색할 때 필요한 콘텐츠가 자연스럽게 준비된다.
-- 측정 결과를 근거로 필요한 최적화만 적용한다.
-
-추천 커밋 메시지:
-
-```text
-perf: optimize scene loading and rendering
 ```
 
 ---

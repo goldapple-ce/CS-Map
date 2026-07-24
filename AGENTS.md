@@ -20,8 +20,9 @@
 
 ## Implementation discipline
 
-- Work only on the stage marked `▶ 현재` in `PLAN.md`.
-- Do not implement future features unless explicitly requested.
+- If an unfinished `PLAN.md` exists, work only on that plan until its implementation and user-owned verification are complete.
+- Do not interrupt or replace the current plan because of a new INBOX request unless the user explicitly asks to stop the current plan and prioritize that request.
+- Do not implement future plan items or requests that are not included in the current plan.
 - Keep content data separate from rendering and navigation code.
 - Do not bind the domain model to a graph-rendering library.
 - Do not introduce a backend for the MVP without a demonstrated requirement.
@@ -30,6 +31,37 @@
 - Report changed files, note that tests were not run, and list unmet acceptance criteria after each task.
 - Never run `git commit`, `git push`, create tags, or rewrite Git history. The user owns all Git operations.
 - Update implementation checkboxes only after the implementation is complete. Do not update test-only checkboxes without the user's confirmation.
+
+## Work management
+
+- Keep at most one `PLAN.md` in the repository.
+- `INBOX.md` must keep exactly two request areas: `## 다음 PLAN 후보` and `## 메모`.
+- The user may edit either INBOX area while a plan is running. Preserve concurrent additions and unrelated wording exactly.
+
+### Current plan lifecycle
+
+- Continue an existing unfinished `PLAN.md` before reviewing any INBOX request.
+- New INBOX entries do not expand the active plan.
+- When the active plan is implemented and the user-owned verification is complete, report the result and delete `PLAN.md`. Do not archive or copy completed plan contents elsewhere.
+- Git history is the work history; the user owns commits and pushes.
+
+### Next PLAN candidates
+
+- Only `## 다음 PLAN 후보` may be reviewed when no unfinished `PLAN.md` exists.
+- Analyze candidate priority and relatedness, then select only the requests appropriate for one coherent plan.
+- A new plan must include its goal, selected INBOX requests, request-level completion criteria, implementation order, required requirement/design updates, verification methods, and current status.
+- Show the new `PLAN.md` to the user and wait for approval before implementation.
+- Remove only the exact candidate entries selected for that plan. Re-read `INBOX.md` immediately before editing it so later additions are preserved.
+- Leave unselected candidates unchanged. Do not rewrite or delete them.
+- If similar candidates are combined, explain the reason in the plan before removing them from INBOX.
+- Ask the user before planning ambiguous or conflicting candidates.
+
+### Notes
+
+- Never automatically include `## 메모` entries in a plan.
+- Do not implement, prioritize, promote, rewrite, delete, or combine notes.
+- Do not use notes as justification to expand implementation scope.
+- Treat a note as a work request only after the user moves it to `## 다음 PLAN 후보` or explicitly asks to implement it.
 
 ## Styling discipline
 
