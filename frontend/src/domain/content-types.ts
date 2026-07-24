@@ -13,29 +13,44 @@ export type Source = {
   type: "official" | "primary" | "secondary"
 }
 
-export type Point = { x: number; y: number }
-
-export type Geometry = Point & {
-  width?: number
-  height?: number
-  points?: Point[]
-}
-
 export type CanvasDefinition = {
   width: number
   height: number
   ariaLabel: string
 }
 
-export type SceneElement = {
+type SceneElementBase = {
   id: ContentId
-  kind: "node" | "group" | "edge" | "annotation"
   label?: string
-  geometry: Geometry
+}
+
+export type SceneNodeElement = SceneElementBase & {
+  kind: "node"
+  groupId?: ContentId
   targetSceneId?: ContentId
   conceptId?: ContentId
   status?: "published" | "planned"
 }
+
+export type SceneGroupElement = SceneElementBase & {
+  kind: "group"
+}
+
+export type SceneEdgeElement = SceneElementBase & {
+  kind: "edge"
+  fromElementId: ContentId
+  toElementId: ContentId
+}
+
+export type SceneAnnotationElement = SceneElementBase & {
+  kind: "annotation"
+}
+
+export type SceneElement =
+  | SceneNodeElement
+  | SceneGroupElement
+  | SceneEdgeElement
+  | SceneAnnotationElement
 
 export type Context = {
   id: ContentId

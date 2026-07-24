@@ -8,4 +8,33 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     status: "published",
     moduleKey: "/content/scenes/google-search/scene.yaml",
   },
+  {
+    id: "google-search-network",
+    path: "/explore/google-search/network",
+    parentId: "google-search-root",
+    status: "published",
+    moduleKey: "/content/scenes/google-search/network/scene.yaml",
+  },
+  {
+    id: "google-search-dns",
+    path: "/explore/google-search/network/dns",
+    parentId: "google-search-network",
+    status: "published",
+    moduleKey: "/content/scenes/google-search/network/dns/scene.yaml",
+  },
+  {
+    id: "google-search-dns-udp-query",
+    path: "/explore/google-search/network/dns/udp-query",
+    parentId: "google-search-dns",
+    status: "published",
+    moduleKey: "/content/scenes/google-search/network/dns/udp-query/scene.yaml",
+  },
+  {
+    id: "google-search-dns-socket-kernel",
+    path: "/explore/google-search/network/dns/udp-query/socket-kernel",
+    parentId: "google-search-dns-udp-query",
+    status: "published",
+    moduleKey:
+      "/content/scenes/google-search/network/dns/udp-query/socket-kernel/scene.yaml",
+  },
 ]

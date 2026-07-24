@@ -1,0 +1,135 @@
+id: google-search-dns-socket-kernel
+slug: socket-kernel
+scenarioId: google-search
+parentId: google-search-dns-udp-query
+title: Socket과 Kernel
+summary: 사용자 프로세스가 Socket API로 UDP 전송을 요청하고 커널 네트워크 스택이 datagram을 처리하는 경계입니다.
+status: published
+canvas:
+  width: 1280
+  height: 720
+  ariaLabel: 사용자 프로세스의 socket file descriptor와 전송 system call이 커널 socket 계층, UDP, IP와 네트워크 드라이버로 이어지는 흐름
+contentRef: content.ko.md
+author: { id: cs-map-team, displayName: CS Map Team }
+updatedAt: 2026-07-24
+sources:
+  - title: Linux socket(2) manual page
+    url: https://man7.org/linux/man-pages/man2/socket.2.html
+    type: primary
+  - title: Linux socket(7) manual page
+    url: https://man7.org/linux/man-pages/man7/socket.7.html
+    type: primary
+  - title: Linux udp(7) manual page
+    url: https://man7.org/linux/man-pages/man7/udp.7.html
+    type: primary
+contexts: []
+occurrences: []
+conceptRefs: []
+elements:
+  - id: process-group
+    kind: group
+    label: 사용자 프로세스
+  - id: kernel-group
+    kind: group
+    label: 운영체제 커널
+  - id: resolver-process
+    kind: node
+    label: Resolver 코드
+    groupId: process-group
+  - id: socket-descriptor
+    kind: node
+    label: Socket file descriptor
+    groupId: process-group
+  - id: send-system-call
+    kind: node
+    label: 전송 System Call
+    groupId: process-group
+    status: planned
+  - id: kernel-socket-layer
+    kind: node
+    label: Kernel Socket 계층
+    groupId: kernel-group
+  - id: udp-layer
+    kind: node
+    label: UDP 계층
+    groupId: kernel-group
+  - id: ip-layer
+    kind: node
+    label: IP 계층
+    groupId: kernel-group
+    status: planned
+  - id: network-driver
+    kind: node
+    label: Network Driver
+    groupId: kernel-group
+    status: planned
+  - id: socket-note
+    kind: annotation
+    label: Linux socket 계층은 사용자 프로세스와 커널 네트워크 프로토콜 스택 사이의 공통 인터페이스를 제공합니다.
+  - id: process-to-descriptor
+    kind: edge
+    label: socket 사용
+    fromElementId: resolver-process
+    toElementId: socket-descriptor
+  - id: descriptor-to-send
+    kind: edge
+    label: 전송 요청
+    fromElementId: socket-descriptor
+    toElementId: send-system-call
+  - id: send-to-kernel
+    kind: edge
+    label: 사용자·커널 경계
+    fromElementId: send-system-call
+    toElementId: kernel-socket-layer
+  - id: socket-to-udp
+    kind: edge
+    label: datagram 처리
+    fromElementId: kernel-socket-layer
+    toElementId: udp-layer
+  - id: udp-to-ip
+    kind: edge
+    label: IP payload
+    fromElementId: udp-layer
+    toElementId: ip-layer
+  - id: ip-to-driver
+    kind: edge
+    label: 송신 경로
+    fromElementId: ip-layer
+    toElementId: network-driver
+relationships:
+  - {
+      type: flows-to,
+      fromElementId: resolver-process,
+      toElementId: socket-descriptor,
+      label: socket 사용,
+    }
+  - {
+      type: flows-to,
+      fromElementId: socket-descriptor,
+      toElementId: send-system-call,
+      label: 전송 요청,
+    }
+  - {
+      type: flows-to,
+      fromElementId: send-system-call,
+      toElementId: kernel-socket-layer,
+      label: 사용자·커널 경계,
+    }
+  - {
+      type: flows-to,
+      fromElementId: kernel-socket-layer,
+      toElementId: udp-layer,
+      label: datagram 처리,
+    }
+  - {
+      type: flows-to,
+      fromElementId: udp-layer,
+      toElementId: ip-layer,
+      label: IP payload,
+    }
+  - {
+      type: flows-to,
+      fromElementId: ip-layer,
+      toElementId: network-driver,
+      label: 송신 경로,
+    }

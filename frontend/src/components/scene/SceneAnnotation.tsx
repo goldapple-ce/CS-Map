@@ -1,11 +1,13 @@
-import type { SceneElement } from "@/domain/content-types"
+import type { LayoutBox } from "@/components/scene/scene-layout"
+import type { SceneAnnotationElement } from "@/domain/content-types"
 
 type SceneAnnotationProps = {
-  element: SceneElement
+  element: SceneAnnotationElement
+  layout: LayoutBox
 }
 
-export function SceneAnnotation({ element }: SceneAnnotationProps) {
-  const { x, y, width = 240, height = 60 } = element.geometry
+export function SceneAnnotation({ element, layout }: SceneAnnotationProps) {
+  const { x, y, width, height } = layout
 
   return (
     <foreignObject x={x} y={y} width={width} height={height}>

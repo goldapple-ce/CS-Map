@@ -1,12 +1,13 @@
-import type { SceneElement } from "@/domain/content-types"
+import type { LayoutPoint } from "@/components/scene/scene-layout"
+import type { SceneEdgeElement } from "@/domain/content-types"
 
 type SceneEdgeProps = {
-  element: SceneElement
+  element: SceneEdgeElement
+  points: readonly LayoutPoint[]
 }
 
-export function SceneEdge({ element }: SceneEdgeProps) {
-  const points = element.geometry.points
-  if (!points || points.length < 2) return null
+export function SceneEdge({ element, points }: SceneEdgeProps) {
+  if (points.length < 2) return null
 
   return (
     <g aria-label={element.label} role={element.label ? "img" : undefined}>

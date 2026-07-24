@@ -6,6 +6,10 @@ import { Button } from "@/components/ui/button"
 const knownLabels: Record<string, string> = {
   explore: "탐색",
   "google-search": "구글 검색",
+  network: "네트워크",
+  dns: "DNS",
+  "udp-query": "UDP 질의",
+  "socket-kernel": "Socket/Kernel",
 }
 
 type ExplorerHeaderProps = {

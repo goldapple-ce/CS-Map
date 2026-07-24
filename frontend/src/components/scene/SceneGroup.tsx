@@ -1,11 +1,13 @@
-import type { SceneElement } from "@/domain/content-types"
+import type { LayoutBox } from "@/components/scene/scene-layout"
+import type { SceneGroupElement } from "@/domain/content-types"
 
 type SceneGroupProps = {
-  element: SceneElement
+  element: SceneGroupElement
+  layout: LayoutBox
 }
 
-export function SceneGroup({ element }: SceneGroupProps) {
-  const { x, y, width = 0, height = 0 } = element.geometry
+export function SceneGroup({ element, layout }: SceneGroupProps) {
+  const { x, y, width, height } = layout
 
   return (
     <g aria-label={element.label} role={element.label ? "group" : undefined}>

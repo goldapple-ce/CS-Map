@@ -1,22 +1,34 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { usePanelRef } from "react-resizable-panels"
+import { useNavigate } from "react-router-dom"
 
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
+import { contentRepository } from "@/content/content-repository"
 import { ExplanationPanel } from "@/features/explanation/ExplanationPanel"
 import { ExplorerHeader } from "@/features/explorer/ExplorerHeader"
 import { SceneViewport } from "@/features/explorer/SceneViewport"
 
 type PanelMode = "split" | "reading"
 
-export function ExplorerShell() {
+type ExplorerShellProps = {
+  sceneId?: string
+  routeNotFound: boolean
+}
+
+export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
+  const navigate = useNavigate()
   const mapPanelRef = usePanelRef()
   const explanationPanelRef = usePanelRef()
+  const navigationLockedRef = useRef(false)
   const [panelCollapsed, setPanelCollapsed] = useState(false)
   const [panelMode, setPanelMode] = useState<PanelMode>("split")
+  useEffect(() => {
+    navigationLockedRef.current = false
+  }, [sceneId])
 
   const collapseExplanation = () => {
     explanationPanelRef.current?.collapse()
@@ -38,6 +50,17 @@ export function ExplorerShell() {
     requestAnimationFrame(() => mapPanelRef.current?.collapse())
   }
 
+  const enterScene = (targetSceneId: string) => {
+    if (navigationLockedRef.current) return
+    const targetRoute = contentRepository
+      .listRoutes()
+      .find((route) => route.id === targetSceneId)
+    if (!targetRoute) return
+
+    navigationLockedRef.current = true
+    navigate(targetRoute.path)
+  }
+
   return (
     <div className="flex h-svh min-h-0 flex-col overflow-hidden bg-background text-foreground">
       <ExplorerHeader
@@ -55,7 +78,13 @@ export function ExplorerShell() {
             collapsible={panelMode === "reading"}
             collapsedSize="0%"
           >
-            <SceneViewport />
+            <SceneViewport
+              key={sceneId ?? "not-found"}
+              sceneId={sceneId}
+              routeNotFound={routeNotFound}
+              navigationDisabled={false}
+              onEnterScene={enterScene}
+            />
           </ResizablePanel>
 
           <ResizableHandle

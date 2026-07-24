@@ -9,5 +9,38 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     status: "published",
     moduleKey: "/content/scenes/google-search/scene.yaml",
   },
+  {
+    id: "google-search-network",
+    slug: "network",
+    scenarioId: "google-search",
+    parentId: "google-search-root",
+    status: "published",
+    moduleKey: "/content/scenes/google-search/network/scene.yaml",
+  },
+  {
+    id: "google-search-dns",
+    slug: "dns",
+    scenarioId: "google-search",
+    parentId: "google-search-network",
+    status: "published",
+    moduleKey: "/content/scenes/google-search/network/dns/scene.yaml",
+  },
+  {
+    id: "google-search-dns-udp-query",
+    slug: "udp-query",
+    scenarioId: "google-search",
+    parentId: "google-search-dns",
+    status: "published",
+    moduleKey: "/content/scenes/google-search/network/dns/udp-query/scene.yaml",
+  },
+  {
+    id: "google-search-dns-socket-kernel",
+    slug: "socket-kernel",
+    scenarioId: "google-search",
+    parentId: "google-search-dns-udp-query",
+    status: "published",
+    moduleKey:
+      "/content/scenes/google-search/network/dns/udp-query/socket-kernel/scene.yaml",
+  },
 ]
 export const conceptIndex: readonly ConceptIndexEntry[] = []

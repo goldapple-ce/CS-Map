@@ -2,21 +2,47 @@ import { SceneAnnotation } from "@/components/scene/SceneAnnotation"
 import { SceneEdge } from "@/components/scene/SceneEdge"
 import { SceneGroup } from "@/components/scene/SceneGroup"
 import { SceneNode, type SceneNodeState } from "@/components/scene/SceneNode"
-import type { Scene, SceneElement } from "@/domain/content-types"
+import { createSceneLayout } from "@/components/scene/scene-layout"
+import type {
+  Scene,
+  SceneAnnotationElement,
+  SceneEdgeElement,
+  SceneGroupElement,
+  SceneNodeElement,
+} from "@/domain/content-types"
 
 type SceneRendererProps = {
   scene: Scene
+  navigationDisabled?: boolean
+  onEnterScene?: (sceneId: string) => void
 }
 
-function nodeState(element: SceneElement): SceneNodeState {
-  if (element.status === "published") return "interactive"
+function nodeState(element: SceneNodeElement): SceneNodeState {
+  if (element.targetSceneId && element.status === "published")
+    return "interactive"
   if (element.status === "planned") return "planned"
   return "static"
 }
 
-export function SceneRenderer({ scene }: SceneRendererProps) {
-  const elementsByKind = (kind: SceneElement["kind"]) =>
-    scene.elements.filter((element) => element.kind === kind)
+export function SceneRenderer({
+  scene,
+  navigationDisabled = false,
+  onEnterScene,
+}: SceneRendererProps) {
+  const layout = createSceneLayout(scene)
+  const groups = scene.elements.filter(
+    (element): element is SceneGroupElement => element.kind === "group"
+  )
+  const edges = scene.elements.filter(
+    (element): element is SceneEdgeElement => element.kind === "edge"
+  )
+  const annotations = scene.elements.filter(
+    (element): element is SceneAnnotationElement =>
+      element.kind === "annotation"
+  )
+  const nodes = scene.elements.filter(
+    (element): element is SceneNodeElement => element.kind === "node"
+  )
 
   return (
     <figure className="flex size-full min-h-0 items-center justify-center overflow-hidden p-5">
@@ -43,22 +69,45 @@ export function SceneRenderer({ scene }: SceneRendererProps) {
           </marker>
         </defs>
 
-        {elementsByKind("group").map((element) => (
-          <SceneGroup key={element.id} element={element} />
-        ))}
-        {elementsByKind("edge").map((element) => (
-          <SceneEdge key={element.id} element={element} />
-        ))}
-        {elementsByKind("annotation").map((element) => (
-          <SceneAnnotation key={element.id} element={element} />
-        ))}
-        {elementsByKind("node").map((element) => (
-          <SceneNode
-            key={element.id}
-            element={element}
-            state={nodeState(element)}
-          />
-        ))}
+        {groups.map((element) => {
+          const elementLayout = layout.groups.get(element.id)
+          return elementLayout ? (
+            <SceneGroup
+              key={element.id}
+              element={element}
+              layout={elementLayout}
+            />
+          ) : null
+        })}
+        {edges.map((element) => {
+          const points = layout.edges.get(element.id)
+          return points ? (
+            <SceneEdge key={element.id} element={element} points={points} />
+          ) : null
+        })}
+        {annotations.map((element) => {
+          const elementLayout = layout.annotations.get(element.id)
+          return elementLayout ? (
+            <SceneAnnotation
+              key={element.id}
+              element={element}
+              layout={elementLayout}
+            />
+          ) : null
+        })}
+        {nodes.map((element) => {
+          const elementLayout = layout.nodes.get(element.id)
+          return elementLayout ? (
+            <SceneNode
+              key={element.id}
+              element={element}
+              layout={elementLayout}
+              state={nodeState(element)}
+              navigationDisabled={navigationDisabled}
+              onEnterScene={onEnterScene}
+            />
+          ) : null
+        })}
       </svg>
       <figcaption className="sr-only">{scene.summary}</figcaption>
     </figure>

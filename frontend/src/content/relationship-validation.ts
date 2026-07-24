@@ -117,6 +117,43 @@ function validateScene(
   }
 
   for (const element of scene.elements) {
+    if (element.kind === "edge") {
+      const from = elementsById.get(element.fromElementId)
+      const to = elementsById.get(element.toElementId)
+      if (from?.kind !== "node") {
+        issues.push(
+          makeIssue(
+            scene.id,
+            `elements.${element.id}.fromElementId`,
+            `Edge source must be a node: ${element.fromElementId}`
+          )
+        )
+      }
+      if (to?.kind !== "node") {
+        issues.push(
+          makeIssue(
+            scene.id,
+            `elements.${element.id}.toElementId`,
+            `Edge target must be a node: ${element.toElementId}`
+          )
+        )
+      }
+      continue
+    }
+    if (element.kind !== "node") continue
+
+    if (
+      element.groupId &&
+      elementsById.get(element.groupId)?.kind !== "group"
+    ) {
+      issues.push(
+        makeIssue(
+          scene.id,
+          `elements.${element.id}.groupId`,
+          `Node group must refer to a group element: ${element.groupId}`
+        )
+      )
+    }
     if (element.conceptId && !conceptsById.has(element.conceptId)) {
       issues.push(
         makeIssue(
@@ -273,10 +310,47 @@ function validateScene(
     )
   }
 
+  const flowPairs = new Set(
+    scene.relationships.flatMap((relationship) =>
+      relationship.type === "flows-to"
+        ? [`${relationship.fromElementId}->${relationship.toElementId}`]
+        : []
+    )
+  )
+  const edgePairs = new Set(
+    scene.elements.flatMap((element) =>
+      element.kind === "edge"
+        ? [`${element.fromElementId}->${element.toElementId}`]
+        : []
+    )
+  )
+  for (const pair of edgePairs) {
+    if (!flowPairs.has(pair)) {
+      issues.push(
+        makeIssue(
+          scene.id,
+          "elements",
+          `Edge must match a flows-to relationship: ${pair}`
+        )
+      )
+    }
+  }
+  for (const pair of flowPairs) {
+    if (!edgePairs.has(pair)) {
+      issues.push(
+        makeIssue(
+          scene.id,
+          "relationships",
+          `flows-to relationship requires a matching edge: ${pair}`
+        )
+      )
+    }
+  }
+
   if (scene.parentId) {
     const parent = scenesById.get(scene.parentId)
     const linked = parent?.elements.some(
-      ({ targetSceneId }) => targetSceneId === scene.id
+      (element) => element.kind === "node" && element.targetSceneId === scene.id
     )
     if (parent && !linked) {
       issues.push(
@@ -321,9 +395,10 @@ function validateRelationship(
   if (relationship.type === "contains") {
     check(elements, relationship.elementId, "element")
     check(scenes, relationship.targetSceneId, "scene")
+    const element = elements.get(relationship.elementId)
     if (
-      elements.get(relationship.elementId)?.targetSceneId !==
-      relationship.targetSceneId
+      element?.kind !== "node" ||
+      element.targetSceneId !== relationship.targetSceneId
     ) {
       issues.push(
         makeIssue(
@@ -336,6 +411,24 @@ function validateRelationship(
   } else if (relationship.type === "flows-to") {
     check(elements, relationship.fromElementId, "element")
     check(elements, relationship.toElementId, "element")
+    if (elements.get(relationship.fromElementId)?.kind !== "node") {
+      issues.push(
+        makeIssue(
+          scene.id,
+          "relationships",
+          `Flow source must be a node: ${relationship.fromElementId}`
+        )
+      )
+    }
+    if (elements.get(relationship.toElementId)?.kind !== "node") {
+      issues.push(
+        makeIssue(
+          scene.id,
+          "relationships",
+          `Flow target must be a node: ${relationship.toElementId}`
+        )
+      )
+    }
   } else if (relationship.type === "uses-concept") {
     check(occurrences, relationship.occurrenceId, "occurrence")
   } else if (relationship.type === "implemented-by") {
@@ -354,8 +447,10 @@ function validateContainsCycles(
   const adjacency = new Map(
     scenes.map((scene) => [
       scene.id,
-      scene.elements.flatMap(({ targetSceneId }) =>
-        targetSceneId ? [targetSceneId] : []
+      scene.elements.flatMap((element) =>
+        element.kind === "node" && element.targetSceneId
+          ? [element.targetSceneId]
+          : []
       ),
     ])
   )

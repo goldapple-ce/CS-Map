@@ -1,12 +1,13 @@
 import { cva } from "class-variance-authority"
 
+import type { LayoutBox } from "@/components/scene/scene-layout"
+import type { SceneNodeElement } from "@/domain/content-types"
 import { cn } from "@/lib/utils"
-import type { SceneElement } from "@/domain/content-types"
 
 export type SceneNodeState = "interactive" | "planned" | "static" | "selected"
 
 const sceneNodeVariants = cva(
-  "flex size-full flex-col items-start justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-[border-color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+  "flex size-full flex-col items-start justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-[border-color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
   {
     variants: {
       state: {
@@ -42,29 +43,56 @@ const stateLabels: Record<SceneNodeState, string> = {
 }
 
 type SceneNodeProps = {
-  element: SceneElement
+  element: SceneNodeElement
+  layout: LayoutBox
   state: SceneNodeState
+  navigationDisabled?: boolean
+  onEnterScene?: (sceneId: string) => void
 }
 
-export function SceneNode({ element, state }: SceneNodeProps) {
-  const { x, y, width = 180, height = 88 } = element.geometry
+export function SceneNode({
+  element,
+  layout,
+  state,
+  navigationDisabled = false,
+  onEnterScene,
+}: SceneNodeProps) {
+  const { x, y, width, height } = layout
   const label = element.label ?? element.id
+  const targetSceneId = element.targetSceneId
+  const content = (
+    <>
+      <span className="text-sm leading-snug font-semibold text-foreground">
+        {label}
+      </span>
+      <span className={cn(sceneNodeBadgeVariants({ state }))}>
+        {stateLabels[state]}
+      </span>
+    </>
+  )
 
   return (
     <foreignObject x={x} y={y} width={width} height={height}>
-      <div
-        tabIndex={0}
-        role="group"
-        aria-label={`${label}, ${stateLabels[state]}`}
-        className={cn(sceneNodeVariants({ state }))}
-      >
-        <span className="text-sm leading-snug font-semibold text-foreground">
-          {label}
-        </span>
-        <span className={cn(sceneNodeBadgeVariants({ state }))}>
-          {stateLabels[state]}
-        </span>
-      </div>
+      {targetSceneId && onEnterScene ? (
+        <button
+          type="button"
+          disabled={navigationDisabled}
+          aria-label={`${label} 하위 장면 열기`}
+          className={cn(sceneNodeVariants({ state }))}
+          onClick={() => onEnterScene(targetSceneId)}
+        >
+          {content}
+        </button>
+      ) : (
+        <div
+          tabIndex={state === "planned" ? 0 : undefined}
+          role="group"
+          aria-label={`${label}, ${stateLabels[state]}`}
+          className={cn(sceneNodeVariants({ state }))}
+        >
+          {content}
+        </div>
+      )}
     </foreignObject>
   )
 }

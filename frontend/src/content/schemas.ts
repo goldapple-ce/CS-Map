@@ -33,31 +33,42 @@ const sourceSchema = z
   })
   .strict()
 
-const pointSchema = z
-  .object({ x: z.number().finite(), y: z.number().finite() })
-  .strict()
-
-const geometrySchema = z
-  .object({
-    x: z.number().finite(),
-    y: z.number().finite(),
-    width: z.number().positive().optional(),
-    height: z.number().positive().optional(),
-    points: z.array(pointSchema).min(2).optional(),
-  })
-  .strict()
-
-const sceneElementSchema = z
-  .object({
-    id: contentIdSchema,
-    kind: z.enum(["node", "group", "edge", "annotation"]),
-    label: z.string().min(1).optional(),
-    geometry: geometrySchema,
-    targetSceneId: contentIdSchema.optional(),
-    conceptId: contentIdSchema.optional(),
-    status: z.enum(["published", "planned"]).optional(),
-  })
-  .strict()
+const sceneElementSchema = z.discriminatedUnion("kind", [
+  z
+    .object({
+      id: contentIdSchema,
+      kind: z.literal("node"),
+      label: z.string().min(1).optional(),
+      groupId: contentIdSchema.optional(),
+      targetSceneId: contentIdSchema.optional(),
+      conceptId: contentIdSchema.optional(),
+      status: z.enum(["published", "planned"]).optional(),
+    })
+    .strict(),
+  z
+    .object({
+      id: contentIdSchema,
+      kind: z.literal("group"),
+      label: z.string().min(1).optional(),
+    })
+    .strict(),
+  z
+    .object({
+      id: contentIdSchema,
+      kind: z.literal("edge"),
+      label: z.string().min(1).optional(),
+      fromElementId: contentIdSchema,
+      toElementId: contentIdSchema,
+    })
+    .strict(),
+  z
+    .object({
+      id: contentIdSchema,
+      kind: z.literal("annotation"),
+      label: z.string().min(1).optional(),
+    })
+    .strict(),
+])
 
 const contextSchema = z
   .object({

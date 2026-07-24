@@ -20,25 +20,25 @@
 
 ### 2.1 MVP 기본 스택
 
-| 영역 | 선택 | 이유 |
-|---|---|---|
-| 언어 | TypeScript | 콘텐츠 스키마와 탐색 상태를 정적으로 검증하기 쉬움 |
-| UI | React | 장면·패널·상태 기반 상호작용 구성 |
-| 빌드 도구 | Vite | 브라우저 중심 SPA를 단순하게 개발·빌드하고 정적 배포 가능 |
-| 라우팅 | React Router | History API 기반 딥 링크, catch-all 경로 및 뒤로·앞으로 가기 처리 |
-| 스타일링 | Tailwind CSS | AI가 utility 기반으로 빠르게 구현하고 별도 컴포넌트 CSS를 만들지 않음 |
-| UI 원시 컴포넌트 | shadcn/ui | 접근 가능한 UI 기반과 의미 기반 theme token 제공 |
-| variant | class-variance-authority | 노드와 패널의 반복 상태를 중앙화 |
-| 장면 렌더링 | SVG + HTML overlay | 선·도형과 접근 가능한 텍스트·버튼을 함께 처리 |
-| 전환 | CSS transform 우선, 필요 시 Motion | 프로토타입은 단순하게 시작하고 shared layout 전환을 선택적으로 사용 |
-| 상태 관리 | 명시적 reducer + 얇은 store adapter | 탐색 상태 머신을 라이브러리와 분리 |
-| 콘텐츠 | YAML 구조 + Markdown 본문 + SVG/이미지 자산 | 사람이 작성·리뷰하기 쉽고 코드와 분리됨 |
-| 검증 | Zod 계열 런타임 스키마 | 외부 파일의 형태 검증과 TypeScript 타입 추론 |
-| 단위 테스트 | Vitest 계열 | 도메인·검증·상태 reducer 테스트 |
-| 컴포넌트 테스트 | Testing Library | 사용자 중심 UI 동작 검증 |
-| E2E | Playwright + axe 연동 | URL, 뒤로 가기, 포커스, 접근성 및 시각 회귀 검증 |
-| 백엔드 | 없음 | MVP는 게시 콘텐츠 읽기만 필요함 |
-| 배포 | SPA fallback을 지원하는 정적 호스팅 | 운영 복잡도를 줄이고 CDN 배포 가능 |
+| 영역             | 선택                                        | 이유                                                                  |
+| ---------------- | ------------------------------------------- | --------------------------------------------------------------------- |
+| 언어             | TypeScript                                  | 콘텐츠 스키마와 탐색 상태를 정적으로 검증하기 쉬움                    |
+| UI               | React                                       | 장면·패널·상태 기반 상호작용 구성                                     |
+| 빌드 도구        | Vite                                        | 브라우저 중심 SPA를 단순하게 개발·빌드하고 정적 배포 가능             |
+| 라우팅           | React Router                                | History API 기반 딥 링크, catch-all 경로 및 뒤로·앞으로 가기 처리     |
+| 스타일링         | Tailwind CSS                                | AI가 utility 기반으로 빠르게 구현하고 별도 컴포넌트 CSS를 만들지 않음 |
+| UI 원시 컴포넌트 | shadcn/ui                                   | 접근 가능한 UI 기반과 의미 기반 theme token 제공                      |
+| variant          | class-variance-authority                    | 노드와 패널의 반복 상태를 중앙화                                      |
+| 장면 렌더링      | SVG + HTML overlay                          | 선·도형과 접근 가능한 텍스트·버튼을 함께 처리                         |
+| 전환             | CSS transform 우선, 필요 시 Motion          | 프로토타입은 단순하게 시작하고 shared layout 전환을 선택적으로 사용   |
+| 상태 관리        | 명시적 reducer + 얇은 store adapter         | 탐색 상태 머신을 라이브러리와 분리                                    |
+| 콘텐츠           | YAML 구조 + Markdown 본문 + SVG/이미지 자산 | 사람이 작성·리뷰하기 쉽고 코드와 분리됨                               |
+| 검증             | Zod 계열 런타임 스키마                      | 외부 파일의 형태 검증과 TypeScript 타입 추론                          |
+| 단위 테스트      | Vitest 계열                                 | 도메인·검증·상태 reducer 테스트                                       |
+| 컴포넌트 테스트  | Testing Library                             | 사용자 중심 UI 동작 검증                                              |
+| E2E              | Playwright + axe 연동                       | URL, 뒤로 가기, 포커스, 접근성 및 시각 회귀 검증                      |
+| 백엔드           | 없음                                        | MVP는 게시 콘텐츠 읽기만 필요함                                       |
+| 배포             | SPA fallback을 지원하는 정적 호스팅         | 운영 복잡도를 줄이고 CDN 배포 가능                                    |
 
 정확한 패키지 버전은 프로젝트 생성 시점의 안정 버전으로 잠그고 lockfile을 커밋한다.
 
@@ -65,8 +65,8 @@ project components
 Tailwind semantic utilities + cva variants
         │
         ▼
-runtime geometry only
-  inline left/top/width/height/transform/transform-origin
+computed layout geometry only
+  renderer-owned coordinates and transforms
 ```
 
 - `src/components/ui`에는 shadcn CLI가 추가한 원시 컴포넌트를 둔다.
@@ -198,13 +198,13 @@ project/
 
 관계를 반드시 구분한다.
 
-| 관계 | 의미 | 순환 허용 | 중앙 지도 사용 |
-|---|---|---:|---:|
-| `contains` | 내부 장면으로 확대 | 아니오 | 예 |
-| `flows-to` | 실제 데이터·제어 흐름 | 장면 내부에서 가능 | 예 |
-| `uses-concept` | 공통 원리 참조 | 예 | 패널 중심 |
-| `related-to` | 비교·인과·최적화 관계 | 예 | 패널 중심 |
-| `implemented-by` | 맥락별 구현체 | 아니오 | 예 |
+| 관계             | 의미                  |          순환 허용 | 중앙 지도 사용 |
+| ---------------- | --------------------- | -----------------: | -------------: |
+| `contains`       | 내부 장면으로 확대    |             아니오 |             예 |
+| `flows-to`       | 실제 데이터·제어 흐름 | 장면 내부에서 가능 |             예 |
+| `uses-concept`   | 공통 원리 참조        |                 예 |      패널 중심 |
+| `related-to`     | 비교·인과·최적화 관계 |                 예 |      패널 중심 |
+| `implemented-by` | 맥락별 구현체         |             아니오 |             예 |
 
 부모-자식 확대 그래프만 비순환이어야 한다. 관련 개념 그래프의 순환은 정상이다.
 
@@ -250,7 +250,9 @@ type SceneElement = {
   id: string;
   kind: "node" | "group" | "edge" | "annotation";
   label?: string;
-  geometry: Geometry;
+  groupId?: ContentId;
+  fromElementId?: ContentId;
+  toElementId?: ContentId;
   targetSceneId?: ContentId;
   conceptId?: ContentId;
   status?: "published" | "planned";
@@ -392,8 +394,9 @@ type HistoryEntry = {
 - 장면의 논리 좌표계는 고정된 viewBox 좌표를 사용한다.
 - SVG는 연결선과 도형을 담당한다.
 - 클릭 가능한 텍스트·버튼은 SVG 접근 가능 요소 또는 위치가 동기화된 HTML overlay로 표현한다.
-- 장면 데이터는 픽셀이 아닌 논리 좌표와 앵커를 저장한다.
-- MVP 레이아웃은 저작자가 수동으로 배치한다. 자동 그래프 레이아웃은 후속 기능이다.
+- 장면 데이터는 좌표를 저장하지 않고 노드 순서, 그룹 소속과 `flows-to` 관계만 저장한다.
+- renderer의 계층형 자동 배치가 논리 좌표, 그룹 경계와 edge 경로를 계산한다.
+- 자동 배치 구현은 도메인 모델 밖에 두어 향후 다른 layout 전략으로 교체할 수 있게 한다.
 
 ### 9.2 진입 전환
 
@@ -482,14 +485,14 @@ read files
 
 ## 14. 오류 처리
 
-| 상황 | 처리 |
-|---|---|
-| 없는 URL | 탐색 shell 안에서 not-found와 루트 복귀 제공 |
-| planned node 클릭 | 이동하지 않고 예정 내용 표시 |
-| 콘텐츠 로딩 실패 | 현재 장면 유지, 재시도와 오류 요약 제공 |
-| 깨진 참조 | 빌드 실패; 운영 환경에 게시하지 않음 |
+| 상황              | 처리                                           |
+| ----------------- | ---------------------------------------------- |
+| 없는 URL          | 탐색 shell 안에서 not-found와 루트 복귀 제공   |
+| planned node 클릭 | 이동하지 않고 예정 내용 표시                   |
+| 콘텐츠 로딩 실패  | 현재 장면 유지, 재시도와 오류 요약 제공        |
+| 깨진 참조         | 빌드 실패; 운영 환경에 게시하지 않음           |
 | 전환 중 중복 클릭 | 첫 전환만 처리하고 이후 입력 무시 또는 큐 제거 |
-| 잘못된 history | 가장 가까운 유효 조상 또는 루트로 복구 |
+| 잘못된 history    | 가장 가까운 유효 조상 또는 루트로 복구         |
 
 ## 15. 테스트 설계
 

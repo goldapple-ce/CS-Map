@@ -27,107 +27,91 @@ elements:
   - id: client-group
     kind: group
     label: 사용자 환경
-    geometry: { x: 40, y: 90, width: 360, height: 540 }
   - id: network-group
     kind: group
     label: 네트워크 경로
-    geometry: { x: 430, y: 90, width: 220, height: 540 }
   - id: service-group
     kind: group
     label: 검색 서비스 영역
-    geometry: { x: 680, y: 90, width: 560, height: 540 }
   - id: user-input
     kind: node
     label: 사용자 입력
-    geometry: { x: 80, y: 165, width: 270, height: 90 }
+    groupId: client-group
   - id: browser
     kind: node
     label: 브라우저
-    status: published
-    geometry: { x: 80, y: 330, width: 270, height: 90 }
+    groupId: client-group
+    status: planned
   - id: browser-rendering
     kind: node
     label: 브라우저 렌더링
-    status: published
-    geometry: { x: 80, y: 500, width: 270, height: 90 }
+    groupId: client-group
+    status: planned
   - id: network
     kind: node
     label: 네트워크
+    groupId: network-group
     status: published
-    geometry: { x: 455, y: 285, width: 170, height: 120 }
+    targetSceneId: google-search-network
   - id: service-infrastructure
     kind: node
     label: 서비스 인프라
+    groupId: service-group
     status: planned
-    geometry: { x: 720, y: 175, width: 200, height: 90 }
   - id: search-server
     kind: node
     label: 검색 요청 처리
+    groupId: service-group
     status: planned
-    geometry: { x: 970, y: 175, width: 220, height: 90 }
   - id: data-processing
     kind: node
     label: 색인 조회와 결과 구성
+    groupId: service-group
     status: planned
-    geometry: { x: 970, y: 365, width: 220, height: 90 }
   - id: search-response
     kind: node
     label: 검색 결과 응답
-    geometry: { x: 720, y: 500, width: 200, height: 90 }
+    groupId: service-group
   - id: request-flow-note
     kind: annotation
     label: 검색 서비스 내부의 상세 구성은 Google의 비공개 구현을 단정하지 않은 일반 아키텍처 예시입니다.
-    geometry: { x: 720, y: 110, width: 470, height: 45 }
   - id: input-to-browser
     kind: edge
     label: 입력 전달
-    geometry:
-      x: 0
-      y: 0
-      points: [{ x: 215, y: 255 }, { x: 215, y: 330 }]
+    fromElementId: user-input
+    toElementId: browser
   - id: browser-to-network
     kind: edge
     label: 요청 준비
-    geometry:
-      x: 0
-      y: 0
-      points: [{ x: 350, y: 375 }, { x: 455, y: 345 }]
+    fromElementId: browser
+    toElementId: network
   - id: network-to-infrastructure
     kind: edge
     label: 요청 전송
-    geometry:
-      x: 0
-      y: 0
-      points: [{ x: 625, y: 345 }, { x: 720, y: 220 }]
+    fromElementId: network
+    toElementId: service-infrastructure
   - id: infrastructure-to-search
     kind: edge
     label: 요청 전달
-    geometry:
-      x: 0
-      y: 0
-      points: [{ x: 920, y: 220 }, { x: 970, y: 220 }]
+    fromElementId: service-infrastructure
+    toElementId: search-server
   - id: search-to-data
     kind: edge
     label: 관련 결과 탐색
-    geometry:
-      x: 0
-      y: 0
-      points: [{ x: 1080, y: 265 }, { x: 1080, y: 365 }]
+    fromElementId: search-server
+    toElementId: data-processing
   - id: data-to-response
     kind: edge
     label: 결과 구성
-    geometry:
-      x: 0
-      y: 0
-      points: [{ x: 970, y: 410 }, { x: 820, y: 500 }]
+    fromElementId: data-processing
+    toElementId: search-response
   - id: response-to-rendering
     kind: edge
     label: 응답 반환
-    geometry:
-      x: 0
-      y: 0
-      points: [{ x: 720, y: 545 }, { x: 350, y: 545 }]
+    fromElementId: search-response
+    toElementId: browser-rendering
 relationships:
+  - { type: contains, elementId: network, targetSceneId: google-search-network }
   - {
       type: flows-to,
       fromElementId: user-input,
