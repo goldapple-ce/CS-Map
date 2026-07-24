@@ -26,10 +26,10 @@
 - Do not bind the domain model to a graph-rendering library.
 - Do not introduce a backend for the MVP without a demonstrated requirement.
 - Preserve unrelated user changes.
-- Run the tests listed for the current stage before reporting completion.
-- Report changed files, tests run, and unmet acceptance criteria after each task.
+- Do not run automated or manual tests; the user owns all test execution.
+- Report changed files, note that tests were not run, and list unmet acceptance criteria after each task.
 - Never run `git commit`, `git push`, create tags, or rewrite Git history. The user owns all Git operations.
-- Update `PLAN.md` checkboxes only after implementation and verification actually succeed.
+- Update implementation checkboxes only after the implementation is complete. Do not update test-only checkboxes without the user's confirmation.
 
 ## Styling discipline
 
