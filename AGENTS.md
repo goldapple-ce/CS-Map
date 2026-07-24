@@ -4,7 +4,14 @@
 
 - `REQUIREMENTS.md` is the product source of truth.
 - `TECHNICAL_DESIGN.md` is the architecture source of truth.
+- `GLOSSARY.md` defines the preferred project terminology for user communication and documentation.
 - If documents conflict, stop and report the conflict before implementation.
+
+## Terminology discipline
+
+- Use the preferred Korean and English terms from `GLOSSARY.md` when communicating with the user or updating project documents.
+- Do not use page, slide, depth screen, or free-form canvas language for the persistent spatial navigation model unless describing an actual page, slide, or HTML canvas.
+- When terminology conflicts with product behavior or architecture, follow `REQUIREMENTS.md` and `TECHNICAL_DESIGN.md` and update the glossary instead of redefining the product through terminology.
 
 ## Product invariants
 
