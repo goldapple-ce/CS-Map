@@ -29,6 +29,7 @@ type SceneViewportProps = {
   navigationDisabled: boolean
   reducedMotion: boolean
   onEnterScene: (request: SceneNavigationRequest) => void
+  onShowPlanned: (elementId: string, label: string) => void
   onSceneReady: (sceneId: string, title: string) => void
   onCameraChange: (camera: CameraState) => void
   onAnimationChange: (animating: boolean) => void
@@ -42,6 +43,7 @@ export function SceneViewport({
   navigationDisabled,
   reducedMotion,
   onEnterScene,
+  onShowPlanned,
   onSceneReady,
   onCameraChange,
   onAnimationChange,
@@ -279,6 +281,7 @@ export function SceneViewport({
             focusedSceneId={sceneId}
             navigationDisabled={navigationDisabled || animating}
             onEnterScene={enterScene}
+            onShowPlanned={onShowPlanned}
           />
         ) : null}
       </div>

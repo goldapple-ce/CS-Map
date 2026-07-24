@@ -20,9 +20,19 @@ sources:
   - title: Linux udp(7) manual page
     url: https://man7.org/linux/man-pages/man7/udp.7.html
     type: primary
-contexts: []
-occurrences: []
-conceptRefs: []
+contexts:
+  - id: dns-udp-transport-context
+    summary: DNS resolver가 만든 하나의 질의 메시지를 이름 서버의 UDP 53번 port로 전달하는 전송 맥락입니다.
+occurrences:
+  - id: dns-udp-transport
+    conceptId: udp
+    contextId: dns-udp-transport-context
+    elementId: udp-datagram
+    implementationSceneIds: [google-search-dns-socket-kernel]
+conceptRefs:
+  - conceptId: udp
+    occurrenceId: dns-udp-transport
+    contextId: dns-udp-transport-context
 elements:
   - id: user-space-group
     kind: group
@@ -87,6 +97,7 @@ elements:
     fromElementId: network-interface
     toElementId: dns-server-port
 relationships:
+  - { type: uses-concept, occurrenceId: dns-udp-transport }
   - {
       type: contains,
       elementId: socket-kernel,

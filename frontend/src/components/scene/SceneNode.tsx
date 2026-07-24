@@ -62,6 +62,7 @@ type SceneNodeProps = {
   density?: SceneNodeDensity
   navigationDisabled?: boolean
   onEnterScene?: (sceneId: string, elementId: string) => void
+  onShowPlanned?: (elementId: string, label: string) => void
 }
 
 export function SceneNode({
@@ -71,10 +72,16 @@ export function SceneNode({
   density = "near",
   navigationDisabled = false,
   onEnterScene,
+  onShowPlanned,
 }: SceneNodeProps) {
   const { x, y, width, height } = layout
   const label = element.label ?? element.id
   const targetSceneId = element.targetSceneId
+  const preview = targetSceneId
+    ? `${label} 내부 흐름으로 확대합니다.`
+    : state === "planned"
+      ? `${label} 상세 장면은 준비 중입니다.`
+      : undefined
   const content = (
     <>
       <span className={sceneNodeLabelVariants({ density })}>{label}</span>
@@ -84,30 +91,59 @@ export function SceneNode({
     </>
   )
 
+  let nodeContent
+  if (targetSceneId && onEnterScene) {
+    nodeContent = (
+      <button
+        type="button"
+        data-scene-node-id={element.id}
+        disabled={navigationDisabled}
+        aria-label={`${label} 하위 장면 열기`}
+        className={cn(sceneNodeVariants({ state }))}
+        onClick={() => onEnterScene(targetSceneId, element.id)}
+      >
+        {content}
+      </button>
+    )
+  } else if (state === "planned" && onShowPlanned) {
+    nodeContent = (
+      <button
+        type="button"
+        data-scene-node-id={element.id}
+        disabled={navigationDisabled}
+        aria-label={`${label}, 준비 중 내용 보기`}
+        className={cn(sceneNodeVariants({ state }), "cursor-pointer")}
+        onClick={() => onShowPlanned(element.id, label)}
+      >
+        {content}
+      </button>
+    )
+  } else {
+    nodeContent = (
+      <div
+        data-scene-node-id={element.id}
+        role="group"
+        aria-label={`${label}, ${stateLabels[state]}`}
+        className={cn(sceneNodeVariants({ state }))}
+      >
+        {content}
+      </div>
+    )
+  }
+
   return (
-    <foreignObject x={x} y={y} width={width} height={height}>
-      {targetSceneId && onEnterScene ? (
-        <button
-          type="button"
-          data-scene-node-id={element.id}
-          disabled={navigationDisabled}
-          aria-label={`${label} 하위 장면 열기`}
-          className={cn(sceneNodeVariants({ state }))}
-          onClick={() => onEnterScene(targetSceneId, element.id)}
-        >
-          {content}
-        </button>
-      ) : (
-        <div
-          data-scene-node-id={element.id}
-          tabIndex={state === "planned" ? 0 : undefined}
-          role="group"
-          aria-label={`${label}, ${stateLabels[state]}`}
-          className={cn(sceneNodeVariants({ state }))}
-        >
-          {content}
-        </div>
-      )}
+    <foreignObject x={x} y={y} width={width} height={height} overflow="visible">
+      <div className="group relative size-full">
+        {nodeContent}
+        {preview ? (
+          <span
+            role="tooltip"
+            className="pointer-events-none absolute top-full left-1/2 z-10 mt-2 w-max max-w-72 -translate-x-1/2 rounded-md border border-border bg-popover px-3 py-2 text-sm leading-5 whitespace-normal text-popover-foreground opacity-0 shadow-md transition-opacity group-focus-within:opacity-100 group-hover:opacity-100"
+          >
+            {preview}
+          </span>
+        ) : null}
+      </div>
     </foreignObject>
   )
 }

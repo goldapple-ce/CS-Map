@@ -8,7 +8,10 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import { contentRepository } from "@/content/content-repository"
-import { ExplanationPanel } from "@/features/explanation/ExplanationPanel"
+import {
+  ExplanationPanel,
+  type PlannedSelection,
+} from "@/features/explanation/ExplanationPanel"
 import type { CameraState } from "@/features/explorer/camera"
 import { ExplorerHeader } from "@/features/explorer/ExplorerHeader"
 import {
@@ -51,6 +54,7 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
   const [reducedMotion, setReducedMotion] = useState(false)
   const [restoreScrollTop, setRestoreScrollTop] = useState(0)
   const [explanationTitle, setExplanationTitle] = useState("검색 요청")
+  const [plannedSelection, setPlannedSelection] = useState<PlannedSelection>()
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
@@ -117,6 +121,7 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
       }
     }
     if (sceneId) restorePanel(sceneId)
+    setPlannedSelection(undefined)
     previousSceneIdRef.current = sceneId
   }, [captureScene, restorePanel, sceneId])
 
@@ -201,6 +206,17 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
     explanationScrollTopRef.current = scrollTop
   }, [])
 
+  const showPlanned = useCallback(
+    (elementId: string, label: string) => {
+      if (!sceneId) return
+      setPlannedSelection({ sceneId, elementId, label })
+      panelCollapsedRef.current = false
+      setPanelCollapsed(false)
+      explanationPanelRef.current?.expand()
+    },
+    [explanationPanelRef, sceneId]
+  )
+
   return (
     <div className="flex h-svh min-h-0 flex-col overflow-hidden bg-background text-foreground">
       <ExplorerHeader
@@ -226,6 +242,7 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
               navigationDisabled={navigationDisabled}
               reducedMotion={reducedMotion}
               onEnterScene={enterScene}
+              onShowPlanned={showPlanned}
               onSceneReady={handleSceneReady}
               onCameraChange={handleCameraChange}
               onAnimationChange={handleAnimationChange}
@@ -259,9 +276,11 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
             <ExplanationPanel
               sceneId={sceneId}
               title={explanationTitle}
+              plannedSelection={plannedSelection}
               readingMode={panelMode === "reading"}
               restoreScrollTop={restoreScrollTop}
               onScrollTopChange={handleExplanationScroll}
+              onClearPlanned={() => setPlannedSelection(undefined)}
               onCollapse={collapseExplanation}
               onToggleReadingMode={toggleReadingMode}
             />

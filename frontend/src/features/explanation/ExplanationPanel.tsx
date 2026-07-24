@@ -1,16 +1,43 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { BookOpen, Columns2, PanelRightClose } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { ContentSection } from "@/features/explanation/ContentSection"
+import { contentRepository } from "@/content/content-repository"
+import type { Concept, Scene } from "@/domain/content-types"
+import { MarkdownContent } from "@/features/explanation/MarkdownContent"
+
+export type PlannedSelection = {
+  sceneId: string
+  elementId: string
+  label: string
+}
+
+type ConceptExplanation = {
+  concept: Concept
+  markdown: string
+  contextSummary: string
+  occurrenceId: string
+}
+
+type ExplanationState =
+  | { status: "idle" | "loading" }
+  | {
+      status: "loaded"
+      scene: Scene
+      markdown: string
+      concepts: ConceptExplanation[]
+    }
+  | { status: "error"; message: string }
 
 type ExplanationPanelProps = {
   sceneId?: string
   title: string
+  plannedSelection?: PlannedSelection
   readingMode: boolean
   restoreScrollTop: number
   onScrollTopChange: (scrollTop: number) => void
+  onClearPlanned: () => void
   onCollapse: () => void
   onToggleReadingMode: () => void
 }
@@ -18,13 +45,67 @@ type ExplanationPanelProps = {
 export function ExplanationPanel({
   sceneId,
   title,
+  plannedSelection,
   readingMode,
   restoreScrollTop,
   onScrollTopChange,
+  onClearPlanned,
   onCollapse,
   onToggleReadingMode,
 }: ExplanationPanelProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const [state, setState] = useState<ExplanationState>({ status: "idle" })
+
+  useEffect(() => {
+    if (!sceneId) {
+      setState({ status: "idle" })
+      return
+    }
+    let active = true
+    setState({ status: "loading" })
+    contentRepository
+      .loadScene(sceneId)
+      .then(async ({ scene, markdown }) => {
+        const conceptLoads = new Map<
+          string,
+          ReturnType<typeof contentRepository.loadConcept>
+        >()
+        const concepts = await Promise.all(
+          scene.conceptRefs.map(async (usage) => {
+            let loaded = conceptLoads.get(usage.conceptId)
+            if (!loaded) {
+              loaded = contentRepository.loadConcept(usage.conceptId)
+              conceptLoads.set(usage.conceptId, loaded)
+            }
+            const { concept, markdown: conceptMarkdown } = await loaded
+            const context = scene.contexts.find(
+              ({ id }) => id === usage.contextId
+            )
+            return {
+              concept,
+              markdown: conceptMarkdown,
+              contextSummary:
+                context?.summary ?? "현재 장면에서 사용되는 공통 개념입니다.",
+              occurrenceId: usage.occurrenceId,
+            }
+          })
+        )
+        if (active) setState({ status: "loaded", scene, markdown, concepts })
+      })
+      .catch((error: unknown) => {
+        if (!active) return
+        setState({
+          status: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "설명 콘텐츠를 불러오지 못했습니다.",
+        })
+      })
+    return () => {
+      active = false
+    }
+  }, [sceneId])
 
   useEffect(() => {
     const viewport = scrollAreaRef.current?.querySelector<HTMLElement>(
@@ -32,11 +113,13 @@ export function ExplanationPanel({
     )
     if (!viewport) return
 
-    viewport.scrollTop = restoreScrollTop
+    viewport.scrollTop = plannedSelection ? 0 : restoreScrollTop
     const handleScroll = () => onScrollTopChange(viewport.scrollTop)
     viewport.addEventListener("scroll", handleScroll, { passive: true })
     return () => viewport.removeEventListener("scroll", handleScroll)
-  }, [onScrollTopChange, restoreScrollTop, sceneId])
+  }, [onScrollTopChange, plannedSelection, restoreScrollTop, sceneId])
+
+  const panelTitle = plannedSelection?.label ?? title
 
   return (
     <aside
@@ -46,10 +129,10 @@ export function ExplanationPanel({
       <div className="flex shrink-0 items-start gap-3 border-b border-border px-5 py-4">
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-            Explanation
+            {plannedSelection ? "Planned topic" : "Explanation"}
           </p>
           <h2 id="explanation-title" className="truncate text-lg font-semibold">
-            {title}
+            {panelTitle}
           </h2>
         </div>
         <Button
@@ -80,61 +163,97 @@ export function ExplanationPanel({
 
       <div ref={scrollAreaRef} className="min-h-0 flex-1">
         <ScrollArea className="size-full">
-          <article className="mx-auto max-w-3xl space-y-8 px-6 py-7">
-            <p className="text-base leading-8 text-foreground">
-              사용자가 검색어를 입력한 순간부터 결과가 화면에 나타나기까지 여러
-              시스템이 하나의 흐름으로 이어집니다. 이 임시 설명은 지도와 긴 글이
-              같은 화면에서 독립적으로 동작하는지 확인하기 위한 내용입니다.
-            </p>
+          <article className="mx-auto max-w-3xl space-y-10 px-6 py-7">
+            {plannedSelection ? (
+              <section className="space-y-5">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    준비 중
+                  </p>
+                  <h3 className="text-2xl font-semibold tracking-tight">
+                    {plannedSelection.label}
+                  </h3>
+                </div>
+                <p className="text-sm leading-7 text-muted-foreground">
+                  이 Topic은 전체 흐름에서 예정된 위치를 보여주지만, 아직 검토된
+                  상세 장면과 설명이 게시되지 않았습니다. 현재 URL과 카메라
+                  위치는 변경되지 않습니다.
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClearPlanned}
+                >
+                  현재 Topic 설명으로 돌아가기
+                </Button>
+              </section>
+            ) : state.status === "loading" || state.status === "idle" ? (
+              <p className="text-sm text-muted-foreground">
+                설명을 불러오는 중입니다.
+              </p>
+            ) : state.status === "error" ? (
+              <p className="text-sm text-destructive">{state.message}</p>
+            ) : (
+              <>
+                <MarkdownContent
+                  markdown={state.markdown}
+                  idPrefix={`scene-${state.scene.id}`}
+                />
 
-            <ContentSection title="개요">
-              <p>
-                브라우저는 입력을 해석하고 네트워크 요청을 준비합니다. 이후 이름
-                확인, 연결 수립, 요청 전송, 서버 처리와 응답 렌더링이 순서대로
-                이어집니다.
-              </p>
-              <p>
-                지도는 이 과정의 위치와 흐름을 보여주고, 설명 패널은 현재
-                장면에서 무엇을 봐야 하는지 충분한 맥락을 제공합니다.
-              </p>
-            </ContentSection>
+                {state.concepts.map(
+                  ({ concept, markdown, contextSummary, occurrenceId }) => (
+                    <section
+                      key={occurrenceId}
+                      className="space-y-5 rounded-xl border border-border bg-muted/20 p-5"
+                    >
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                          현재 맥락
+                        </p>
+                        <p className="text-sm leading-7 text-muted-foreground">
+                          {contextSummary}
+                        </p>
+                      </div>
+                      <div className="space-y-2 border-t border-border pt-5">
+                        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                          공통 Concept
+                        </p>
+                        <p className="text-lg font-semibold">{concept.title}</p>
+                        <p className="text-sm leading-7 text-muted-foreground">
+                          {concept.summary}
+                        </p>
+                      </div>
+                      <MarkdownContent
+                        markdown={markdown}
+                        idPrefix={`concept-${concept.id}-${occurrenceId}`}
+                        compact
+                      />
+                    </section>
+                  )
+                )}
 
-            <ContentSection title="왜 필요한가">
-              <p>
-                개별 기술 용어만 학습하면 서로 다른 계층이 실제 요청에서 어떻게
-                연결되는지 놓치기 쉽습니다. 하나의 사건을 따라가면 네트워크,
-                운영체제, 서버와 데이터 처리의 경계를 자연스럽게 비교할 수
-                있습니다.
-              </p>
-            </ContentSection>
-
-            <ContentSection title="전체 동작 과정">
-              <p>
-                입력 이벤트가 브라우저에 전달되고, 브라우저는 목적지를 확인한 뒤
-                연결을 준비합니다. 요청은 여러 네트워크 구간을 지나 서비스
-                인프라에 도착하며, 서버가 만든 응답은 반대 방향으로 돌아옵니다.
-              </p>
-              <p>
-                각 단계는 이후 별도의 장면으로 확장될 수 있지만, 아직 제작되지
-                않은 장면으로 이동하는 동작은 이 단계에서 구현하지 않습니다.
-              </p>
-            </ContentSection>
-
-            <ContentSection title="실패 상황">
-              <p>
-                주소 확인 실패, 연결 시간 초과, 서버 오류처럼 서로 다른 계층에서
-                문제가 발생할 수 있습니다. 현재 장면의 설명은 이런 실패가 전체
-                흐름의 어느 지점에 해당하는지 함께 다룰 수 있어야 합니다.
-              </p>
-            </ContentSection>
-
-            <ContentSection title="읽는 방법">
-              <p>
-                패널 경계를 드래그해 지도와 설명의 비율을 바꿀 수 있습니다. 읽기
-                모드는 같은 페이지 안에서 설명을 넓히며, 분할 화면으로 돌아오면
-                지도 Viewport가 다시 나타납니다.
-              </p>
-            </ContentSection>
+                <section className="space-y-3 border-t border-border pt-6">
+                  <h3 className="text-lg font-semibold tracking-tight">
+                    확인 가능한 출처
+                  </h3>
+                  <ul className="space-y-2 text-sm leading-7 text-muted-foreground">
+                    {state.scene.sources.map((source) => (
+                      <li key={source.url}>
+                        <a
+                          href={source.url}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="font-medium text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+                        >
+                          {source.title}
+                        </a>{" "}
+                        <span>({source.type})</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              </>
+            )}
           </article>
         </ScrollArea>
       </div>

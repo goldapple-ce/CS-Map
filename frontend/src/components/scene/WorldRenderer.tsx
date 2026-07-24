@@ -28,6 +28,7 @@ type WorldRendererProps = {
   focusedSceneId: string
   navigationDisabled: boolean
   onEnterScene: (sceneId: string, elementId: string) => void
+  onShowPlanned: (elementId: string, label: string) => void
 }
 
 function nodeState(element: SceneNodeElement): SceneNodeState {
@@ -50,6 +51,7 @@ export function WorldRenderer({
   focusedSceneId,
   navigationDisabled,
   onEnterScene,
+  onShowPlanned,
 }: WorldRendererProps) {
   const visibleBounds = visibleWorldBounds(camera, viewport)
   const ancestors = getSceneAncestors(layout, focusedSceneId)
@@ -206,6 +208,7 @@ export function WorldRenderer({
                     density={nodeDensity(renderScale)}
                     navigationDisabled={navigationDisabled}
                     onEnterScene={onEnterScene}
+                    onShowPlanned={onShowPlanned}
                   />
                 )
               })}

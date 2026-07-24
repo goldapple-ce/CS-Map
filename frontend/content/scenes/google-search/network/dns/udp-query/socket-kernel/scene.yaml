@@ -20,9 +20,19 @@ sources:
   - title: Linux udp(7) manual page
     url: https://man7.org/linux/man-pages/man7/udp.7.html
     type: primary
-contexts: []
-occurrences: []
-conceptRefs: []
+contexts:
+  - id: kernel-udp-processing-context
+    summary: 사용자 프로세스가 넘긴 payload를 커널 UDP 계층이 datagram으로 구성해 IP 계층에 전달하는 처리 맥락입니다.
+occurrences:
+  - id: kernel-udp-processing
+    conceptId: udp
+    contextId: kernel-udp-processing-context
+    elementId: udp-layer
+    implementationSceneIds: []
+conceptRefs:
+  - conceptId: udp
+    occurrenceId: kernel-udp-processing
+    contextId: kernel-udp-processing-context
 elements:
   - id: process-group
     kind: group
@@ -95,6 +105,7 @@ elements:
     fromElementId: ip-layer
     toElementId: network-driver
 relationships:
+  - { type: uses-concept, occurrenceId: kernel-udp-processing }
   - {
       type: flows-to,
       fromElementId: resolver-process,

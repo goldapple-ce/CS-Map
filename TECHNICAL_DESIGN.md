@@ -317,7 +317,8 @@ content/concepts/tcp/
 
 ### 6.4 Markdown 정책
 
-- 허용 요소를 제한한 Markdown을 빌드 시 HTML로 변환한다.
+- Markdown 원문은 Vite의 정적 loader map에 빌드하고, 패널은 허용 목록 기반 React 요소로만 변환한다.
+- 원문 HTML은 해석하지 않고 일반 텍스트로 취급하며 `dangerouslySetInnerHTML`을 사용하지 않는다.
 - 임의 JSX, script, inline event handler를 허용하지 않는다.
 - 제목에 안정적인 section ID를 부여한다.
 - 장면 내 링크는 일반 URL 대신 검증 가능한 콘텐츠 참조 문법을 사용한다.
