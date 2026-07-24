@@ -53,6 +53,7 @@ export function SceneViewport({
   const animationFrameRef = useRef<number | undefined>(undefined)
   const cameraRef = useRef(DEFAULT_CAMERA)
   const initializedRef = useRef(false)
+  const pendingAnnouncementRef = useRef<string>()
   const [viewport, setViewport] = useState<ViewportSize>({
     width: 1,
     height: 1,
@@ -62,6 +63,7 @@ export function SceneViewport({
     status: "loading",
   })
   const [animating, setAnimating] = useState(false)
+  const [announcement, setAnnouncement] = useState("")
 
   useEffect(() => {
     let active = true
@@ -122,6 +124,10 @@ export function SceneViewport({
       if (immediate || reducedMotion) {
         updateCamera(target)
         setAnimating(false)
+        if (pendingAnnouncementRef.current) {
+          setAnnouncement(pendingAnnouncementRef.current)
+          pendingAnnouncementRef.current = undefined
+        }
         onAnimationChange(false)
         return
       }
@@ -156,6 +162,10 @@ export function SceneViewport({
         } else {
           animationFrameRef.current = undefined
           setAnimating(false)
+          if (pendingAnnouncementRef.current) {
+            setAnnouncement(pendingAnnouncementRef.current)
+            pendingAnnouncementRef.current = undefined
+          }
           onAnimationChange(false)
         }
       }
@@ -177,9 +187,10 @@ export function SceneViewport({
     if (!positioned) return
     const savedCamera = getSceneSnapshot(sceneId)?.camera
     const target = savedCamera ?? cameraForBounds(positioned.bounds, viewport)
+    pendingAnnouncementRef.current = `${positioned.scene.title} Topic으로 이동했습니다.`
+    onSceneReady(sceneId, positioned.scene.title)
     animateCamera(target, !initializedRef.current)
     initializedRef.current = true
-    onSceneReady(sceneId, positioned.scene.title)
   }, [
     animateCamera,
     onSceneReady,
@@ -227,6 +238,14 @@ export function SceneViewport({
       aria-busy={worldState.status === "loading" || animating}
       className="flex size-full min-h-0 flex-col bg-muted/20"
     >
+      <p
+        className="sr-only"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {announcement}
+      </p>
       <div className="flex items-center justify-between border-b border-border px-5 py-3">
         <div>
           <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
