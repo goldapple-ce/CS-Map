@@ -28,6 +28,17 @@ export function cameraForBounds(
   }
 }
 
+export function cameraForWidth(
+  bounds: WorldBounds,
+  viewport: ViewportSize
+): CameraState {
+  return {
+    centerX: bounds.x + bounds.width / 2,
+    centerY: bounds.y + bounds.height / 2,
+    scale: viewport.width / Math.max(bounds.width, 0.0001),
+  }
+}
+
 export function visibleWorldBounds(
   camera: CameraState,
   viewport: ViewportSize,

@@ -70,9 +70,9 @@ elements:
     kind: node
     label: 검색 결과 응답
     groupId: service-group
-  - id: request-flow-note
-    kind: annotation
-    label: 검색 서비스 내부의 상세 구성은 Google의 비공개 구현을 단정하지 않은 일반 아키텍처 예시입니다.
+  # - id: request-flow-note
+  #   kind: annotation
+  #   label: 검색 서비스 내부의 상세 구성은 Google의 비공개 구현을 단정하지 않은 일반 아키텍처 예시입니다.
   - id: input-to-browser
     kind: edge
     label: 입력 전달

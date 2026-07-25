@@ -145,6 +145,7 @@ project/
 │  │  ├─ App.tsx
 │  │  ├─ router.tsx
 │  │  └─ routes/
+│  │     ├─ HomeRoute.tsx
 │  │     ├─ ExploreRoute.tsx
 │  │     └─ NotFoundRoute.tsx
 │  ├─ domain/
@@ -368,12 +369,18 @@ type HistoryEntry = {
 ### 8.1 형식
 
 ```text
+/                                      # 소개 홈페이지
 /explore/google-search
 /explore/google-search/network
 /explore/google-search/network/dns
 /explore/google-search/network/dns/udp-query
 ```
 
+- `/`는 서비스 소개와 이용 방법을 제공하고 루트 Scene의 `SceneViewport`를 재사용하는 `HomeRoute`를 표시한다.
+- 홈페이지의 `SceneViewport`는 같은 콘텐츠 repository와 World renderer를 사용하며, 게시된 Topic 클릭을 해당 `/explore/*` 경로로 연결한다.
+- 홈페이지에서는 `SceneViewport`의 embedded presentation을 사용해 Explorer 전용 chrome을 렌더링하지 않으며, 접근성 제목과 실제 흐름 renderer는 유지한다.
+- embedded presentation은 홈페이지 콘텐츠 영역의 너비를 유지하고, Scene 전체 높이를 맞추지 않은 채 월드 bounds의 가로 너비를 그 영역에 맞춰 카메라 배율을 계산한다. 홈페이지 영역을 벗어나는 세로 여백과 부가 annotation은 잘릴 수 있다. Explorer presentation은 기존 전체 bounds와 padding 맞춤을 유지한다.
+- 전체 화면 탐색 행동은 `/explore/google-search`로 클라이언트 측 이동한다.
 - URL path는 현재 맥락을 표현한다.
 - 내부 데이터 참조는 변경에 강한 영구 ID를 사용한다.
 - slug가 변경되면 alias 목록 또는 redirect manifest로 기존 URL을 보존한다.
@@ -383,7 +390,7 @@ type HistoryEntry = {
 ### 8.2 정적 SPA 배포
 
 - Vite는 단일 SPA entry와 분할된 정적 자산을 `dist`에 생성한다.
-- React Router의 `/explore/*` route가 임의 깊이의 장면 path를 해석한다.
+- React Router의 `/` route는 `HomeRoute`를, `/explore/*` route는 임의 깊이의 장면 path를 해석하는 `ExploreRoute`를 사용한다.
 - 게시된 모든 장면 경로를 콘텐츠 route index에 포함한다.
 - 정적 호스팅은 `/explore/*` 직접 요청을 `/index.html`로 되돌리는 SPA fallback을 제공해야 한다.
 - route index에 없거나 게시되지 않은 경로는 애플리케이션 내부 not-found로 처리한다.

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { contentRepository } from "@/content/content-repository"
 import {
   cameraForBounds,
+  cameraForWidth,
   type CameraState,
   type ViewportSize,
 } from "@/features/explorer/camera"
@@ -28,6 +29,7 @@ type SceneViewportProps = {
   routeNotFound: boolean
   navigationDisabled: boolean
   reducedMotion: boolean
+  presentation?: "explorer" | "embedded"
   onEnterScene: (request: SceneNavigationRequest) => void
   onShowPlanned: (elementId: string, label: string) => void
   onSceneReady: (sceneId: string, title: string) => void
@@ -42,6 +44,7 @@ export function SceneViewport({
   routeNotFound,
   navigationDisabled,
   reducedMotion,
+  presentation = "explorer",
   onEnterScene,
   onShowPlanned,
   onSceneReady,
@@ -49,6 +52,7 @@ export function SceneViewport({
   onAnimationChange,
 }: SceneViewportProps) {
   const navigate = useNavigate()
+  const embedded = presentation === "embedded"
   const viewportRef = useRef<HTMLDivElement>(null)
   const animationFrameRef = useRef<number | undefined>(undefined)
   const cameraRef = useRef(DEFAULT_CAMERA)
@@ -185,14 +189,19 @@ export function SceneViewport({
       return
     const positioned = worldState.layout.scenes.get(sceneId)
     if (!positioned) return
-    const savedCamera = getSceneSnapshot(sceneId)?.camera
-    const target = savedCamera ?? cameraForBounds(positioned.bounds, viewport)
+    const savedCamera = embedded ? undefined : getSceneSnapshot(sceneId)?.camera
+    const target =
+      savedCamera ??
+      (embedded
+        ? cameraForWidth(positioned.bounds, viewport)
+        : cameraForBounds(positioned.bounds, viewport))
     pendingAnnouncementRef.current = `${positioned.scene.title} Topic으로 이동했습니다.`
     onSceneReady(sceneId, positioned.scene.title)
     animateCamera(target, !initializedRef.current)
     initializedRef.current = true
   }, [
     animateCamera,
+    embedded,
     onSceneReady,
     routeNotFound,
     sceneId,
@@ -231,12 +240,19 @@ export function SceneViewport({
   const relativeZoom = rootCamera
     ? Math.round((camera.scale / rootCamera.scale) * 100)
     : 100
+  const sceneTitle = routeNotFound
+    ? "Topic을 찾을 수 없음"
+    : (focusedScene?.title ?? "지식 공간 로딩")
 
   return (
     <section
       aria-labelledby="scene-title"
       aria-busy={worldState.status === "loading" || animating}
-      className="flex size-full min-h-0 flex-col bg-muted/20"
+      className={
+        embedded
+          ? "flex size-full min-h-0 flex-col"
+          : "flex size-full min-h-0 flex-col bg-muted/20"
+      }
     >
       <p
         className="sr-only"
@@ -246,25 +262,29 @@ export function SceneViewport({
       >
         {announcement}
       </p>
-      <div className="flex items-center justify-between border-b border-border px-5 py-3">
-        <div>
-          <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-            World viewport
-          </p>
-          <h1
-            id="scene-title"
-            tabIndex={-1}
-            className="text-lg font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-          >
-            {routeNotFound
-              ? "Topic을 찾을 수 없음"
-              : (focusedScene?.title ?? "지식 공간 로딩")}
-          </h1>
+      {embedded ? (
+        <h2 id="scene-title" className="sr-only">
+          {sceneTitle}
+        </h2>
+      ) : (
+        <div className="flex items-center justify-between border-b border-border px-5 py-3">
+          <div>
+            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              World viewport
+            </p>
+            <h1
+              id="scene-title"
+              tabIndex={-1}
+              className="text-lg font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              {sceneTitle}
+            </h1>
+          </div>
+          {focusedScene ? (
+            <p className="text-xs text-muted-foreground">{relativeZoom}%</p>
+          ) : null}
         </div>
-        {focusedScene ? (
-          <p className="text-xs text-muted-foreground">{relativeZoom}%</p>
-        ) : null}
-      </div>
+      )}
 
       <div
         ref={viewportRef}
