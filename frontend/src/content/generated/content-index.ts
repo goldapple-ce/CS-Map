@@ -5,15 +5,15 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
   {
     id: "google-search-dns",
     slug: "dns",
-    scenarioId: "google-search",
-    parentId: "google-search-network",
+    scenarioId: "google-com",
+    parentId: "google-search-root",
     status: "published",
     moduleKey: "/content/scenes/google-search/network/dns/scene.yaml",
   },
   {
     id: "google-search-dns-udp-query",
     slug: "udp-query",
-    scenarioId: "google-search",
+    scenarioId: "google-com",
     parentId: "google-search-dns",
     status: "published",
     moduleKey: "/content/scenes/google-search/network/dns/udp-query/scene.yaml",
@@ -21,7 +21,7 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
   {
     id: "google-search-dns-socket-kernel",
     slug: "socket-kernel",
-    scenarioId: "google-search",
+    scenarioId: "google-com",
     parentId: "google-search-dns-udp-query",
     status: "published",
     moduleKey:
@@ -29,16 +29,16 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
   },
   {
     id: "google-search-network",
-    slug: "network",
-    scenarioId: "google-search",
+    slug: "router",
+    scenarioId: "google-com",
     parentId: "google-search-root",
     status: "published",
     moduleKey: "/content/scenes/google-search/network/scene.yaml",
   },
   {
     id: "google-search-root",
-    slug: "google-search",
-    scenarioId: "google-search",
+    slug: "google-com",
+    scenarioId: "google-com",
     status: "published",
     moduleKey: "/content/scenes/google-search/scene.yaml",
   },

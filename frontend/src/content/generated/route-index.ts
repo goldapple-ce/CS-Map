@@ -4,37 +4,37 @@ import type { RouteIndexEntry } from "@/content/repository"
 export const routeIndex: readonly RouteIndexEntry[] = [
   {
     id: "google-search-root",
-    path: "/explore/google-search",
+    path: "/explore/google-com",
     status: "published",
     moduleKey: "/content/scenes/google-search/scene.yaml",
   },
   {
-    id: "google-search-network",
-    path: "/explore/google-search/network",
-    parentId: "google-search-root",
-    status: "published",
-    moduleKey: "/content/scenes/google-search/network/scene.yaml",
-  },
-  {
     id: "google-search-dns",
-    path: "/explore/google-search/network/dns",
-    parentId: "google-search-network",
+    path: "/explore/google-com/dns",
+    parentId: "google-search-root",
     status: "published",
     moduleKey: "/content/scenes/google-search/network/dns/scene.yaml",
   },
   {
     id: "google-search-dns-udp-query",
-    path: "/explore/google-search/network/dns/udp-query",
+    path: "/explore/google-com/dns/udp-query",
     parentId: "google-search-dns",
     status: "published",
     moduleKey: "/content/scenes/google-search/network/dns/udp-query/scene.yaml",
   },
   {
     id: "google-search-dns-socket-kernel",
-    path: "/explore/google-search/network/dns/udp-query/socket-kernel",
+    path: "/explore/google-com/dns/udp-query/socket-kernel",
     parentId: "google-search-dns-udp-query",
     status: "published",
     moduleKey:
       "/content/scenes/google-search/network/dns/udp-query/socket-kernel/scene.yaml",
+  },
+  {
+    id: "google-search-network",
+    path: "/explore/google-com/router",
+    parentId: "google-search-root",
+    status: "published",
+    moduleKey: "/content/scenes/google-search/network/scene.yaml",
   },
 ]

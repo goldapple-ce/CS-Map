@@ -1,6 +1,6 @@
 id: google-search-dns-socket-kernel
 slug: socket-kernel
-scenarioId: google-search
+scenarioId: google-com
 parentId: google-search-dns-udp-query
 title: Socket과 Kernel
 summary: 사용자 프로세스가 Socket API로 UDP 전송을 요청하고 커널 네트워크 스택이 datagram을 처리하는 경계입니다.

@@ -1,8 +1,8 @@
 # CS Zoom Map 기술 설계서
 
-- 상태: Proposed v0.3
-- 기준 요구사항: `REQUIREMENTS.md` Draft v0.4
-- 목표: 구글 검색 시나리오의 클릭 기반 Semantic Zoom MVP
+- 상태: Proposed v0.4
+- 기준 요구사항: `REQUIREMENTS.md` Draft v0.5
+- 목표: `google.com` 접속 시나리오의 클릭 기반 Semantic Zoom MVP
 
 ## 1. 설계 목표
 
@@ -309,6 +309,8 @@ content/scenes/google-search/network/dns/
 
 `scene.yaml`은 구조, 위치, 관계와 메타데이터를 가진다. `content.ko.md`는 긴 설명 섹션을 가진다.
 
+현재 콘텐츠 디렉터리와 `google-search-*` 영구 ID는 기존 참조를 깨뜨리지 않기 위해 유지한다. 사용자에게 노출되는 루트 slug와 canonical URL은 새 시나리오를 반영한 `google-com`을 사용한다. 새 하위 Scene은 의미에 맞는 ID를 사용하며, 기존 ID를 일괄 변경해야 할 필요가 생기면 별도의 migration으로 처리한다.
+
 ### 6.2 공통 개념 디렉터리
 
 ```text
@@ -385,20 +387,21 @@ type HistoryEntry = {
 
 ```text
 /                                      # 소개 홈페이지
-/explore/google-search
-/explore/google-search/network
-/explore/google-search/network/dns
-/explore/google-search/network/dns/udp-query
+/explore/google-com
+/explore/google-com/dns
+/explore/google-com/dns/udp-query
+/explore/google-com/router
 ```
 
 - `/`는 서비스 소개와 이용 방법을 제공하고 루트 Scene의 `SceneViewport`를 재사용하는 `HomeRoute`를 표시한다.
 - 홈페이지의 `SceneViewport`는 같은 콘텐츠 repository와 World renderer를 사용하며, 게시된 Topic 클릭을 해당 `/explore/*` 경로로 연결한다.
 - 홈페이지에서는 `SceneViewport`의 embedded presentation을 사용해 Explorer 전용 chrome을 렌더링하지 않으며, 접근성 제목과 실제 흐름 renderer는 유지한다.
 - embedded presentation은 홈페이지 콘텐츠 영역의 너비를 유지하고, Scene 전체 높이를 맞추지 않은 채 월드 bounds의 가로 너비를 그 영역에 맞춰 카메라 배율을 계산한다. 홈페이지 영역을 벗어나는 세로 여백과 부가 annotation은 잘릴 수 있다. Explorer presentation은 기존 전체 bounds와 padding 맞춤을 유지한다.
-- 전체 화면 탐색 행동은 `/explore/google-search`로 클라이언트 측 이동한다.
+- 전체 화면 탐색 행동은 `/explore/google-com`으로 클라이언트 측 이동한다.
 - URL path는 현재 맥락을 표현한다.
 - 내부 데이터 참조는 변경에 강한 영구 ID를 사용한다.
 - slug가 변경되면 alias 목록 또는 redirect manifest로 기존 URL을 보존한다.
+- 기존 `/explore/google-search`와 제작된 하위 경로는 router의 명시적 alias에서 대응하는 `/explore/google-com` 경로로 교체 이동한다.
 - 같은 공통 개념이라도 서로 다른 사용 맥락은 다른 탐색 URL을 가질 수 있다.
 - 공통 설명 데이터는 중복하지 않고 같은 Concept를 참조한다.
 

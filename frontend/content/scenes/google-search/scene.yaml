@@ -1,10 +1,10 @@
 id: google-search-root
-slug: google-search
-scenarioId: google-search
-title: 구글 검색
-summary: 사용자의 검색어가 브라우저와 네트워크를 거쳐 검색 결과로 돌아와 화면에 표시되는 전체 흐름입니다.
+slug: google-com
+scenarioId: google-com
+title: google.com 접속
+summary: 브라우저 주소창에 google.com을 입력한 뒤 이름 확인과 네트워크 경로를 거쳐 서버에 도달하는 주요 학습 흐름입니다.
 status: published
-ariaLabel: 사용자 입력에서 브라우저, 네트워크, 검색 서비스, 결과 응답과 브라우저 렌더링으로 이어지는 흐름
+ariaLabel: 사용자와 브라우저에서 DNS, Router, Server로 이어지는 google.com 접속 학습 흐름
 layoutHint: horizontal
 contentRef: content.ko.md
 author:
@@ -12,167 +12,71 @@ author:
   displayName: CS Map Team
 updatedAt: 2026-07-25
 sources:
-  - title: In-depth guide to how Google Search works
-    url: https://developers.google.com/search/docs/fundamentals/how-search-works
-    type: official
-  - title: How browsers work
-    url: https://web.dev/articles/howbrowserswork
-    type: official
+  - title: RFC 1034 — Domain Names, Concepts and Facilities
+    url: https://www.rfc-editor.org/rfc/rfc1034.html
+    type: primary
+  - title: RFC 8446 — The Transport Layer Security Protocol Version 1.3
+    url: https://www.rfc-editor.org/rfc/rfc8446.html
+    type: primary
 contexts: []
 occurrences: []
 conceptRefs: []
-quiz:
-  questions:
-    - id: browser-next-step
-      prompt: 전체 흐름에서 브라우저가 요청을 준비한 다음 거치는 단계는 무엇인가요?
-      options:
-        - id: network
-          label: 네트워크
-        - id: data-processing
-          label: 색인 조회와 결과 구성
-        - id: browser-rendering
-          label: 브라우저 렌더링
-      correctOptionId: network
-      explanation: 브라우저가 요청을 준비하면 네트워크를 통해 외부 검색 서비스로 요청을 전송합니다.
-    - id: response-next-step
-      prompt: 검색 결과 응답이 사용자 화면에 표시되기 전에 이어지는 단계는 무엇인가요?
-      options:
-        - id: user-input
-          label: 사용자 입력
-        - id: browser-rendering
-          label: 브라우저 렌더링
-        - id: service-infrastructure
-          label: 서비스 인프라
-      correctOptionId: browser-rendering
-      explanation: 검색 결과 응답을 받은 브라우저가 결과를 렌더링해야 사용자가 화면에서 확인할 수 있습니다.
 elements:
-  - id: client-group
-    kind: group
-    label: 사용자 환경
-  - id: network-group
-    kind: group
-    label: 네트워크 경로
-  - id: service-group
-    kind: group
-    label: 검색 서비스 영역
-  - id: user-input
+  - id: user-browser
     kind: node
-    label: 사용자 입력
-    groupId: client-group
-  - id: browser
-    kind: node
-    label: 브라우저
-    groupId: client-group
+    label: 사용자 / 브라우저
     status: planned
-  - id: browser-rendering
+  - id: dns
     kind: node
-    label: 브라우저 렌더링
-    groupId: client-group
-    status: planned
-  - id: network
+    label: DNS
+    status: published
+    targetSceneId: google-search-dns
+  - id: router
     kind: node
-    label: 네트워크
-    groupId: network-group
+    label: Router
     status: published
     targetSceneId: google-search-network
-  - id: service-infrastructure
+  - id: server
     kind: node
-    label: 서비스 인프라
-    groupId: service-group
+    label: Server
     status: planned
-  - id: search-server
-    kind: node
-    label: 검색 요청 처리
-    groupId: service-group
-    status: planned
-  - id: data-processing
-    kind: node
-    label: 색인 조회와 결과 구성
-    groupId: service-group
-    status: planned
-  - id: search-response
-    kind: node
-    label: 검색 결과 응답
-    groupId: service-group
-  # - id: request-flow-note
-  #   kind: annotation
-  #   label: 검색 서비스 내부의 상세 구성은 Google의 비공개 구현을 단정하지 않은 일반 아키텍처 예시입니다.
-  - id: input-to-browser
+  - id: user-to-dns
     kind: edge
-    label: 입력 전달
-    fromElementId: user-input
-    toElementId: browser
-  - id: browser-to-network
+    label: 이름 확인
+    fromElementId: user-browser
+    toElementId: dns
+  - id: dns-to-router
     kind: edge
-    label: 요청 준비
-    fromElementId: browser
-    toElementId: network
-  - id: network-to-infrastructure
+    label: 목적지 주소 확인
+    fromElementId: dns
+    toElementId: router
+  - id: router-to-server
     kind: edge
-    label: 요청 전송
-    fromElementId: network
-    toElementId: service-infrastructure
-  - id: infrastructure-to-search
-    kind: edge
-    label: 요청 전달
-    fromElementId: service-infrastructure
-    toElementId: search-server
-  - id: search-to-data
-    kind: edge
-    label: 관련 결과 탐색
-    fromElementId: search-server
-    toElementId: data-processing
-  - id: data-to-response
-    kind: edge
-    label: 결과 구성
-    fromElementId: data-processing
-    toElementId: search-response
-  - id: response-to-rendering
-    kind: edge
-    label: 응답 반환
-    fromElementId: search-response
-    toElementId: browser-rendering
+    label: 서버로 전송
+    fromElementId: router
+    toElementId: server
 relationships:
-  - { type: contains, elementId: network, targetSceneId: google-search-network }
+  - { type: contains, elementId: dns, targetSceneId: google-search-dns }
   - {
-      type: flows-to,
-      fromElementId: user-input,
-      toElementId: browser,
-      label: 입력 전달,
+      type: contains,
+      elementId: router,
+      targetSceneId: google-search-network,
     }
   - {
       type: flows-to,
-      fromElementId: browser,
-      toElementId: network,
-      label: 요청 준비,
+      fromElementId: user-browser,
+      toElementId: dns,
+      label: 이름 확인,
     }
   - {
       type: flows-to,
-      fromElementId: network,
-      toElementId: service-infrastructure,
-      label: 요청 전송,
+      fromElementId: dns,
+      toElementId: router,
+      label: 목적지 주소 확인,
     }
   - {
       type: flows-to,
-      fromElementId: service-infrastructure,
-      toElementId: search-server,
-      label: 요청 전달,
-    }
-  - {
-      type: flows-to,
-      fromElementId: search-server,
-      toElementId: data-processing,
-      label: 관련 결과 탐색,
-    }
-  - {
-      type: flows-to,
-      fromElementId: data-processing,
-      toElementId: search-response,
-      label: 결과 구성,
-    }
-  - {
-      type: flows-to,
-      fromElementId: search-response,
-      toElementId: browser-rendering,
-      label: 응답 반환,
+      fromElementId: router,
+      toElementId: server,
+      label: 서버로 전송,
     }

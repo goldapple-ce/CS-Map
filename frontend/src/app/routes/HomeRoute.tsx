@@ -34,6 +34,7 @@ export function HomeRoute() {
   const rootRoute = contentRepository
     .listRoutes()
     .find(({ parentId }) => !parentId)
+  const rootPath = rootRoute?.path ?? "/explore/google-com"
 
   const enterScene = ({ sceneId }: SceneNavigationRequest) => {
     const targetRoute = contentRepository
@@ -71,7 +72,7 @@ export function HomeRoute() {
                 id="first-topic-title"
                 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl"
               >
-                구글에서 검색하면 무슨 일이 발생할까요?
+                브라우저에 google.com을 입력하면 무슨 일이 발생할까요?
               </h2>
               <p className="mt-3 max-w-2xl leading-7 text-muted-foreground">
                 아래 흐름에서 궁금한 Topic을 클릭하면 해당 위치부터 바로 탐색할
@@ -82,7 +83,7 @@ export function HomeRoute() {
               type="button"
               variant="outline"
               className="shrink-0"
-              onClick={() => navigate("/explore/google-search")}
+              onClick={() => navigate(rootPath)}
             >
               전체 화면으로 탐색
               <ArrowRight aria-hidden="true" />
@@ -97,7 +98,7 @@ export function HomeRoute() {
               reducedMotion
               presentation="embedded"
               onEnterScene={enterScene}
-              onShowPlanned={() => navigate("/explore/google-search")}
+              onShowPlanned={() => navigate(rootPath)}
               onSceneReady={() => undefined}
               onCameraChange={() => undefined}
               onAnimationChange={() => undefined}

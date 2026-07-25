@@ -1,8 +1,8 @@
 id: google-search-network
-slug: network
-scenarioId: google-search
+slug: router
+scenarioId: google-com
 parentId: google-search-root
-title: 네트워크
+title: Router
 summary: 브라우저가 검색 서비스에 요청을 보내기 위해 이름을 주소로 확인하고 전송 경로를 준비하는 장면입니다.
 status: published
 ariaLabel: 브라우저 요청에서 DNS 이름 확인, 연결 준비, 검색 서비스 도착으로 이어지는 네트워크 흐름
@@ -35,8 +35,7 @@ elements:
     kind: node
     label: DNS 이름 확인
     groupId: client-network-group
-    status: published
-    targetSceneId: google-search-dns
+    status: planned
   - id: transport-connection
     kind: node
     label: 전송 연결 준비
@@ -75,11 +74,6 @@ elements:
     fromElementId: secure-request
     toElementId: service-endpoint
 relationships:
-  - {
-      type: contains,
-      elementId: dns-resolution,
-      targetSceneId: google-search-dns,
-    }
   - {
       type: flows-to,
       fromElementId: browser-request,

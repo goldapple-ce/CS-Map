@@ -53,7 +53,7 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
   const [navigationDisabled, setNavigationDisabled] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(false)
   const [restoreScrollTop, setRestoreScrollTop] = useState(0)
-  const [explanationTitle, setExplanationTitle] = useState("검색 요청")
+  const [explanationTitle, setExplanationTitle] = useState("google.com 접속")
   const [plannedSelection, setPlannedSelection] = useState<PlannedSelection>()
 
   useEffect(() => {

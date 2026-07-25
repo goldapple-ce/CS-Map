@@ -52,6 +52,9 @@ export function SceneViewport({
   onAnimationChange,
 }: SceneViewportProps) {
   const navigate = useNavigate()
+  const rootPath =
+    contentRepository.listRoutes().find(({ parentId }) => !parentId)?.path ??
+    "/explore/google-com"
   const embedded = presentation === "embedded"
   const viewportRef = useRef<HTMLDivElement>(null)
   const animationFrameRef = useRef<number | undefined>(undefined)
@@ -296,7 +299,7 @@ export function SceneViewport({
               <h2 className="text-xl font-semibold">
                 게시된 Topic이 없습니다.
               </h2>
-              <Button onClick={() => navigate("/explore/google-search")}>
+              <Button onClick={() => navigate(rootPath)}>
                 루트로
               </Button>
             </div>

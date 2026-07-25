@@ -2,7 +2,7 @@
 
 ## 현재 상태
 
-**사용자 확인 대기 — 아직 구현을 시작하지 않음**
+**1단계 구현 완료 — 사용자 확인 대기**
 
 ## 이번 목표
 
@@ -94,11 +94,11 @@ Proxy Server → Application Server → Database
 
 ## 작업 순서
 
-### 1단계 — 루트 시나리오와 영구 문서 정정
+### 1단계 — 루트 시나리오와 영구 문서 정정 `▶ 현재`
 
-- [ ] `REQUIREMENTS.md`와 `TECHNICAL_DESIGN.md`의 MVP 시작 시나리오를 `google.com` 주소 입력으로 변경한다.
-- [ ] 새 루트 ID·slug·URL과 콘텐츠 트리를 확정하고 홈페이지 진입 경로를 갱신한다.
-- [ ] 루트 Scene을 `사용자/브라우저 → DNS → Router → Server` 흐름으로 교체한다.
+- [x] `REQUIREMENTS.md`와 `TECHNICAL_DESIGN.md`의 MVP 시작 시나리오를 `google.com` 주소 입력으로 변경한다.
+- [x] 기존 영구 ID 유지, 새 `google-com` slug·URL과 콘텐츠 트리를 확정하고 홈페이지 진입 경로를 갱신한다.
+- [x] 루트 Scene을 `사용자/브라우저 → DNS → Router → Server` 흐름으로 교체한다.
 
 ### 2단계 — 사용자·DNS·Router Scene
 
