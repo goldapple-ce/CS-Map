@@ -41,6 +41,7 @@ const sceneElementSchema = z.discriminatedUnion("kind", [
       label: z.string().min(1).optional(),
       groupId: contentIdSchema.optional(),
       targetSceneId: contentIdSchema.optional(),
+      navigateToSceneId: contentIdSchema.optional(),
       conceptId: contentIdSchema.optional(),
       status: z.enum(["published", "planned"]).optional(),
     })

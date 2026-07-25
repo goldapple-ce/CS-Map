@@ -276,10 +276,16 @@ type SceneElement = {
   toElementId?: ContentId;
   variant?: "flow" | "supporting";
   targetSceneId?: ContentId;
+  navigateToSceneId?: ContentId;
   conceptId?: ContentId;
   status?: "published" | "planned";
 };
 ```
+
+`targetSceneId`는 node 안에 중첩되는 자식 Scene만 가리키며 대상 Scene의
+`parentId`가 현재 Scene이어야 한다. 이미 월드의 다른 위치에 배치된 Scene으로
+이동하는 교차 탐색은 `navigateToSceneId`를 사용한다. 교차 탐색은 카메라와 URL만
+대상 Scene으로 이동하며 월드 중첩이나 `contains` 관계를 추가하지 않는다.
 
 ### 5.3 공통 개념과 사용 위치 예시
 

@@ -163,12 +163,25 @@ function validateScene(
         )
       )
     }
-    if (element.status === "planned" && element.targetSceneId) {
+    if (
+      element.status === "planned" &&
+      (element.targetSceneId || element.navigateToSceneId)
+    ) {
       issues.push(
         makeIssue(
           scene.id,
-          `elements.${element.id}.targetSceneId`,
+          `elements.${element.id}`,
           "Planned elements must not navigate to a scene"
+        )
+      )
+      continue
+    }
+    if (element.targetSceneId && element.navigateToSceneId) {
+      issues.push(
+        makeIssue(
+          scene.id,
+          `elements.${element.id}`,
+          "Node must use either targetSceneId or navigateToSceneId, not both"
         )
       )
       continue
@@ -202,6 +215,26 @@ function validateScene(
             )
           )
         }
+      }
+    }
+    if (element.navigateToSceneId) {
+      const target = scenesById.get(element.navigateToSceneId)
+      if (!target) {
+        issues.push(
+          makeIssue(
+            scene.id,
+            `elements.${element.id}.navigateToSceneId`,
+            `Unknown navigation target scene: ${element.navigateToSceneId}`
+          )
+        )
+      } else if (scene.status === "published" && target.status !== "published") {
+        issues.push(
+          makeIssue(
+            scene.id,
+            `elements.${element.id}.navigateToSceneId`,
+            `Published scene cannot navigate to ${target.status} scene ${target.id}`
+          )
+        )
       }
     }
   }

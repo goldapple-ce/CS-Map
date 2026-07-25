@@ -76,12 +76,15 @@ export function SceneNode({
 }: SceneNodeProps) {
   const { x, y, width, height } = layout
   const label = element.label ?? element.id
-  const targetSceneId = element.targetSceneId
-  const preview = targetSceneId
+  const navigationSceneId =
+    element.targetSceneId ?? element.navigateToSceneId
+  const preview = element.targetSceneId
     ? `${label} 내부 흐름으로 확대합니다.`
-    : state === "planned"
-      ? `${label} 상세 장면은 준비 중입니다.`
-      : undefined
+    : element.navigateToSceneId
+      ? `${label} Topic으로 이동합니다.`
+      : state === "planned"
+        ? `${label} 상세 장면은 준비 중입니다.`
+        : undefined
   const content = (
     <>
       <span className={sceneNodeLabelVariants({ density })}>{label}</span>
@@ -92,15 +95,19 @@ export function SceneNode({
   )
 
   let nodeContent
-  if (targetSceneId && onEnterScene) {
+  if (navigationSceneId && onEnterScene) {
     nodeContent = (
       <button
         type="button"
         data-scene-node-id={element.id}
         disabled={navigationDisabled}
-        aria-label={`${label} 하위 장면 열기`}
+        aria-label={
+          element.targetSceneId
+            ? `${label} 하위 장면 열기`
+            : `${label} Topic으로 이동`
+        }
         className={cn(sceneNodeVariants({ state }))}
-        onClick={() => onEnterScene(targetSceneId, element.id)}
+        onClick={() => onEnterScene(navigationSceneId, element.id)}
       >
         {content}
       </button>

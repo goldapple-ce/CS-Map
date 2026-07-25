@@ -32,7 +32,10 @@ type WorldRendererProps = {
 }
 
 function nodeState(element: SceneNodeElement): SceneNodeState {
-  if (element.targetSceneId && element.status === "published")
+  if (
+    (element.targetSceneId || element.navigateToSceneId) &&
+    element.status === "published"
+  )
     return "interactive"
   if (element.status === "planned") return "planned"
   return "static"

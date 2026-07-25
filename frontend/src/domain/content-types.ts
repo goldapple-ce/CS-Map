@@ -24,6 +24,7 @@ export type SceneNodeElement = SceneElementBase & {
   kind: "node"
   groupId?: ContentId
   targetSceneId?: ContentId
+  navigateToSceneId?: ContentId
   conceptId?: ContentId
   status?: "published" | "planned"
 }

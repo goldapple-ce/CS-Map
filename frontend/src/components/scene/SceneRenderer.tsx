@@ -23,7 +23,10 @@ function nodeState(
   selectedElementId?: string
 ): SceneNodeState {
   if (element.id === selectedElementId) return "selected"
-  if (element.targetSceneId && element.status === "published")
+  if (
+    (element.targetSceneId || element.navigateToSceneId) &&
+    element.status === "published"
+  )
     return "interactive"
   if (element.status === "planned") return "planned"
   return "static"
