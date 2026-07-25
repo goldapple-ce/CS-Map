@@ -25,7 +25,8 @@ elements:
   - id: user-browser
     kind: node
     label: 사용자 / 브라우저
-    status: planned
+    status: published
+    targetSceneId: google-com-user-browser
   - id: dns
     kind: node
     label: DNS
@@ -56,6 +57,11 @@ elements:
     fromElementId: router
     toElementId: server
 relationships:
+  - {
+      type: contains,
+      elementId: user-browser,
+      targetSceneId: google-com-user-browser,
+    }
   - { type: contains, elementId: dns, targetSceneId: google-search-dns }
   - {
       type: contains,

@@ -36,6 +36,7 @@ export type SceneEdgeElement = SceneElementBase & {
   kind: "edge"
   fromElementId: ContentId
   toElementId: ContentId
+  variant?: "flow" | "supporting"
 }
 
 export type SceneAnnotationElement = SceneElementBase & {
@@ -89,6 +90,12 @@ export type Relationship =
   | { type: "contains"; elementId: ContentId; targetSceneId: ContentId }
   | {
       type: "flows-to"
+      fromElementId: ContentId
+      toElementId: ContentId
+      label?: string
+    }
+  | {
+      type: "supports"
       fromElementId: ContentId
       toElementId: ContentId
       label?: string

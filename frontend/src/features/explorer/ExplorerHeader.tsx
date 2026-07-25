@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 const knownLabels: Record<string, string> = {
   explore: "탐색",
   "google-com": "google.com 접속",
+  "user-browser": "사용자와 브라우저",
+  router: "Router",
   network: "네트워크",
   dns: "DNS",
   "udp-query": "UDP 질의",

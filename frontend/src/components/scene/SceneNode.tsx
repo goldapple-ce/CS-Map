@@ -8,7 +8,7 @@ export type SceneNodeState = "interactive" | "planned" | "static" | "selected"
 export type SceneNodeDensity = "far" | "medium" | "near"
 
 const sceneNodeVariants = cva(
-  "flex size-full flex-col items-center justify-center gap-0.5 rounded-lg px-2 text-center transition-[background-color,color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
+  "flex size-full flex-col items-center justify-center gap-0.5 rounded-xl border border-border bg-card/90 px-3 text-center shadow-sm transition-[background-color,color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
   {
     variants: {
       state: {
@@ -28,9 +28,9 @@ const sceneNodeLabelVariants = cva(
   {
     variants: {
       density: {
-        far: "text-3xl",
-        medium: "text-2xl",
-        near: "text-xl",
+        far: "text-4xl",
+        medium: "text-3xl",
+        near: "text-2xl",
       },
     },
     defaultVariants: { density: "near" },
@@ -40,9 +40,9 @@ const sceneNodeLabelVariants = cva(
 const sceneNodeStatusVariants = cva("text-muted-foreground", {
   variants: {
     density: {
-      far: "text-lg",
-      medium: "text-base",
-      near: "text-sm",
+      far: "text-xl",
+      medium: "text-lg",
+      near: "text-base",
     },
   },
   defaultVariants: { density: "near" },

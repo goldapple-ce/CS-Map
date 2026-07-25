@@ -2,7 +2,7 @@
 
 ## 현재 상태
 
-**1단계 구현 완료 — 사용자 확인 대기**
+**2단계 구현 완료 — 사용자 확인 대기**
 
 ## 이번 목표
 
@@ -94,19 +94,19 @@ Proxy Server → Application Server → Database
 
 ## 작업 순서
 
-### 1단계 — 루트 시나리오와 영구 문서 정정 `▶ 현재`
+### 1단계 — 루트 시나리오와 영구 문서 정정
 
 - [x] `REQUIREMENTS.md`와 `TECHNICAL_DESIGN.md`의 MVP 시작 시나리오를 `google.com` 주소 입력으로 변경한다.
 - [x] 기존 영구 ID 유지, 새 `google-com` slug·URL과 콘텐츠 트리를 확정하고 홈페이지 진입 경로를 갱신한다.
 - [x] 루트 Scene을 `사용자/브라우저 → DNS → Router → Server` 흐름으로 교체한다.
 
-### 2단계 — 사용자·DNS·Router Scene
+### 2단계 — 사용자·DNS·Router Scene `▶ 현재`
 
-- [ ] 사용자 Scene에 브라우저의 `ClientHello`, 서버의 인증서 체인 제공, 브라우저의 인증서 검증 흐름을 구현한다.
-- [ ] 진행·리턴 화살표의 라벨을 화면에 표시하고 위치를 자동 계산하도록 edge renderer를 보강한다.
-- [ ] DNS Scene을 Resolver → Root → TLD → 권한 DNS → IP 응답 흐름으로 재구성한다.
-- [ ] 기존 UDP 및 Socket/Kernel 콘텐츠를 새 DNS 경로에 맞게 연결한다.
-- [ ] Router Scene에 게이트웨이·NAT·ISP·인터넷 라우팅 흐름을 구현한다.
+- [x] 사용자 Scene에 브라우저의 `ClientHello`, 서버의 인증서 체인 제공, 브라우저의 인증서 검증 흐름을 구현한다.
+- [x] 진행·리턴 화살표의 라벨을 화면에 표시하고 위치를 자동 계산하도록 edge renderer를 보강한다.
+- [x] DNS Scene을 Resolver → Root → TLD → 권한 DNS → IP 응답 흐름으로 재구성한다.
+- [x] 기존 UDP 및 Socket/Kernel 콘텐츠를 새 DNS 경로에 맞게 연결한다.
+- [x] Router Scene에 게이트웨이·NAT·ISP·인터넷 라우팅 흐름을 구현한다.
 
 ### 3단계 — Server와 구현 예시
 

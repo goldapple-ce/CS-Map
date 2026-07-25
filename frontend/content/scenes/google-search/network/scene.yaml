@@ -2,99 +2,121 @@ id: google-search-network
 slug: router
 scenarioId: google-com
 parentId: google-search-root
-title: Router
-summary: 브라우저가 검색 서비스에 요청을 보내기 위해 이름을 주소로 확인하고 전송 경로를 준비하는 장면입니다.
+title: Router와 인터넷 경로
+summary: 장치가 기본 게이트웨이의 링크 계층 주소를 확인하고 공유기와 ISP를 거쳐 목적지 네트워크로 packet을 전달하는 흐름입니다.
 status: published
-ariaLabel: 브라우저 요청에서 DNS 이름 확인, 연결 준비, 검색 서비스 도착으로 이어지는 네트워크 흐름
+ariaLabel: 사용자 장치에서 기본 게이트웨이, ARP 또는 NDP, 공유기와 NAT, ISP, 인터넷 라우팅과 목적지 서버로 이어지는 흐름
 layoutHint: horizontal
 contentRef: content.ko.md
-author: { id: cs-map-team, displayName: CS Map Team }
-updatedAt: 2026-07-24
+author:
+  id: cs-map-team
+  displayName: CS Map Team
+updatedAt: 2026-07-25
 sources:
-  - title: RFC 1034 — Domain names, concepts and facilities
-    url: https://www.rfc-editor.org/info/rfc1034/
+  - title: RFC 826 — An Ethernet Address Resolution Protocol
+    url: https://www.rfc-editor.org/rfc/rfc826.html
     type: primary
-  - title: How browsers work
-    url: https://web.dev/articles/howbrowserswork
-    type: official
+  - title: RFC 4861 — Neighbor Discovery for IPv6
+    url: https://www.rfc-editor.org/rfc/rfc4861.html
+    type: primary
+  - title: RFC 3022 — Traditional IP Network Address Translator
+    url: https://www.rfc-editor.org/rfc/rfc3022.html
+    type: primary
+  - title: RFC 4271 — A Border Gateway Protocol 4
+    url: https://www.rfc-editor.org/rfc/rfc4271.html
+    type: primary
 contexts: []
 occurrences: []
 conceptRefs: []
 elements:
-  - id: client-network-group
-    kind: group
+  - id: user-device
+    kind: node
     label: 사용자 장치
-  - id: remote-network-group
-    kind: group
-    label: 외부 네트워크와 서비스
-  - id: browser-request
+  - id: default-gateway
     kind: node
-    label: 브라우저 요청 준비
-    groupId: client-network-group
-  - id: dns-resolution
+    label: 기본 게이트웨이 선택
+  - id: neighbor-resolution
     kind: node
-    label: DNS 이름 확인
-    groupId: client-network-group
-    status: planned
-  - id: transport-connection
+    label: ARP / NDP
+  - id: home-router-nat
     kind: node
-    label: 전송 연결 준비
-    groupId: remote-network-group
-    status: planned
-  - id: secure-request
+    label: 공유기 / NAT
+  - id: isp
     kind: node
-    label: 보안 요청 전송
-    groupId: remote-network-group
-    status: planned
-  - id: service-endpoint
+    label: ISP
+  - id: internet-routing
     kind: node
-    label: 검색 서비스 도착
-    groupId: remote-network-group
-  - id: network-note
+    label: 인터넷 라우팅
+  - id: destination-server
+    kind: node
+    label: 목적지 서버
+  - id: router-scope-note
     kind: annotation
-    label: 실제 요청에서는 캐시와 기존 연결 상태에 따라 일부 단계가 생략되거나 재사용될 수 있습니다.
-  - id: browser-to-dns
+    label: NAT는 모든 경로에 필수인 단계가 아니며, 가정용 IPv4 공유기를 사용하는 일반적인 예시로 표시합니다.
+  - id: device-to-gateway
     kind: edge
-    label: 호스트 이름 전달
-    fromElementId: browser-request
-    toElementId: dns-resolution
-  - id: dns-to-transport
+    label: 다음 hop 선택
+    fromElementId: user-device
+    toElementId: default-gateway
+  - id: gateway-to-neighbor
     kind: edge
-    label: 목적지 주소 확보
-    fromElementId: dns-resolution
-    toElementId: transport-connection
-  - id: transport-to-request
+    label: 링크 주소 확인
+    fromElementId: default-gateway
+    toElementId: neighbor-resolution
+  - id: neighbor-to-router
     kind: edge
-    label: 연결 위에서 요청
-    fromElementId: transport-connection
-    toElementId: secure-request
-  - id: request-to-service
+    label: frame 전달
+    fromElementId: neighbor-resolution
+    toElementId: home-router-nat
+  - id: router-to-isp
     kind: edge
-    label: 요청 전달
-    fromElementId: secure-request
-    toElementId: service-endpoint
+    label: 외부망 전달
+    fromElementId: home-router-nat
+    toElementId: isp
+  - id: isp-to-internet
+    kind: edge
+    label: 경로 선택
+    fromElementId: isp
+    toElementId: internet-routing
+  - id: internet-to-server
+    kind: edge
+    label: 목적지 network 도달
+    fromElementId: internet-routing
+    toElementId: destination-server
 relationships:
   - {
       type: flows-to,
-      fromElementId: browser-request,
-      toElementId: dns-resolution,
-      label: 호스트 이름 전달,
+      fromElementId: user-device,
+      toElementId: default-gateway,
+      label: 다음 hop 선택,
     }
   - {
       type: flows-to,
-      fromElementId: dns-resolution,
-      toElementId: transport-connection,
-      label: 목적지 주소 확보,
+      fromElementId: default-gateway,
+      toElementId: neighbor-resolution,
+      label: 링크 주소 확인,
     }
   - {
       type: flows-to,
-      fromElementId: transport-connection,
-      toElementId: secure-request,
-      label: 연결 위에서 요청,
+      fromElementId: neighbor-resolution,
+      toElementId: home-router-nat,
+      label: frame 전달,
     }
   - {
       type: flows-to,
-      fromElementId: secure-request,
-      toElementId: service-endpoint,
-      label: 요청 전달,
+      fromElementId: home-router-nat,
+      toElementId: isp,
+      label: 외부망 전달,
+    }
+  - {
+      type: flows-to,
+      fromElementId: isp,
+      toElementId: internet-routing,
+      label: 경로 선택,
+    }
+  - {
+      type: flows-to,
+      fromElementId: internet-routing,
+      toElementId: destination-server,
+      label: 목적지 network 도달,
     }

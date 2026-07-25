@@ -205,6 +205,7 @@ project/
 | ---------------- | --------------------- | -----------------: | -------------: |
 | `contains`       | 내부 장면으로 확대    |             아니오 |             예 |
 | `flows-to`       | 실제 데이터·제어 흐름 | 장면 내부에서 가능 |             예 |
+| `supports`       | 사전 신뢰·지원 관계   |                 예 | 구분된 점선 edge |
 | `related`        | 관련 지식 연결        |                 예 |  구분된 연결선 |
 | `prerequisite`   | 선수 지식 연결        |                 예 |  구분된 연결선 |
 | `used-by`        | 사용 관계 연결        |                 예 |  구분된 연결선 |
@@ -273,6 +274,7 @@ type SceneElement = {
   groupId?: ContentId;
   fromElementId?: ContentId;
   toElementId?: ContentId;
+  variant?: "flow" | "supporting";
   targetSceneId?: ContentId;
   conceptId?: ContentId;
   status?: "published" | "planned";
@@ -391,6 +393,7 @@ type HistoryEntry = {
 /explore/google-com/dns
 /explore/google-com/dns/udp-query
 /explore/google-com/router
+/explore/google-com/user-browser
 ```
 
 - `/`는 서비스 소개와 이용 방법을 제공하고 루트 Scene의 `SceneViewport`를 재사용하는 `HomeRoute`를 표시한다.
@@ -424,8 +427,17 @@ type HistoryEntry = {
 - 각 하위 장면은 부모의 확대 대상 노드 영역 안에 로컬 좌표계로 중첩된다.
 - SVG는 연결선과 도형을 담당한다.
 - 클릭 가능한 텍스트·버튼은 SVG 접근 가능 요소 또는 위치가 동기화된 HTML overlay로 표현한다.
-- 장면 데이터는 좌표를 저장하지 않고 노드 순서, 그룹 소속과 `flows-to` 관계만 저장한다.
+- 장면 데이터는 좌표를 저장하지 않고 노드 순서, 그룹 소속과 `flows-to`·`supports` 관계만 저장한다.
 - renderer의 결정적 재귀 자동 배치가 로컬 좌표, 월드 bounds, 그룹 경계와 edge 경로를 계산한다.
+- `SceneEdge`는 `label`이 있으면 edge 경로에서 가장 긴 선분의 중점을 선택해 보이는 라벨을 배치한다. 진행 edge는 추정 라벨 너비만큼 인접 열 간격을 확보하며 콘텐츠에는 라벨 좌표를 저장하지 않는다.
+- edge router는 노드의 상대 위치에 따라 좌우 또는 위·아래 접점을 고르고, 수평·수직 선분만 사용하는 직교 꺾은선을 계산한다.
+- 출발과 도착 요소가 같은 self edge는 depth 계산에서 제외하고 해당 노드 위쪽을 돌아 다시 노드로 들어오는 loop 경로로 표시한다.
+- 동일한 두 Topic 사이에 edge가 여러 개 존재하면 데이터 순서대로 일정한 간격의 평행 lane을 할당한다. 방향은 각 edge의 화살표로 유지하며, 단일 return edge의 우회 경로와는 구분한다.
+- `supports` 관계는 주요 `flows-to` depth 계산에서 제외하고 대상 Topic과 같은 열의 위쪽 보조 분기로 자동 배치하며 점선 edge로 표시한다.
+- 위쪽 `supports` Topic에서 아래쪽 대상으로 향하는 edge는 대상의 윗면 중앙을 도착 접점으로 선택해 주 흐름의 좌우 연결선과 겹치지 않게 한다.
+- 기본 Topic 크기와 열·행 간격은 확대된 Scene에서도 라벨과 진행 방향을 구분할 수 있는 크기로 유지하며, edge 라벨 너비가 더 크면 열 간격을 추가로 확장한다.
+- `branch` 레이아웃에서 첫 열에 여러 진입 Topic이 있으면 데이터상 마지막 Topic을 중앙의 주 흐름에 맞추고 앞선 Topic을 위쪽 보조 분기로 쌓는다.
+- 보이는 edge 라벨은 배경색 halo로 선과 분리하고, edge 그룹의 접근성 이름과 SVG `title`은 그대로 유지한다.
 - 자동 배치 구현은 도메인 모델 밖에 두어 향후 다른 layout 전략으로 교체할 수 있게 한다.
 - 화면 투영 크기에 따른 LOD와 Viewport 교차 검사로 실제 DOM 렌더링 범위를 제한한다.
 

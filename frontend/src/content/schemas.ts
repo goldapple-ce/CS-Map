@@ -59,6 +59,7 @@ const sceneElementSchema = z.discriminatedUnion("kind", [
       label: z.string().min(1).optional(),
       fromElementId: contentIdSchema,
       toElementId: contentIdSchema,
+      variant: z.enum(["flow", "supporting"]).optional(),
     })
     .strict(),
   z
@@ -159,6 +160,14 @@ const relationshipSchema = z.discriminatedUnion("type", [
   z
     .object({
       type: z.literal("flows-to"),
+      fromElementId: contentIdSchema,
+      toElementId: contentIdSchema,
+      label: z.string().min(1).optional(),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("supports"),
       fromElementId: contentIdSchema,
       toElementId: contentIdSchema,
       label: z.string().min(1).optional(),

@@ -29,12 +29,13 @@ export type SceneLayout = {
 
 const MIN_SCENE_WIDTH = 1280
 const MIN_SCENE_HEIGHT = 720
-const MIN_NODE_WIDTH = 112
-const NODE_HEIGHT = 104
-const HORIZONTAL_MARGIN = 52
-const VERTICAL_MARGIN = 72
-const COLUMN_GAP = 64
-const ROW_GAP = 34
+const MIN_NODE_WIDTH = 144
+const NODE_HEIGHT = 124
+const HORIZONTAL_MARGIN = 72
+const VERTICAL_MARGIN = 88
+const COLUMN_GAP = 112
+const ROW_GAP = 52
+const PARALLEL_EDGE_GAP = 28
 
 function estimatedNodeWidth(node: SceneNodeElement) {
   const label = node.label ?? node.id
@@ -46,16 +47,28 @@ function estimatedNodeWidth(node: SceneNodeElement) {
   return Math.max(MIN_NODE_WIDTH, textWidth + 32)
 }
 
+function estimatedEdgeLabelWidth(label: string) {
+  return (
+    [...label].reduce((width, character) => {
+      if (/\s/u.test(character)) return width + 6
+      if (/[^\u0000-\u00ff]/u.test(character)) return width + 18
+      return width + 10
+    }, 0) + 28
+  )
+}
+
 function calculateDepths(scene: Scene, nodes: readonly SceneNodeElement[]) {
   const nodeIds = new Set(nodes.map(({ id }) => id))
   const incoming = new Map(nodes.map(({ id }) => [id, 0]))
   const outgoing = new Map<string, string[]>()
+  const flowNodeIds = new Set<string>()
 
   for (const relationship of scene.relationships) {
     if (
       relationship.type !== "flows-to" ||
       !nodeIds.has(relationship.fromElementId) ||
-      !nodeIds.has(relationship.toElementId)
+      !nodeIds.has(relationship.toElementId) ||
+      relationship.fromElementId === relationship.toElementId
     ) {
       continue
     }
@@ -63,12 +76,16 @@ function calculateDepths(scene: Scene, nodes: readonly SceneNodeElement[]) {
       relationship.toElementId,
       (incoming.get(relationship.toElementId) ?? 0) + 1
     )
+    flowNodeIds.add(relationship.fromElementId)
+    flowNodeIds.add(relationship.toElementId)
     const targets = outgoing.get(relationship.fromElementId) ?? []
     targets.push(relationship.toElementId)
     outgoing.set(relationship.fromElementId, targets)
   }
 
-  const roots = nodes.filter(({ id }) => incoming.get(id) === 0)
+  const roots = nodes.filter(
+    ({ id }) => flowNodeIds.has(id) && incoming.get(id) === 0
+  )
   const queue = (roots.length > 0 ? roots : nodes.slice(0, 1)).map(
     ({ id }) => id
   )
@@ -83,6 +100,26 @@ function calculateDepths(scene: Scene, nodes: readonly SceneNodeElement[]) {
       depths.set(target, nextDepth)
       queue.push(target)
     }
+  }
+
+  for (let pass = 0; pass < nodes.length; pass += 1) {
+    let changed = false
+    for (const node of nodes) {
+      if (depths.has(node.id)) continue
+      const targetDepths = scene.relationships.flatMap((relationship) =>
+        relationship.type === "supports" &&
+        relationship.fromElementId === node.id
+          ? [depths.get(relationship.toElementId)]
+          : []
+      )
+      const resolvedDepths = targetDepths.filter(
+        (depth): depth is number => depth !== undefined
+      )
+      if (resolvedDepths.length === 0) continue
+      depths.set(node.id, Math.min(...resolvedDepths))
+      changed = true
+    }
+    if (!changed) break
   }
 
   for (const node of nodes) {
@@ -115,29 +152,82 @@ function calculateDepths(scene: Scene, nodes: readonly SceneNodeElement[]) {
 function edgePoints(
   source: LayoutBox,
   target: LayoutBox,
-  sceneHeight: number
+  laneOffset?: number,
+  supporting = false
 ): LayoutPoint[] {
+  const sourceCenterX = source.x + source.width / 2
   const sourceCenterY = source.y + source.height / 2
+  const targetCenterX = target.x + target.width / 2
   const targetCenterY = target.y + target.height / 2
 
-  if (target.x >= source.x) {
+  if (source === target) {
+    const loopTop = Math.max(28, source.y - 54)
+    const startX = source.x + source.width * 0.35
+    const rightX = source.x + source.width + 34
+    const targetY = source.y + source.height * 0.35
     return [
-      { x: source.x + source.width, y: sourceCenterY },
-      { x: target.x, y: targetCenterY },
+      { x: startX, y: source.y },
+      { x: startX, y: loopTop },
+      { x: rightX, y: loopTop },
+      { x: rightX, y: targetY },
+      { x: source.x + source.width, y: targetY },
     ]
   }
 
-  const returnY = Math.min(
-    sceneHeight - 36,
-    Math.max(source.y + source.height, target.y + target.height) + 54
-  )
+  const offset = laneOffset ?? 0
+  const horizontallySeparated =
+    target.x >= source.x + source.width ||
+    source.x >= target.x + target.width
+
+  if (supporting && sourceCenterY < target.y) {
+    const targetIsLeftOfSource = targetCenterX < sourceCenterX
+    const start = horizontallySeparated
+      ? {
+          x: targetIsLeftOfSource ? source.x : source.x + source.width,
+          y: sourceCenterY,
+        }
+      : { x: sourceCenterX, y: source.y + source.height }
+    const end = { x: targetCenterX, y: target.y }
+    if (start.x === end.x) return [start, end]
+    return [start, { x: end.x, y: start.y }, end]
+  }
+
+  if (horizontallySeparated) {
+    const forward = targetCenterX > sourceCenterX
+    const start = {
+      x: forward ? source.x + source.width : source.x,
+      y: sourceCenterY + offset,
+    }
+    const end = {
+      x: forward ? target.x : target.x + target.width,
+      y: targetCenterY + offset,
+    }
+    if (start.y === end.y) return [start, end]
+    const middleX = (start.x + end.x) / 2
+    return [
+      start,
+      { x: middleX, y: start.y },
+      { x: middleX, y: end.y },
+      end,
+    ]
+  }
+
+  const downward = targetCenterY > sourceCenterY
+  const start = {
+    x: sourceCenterX + offset,
+    y: downward ? source.y + source.height : source.y,
+  }
+  const end = {
+    x: targetCenterX + offset,
+    y: downward ? target.y : target.y + target.height,
+  }
+  if (start.x === end.x) return [start, end]
+  const middleY = (start.y + end.y) / 2
   return [
-    { x: source.x, y: sourceCenterY },
-    { x: source.x - 24, y: sourceCenterY },
-    { x: source.x - 24, y: returnY },
-    { x: target.x + target.width + 24, y: returnY },
-    { x: target.x + target.width + 24, y: targetCenterY },
-    { x: target.x + target.width, y: targetCenterY },
+    start,
+    { x: start.x, y: middleY },
+    { x: end.x, y: middleY },
+    end,
   ]
 }
 
@@ -166,9 +256,30 @@ export function createSceneLayout(scene: Scene): SceneLayout {
   const layerWidths = layers.map((layer) =>
     Math.max(...layer.map((node) => nodeWidths.get(node.id) ?? 0), 0)
   )
+  const layerGaps = Array.from(
+    { length: Math.max(layers.length - 1, 0) },
+    () => COLUMN_GAP
+  )
+  for (const edge of edges) {
+    if (!edge.label) continue
+    const sourceDepth = depths.get(edge.fromElementId)
+    const targetDepth = depths.get(edge.toElementId)
+    if (
+      sourceDepth === undefined ||
+      targetDepth === undefined ||
+      Math.abs(targetDepth - sourceDepth) !== 1
+    ) {
+      continue
+    }
+    const gapIndex = Math.min(sourceDepth, targetDepth)
+    layerGaps[gapIndex] = Math.max(
+      layerGaps[gapIndex] ?? COLUMN_GAP,
+      estimatedEdgeLabelWidth(edge.label)
+    )
+  }
   const contentWidth =
     layerWidths.reduce((sum, width) => sum + width, 0) +
-    Math.max(layerWidths.length - 1, 0) * COLUMN_GAP
+    layerGaps.reduce((sum, gap) => sum + gap, 0)
   const sceneWidth = Math.max(
     MIN_SCENE_WIDTH,
     HORIZONTAL_MARGIN * 2 + contentWidth
@@ -192,7 +303,12 @@ export function createSceneLayout(scene: Scene): SceneLayout {
     const layerWidth = layerWidths[depth] ?? 0
     const layerHeight =
       layer.length * NODE_HEIGHT + Math.max(layer.length - 1, 0) * ROW_GAP
-    const firstY = centerY - layerHeight / 2
+    const firstY =
+      scene.layoutHint === "branch" && layer.length > 1
+        ? centerY -
+          NODE_HEIGHT / 2 -
+          (layer.length - 1) * (NODE_HEIGHT + ROW_GAP)
+        : centerY - layerHeight / 2
 
     layer.forEach((node, index) => {
       const width = nodeWidths.get(node.id) ?? MIN_NODE_WIDTH
@@ -203,7 +319,7 @@ export function createSceneLayout(scene: Scene): SceneLayout {
         height: NODE_HEIGHT,
       })
     })
-    columnX += layerWidth + COLUMN_GAP
+    columnX += layerWidth + (layerGaps[depth] ?? 0)
   })
 
   const groupLayouts = new Map<string, LayoutBox>()
@@ -227,11 +343,37 @@ export function createSceneLayout(scene: Scene): SceneLayout {
   }
 
   const edgeLayouts = new Map<string, readonly LayoutPoint[]>()
+  const edgesByPair = new Map<string, SceneEdgeElement[]>()
+  for (const edge of edges) {
+    if (edge.fromElementId === edge.toElementId) continue
+    const pairKey = [edge.fromElementId, edge.toElementId].sort().join("<->")
+    const pairEdges = edgesByPair.get(pairKey) ?? []
+    pairEdges.push(edge)
+    edgesByPair.set(pairKey, pairEdges)
+  }
+  const laneOffsets = new Map<string, number>()
+  for (const pairEdges of edgesByPair.values()) {
+    if (pairEdges.length < 2) continue
+    pairEdges.forEach((edge, index) => {
+      laneOffsets.set(
+        edge.id,
+        (index - (pairEdges.length - 1) / 2) * PARALLEL_EDGE_GAP
+      )
+    })
+  }
   for (const edge of edges) {
     const source = nodeLayouts.get(edge.fromElementId)
     const target = nodeLayouts.get(edge.toElementId)
     if (source && target) {
-      edgeLayouts.set(edge.id, edgePoints(source, target, sceneHeight))
+      edgeLayouts.set(
+        edge.id,
+        edgePoints(
+          source,
+          target,
+          laneOffsets.get(edge.id),
+          edge.variant === "supporting"
+        )
+      )
     }
   }
 

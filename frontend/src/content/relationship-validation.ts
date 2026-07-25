@@ -310,9 +310,9 @@ function validateScene(
     )
   }
 
-  const flowPairs = new Set(
+  const relationPairs = new Set(
     scene.relationships.flatMap((relationship) =>
-      relationship.type === "flows-to"
+      relationship.type === "flows-to" || relationship.type === "supports"
         ? [`${relationship.fromElementId}->${relationship.toElementId}`]
         : []
     )
@@ -324,24 +324,46 @@ function validateScene(
         : []
     )
   )
-  for (const pair of edgePairs) {
-    if (!flowPairs.has(pair)) {
+  for (const edge of scene.elements) {
+    if (edge.kind !== "edge") continue
+    const expectedType =
+      edge.variant === "supporting" ? "supports" : "flows-to"
+    const matched = scene.relationships.some(
+      (relationship) =>
+        (relationship.type === "flows-to" ||
+          relationship.type === "supports") &&
+        relationship.type === expectedType &&
+        relationship.fromElementId === edge.fromElementId &&
+        relationship.toElementId === edge.toElementId
+    )
+    if (!matched) {
       issues.push(
         makeIssue(
           scene.id,
-          "elements",
-          `Edge must match a flows-to relationship: ${pair}`
+          `elements.${edge.id}`,
+          `Edge variant requires a matching ${expectedType} relationship`
         )
       )
     }
   }
-  for (const pair of flowPairs) {
+  for (const pair of edgePairs) {
+    if (!relationPairs.has(pair)) {
+      issues.push(
+        makeIssue(
+          scene.id,
+          "elements",
+          `Edge must match a flows-to or supports relationship: ${pair}`
+        )
+      )
+    }
+  }
+  for (const pair of relationPairs) {
     if (!edgePairs.has(pair)) {
       issues.push(
         makeIssue(
           scene.id,
           "relationships",
-          `flows-to relationship requires a matching edge: ${pair}`
+          `Element relationship requires a matching edge: ${pair}`
         )
       )
     }
@@ -408,7 +430,10 @@ function validateRelationship(
         )
       )
     }
-  } else if (relationship.type === "flows-to") {
+  } else if (
+    relationship.type === "flows-to" ||
+    relationship.type === "supports"
+  ) {
     check(elements, relationship.fromElementId, "element")
     check(elements, relationship.toElementId, "element")
     if (elements.get(relationship.fromElementId)?.kind !== "node") {
@@ -416,7 +441,7 @@ function validateRelationship(
         makeIssue(
           scene.id,
           "relationships",
-          `Flow source must be a node: ${relationship.fromElementId}`
+          `Relationship source must be a node: ${relationship.fromElementId}`
         )
       )
     }
@@ -425,7 +450,7 @@ function validateRelationship(
         makeIssue(
           scene.id,
           "relationships",
-          `Flow target must be a node: ${relationship.toElementId}`
+          `Relationship target must be a node: ${relationship.toElementId}`
         )
       )
     }

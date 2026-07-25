@@ -3,119 +3,124 @@ slug: dns
 scenarioId: google-com
 parentId: google-search-root
 title: DNS 이름 확인
-summary: resolver가 도메인 이름에 필요한 리소스 레코드를 질의하고 응답을 애플리케이션에 돌려주는 흐름입니다.
+summary: 캐시와 재귀 Resolver를 거쳐 Root, .com TLD, 권한 DNS의 안내를 따라 google.com의 주소를 얻는 흐름입니다.
 status: published
-ariaLabel: 애플리케이션의 이름 확인 요청이 resolver, DNS 캐시, 이름 서버 질의와 응답으로 이어지는 흐름
-layoutHint: branch
+ariaLabel: 브라우저와 운영체제 캐시, 재귀 Resolver, DNS 질의 전송, Root DNS, com TLD DNS, 권한 DNS와 IP 응답으로 이어지는 흐름
+layoutHint: horizontal
 contentRef: content.ko.md
-author: { id: cs-map-team, displayName: CS Map Team }
-updatedAt: 2026-07-24
+author:
+  id: cs-map-team
+  displayName: CS Map Team
+updatedAt: 2026-07-25
 sources:
-  - title: RFC 1034 — Domain names, concepts and facilities
-    url: https://www.rfc-editor.org/info/rfc1034/
+  - title: RFC 1034 — Domain Names, Concepts and Facilities
+    url: https://www.rfc-editor.org/rfc/rfc1034.html
     type: primary
-  - title: RFC 1035 — Domain names, implementation and specification
-    url: https://www.rfc-editor.org/info/rfc1035/
+  - title: RFC 1035 — Domain Names, Implementation and Specification
+    url: https://www.rfc-editor.org/rfc/rfc1035.html
+    type: primary
+  - title: RFC 8499 — DNS Terminology
+    url: https://www.rfc-editor.org/rfc/rfc8499.html
     type: primary
 contexts: []
 occurrences: []
 conceptRefs: []
 elements:
-  - id: resolver-group
-    kind: group
-    label: 로컬 이름 확인
-  - id: dns-service-group
-    kind: group
-    label: DNS 서비스
-  - id: application-request
+  - id: browser-os-cache
     kind: node
-    label: 이름 확인 요청
-    groupId: resolver-group
-  - id: resolver
+    label: 브라우저 / OS 캐시
+  - id: recursive-resolver
     kind: node
-    label: Resolver
-    groupId: resolver-group
-  - id: resolver-cache
+    label: 로컬 / 재귀 DNS
+  - id: dns-query-transport
     kind: node
-    label: DNS 캐시 확인
-    groupId: resolver-group
-    status: planned
-  - id: udp-query
-    kind: node
-    label: UDP DNS 질의
-    groupId: dns-service-group
+    label: DNS 질의 전송
     status: published
     targetSceneId: google-search-dns-udp-query
-  - id: name-server
+  - id: root-dns
     kind: node
-    label: 이름 서버
-    groupId: dns-service-group
-    status: planned
-  - id: dns-response
+    label: Root DNS
+  - id: com-tld-dns
     kind: node
-    label: DNS 응답
-    groupId: dns-service-group
-  - id: dns-note
+    label: .com TLD DNS
+  - id: authoritative-dns
+    kind: node
+    label: 권한 DNS
+  - id: ip-response
+    kind: node
+    label: IP 주소 응답
+  - id: referral-note
     kind: annotation
-    label: RFC 1034는 애플리케이션이 직접 질의하기보다 resolver가 이름 서버 질의와 referral을 처리하는 일반 구조를 설명합니다.
-  - id: app-to-resolver
+    label: Root와 .com TLD DNS는 보통 최종 IP가 아니라 다음으로 질의할 권한 DNS의 위치를 안내합니다.
+  - id: cache-to-resolver
     kind: edge
-    label: 이름과 레코드 유형
-    fromElementId: application-request
-    toElementId: resolver
+    label: 캐시 miss 시 요청
+    fromElementId: browser-os-cache
+    toElementId: recursive-resolver
   - id: resolver-to-query
     kind: edge
     label: 질의 생성
-    fromElementId: resolver
-    toElementId: udp-query
-  - id: query-to-server
+    fromElementId: recursive-resolver
+    toElementId: dns-query-transport
+  - id: query-to-root
     kind: edge
-    label: DNS 메시지
-    fromElementId: udp-query
-    toElementId: name-server
-  - id: server-to-response
+    label: root부터 탐색
+    fromElementId: dns-query-transport
+    toElementId: root-dns
+  - id: root-to-tld
     kind: edge
-    label: 응답 또는 referral
-    fromElementId: name-server
-    toElementId: dns-response
-  - id: response-to-resolver
+    label: .com DNS 안내
+    fromElementId: root-dns
+    toElementId: com-tld-dns
+  - id: tld-to-authoritative
     kind: edge
-    label: 레코드 반환
-    fromElementId: dns-response
-    toElementId: resolver
+    label: 권한 DNS 안내
+    fromElementId: com-tld-dns
+    toElementId: authoritative-dns
+  - id: authoritative-to-ip
+    kind: edge
+    label: 주소 record 반환
+    fromElementId: authoritative-dns
+    toElementId: ip-response
 relationships:
   - {
       type: contains,
-      elementId: udp-query,
+      elementId: dns-query-transport,
       targetSceneId: google-search-dns-udp-query,
     }
   - {
       type: flows-to,
-      fromElementId: application-request,
-      toElementId: resolver,
-      label: 이름과 레코드 유형,
+      fromElementId: browser-os-cache,
+      toElementId: recursive-resolver,
+      label: 캐시 miss 시 요청,
     }
   - {
       type: flows-to,
-      fromElementId: resolver,
-      toElementId: udp-query,
+      fromElementId: recursive-resolver,
+      toElementId: dns-query-transport,
       label: 질의 생성,
     }
   - {
       type: flows-to,
-      fromElementId: udp-query,
-      toElementId: name-server,
-      label: DNS 메시지,
+      fromElementId: dns-query-transport,
+      toElementId: root-dns,
+      label: root부터 탐색,
     }
   - {
       type: flows-to,
-      fromElementId: name-server,
-      toElementId: dns-response,
-      label: 응답 또는 referral,
+      fromElementId: root-dns,
+      toElementId: com-tld-dns,
+      label: .com DNS 안내,
     }
   - {
       type: flows-to,
-      fromElementId: dns-response,
-      toElementId: resolver,
-      label: 레코드 반환,
+      fromElementId: com-tld-dns,
+      toElementId: authoritative-dns,
+      label: 권한 DNS 안내,
+    }
+  - {
+      type: flows-to,
+      fromElementId: authoritative-dns,
+      toElementId: ip-response,
+      label: 주소 record 반환,
     }
