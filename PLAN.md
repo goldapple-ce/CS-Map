@@ -2,7 +2,7 @@
 
 ## 현재 상태
 
-**2단계 구현 완료 — 사용자 확인 대기**
+**3단계 구현 완료 — 사용자 확인 대기**
 
 ## 이번 목표
 
@@ -100,7 +100,7 @@ Proxy Server → Application Server → Database
 - [x] 기존 영구 ID 유지, 새 `google-com` slug·URL과 콘텐츠 트리를 확정하고 홈페이지 진입 경로를 갱신한다.
 - [x] 루트 Scene을 `사용자/브라우저 → DNS → Router → Server` 흐름으로 교체한다.
 
-### 2단계 — 사용자·DNS·Router Scene `▶ 현재`
+### 2단계 — 사용자·DNS·Router Scene
 
 - [x] 사용자 Scene에 브라우저의 `ClientHello`, 서버의 인증서 체인 제공, 브라우저의 인증서 검증 흐름을 구현한다.
 - [x] 진행·리턴 화살표의 라벨을 화면에 표시하고 위치를 자동 계산하도록 edge renderer를 보강한다.
@@ -108,12 +108,12 @@ Proxy Server → Application Server → Database
 - [x] 기존 UDP 및 Socket/Kernel 콘텐츠를 새 DNS 경로에 맞게 연결한다.
 - [x] Router Scene에 게이트웨이·NAT·ISP·인터넷 라우팅 흐름을 구현한다.
 
-### 3단계 — Server와 구현 예시
+### 3단계 — Server와 구현 예시 `▶ 현재`
 
-- [ ] Server Scene에 Proxy Server → Application Server → Database 흐름을 구현한다.
-- [ ] NGINX와 Spring 하위 Scene을 작성하고 각 부모 Topic에 연결한다.
-- [ ] SQL과 NoSQL 하위 Scene을 작성하고 Database Topic에 연결한다.
-- [ ] 일반적인 학습용 가정과 Google 관련 사실을 구분해 설명하고 출처를 기록한다.
+- [x] Server Scene에 Proxy Server → Application Server → Database 흐름을 구현한다.
+- [x] NGINX와 Spring 하위 Scene을 작성하고 각 부모 Topic에 연결한다.
+- [x] SQL과 NoSQL 하위 Scene을 작성하고 Database Topic에 연결한다.
+- [x] 일반적인 학습용 가정과 Google 관련 사실을 구분해 설명하고 출처를 기록한다.
 
 ### 4단계 — 연결 정리와 사용자 확인
 

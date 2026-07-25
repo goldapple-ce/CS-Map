@@ -28,7 +28,7 @@ conceptRefs: []
 elements:
   - id: certificate-authority
     kind: node
-    label: CA
+    label: CA (인증기관)
   - id: user
     kind: node
     label: 사용자

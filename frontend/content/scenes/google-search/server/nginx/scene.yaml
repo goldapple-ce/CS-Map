@@ -1,0 +1,63 @@
+id: google-com-server-nginx
+slug: nginx
+scenarioId: google-com
+parentId: google-com-server
+title: NGINX Reverse Proxy
+summary: NGINX가 HTTP 요청을 받고 설정에 따라 upstream Application Server로 전달하는 일반적인 reverse proxy 흐름입니다.
+status: published
+ariaLabel: HTTP 요청 수신, location 규칙 확인, upstream 선택, proxy pass와 응답 전달로 이어지는 NGINX reverse proxy 예시
+layoutHint: horizontal
+contentRef: content.ko.md
+author: { id: cs-map-team, displayName: CS Map Team }
+updatedAt: 2026-07-25
+sources:
+  - title: NGINX ngx_http_proxy_module
+    url: https://nginx.org/en/docs/http/ngx_http_proxy_module.html
+    type: primary
+  - title: NGINX Beginner's Guide — Setting Up a Simple Proxy Server
+    url: https://nginx.org/en/docs/beginners_guide.html#proxy
+    type: primary
+contexts: []
+occurrences: []
+conceptRefs: []
+elements:
+  - id: http-request
+    kind: node
+    label: HTTP 요청 수신
+  - id: location-match
+    kind: node
+    label: Location 규칙 확인
+  - id: upstream-selection
+    kind: node
+    label: Upstream 선택
+  - id: proxy-pass
+    kind: node
+    label: proxy_pass 전달
+  - id: upstream-response
+    kind: node
+    label: 응답 전달
+  - id: request-to-location
+    kind: edge
+    label: URI 확인
+    fromElementId: http-request
+    toElementId: location-match
+  - id: location-to-upstream
+    kind: edge
+    label: 설정 적용
+    fromElementId: location-match
+    toElementId: upstream-selection
+  - id: upstream-to-proxy
+    kind: edge
+    label: 목적지 결정
+    fromElementId: upstream-selection
+    toElementId: proxy-pass
+  - id: proxy-to-response
+    kind: edge
+    label: upstream 응답
+    fromElementId: proxy-pass
+    toElementId: upstream-response
+relationships:
+  - { type: flows-to, fromElementId: http-request, toElementId: location-match, label: URI 확인 }
+  - { type: flows-to, fromElementId: location-match, toElementId: upstream-selection, label: 설정 적용 }
+  - { type: flows-to, fromElementId: upstream-selection, toElementId: proxy-pass, label: 목적지 결정 }
+  - { type: flows-to, fromElementId: proxy-pass, toElementId: upstream-response, label: upstream 응답 }

@@ -40,7 +40,8 @@ elements:
   - id: server
     kind: node
     label: Server
-    status: planned
+    status: published
+    targetSceneId: google-com-server
   - id: user-to-dns
     kind: edge
     label: 이름 확인
@@ -68,6 +69,7 @@ relationships:
       elementId: router,
       targetSceneId: google-search-network,
     }
+  - { type: contains, elementId: server, targetSceneId: google-com-server }
   - {
       type: flows-to,
       fromElementId: user-browser,

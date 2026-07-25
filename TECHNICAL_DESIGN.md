@@ -394,6 +394,12 @@ type HistoryEntry = {
 /explore/google-com/dns/udp-query
 /explore/google-com/router
 /explore/google-com/user-browser
+/explore/google-com/server
+/explore/google-com/server/nginx
+/explore/google-com/server/spring
+/explore/google-com/server/database
+/explore/google-com/server/database/sql
+/explore/google-com/server/database/nosql
 ```
 
 - `/`는 서비스 소개와 이용 방법을 제공하고 루트 Scene의 `SceneViewport`를 재사용하는 `HomeRoute`를 표시한다.

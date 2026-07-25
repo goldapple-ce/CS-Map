@@ -42,6 +42,54 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "moduleKey": "/content/scenes/google-search/scene.yaml"
   },
   {
+    "id": "google-com-server-nosql",
+    "slug": "nosql",
+    "scenarioId": "google-com",
+    "parentId": "google-com-server-database",
+    "status": "published",
+    "moduleKey": "/content/scenes/google-search/server/database/nosql/scene.yaml"
+  },
+  {
+    "id": "google-com-server-database",
+    "slug": "database",
+    "scenarioId": "google-com",
+    "parentId": "google-com-server",
+    "status": "published",
+    "moduleKey": "/content/scenes/google-search/server/database/scene.yaml"
+  },
+  {
+    "id": "google-com-server-sql",
+    "slug": "sql",
+    "scenarioId": "google-com",
+    "parentId": "google-com-server-database",
+    "status": "published",
+    "moduleKey": "/content/scenes/google-search/server/database/sql/scene.yaml"
+  },
+  {
+    "id": "google-com-server-nginx",
+    "slug": "nginx",
+    "scenarioId": "google-com",
+    "parentId": "google-com-server",
+    "status": "published",
+    "moduleKey": "/content/scenes/google-search/server/nginx/scene.yaml"
+  },
+  {
+    "id": "google-com-server",
+    "slug": "server",
+    "scenarioId": "google-com",
+    "parentId": "google-search-root",
+    "status": "published",
+    "moduleKey": "/content/scenes/google-search/server/scene.yaml"
+  },
+  {
+    "id": "google-com-server-spring",
+    "slug": "spring",
+    "scenarioId": "google-com",
+    "parentId": "google-com-server",
+    "status": "published",
+    "moduleKey": "/content/scenes/google-search/server/spring/scene.yaml"
+  },
+  {
     "id": "google-com-user-browser",
     "slug": "user-browser",
     "scenarioId": "google-com",
