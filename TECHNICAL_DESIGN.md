@@ -166,12 +166,14 @@ project/
 │  │  │  └─ useExplorationStore.ts
 │  │  └─ explanation/
 │  │     ├─ ExplanationPanel.tsx
+│  │     ├─ QuizPanel.tsx
 │  │     ├─ ContentSection.tsx
 │  │     └─ TableOfContents.tsx
 │  ├─ components/
 │  │  ├─ ui/
 │  │  │  ├─ button.tsx
 │  │  │  ├─ scroll-area.tsx
+│  │  │  ├─ tabs.tsx
 │  │  │  └─ tooltip.tsx
 │  │  └─ scene/
 │  │     ├─ SceneRenderer.tsx
@@ -230,6 +232,7 @@ type Scene = {
   elements: SceneElement[];
   contentRef: string;
   conceptRefs: ConceptUsage[];
+  quiz?: TopicQuiz;
   sources: Source[];
   author: Contributor;
   updatedAt: string;
@@ -249,6 +252,18 @@ type ConceptUsage = {
   occurrenceId: ContentId;
   contextSummary: string;
   contextContentRef?: string;
+};
+
+type TopicQuiz = {
+  questions: QuizQuestion[];
+};
+
+type QuizQuestion = {
+  id: ContentId;
+  prompt: string;
+  options: { id: ContentId; label: string }[];
+  correctOptionId: ContentId;
+  explanation: string;
 };
 
 type SceneElement = {
@@ -458,6 +473,16 @@ failure, security, practice, related, sources, custom
 ```
 
 모든 장면에 모든 섹션을 강제하지 않는다. 장면의 학습 목표에 필요한 섹션만 제공한다.
+
+### 10.3 Topic 퀴즈
+
+- `Scene.quiz.questions`는 선택적 데이터이며 콘텐츠 YAML에서 관리한다.
+- 각 문항은 ID, 질문, 두 개 이상의 선택지, 선택지 중 하나를 가리키는 정답 ID와 해설을 가진다.
+- 스키마는 Topic 안의 문항 ID, 문항 안의 선택지 ID 중복과 존재하지 않는 정답 ID를 거부한다.
+- `ExplanationPanel`은 접근 가능한 tabs primitive로 설명과 퀴즈를 전환한다.
+- `QuizPanel`은 답안 선택, 정답·오답의 텍스트·아이콘 표시와 해설 공개를 담당한다.
+- 퀴즈 UI 상태는 현재 브라우저 메모리에만 존재하며 Topic 이동 시 초기화한다. 점수, 진도와 결과 이력을 저장하지 않는다.
+- 퀴즈가 없는 Topic에는 명시적인 빈 상태를 표시한다.
 
 ## 11. 콘텐츠 검증 파이프라인
 

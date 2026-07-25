@@ -96,6 +96,58 @@ const conceptUsageSchema = z
   })
   .strict()
 
+const quizQuestionSchema = z
+  .object({
+    id: contentIdSchema,
+    prompt: z.string().min(1),
+    options: z
+      .array(
+        z
+          .object({
+            id: contentIdSchema,
+            label: z.string().min(1),
+          })
+          .strict()
+      )
+      .min(2),
+    correctOptionId: contentIdSchema,
+    explanation: z.string().min(1),
+  })
+  .strict()
+  .superRefine((question, context) => {
+    const optionIds = question.options.map(({ id }) => id)
+    if (new Set(optionIds).size !== optionIds.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["options"],
+        message: "Quiz option IDs must be unique within a question",
+      })
+    }
+    if (!optionIds.includes(question.correctOptionId)) {
+      context.addIssue({
+        code: "custom",
+        path: ["correctOptionId"],
+        message: "Quiz correctOptionId must reference one of its options",
+      })
+    }
+  })
+
+const topicQuizSchema = z
+  .object({
+    questions: z.array(quizQuestionSchema).min(1),
+  })
+  .strict()
+  .superRefine((quiz, context) => {
+    const questionIds = quiz.questions.map(({ id }) => id)
+    if (new Set(questionIds).size !== questionIds.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["questions"],
+        message: "Quiz question IDs must be unique within a Topic",
+      })
+    }
+  })
+
 const relationshipSchema = z.discriminatedUnion("type", [
   z
     .object({
@@ -159,6 +211,7 @@ export const sceneSchema = z
     contexts: z.array(contextSchema).default([]),
     occurrences: z.array(occurrenceSchema).default([]),
     conceptRefs: z.array(conceptUsageSchema).default([]),
+    quiz: topicQuizSchema.optional(),
     relationships: z.array(relationshipSchema).default([]),
     sources: z.array(sourceSchema).min(1),
     author: contributorSchema,

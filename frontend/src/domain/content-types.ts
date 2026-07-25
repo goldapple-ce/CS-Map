@@ -68,6 +68,23 @@ export type ConceptUsage = {
   contextId: ContentId
 }
 
+export type QuizOption = {
+  id: ContentId
+  label: string
+}
+
+export type QuizQuestion = {
+  id: ContentId
+  prompt: string
+  options: QuizOption[]
+  correctOptionId: ContentId
+  explanation: string
+}
+
+export type TopicQuiz = {
+  questions: QuizQuestion[]
+}
+
 export type Relationship =
   | { type: "contains"; elementId: ContentId; targetSceneId: ContentId }
   | {
@@ -110,6 +127,7 @@ export type Scene = {
   contexts: Context[]
   occurrences: Occurrence[]
   conceptRefs: ConceptUsage[]
+  quiz?: TopicQuiz
   relationships: Relationship[]
   sources: Source[]
   author: Contributor

@@ -34,6 +34,10 @@
 - 권장 표현: `Explanation Panel`, `설명 패널`
 - 표기: 영문 철자는 `Explanation`이다.
 
+### Quiz Tab — 퀴즈 탭
+
+Explanation Panel에서 현재 Topic의 이해를 확인하는 정적 문항 영역이다. 답을 선택하고 정답과 해설을 확인할 수 있지만 MVP에서는 점수, 진도와 결과 이력을 저장하지 않는다.
+
 ## 공간과 카메라
 
 ### Logical World — 논리적 월드
