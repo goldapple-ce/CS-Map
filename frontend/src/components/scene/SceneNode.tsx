@@ -28,7 +28,7 @@ const sceneNodeVariants = cva(
 )
 
 const sceneNodeLabelVariants = cva(
-  "inline-block origin-center leading-none font-medium whitespace-nowrap",
+  "inline-flex flex-col items-center justify-center leading-none font-medium whitespace-nowrap",
   {
     variants: {
       density: {
@@ -67,21 +67,37 @@ export function SceneNode({
 }: SceneNodeProps) {
   const { x, y, width, height } = layout
   const label = element.label ?? element.id
+  const labelLines = label.split(/\r?\n|\\n/u)
+  const accessibleLabel = labelLines
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .join(" ")
   const labelFontSize = sceneNodeLabelFontSizes[density]
-  const estimatedLabelWidth =
-    estimatedSceneNodeLabelWidth(label) * (labelFontSize / 36)
-  const labelScale = Math.min(1, (width - 12) / estimatedLabelWidth)
   const navigationSceneId = element.targetSceneId ?? element.navigateToSceneId
+  const estimatedLabelWidth =
+    Math.max(...labelLines.map(estimatedSceneNodeLabelWidth), 1) *
+    (labelFontSize / 36)
+  const availableLabelHeight = height - (navigationSceneId ? 24 : 8)
+  const estimatedLabelHeight = labelLines.length * labelFontSize
+  const labelScale = Math.min(
+    1,
+    (width - 12) / estimatedLabelWidth,
+    availableLabelHeight / estimatedLabelHeight
+  )
   const preview = navigationSceneId
-    ? `${label} 내부 내용을 봅니다.`
-    : `${label} 설명을 엽니다.`
+    ? `${accessibleLabel} 내부 내용을 봅니다.`
+    : `${accessibleLabel} 설명을 엽니다.`
   const content = (
     <>
       <span
         className={sceneNodeLabelVariants({ density })}
-        style={{ transform: `scale(${labelScale})` }}
+        style={{ fontSize: labelFontSize * labelScale }}
       >
-        {label}
+        {labelLines.map((line, index) => (
+          <span key={`${index}-${line}`} className="block">
+            {line || "\u00a0"}
+          </span>
+        ))}
       </span>
       {navigationSceneId ? (
         <span
@@ -101,7 +117,7 @@ export function SceneNode({
         type="button"
         data-scene-node-id={element.id}
         disabled={navigationDisabled}
-        aria-label={`${label} 내부 보기`}
+        aria-label={`${accessibleLabel} 내부 보기`}
         className={cn(sceneNodeVariants({ state }))}
         onClick={() => onEnterScene(navigationSceneId, element.id)}
       >
@@ -114,9 +130,9 @@ export function SceneNode({
         type="button"
         data-scene-node-id={element.id}
         disabled={navigationDisabled}
-        aria-label={`${label} 설명 열기`}
+        aria-label={`${accessibleLabel} 설명 열기`}
         className={cn(sceneNodeVariants({ state }))}
-        onClick={() => onSelectTopic(element.id, label)}
+        onClick={() => onSelectTopic(element.id, accessibleLabel)}
       >
         {content}
       </button>
@@ -126,7 +142,7 @@ export function SceneNode({
       <div
         data-scene-node-id={element.id}
         role="group"
-        aria-label={`${label}, ${stateLabels[state]}`}
+        aria-label={`${accessibleLabel}, ${stateLabels[state]}`}
         className={cn(sceneNodeVariants({ state }))}
       >
         {content}

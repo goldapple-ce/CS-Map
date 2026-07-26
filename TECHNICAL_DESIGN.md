@@ -234,6 +234,7 @@ type SceneEdge = {
   variant?: "flow" | "supporting" | "return";
   fromSide?: "top" | "right" | "bottom" | "left";
   toSide?: "top" | "right" | "bottom" | "left";
+  labelSide?: "top" | "right" | "bottom" | "left";
 };
 
 type SelfCheckQuestion = {
@@ -414,12 +415,13 @@ type HistoryEntry = {
 - 클릭 가능한 텍스트·버튼은 SVG 접근 가능 요소 또는 위치가 동기화된 HTML overlay로 표현한다.
 - 장면 데이터는 픽셀 좌표를 저장하지 않는다. 모든 MVP Scene은 node마다 1~5 범위의 5×5 논리 격자 셀을 저장한다.
 - 논리 격자 스키마는 모든 node의 셀 지정, 좌표 범위와 셀 중복을 검증한다. 모든 5×5 Scene의 논리적 bounds는 `1000×500`, 각 셀은 `200×100`, 각 Topic은 `130×80`으로 고정한다. Topic은 지정된 셀 중앙에 배치되어 가로 70, 세로 20의 셀 내부 여유를 화살표 경로에 제공한다.
-- Topic 제목의 최대 LOD 예상 너비는 `scene-node-metrics.ts`에서 한글·영문·공백별로 계산한다. 제목이 Topic의 가용 너비를 넘으면 Topic box를 확장하거나 줄바꿈하지 않고 현재 LOD 글자 크기에 축소 비율을 적용해 한 줄로 맞춘다.
+- Topic 제목은 YAML `label`에 포함된 실제 개행 문자와 문자 형태의 `\n`을 명시적 줄바꿈으로 해석하며 자동 줄바꿈하지 않는다. 따라서 큰따옴표 문자열과 따옴표 없는 문자열 모두 `\n` 표기를 사용할 수 있다. 각 줄의 최대 LOD 예상 너비는 `scene-node-metrics.ts`에서 한글·영문·공백별로 계산한다. `SceneNode`는 가장 긴 줄의 예상 너비와 전체 줄의 예상 높이를 Topic의 가용 영역과 비교해 하나의 공통 축소 비율을 계산하고, 모든 줄을 같은 글자 크기로 중앙 정렬한다.
 - 논리 격자 node는 `grid: { row, col }`을 사용한다. `row`는 세로 셀, `col`은 가로 셀이며 둘 다 1~5 범위다.
 - 콘텐츠 빌드 단계의 Scene layout adapter가 논리 격자를 로컬 Topic 좌표로 투영하고 직교 edge 경로를 계산해 `scene-layout-index.ts`를 생성한다.
 - 기존 ELK layered adapter는 격자가 없는 이전 콘텐츠를 위한 fallback으로만 남기며 Scene·Relationship 도메인 모델을 ELK 타입에 결합하지 않는다. 런타임 renderer는 생성 인덱스를 읽고, 인덱스가 없는 개발·복구 상황에서만 기존 결정적 배치를 fallback으로 사용한다.
 - 생성된 로컬 Scene 배치를 기존 재귀 월드 배치가 조합해 월드 bounds와 자식 Scene 중첩 영역을 계산하므로 카메라, URL과 Semantic Zoom 상태 모델은 바뀌지 않는다.
 - `SceneEdge`는 `label`이 있으면 edge 경로에서 가장 긴 선분의 중점을 선택해 보이는 라벨을 배치하며 콘텐츠에는 라벨 좌표를 저장하지 않는다.
+- edge의 선택적 `labelSide`는 `top`·`bottom`일 때 가장 긴 수평 선분, `left`·`right`일 때 가장 긴 수직 선분을 우선 선택하고 지정한 방향으로 고정 간격을 둔다. 같은 축의 선분이 없으면 전체 경로의 가장 긴 선분을 사용한다. 힌트가 없으면 가장 긴 선분에서 수평은 위, 수직은 오른쪽에 두는 기존 자동 배치를 유지한다.
 - ELK edge router는 주요 흐름, 반환, 지원 관계별 port 방향을 사용하고 수평·수직 선분만 사용하는 직교 꺾은선을 계산한다. 각 edge는 별도 port를 가져 동일 Topic 사이의 여러 선도 접점과 lane을 공유하지 않는다.
 - 논리 격자 Scene은 고정 Topic 위치를 바꾸지 않는 libavoid router로 직교 edge를 계산한다. 노드 장애물 회피, 교차 비용과 평행 선분 nudging을 빌드 단계에서 적용하며 콘텐츠에는 접점과 bend point를 저장하지 않는다.
 - edge의 선택적 `fromSide`·`toSide`는 `top`·`right`·`bottom`·`left` 값을 사용한다. build adapter는 같은 면을 사용하는 edge별 port를 해당 면에 분산 생성하고 ELK JSON edge가 그 port를 참조하게 한다. 힌트가 없는 endpoint는 libavoid의 자동 pin 선택을 사용한다.
@@ -434,6 +436,7 @@ type HistoryEntry = {
 - `SceneNode`는 `targetSceneId` 또는 `navigateToSceneId`가 있으면 제목 아래에 `[내부 보기]`를 표시한다. 둘 다 없는 말단 Topic에는 별도 표식을 추가하지 않으며 작성 YAML에도 표시 전용 필드를 추가하지 않는다.
 - `[내부 보기]`는 LOD와 관계없이 `text-sm`으로 Topic label 아래에 표시한다. 배경의 Scene에서는 별도 크기 보정 없이 월드 transform에 따라 자연스럽게 축소된다.
 - 이동 대상이 있는 Topic button의 접근성 이름과 hover·focus 미리보기는 화면 표시와 같은 `내부 보기` 용어를 사용한다.
+- Topic label의 명시적 줄바꿈은 접근성 이름과 hover·focus 미리보기에서 공백으로 정규화하여 하나의 자연스러운 제목으로 읽는다.
 
 ### 9.2 진입 전환
 

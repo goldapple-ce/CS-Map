@@ -54,6 +54,7 @@ const sceneEdgeSchema = z
     variant: z.enum(["flow", "supporting", "return"]).optional(),
     fromSide: portSideSchema.optional(),
     toSide: portSideSchema.optional(),
+    labelSide: portSideSchema.optional(),
   })
   .strict()
 
@@ -158,6 +159,7 @@ export function normalizeSceneDocument(
         ...(edge.variant ? { variant: edge.variant } : {}),
         ...(edge.fromSide ? { fromSide: edge.fromSide } : {}),
         ...(edge.toSide ? { toSide: edge.toSide } : {}),
+        ...(edge.labelSide ? { labelSide: edge.labelSide } : {}),
       })),
     ],
     contentRef: "content.ko.md",

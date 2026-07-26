@@ -101,8 +101,35 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "moduleKey": "/content/scenes/google-com/server/spring/container/scene.yaml"
   },
   {
+    "id": "google-com-server-spring-filterchain",
+    "title": "Servlet FilterChain",
+    "slug": "security",
+    "scenarioId": "google-search-root",
+    "parentId": "google-com-server-spring",
+    "status": "published",
+    "moduleKey": "/content/scenes/google-com/server/spring/filterchain/scene.yaml"
+  },
+  {
+    "id": "google-com-server-spring-filterchain-securityfilterchain",
+    "title": "SecurityFilterChain",
+    "slug": "security-filter-chain",
+    "scenarioId": "google-search-root",
+    "parentId": "google-com-server-spring-filterchain",
+    "status": "published",
+    "moduleKey": "/content/scenes/google-com/server/spring/filterchain/securityFilterchain/scene.yaml"
+  },
+  {
+    "id": "google-com-server-spring-filterchain-securityfilterchain-usernamepasswordauthenticationfilter",
+    "title": "SecurityFilterChain",
+    "slug": "username-password-authentication-filter",
+    "scenarioId": "google-search-root",
+    "parentId": "google-com-server-spring-filterchain-securityfilterchain",
+    "status": "published",
+    "moduleKey": "/content/scenes/google-com/server/spring/filterchain/securityFilterchain/usernamePasswordAuthenticationFilter/scene.yaml"
+  },
+  {
     "id": "google-com-server-spring-mvc",
-    "title": "Spring MVC 요청과 View 렌더링",
+    "title": "DispatcherServlet과 Spring MVC",
     "slug": "mvc",
     "scenarioId": "google-search-root",
     "parentId": "google-com-server-spring",
@@ -111,21 +138,12 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
   },
   {
     "id": "google-com-server-spring",
-    "title": "Spring 기반 애플리케이션",
+    "title": "Spring",
     "slug": "spring",
     "scenarioId": "google-search-root",
     "parentId": "google-com-server",
     "status": "published",
     "moduleKey": "/content/scenes/google-com/server/spring/scene.yaml"
-  },
-  {
-    "id": "google-com-server-spring-security",
-    "title": "Spring Security 요청 흐름",
-    "slug": "security",
-    "scenarioId": "google-search-root",
-    "parentId": "google-com-server-spring",
-    "status": "published",
-    "moduleKey": "/content/scenes/google-com/server/spring/security/scene.yaml"
   },
   {
     "id": "google-com-server-spring-tomcat",

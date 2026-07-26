@@ -146,6 +146,8 @@ Scene 내부를 구성하는 요소의 총칭이다.
 
 edge의 `fromSide`와 `toSide`는 각각 출발 Topic과 도착 Topic에서 사용할 면을 지정하는 선택적 Port Side Hint다. 값은 `top`, `right`, `bottom`, `left`이며, 중간 연결선 경로를 직접 작성하는 좌표가 아니다.
 
+edge의 `labelSide`는 계산된 연결선에서 라벨을 어느 방향에 표시할지 지정하는 선택적 Label Side Hint다. 값은 `top`, `right`, `bottom`, `left`이며, 라벨 좌표를 직접 작성하는 필드가 아니다.
+
 ### Parent Scene / Child Scene — 부모·자식 장면
 
 공간 중첩과 주요 탐색 경로를 만드는 대표 계층이다. 자식 Scene은 부모 Scene의 특정 node 영역 안에 자동 배치된다.

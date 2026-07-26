@@ -1,0 +1,30 @@
+id: google-com-server-spring-filterchain-securityfilterchain
+title: SecurityFilterChain
+summary: Servlet FilterChain이 Spring Security의 FilterChainProxy와 SecurityFilterChain으로 처리를 위임한 뒤 원래 FilterChain을 계속 진행하는 흐름입니다.
+nodes:
+  security-filter-chain:
+    label: SecurityFilterChain
+    row: 3
+    col: 1
+  security-context-holder-filter:
+    label: SecurityContextHolderFilter
+    row: 1
+    col: 5
+  username-password-authentication-filter:
+    label: UsernamePassword\nAuthenticationFilter
+    row: 2
+    col: 5
+    childSceneId: google-com-server-spring-filterchain-securityfilterchain-usernamepasswordauthenticationfilter
+
+  oauth2-authorization-request-redirect-filter:
+    label: Oauth2Authorization\nRequestRedirectFilter
+    row: 3
+    col: 5
+  oauth2-login-authentication-filter:
+    label: OauthLogin\nAuthenticationFilter
+    row: 4
+    col: 5
+  bearer-token-authentication-filter:
+    label: BearerToken\nAuthenticationFilter
+    row: 5
+    col: 5

@@ -1,0 +1,58 @@
+id: google-com-server-spring-filterchain
+title: Servlet FilterChain
+summary: Servlet FilterChain이 Spring Security의 FilterChainProxy와 SecurityFilterChain으로 처리를 위임한 뒤 원래 FilterChain을 계속 진행하는 흐름입니다.
+nodes:
+  servlet-filter-chain:
+    label: Servlet FilterChain
+    row: 3
+    col: 1
+  servlet-filter:
+    label: servlet Filter
+    row: 2
+    col: 2
+  delegating-filter-proxy:
+    label: DelegatingFilterProxy
+    row: 3
+    col: 2
+  servlet-filter-2:
+    label: servlet Filter
+    row: 4
+    col: 2
+  filter-chain-proxy:
+    label: FilterChainProxy
+    row: 3
+    col: 3
+  security-filter-chain:
+    label: SecurityFilterChain
+    row: 3
+    col: 4
+    childSceneId: google-com-server-spring-filterchain-securityfilterchain
+  dispatcher-servlet:
+    label: DispatcherServlet
+    row: 5
+    col: 5
+    navigateToSceneId: google-com-server-spring-mvc
+
+edges:
+  - from: servlet-filter-chain
+    to: servlet-filter
+    label: filter 호출
+  - from: servlet-filter
+    fromSide: bottom
+    to: delegating-filter-proxy
+    toSide: top
+    label: filter 호출
+  - from: delegating-filter-proxy
+    to: filter-chain-proxy
+    label: 위임
+  - from: filter-chain-proxy
+    to: security-filter-chain
+    label: 요청 조건 비교
+  - from: delegating-filter-proxy
+    fromSide: bottom
+    to: servlet-filter-2
+    toSide: top
+    label: filter 호출
+  - from: servlet-filter-2
+    to: dispatcher-servlet
+    label: 호출

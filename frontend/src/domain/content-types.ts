@@ -45,6 +45,7 @@ export type SceneEdgeElement = SceneElementBase & {
   variant?: "flow" | "supporting" | "return"
   fromSide?: "top" | "right" | "bottom" | "left"
   toSide?: "top" | "right" | "bottom" | "left"
+  labelSide?: "top" | "right" | "bottom" | "left"
 }
 
 export type SceneElement = SceneNodeElement | SceneEdgeElement

@@ -93,7 +93,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
   },
   {
     "id": "google-com-server-spring",
-    "title": "Spring 기반 애플리케이션",
+    "title": "Spring",
     "path": "/explore/google-com/server/spring",
     "parentId": "google-com-server",
     "order": 1,
@@ -111,7 +111,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
   },
   {
     "id": "google-com-server-spring-mvc",
-    "title": "Spring MVC 요청과 View 렌더링",
+    "title": "DispatcherServlet과 Spring MVC",
     "path": "/explore/google-com/server/spring/mvc",
     "parentId": "google-com-server-spring",
     "order": 3,
@@ -119,13 +119,31 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "moduleKey": "/content/scenes/google-com/server/spring/mvc/scene.yaml"
   },
   {
-    "id": "google-com-server-spring-security",
-    "title": "Spring Security 요청 흐름",
+    "id": "google-com-server-spring-filterchain",
+    "title": "Servlet FilterChain",
     "path": "/explore/google-com/server/spring/security",
     "parentId": "google-com-server-spring",
     "order": 2,
     "status": "published",
-    "moduleKey": "/content/scenes/google-com/server/spring/security/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/filterchain/scene.yaml"
+  },
+  {
+    "id": "google-com-server-spring-filterchain-securityfilterchain",
+    "title": "SecurityFilterChain",
+    "path": "/explore/google-com/server/spring/security/security-filter-chain",
+    "parentId": "google-com-server-spring-filterchain",
+    "order": 5,
+    "status": "published",
+    "moduleKey": "/content/scenes/google-com/server/spring/filterchain/securityFilterchain/scene.yaml"
+  },
+  {
+    "id": "google-com-server-spring-filterchain-securityfilterchain-usernamepasswordauthenticationfilter",
+    "title": "SecurityFilterChain",
+    "path": "/explore/google-com/server/spring/security/security-filter-chain/username-password-authentication-filter",
+    "parentId": "google-com-server-spring-filterchain-securityfilterchain",
+    "order": 2,
+    "status": "published",
+    "moduleKey": "/content/scenes/google-com/server/spring/filterchain/securityFilterchain/usernamePasswordAuthenticationFilter/scene.yaml"
   },
   {
     "id": "google-com-server-spring-tomcat",

@@ -4,47 +4,47 @@ import type { SerializedSceneLayout } from "@/components/scene/scene-layout"
 export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> = {
   "google-search-dns": {
     "width": 1000,
-    "height": 500,
+    "height": 600,
     "nodes": {
       "browser-os-cache": {
         "x": 35,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "recursive-resolver": {
         "x": 235,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "udp-query": {
         "x": 435,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "root-dns": {
         "x": 635,
-        "y": 10,
+        "y": 20,
         "width": 130,
         "height": 80
       },
       "com-tld-dns": {
         "x": 635,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "authoritative-dns": {
         "x": 635,
-        "y": 410,
+        "y": 500,
         "width": 130,
         "height": 80
       },
       "ip-response": {
         "x": 835,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       }
@@ -53,110 +53,110 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       "edge-browser-os-cache-recursive-resolver-1": [
         {
           "x": 165,
-          "y": 242
+          "y": 292
         },
         {
           "x": 235,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-recursive-resolver-udp-query-2": [
         {
           "x": 365,
-          "y": 242
+          "y": 292
         },
         {
           "x": 435,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-udp-query-root-dns-3": [
         {
           "x": 513,
-          "y": 210
+          "y": 260
         },
         {
           "x": 513,
-          "y": 74
+          "y": 84
         },
         {
           "x": 635,
-          "y": 74
+          "y": 84
         }
       ],
       "edge-root-dns-com-tld-dns-4": [
         {
           "x": 687,
-          "y": 90
+          "y": 100
         },
         {
           "x": 687,
-          "y": 210
+          "y": 260
         }
       ],
       "edge-com-tld-dns-authoritative-dns-5": [
         {
           "x": 687,
-          "y": 290
+          "y": 340
         },
         {
           "x": 687,
-          "y": 410
+          "y": 500
         }
       ],
       "edge-authoritative-dns-ip-response-6": [
         {
           "x": 765,
-          "y": 426
+          "y": 516
         },
         {
           "x": 861,
-          "y": 426
+          "y": 516
         },
         {
           "x": 861,
-          "y": 290
+          "y": 340
         }
       ]
     }
   },
   "google-search-dns-udp-query": {
     "width": 1000,
-    "height": 500,
+    "height": 600,
     "nodes": {
       "dns-message": {
         "x": 35,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "socket-kernel": {
         "x": 235,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "udp-datagram": {
         "x": 435,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "ip-packet": {
         "x": 635,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "network-interface": {
         "x": 835,
-        "y": 110,
+        "y": 140,
         "width": 130,
         "height": 80
       },
       "dns-server-port": {
         "x": 835,
-        "y": 310,
+        "y": 380,
         "width": 130,
         "height": 80
       }
@@ -165,102 +165,102 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       "edge-dns-message-socket-kernel-1": [
         {
           "x": 165,
-          "y": 242
+          "y": 292
         },
         {
           "x": 235,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-socket-kernel-udp-datagram-2": [
         {
           "x": 365,
-          "y": 242
+          "y": 292
         },
         {
           "x": 435,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-udp-datagram-ip-packet-3": [
         {
           "x": 565,
-          "y": 242
+          "y": 292
         },
         {
           "x": 635,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-ip-packet-network-interface-4": [
         {
           "x": 713,
-          "y": 210
+          "y": 260
         },
         {
           "x": 713,
-          "y": 174
+          "y": 204
         },
         {
           "x": 835,
-          "y": 174
+          "y": 204
         }
       ],
       "edge-network-interface-dns-server-port-5": [
         {
           "x": 887,
-          "y": 190
+          "y": 220
         },
         {
           "x": 887,
-          "y": 310
+          "y": 380
         }
       ]
     }
   },
   "google-search-dns-socket-kernel": {
     "width": 1000,
-    "height": 500,
+    "height": 600,
     "nodes": {
       "resolver-process": {
         "x": 35,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "socket-descriptor": {
         "x": 235,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "send-system-call": {
         "x": 435,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "kernel-socket-layer": {
         "x": 635,
-        "y": 10,
+        "y": 20,
         "width": 130,
         "height": 80
       },
       "udp-layer": {
         "x": 635,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "ip-layer": {
         "x": 635,
-        "y": 410,
+        "y": 500,
         "width": 130,
         "height": 80
       },
       "network-driver": {
         "x": 835,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       }
@@ -269,116 +269,116 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       "edge-resolver-process-socket-descriptor-1": [
         {
           "x": 165,
-          "y": 242
+          "y": 292
         },
         {
           "x": 235,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-socket-descriptor-send-system-call-2": [
         {
           "x": 365,
-          "y": 242
+          "y": 292
         },
         {
           "x": 435,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-send-system-call-kernel-socket-layer-3": [
         {
           "x": 513,
-          "y": 210
+          "y": 260
         },
         {
           "x": 513,
-          "y": 74
+          "y": 84
         },
         {
           "x": 635,
-          "y": 74
+          "y": 84
         }
       ],
       "edge-kernel-socket-layer-udp-layer-4": [
         {
           "x": 687,
-          "y": 90
+          "y": 100
         },
         {
           "x": 687,
-          "y": 210
+          "y": 260
         }
       ],
       "edge-udp-layer-ip-layer-5": [
         {
           "x": 687,
-          "y": 290
+          "y": 340
         },
         {
           "x": 687,
-          "y": 410
+          "y": 500
         }
       ],
       "edge-ip-layer-network-driver-6": [
         {
           "x": 765,
-          "y": 426
+          "y": 516
         },
         {
           "x": 861,
-          "y": 426
+          "y": 516
         },
         {
           "x": 861,
-          "y": 290
+          "y": 340
         }
       ]
     }
   },
   "google-search-network": {
     "width": 1000,
-    "height": 500,
+    "height": 600,
     "nodes": {
       "user-device": {
         "x": 35,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "default-gateway": {
         "x": 235,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "neighbor-resolution": {
         "x": 435,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "home-router-nat": {
         "x": 635,
-        "y": 110,
+        "y": 140,
         "width": 130,
         "height": 80
       },
       "isp": {
         "x": 635,
-        "y": 310,
+        "y": 380,
         "width": 130,
         "height": 80
       },
       "internet-routing": {
         "x": 835,
-        "y": 110,
+        "y": 140,
         "width": 130,
         "height": 80
       },
       "destination-server": {
         "x": 835,
-        "y": 310,
+        "y": 380,
         "width": 130,
         "height": 80
       }
@@ -387,102 +387,102 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       "edge-user-device-default-gateway-1": [
         {
           "x": 165,
-          "y": 242
+          "y": 292
         },
         {
           "x": 235,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-default-gateway-neighbor-resolution-2": [
         {
           "x": 365,
-          "y": 242
+          "y": 292
         },
         {
           "x": 435,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-neighbor-resolution-home-router-nat-3": [
         {
           "x": 513,
-          "y": 210
+          "y": 260
         },
         {
           "x": 513,
-          "y": 174
+          "y": 204
         },
         {
           "x": 635,
-          "y": 174
+          "y": 204
         }
       ],
       "edge-home-router-nat-isp-4": [
         {
           "x": 687,
-          "y": 190
+          "y": 220
         },
         {
           "x": 687,
-          "y": 310
+          "y": 380
         }
       ],
       "edge-isp-internet-routing-5": [
         {
           "x": 765,
-          "y": 326
+          "y": 396
         },
         {
           "x": 800,
-          "y": 326
+          "y": 396
         },
         {
           "x": 800,
-          "y": 174
+          "y": 204
         },
         {
           "x": 835,
-          "y": 174
+          "y": 204
         }
       ],
       "edge-internet-routing-destination-server-6": [
         {
           "x": 887,
-          "y": 190
+          "y": 220
         },
         {
           "x": 887,
-          "y": 310
+          "y": 380
         }
       ]
     }
   },
   "google-search-root": {
     "width": 1000,
-    "height": 500,
+    "height": 600,
     "nodes": {
       "user-browser": {
         "x": 35,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "dns": {
         "x": 235,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "router": {
         "x": 635,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "server": {
         "x": 835,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       }
@@ -491,60 +491,60 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       "edge-user-browser-dns-1": [
         {
           "x": 165,
-          "y": 242
+          "y": 292
         },
         {
           "x": 235,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-dns-router-2": [
         {
           "x": 365,
-          "y": 242
+          "y": 292
         },
         {
           "x": 635,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-router-server-3": [
         {
           "x": 765,
-          "y": 242
+          "y": 292
         },
         {
           "x": 835,
-          "y": 242
+          "y": 292
         }
       ]
     }
   },
   "google-com-server-nosql": {
     "width": 1000,
-    "height": 500,
+    "height": 600,
     "nodes": {
       "document-query": {
         "x": 35,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "collection-index": {
         "x": 235,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "bson-document": {
         "x": 635,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "document-result": {
         "x": 835,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       }
@@ -553,60 +553,60 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       "edge-document-query-collection-index-1": [
         {
           "x": 165,
-          "y": 242
+          "y": 292
         },
         {
           "x": 235,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-collection-index-bson-document-2": [
         {
           "x": 365,
-          "y": 242
+          "y": 292
         },
         {
           "x": 635,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-bson-document-document-result-3": [
         {
           "x": 765,
-          "y": 242
+          "y": 292
         },
         {
           "x": 835,
-          "y": 242
+          "y": 292
         }
       ]
     }
   },
   "google-com-server-database": {
     "width": 1000,
-    "height": 500,
+    "height": 600,
     "nodes": {
       "data-request": {
         "x": 35,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "sql": {
         "x": 435,
-        "y": 110,
+        "y": 140,
         "width": 130,
         "height": 80
       },
       "nosql": {
         "x": 435,
-        "y": 310,
+        "y": 380,
         "width": 130,
         "height": 80
       },
       "data-result": {
         "x": 835,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       }
@@ -615,92 +615,92 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       "edge-data-request-sql-1": [
         {
           "x": 113,
-          "y": 210
+          "y": 260
         },
         {
           "x": 113,
-          "y": 174
+          "y": 204
         },
         {
           "x": 435,
-          "y": 174
+          "y": 204
         }
       ],
       "edge-data-request-nosql-2": [
         {
           "x": 113,
-          "y": 290
+          "y": 340
         },
         {
           "x": 113,
-          "y": 326
+          "y": 396
         },
         {
           "x": 435,
-          "y": 326
+          "y": 396
         }
       ],
       "edge-sql-data-result-3": [
         {
           "x": 513,
-          "y": 190
+          "y": 220
         },
         {
           "x": 513,
-          "y": 226
+          "y": 276
         },
         {
           "x": 835,
-          "y": 226
+          "y": 276
         }
       ],
       "edge-nosql-data-result-4": [
         {
           "x": 513,
-          "y": 310
+          "y": 380
         },
         {
           "x": 513,
-          "y": 274
+          "y": 324
         },
         {
           "x": 835,
-          "y": 274
+          "y": 324
         }
       ]
     }
   },
   "google-com-server-sql": {
     "width": 1000,
-    "height": 500,
+    "height": 600,
     "nodes": {
       "sql-query": {
         "x": 35,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "parse-plan": {
         "x": 235,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "table-index": {
         "x": 435,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "transaction-constraint": {
         "x": 635,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "row-result": {
         "x": 835,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       }
@@ -709,76 +709,76 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       "edge-sql-query-parse-plan-1": [
         {
           "x": 165,
-          "y": 242
+          "y": 292
         },
         {
           "x": 235,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-parse-plan-table-index-2": [
         {
           "x": 365,
-          "y": 242
+          "y": 292
         },
         {
           "x": 435,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-table-index-transaction-constraint-3": [
         {
           "x": 565,
-          "y": 242
+          "y": 292
         },
         {
           "x": 635,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-transaction-constraint-row-result-4": [
         {
           "x": 765,
-          "y": 242
+          "y": 292
         },
         {
           "x": 835,
-          "y": 242
+          "y": 292
         }
       ]
     }
   },
   "google-com-server-nginx": {
     "width": 1000,
-    "height": 500,
+    "height": 600,
     "nodes": {
       "http-request": {
         "x": 35,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "location-match": {
         "x": 235,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "upstream-selection": {
         "x": 435,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "proxy-pass": {
         "x": 635,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "upstream-response": {
         "x": 835,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       }
@@ -787,64 +787,64 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       "edge-http-request-location-match-1": [
         {
           "x": 165,
-          "y": 242
+          "y": 292
         },
         {
           "x": 235,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-location-match-upstream-selection-2": [
         {
           "x": 365,
-          "y": 242
+          "y": 292
         },
         {
           "x": 435,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-upstream-selection-proxy-pass-3": [
         {
           "x": 565,
-          "y": 242
+          "y": 292
         },
         {
           "x": 635,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-proxy-pass-upstream-response-4": [
         {
           "x": 765,
-          "y": 242
+          "y": 292
         },
         {
           "x": 835,
-          "y": 242
+          "y": 292
         }
       ]
     }
   },
   "google-com-server": {
     "width": 1000,
-    "height": 500,
+    "height": 600,
     "nodes": {
       "nginx": {
         "x": 35,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "spring": {
         "x": 435,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "database": {
         "x": 835,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       }
@@ -853,68 +853,68 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       "edge-nginx-spring-1": [
         {
           "x": 165,
-          "y": 242
+          "y": 292
         },
         {
           "x": 435,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-spring-database-2": [
         {
           "x": 565,
-          "y": 242
+          "y": 292
         },
         {
           "x": 835,
-          "y": 242
+          "y": 292
         }
       ]
     }
   },
   "google-com-server-spring-container": {
     "width": 1000,
-    "height": 500,
+    "height": 600,
     "nodes": {
       "configuration-metadata": {
         "x": 35,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "bean-definition": {
         "x": 235,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "application-context": {
         "x": 435,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "bean-creation": {
         "x": 635,
-        "y": 10,
+        "y": 20,
         "width": 130,
         "height": 80
       },
       "dependency-injection": {
         "x": 635,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "initialization-callback": {
         "x": 635,
-        "y": 410,
+        "y": 500,
         "width": 130,
         "height": 80
       },
       "ready-beans": {
         "x": 835,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       }
@@ -923,116 +923,477 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       "edge-configuration-metadata-bean-definition-1": [
         {
           "x": 165,
-          "y": 242
+          "y": 292
         },
         {
           "x": 235,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-bean-definition-application-context-2": [
         {
           "x": 365,
-          "y": 242
+          "y": 292
         },
         {
           "x": 435,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-application-context-bean-creation-3": [
         {
           "x": 513,
-          "y": 210
+          "y": 260
         },
         {
           "x": 513,
-          "y": 74
+          "y": 84
         },
         {
           "x": 635,
-          "y": 74
+          "y": 84
         }
       ],
       "edge-bean-creation-dependency-injection-4": [
         {
           "x": 687,
-          "y": 90
+          "y": 100
         },
         {
           "x": 687,
-          "y": 210
+          "y": 260
         }
       ],
       "edge-dependency-injection-initialization-callback-5": [
         {
           "x": 687,
-          "y": 290
+          "y": 340
         },
         {
           "x": 687,
-          "y": 410
+          "y": 500
         }
       ],
       "edge-initialization-callback-ready-beans-6": [
         {
           "x": 765,
-          "y": 426
+          "y": 516
         },
         {
           "x": 861,
-          "y": 426
+          "y": 516
         },
         {
           "x": 861,
-          "y": 290
+          "y": 340
+        }
+      ]
+    }
+  },
+  "google-com-server-spring-filterchain": {
+    "width": 1000,
+    "height": 600,
+    "nodes": {
+      "servlet-filter-chain": {
+        "x": 35,
+        "y": 260,
+        "width": 130,
+        "height": 80
+      },
+      "servlet-filter": {
+        "x": 235,
+        "y": 140,
+        "width": 130,
+        "height": 80
+      },
+      "delegating-filter-proxy": {
+        "x": 235,
+        "y": 260,
+        "width": 130,
+        "height": 80
+      },
+      "servlet-filter-2": {
+        "x": 235,
+        "y": 380,
+        "width": 130,
+        "height": 80
+      },
+      "filter-chain-proxy": {
+        "x": 435,
+        "y": 260,
+        "width": 130,
+        "height": 80
+      },
+      "security-filter-chain": {
+        "x": 635,
+        "y": 260,
+        "width": 130,
+        "height": 80
+      },
+      "dispatcher-servlet": {
+        "x": 835,
+        "y": 500,
+        "width": 130,
+        "height": 80
+      }
+    },
+    "edges": {
+      "edge-servlet-filter-chain-servlet-filter-1": [
+        {
+          "x": 113,
+          "y": 260
+        },
+        {
+          "x": 113,
+          "y": 204
+        },
+        {
+          "x": 235,
+          "y": 204
+        }
+      ],
+      "edge-servlet-filter-delegating-filter-proxy-2": [
+        {
+          "x": 300,
+          "y": 220
+        },
+        {
+          "x": 300,
+          "y": 260
+        }
+      ],
+      "edge-delegating-filter-proxy-filter-chain-proxy-3": [
+        {
+          "x": 365,
+          "y": 292
+        },
+        {
+          "x": 435,
+          "y": 292
+        }
+      ],
+      "edge-filter-chain-proxy-security-filter-chain-4": [
+        {
+          "x": 565,
+          "y": 292
+        },
+        {
+          "x": 635,
+          "y": 292
+        }
+      ],
+      "edge-delegating-filter-proxy-servlet-filter-2-5": [
+        {
+          "x": 300,
+          "y": 340
+        },
+        {
+          "x": 300,
+          "y": 380
+        }
+      ],
+      "edge-servlet-filter-2-dispatcher-servlet-6": [
+        {
+          "x": 313,
+          "y": 460
+        },
+        {
+          "x": 313,
+          "y": 516
+        },
+        {
+          "x": 835,
+          "y": 516
+        }
+      ]
+    }
+  },
+  "google-com-server-spring-filterchain-securityfilterchain": {
+    "width": 1000,
+    "height": 600,
+    "nodes": {
+      "security-filter-chain": {
+        "x": 35,
+        "y": 260,
+        "width": 130,
+        "height": 80
+      },
+      "security-context-holder-filter": {
+        "x": 835,
+        "y": 20,
+        "width": 130,
+        "height": 80
+      },
+      "username-password-authentication-filter": {
+        "x": 835,
+        "y": 140,
+        "width": 130,
+        "height": 80
+      },
+      "oauth2-authorization-request-redirect-filter": {
+        "x": 835,
+        "y": 260,
+        "width": 130,
+        "height": 80
+      },
+      "oauth2-login-authentication-filter": {
+        "x": 835,
+        "y": 380,
+        "width": 130,
+        "height": 80
+      },
+      "bearer-token-authentication-filter": {
+        "x": 835,
+        "y": 500,
+        "width": 130,
+        "height": 80
+      }
+    },
+    "edges": {}
+  },
+  "google-com-server-spring-filterchain-securityfilterchain-usernamepasswordauthenticationfilter": {
+    "width": 1000,
+    "height": 600,
+    "nodes": {
+      "filter-chain-proxy": {
+        "x": 35,
+        "y": 260,
+        "width": 130,
+        "height": 80
+      },
+      "authentication-filter": {
+        "x": 235,
+        "y": 260,
+        "width": 130,
+        "height": 80
+      },
+      "authentication-converter": {
+        "x": 635,
+        "y": 140,
+        "width": 130,
+        "height": 80
+      },
+      "authentication-manager": {
+        "x": 435,
+        "y": 260,
+        "width": 130,
+        "height": 80
+      },
+      "authentication-provider": {
+        "x": 635,
+        "y": 260,
+        "width": 130,
+        "height": 80
+      },
+      "dao-authentication-provider": {
+        "x": 835,
+        "y": 260,
+        "width": 130,
+        "height": 80
+      },
+      "user-detail-service": {
+        "x": 835,
+        "y": 380,
+        "width": 130,
+        "height": 80
+      },
+      "security-context-holder": {
+        "x": 235,
+        "y": 380,
+        "width": 130,
+        "height": 80
+      },
+      "provider-manager": {
+        "x": 435,
+        "y": 380,
+        "width": 130,
+        "height": 80
+      }
+    },
+    "edges": {
+      "edge-filter-chain-proxy-authentication-filter-1": [
+        {
+          "x": 165,
+          "y": 292
+        },
+        {
+          "x": 235,
+          "y": 292
+        }
+      ],
+      "edge-authentication-filter-authentication-converter-2": [
+        {
+          "x": 348,
+          "y": 260
+        },
+        {
+          "x": 348,
+          "y": 205
+        },
+        {
+          "x": 635,
+          "y": 205
+        }
+      ],
+      "edge-authentication-converter-authentication-filter-3": [
+        {
+          "x": 635,
+          "y": 187
+        },
+        {
+          "x": 330,
+          "y": 187
+        },
+        {
+          "x": 330,
+          "y": 260
+        }
+      ],
+      "edge-authentication-filter-authentication-manager-4": [
+        {
+          "x": 365,
+          "y": 301
+        },
+        {
+          "x": 435,
+          "y": 301
+        }
+      ],
+      "edge-authentication-manager-authentication-provider-5": [
+        {
+          "x": 565,
+          "y": 301
+        },
+        {
+          "x": 635,
+          "y": 301
+        }
+      ],
+      "edge-authentication-provider-dao-authentication-provider-6": [
+        {
+          "x": 765,
+          "y": 301
+        },
+        {
+          "x": 835,
+          "y": 301
+        }
+      ],
+      "edge-dao-authentication-provider-user-detail-service-7": [
+        {
+          "x": 878,
+          "y": 340
+        },
+        {
+          "x": 878,
+          "y": 380
+        }
+      ],
+      "edge-user-detail-service-dao-authentication-provider-8": [
+        {
+          "x": 896,
+          "y": 380
+        },
+        {
+          "x": 896,
+          "y": 340
+        }
+      ],
+      "edge-dao-authentication-provider-authentication-provider-9": [
+        {
+          "x": 835,
+          "y": 283
+        },
+        {
+          "x": 765,
+          "y": 283
+        }
+      ],
+      "edge-authentication-provider-authentication-manager-10": [
+        {
+          "x": 635,
+          "y": 283
+        },
+        {
+          "x": 565,
+          "y": 283
+        }
+      ],
+      "edge-authentication-manager-authentication-filter-11": [
+        {
+          "x": 435,
+          "y": 283
+        },
+        {
+          "x": 365,
+          "y": 283
+        }
+      ],
+      "edge-authentication-filter-security-context-holder-12": [
+        {
+          "x": 287,
+          "y": 340
+        },
+        {
+          "x": 287,
+          "y": 380
+        }
+      ],
+      "edge-provider-manager-authentication-manager-13": [
+        {
+          "x": 487,
+          "y": 380
+        },
+        {
+          "x": 487,
+          "y": 340
         }
       ]
     }
   },
   "google-com-server-spring-mvc": {
     "width": 1000,
-    "height": 500,
+    "height": 600,
     "nodes": {
       "dispatcher-servlet": {
         "x": 35,
-        "y": 110,
+        "y": 140,
         "width": 130,
         "height": 80
       },
       "rendered-view": {
         "x": 35,
-        "y": 310,
+        "y": 380,
         "width": 130,
         "height": 80
       },
       "handler-mapping": {
         "x": 435,
-        "y": 10,
+        "y": 20,
         "width": 130,
         "height": 80
       },
       "handler-adapter": {
         "x": 435,
-        "y": 110,
+        "y": 140,
         "width": 130,
         "height": 80
       },
       "view-resolver": {
         "x": 435,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "controller": {
         "x": 835,
-        "y": 110,
+        "y": 140,
         "width": 130,
         "height": 80
       },
       "model": {
         "x": 835,
-        "y": 310,
+        "y": 380,
         "width": 130,
         "height": 80
       }
@@ -1041,140 +1402,140 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       "edge-dispatcher-servlet-handler-mapping-1": [
         {
           "x": 113,
-          "y": 110
+          "y": 140
         },
         {
           "x": 113,
-          "y": 74
+          "y": 84
         },
         {
           "x": 435,
-          "y": 74
+          "y": 84
         }
       ],
       "edge-handler-mapping-controller-2": [
         {
           "x": 565,
-          "y": 58
+          "y": 68
         },
         {
           "x": 861,
-          "y": 58
+          "y": 68
         },
         {
           "x": 861,
-          "y": 110
+          "y": 140
         }
       ],
       "edge-dispatcher-servlet-handler-adapter-3": [
         {
           "x": 165,
-          "y": 142
+          "y": 172
         },
         {
           "x": 435,
-          "y": 142
+          "y": 172
         }
       ],
       "edge-handler-adapter-controller-4": [
         {
           "x": 565,
-          "y": 142
+          "y": 172
         },
         {
           "x": 835,
-          "y": 142
+          "y": 172
         }
       ],
       "edge-controller-view-resolver-5": [
         {
           "x": 861,
-          "y": 190
+          "y": 220
         },
         {
           "x": 861,
-          "y": 226
+          "y": 276
         },
         {
           "x": 565,
-          "y": 226
+          "y": 276
         }
       ],
       "edge-controller-model-6": [
         {
           "x": 887,
-          "y": 190
+          "y": 220
         },
         {
           "x": 887,
-          "y": 310
+          "y": 380
         }
       ],
       "edge-dispatcher-servlet-view-resolver-7": [
         {
           "x": 113,
-          "y": 190
+          "y": 220
         },
         {
           "x": 113,
-          "y": 226
+          "y": 276
         },
         {
           "x": 435,
-          "y": 226
+          "y": 276
         }
       ],
       "edge-view-resolver-rendered-view-8": [
         {
           "x": 461,
-          "y": 290
+          "y": 340
         },
         {
           "x": 461,
-          "y": 324
+          "y": 394
         },
         {
           "x": 165,
-          "y": 324
+          "y": 394
         }
       ],
       "edge-model-rendered-view-9": [
         {
           "x": 835,
-          "y": 342
+          "y": 412
         },
         {
           "x": 165,
-          "y": 342
+          "y": 412
         }
       ]
     }
   },
   "google-com-server-spring": {
     "width": 1000,
-    "height": 500,
+    "height": 600,
     "nodes": {
       "tomcat": {
         "x": 35,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "container": {
         "x": 635,
-        "y": 110,
+        "y": 140,
         "width": 130,
         "height": 80
       },
       "security": {
         "x": 435,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "mvc": {
         "x": 835,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       }
@@ -1183,214 +1544,96 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       "edge-tomcat-security-1": [
         {
           "x": 165,
-          "y": 242
+          "y": 292
         },
         {
           "x": 435,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-container-security-2": [
         {
           "x": 635,
-          "y": 150
+          "y": 180
         },
         {
           "x": 500,
-          "y": 150
+          "y": 180
         },
         {
           "x": 500,
-          "y": 210
+          "y": 260
         }
       ],
       "edge-container-mvc-3": [
         {
           "x": 765,
-          "y": 150
+          "y": 180
         },
         {
           "x": 900,
-          "y": 150
+          "y": 180
         },
         {
           "x": 900,
-          "y": 210
+          "y": 260
         }
       ],
       "edge-security-mvc-4": [
         {
           "x": 565,
-          "y": 242
+          "y": 292
         },
         {
           "x": 835,
-          "y": 242
-        }
-      ]
-    }
-  },
-  "google-com-server-spring-security": {
-    "width": 1000,
-    "height": 500,
-    "nodes": {
-      "servlet-filter-chain": {
-        "x": 35,
-        "y": 210,
-        "width": 130,
-        "height": 80
-      },
-      "delegating-filter-proxy": {
-        "x": 235,
-        "y": 210,
-        "width": 130,
-        "height": 80
-      },
-      "filter-chain-proxy": {
-        "x": 435,
-        "y": 210,
-        "width": 130,
-        "height": 80
-      },
-      "security-filter-chain": {
-        "x": 635,
-        "y": 10,
-        "width": 130,
-        "height": 80
-      },
-      "authentication": {
-        "x": 635,
-        "y": 210,
-        "width": 130,
-        "height": 80
-      },
-      "authorization": {
-        "x": 635,
-        "y": 410,
-        "width": 130,
-        "height": 80
-      },
-      "dispatcher-servlet": {
-        "x": 835,
-        "y": 210,
-        "width": 130,
-        "height": 80
-      }
-    },
-    "edges": {
-      "edge-servlet-filter-chain-delegating-filter-proxy-1": [
-        {
-          "x": 165,
-          "y": 242
-        },
-        {
-          "x": 235,
-          "y": 242
-        }
-      ],
-      "edge-delegating-filter-proxy-filter-chain-proxy-2": [
-        {
-          "x": 365,
-          "y": 242
-        },
-        {
-          "x": 435,
-          "y": 242
-        }
-      ],
-      "edge-filter-chain-proxy-security-filter-chain-3": [
-        {
-          "x": 513,
-          "y": 210
-        },
-        {
-          "x": 513,
-          "y": 74
-        },
-        {
-          "x": 635,
-          "y": 74
-        }
-      ],
-      "edge-security-filter-chain-authentication-4": [
-        {
-          "x": 687,
-          "y": 90
-        },
-        {
-          "x": 687,
-          "y": 210
-        }
-      ],
-      "edge-authentication-authorization-5": [
-        {
-          "x": 687,
-          "y": 290
-        },
-        {
-          "x": 687,
-          "y": 410
-        }
-      ],
-      "edge-authorization-dispatcher-servlet-6": [
-        {
-          "x": 765,
-          "y": 426
-        },
-        {
-          "x": 861,
-          "y": 426
-        },
-        {
-          "x": 861,
-          "y": 290
+          "y": 292
         }
       ]
     }
   },
   "google-com-server-spring-tomcat": {
     "width": 1000,
-    "height": 500,
+    "height": 600,
     "nodes": {
       "http-request": {
         "x": 35,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "connector-endpoint": {
         "x": 235,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "protocol-processor": {
         "x": 435,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "coyote-adapter": {
         "x": 635,
-        "y": 10,
+        "y": 20,
         "width": 130,
         "height": 80
       },
       "servlet-container": {
         "x": 635,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "filter-chain": {
         "x": 635,
-        "y": 410,
+        "y": 500,
         "width": 130,
         "height": 80
       },
       "dispatcher-servlet": {
         "x": 835,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       }
@@ -1399,98 +1642,98 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       "edge-http-request-connector-endpoint-1": [
         {
           "x": 165,
-          "y": 242
+          "y": 292
         },
         {
           "x": 235,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-connector-endpoint-protocol-processor-2": [
         {
           "x": 365,
-          "y": 242
+          "y": 292
         },
         {
           "x": 435,
-          "y": 242
+          "y": 292
         }
       ],
       "edge-protocol-processor-coyote-adapter-3": [
         {
           "x": 513,
-          "y": 210
+          "y": 260
         },
         {
           "x": 513,
-          "y": 74
+          "y": 84
         },
         {
           "x": 635,
-          "y": 74
+          "y": 84
         }
       ],
       "edge-coyote-adapter-servlet-container-4": [
         {
           "x": 687,
-          "y": 90
+          "y": 100
         },
         {
           "x": 687,
-          "y": 210
+          "y": 260
         }
       ],
       "edge-servlet-container-filter-chain-5": [
         {
           "x": 687,
-          "y": 290
+          "y": 340
         },
         {
           "x": 687,
-          "y": 410
+          "y": 500
         }
       ],
       "edge-filter-chain-dispatcher-servlet-6": [
         {
           "x": 765,
-          "y": 426
+          "y": 516
         },
         {
           "x": 861,
-          "y": 426
+          "y": 516
         },
         {
           "x": 861,
-          "y": 290
+          "y": 340
         }
       ]
     }
   },
   "google-com-user-browser": {
     "width": 1000,
-    "height": 500,
+    "height": 600,
     "nodes": {
       "certificate-authority": {
         "x": 635,
-        "y": 10,
+        "y": 20,
         "width": 130,
         "height": 80
       },
       "user": {
         "x": 35,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "browser": {
         "x": 435,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       },
       "server": {
         "x": 835,
-        "y": 210,
+        "y": 260,
         "width": 130,
         "height": 80
       }
@@ -1499,87 +1742,87 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       "edge-certificate-authority-browser-1": [
         {
           "x": 678.33,
-          "y": 90
+          "y": 100
         },
         {
           "x": 678.33,
-          "y": 150
+          "y": 180
         },
         {
           "x": 500,
-          "y": 150
+          "y": 180
         },
         {
           "x": 500,
-          "y": 210
+          "y": 260
         }
       ],
       "edge-certificate-authority-server-2": [
         {
           "x": 721.67,
-          "y": 90
+          "y": 100
         },
         {
           "x": 721.67,
-          "y": 150
+          "y": 180
         },
         {
           "x": 900,
-          "y": 150
+          "y": 180
         },
         {
           "x": 900,
-          "y": 210
+          "y": 260
         }
       ],
       "edge-user-browser-3": [
         {
           "x": 165,
-          "y": 250
+          "y": 300
         },
         {
           "x": 435,
-          "y": 250
+          "y": 300
         }
       ],
       "edge-browser-server-4": [
         {
           "x": 565,
-          "y": 223
+          "y": 273
         },
         {
           "x": 835,
-          "y": 223
+          "y": 273
         }
       ],
       "edge-server-browser-5": [
         {
           "x": 835,
-          "y": 241
+          "y": 291
         },
         {
           "x": 565,
-          "y": 241
+          "y": 291
         }
       ],
       "edge-browser-server-6": [
         {
           "x": 565,
-          "y": 259
+          "y": 309
         },
         {
           "x": 835,
-          "y": 259
+          "y": 309
         }
       ],
       "edge-server-browser-7": [
         {
           "x": 835,
-          "y": 277
+          "y": 327
         },
         {
           "x": 565,
-          "y": 277
+          "y": 327
         }
       ]
     }

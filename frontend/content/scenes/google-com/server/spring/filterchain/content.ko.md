@@ -13,7 +13,7 @@ Spring Security의 Servlet 지원은 Servlet Filter를 기반으로 합니다. `
 3. `FilterChainProxy`가 요청 조건과 일치하는 첫 번째 `SecurityFilterChain`을 선택합니다.
 4. 선택된 filter들이 인증 정보와 보안 상태를 처리합니다.
 5. 인가 규칙이 요청을 허용하는지 판단합니다.
-6. 허용된 요청만 다음 Filter 또는 Spring MVC의 `DispatcherServlet`로 전달됩니다.
+6. 허용된 요청은 원래 Servlet FilterChain을 계속 진행하고, 남은 Filter를 거쳐 대상 Servlet인 `DispatcherServlet`에 도달할 수 있습니다.
 
 ## 내부 구조
 

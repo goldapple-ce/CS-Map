@@ -10,25 +10,46 @@ type SceneEdgeProps = {
 const LABEL_FONT_SIZE = 12
 const LABEL_OUTLINE_WIDTH = 4
 
-function labelPosition(points: readonly LayoutPoint[], clearance: number) {
-  let longestSegment = { start: points[0], end: points[1], length: -1 }
+type LabelSide = NonNullable<SceneEdgeElement["labelSide"]>
 
-  for (let index = 0; index < points.length - 1; index += 1) {
-    const start = points[index]
+function labelPosition(
+  points: readonly LayoutPoint[],
+  clearance: number,
+  labelSide?: LabelSide
+) {
+  const segments = points.slice(0, -1).map((start, index) => {
     const end = points[index + 1]
-    const length = Math.hypot(end.x - start.x, end.y - start.y)
-    if (length > longestSegment.length) {
-      longestSegment = { start, end, length }
+    const horizontal = Math.abs(end.x - start.x) >= Math.abs(end.y - start.y)
+    return {
+      start,
+      end,
+      horizontal,
+      length: Math.hypot(end.x - start.x, end.y - start.y),
     }
-  }
+  })
+  const wantsHorizontal = labelSide === "top" || labelSide === "bottom"
+  const matchingSegments = labelSide
+    ? segments.filter(({ horizontal }) => horizontal === wantsHorizontal)
+    : segments
+  const candidates = matchingSegments.length > 0 ? matchingSegments : segments
+  const segment = candidates.reduce((longest, candidate) =>
+    candidate.length > longest.length ? candidate : longest
+  )
+  const resolvedSide =
+    labelSide ?? (segment.horizontal ? ("top" as const) : ("right" as const))
+  const centerX = (segment.start.x + segment.end.x) / 2
+  const centerY = (segment.start.y + segment.end.y) / 2
 
-  const { start, end } = longestSegment
-  const horizontal = Math.abs(end.x - start.x) >= Math.abs(end.y - start.y)
-  return {
-    x: (start.x + end.x) / 2 + (horizontal ? 0 : clearance),
-    y: (start.y + end.y) / 2 + (horizontal ? -clearance : 0),
-    textAnchor: horizontal ? ("middle" as const) : ("start" as const),
+  if (resolvedSide === "top") {
+    return { x: centerX, y: centerY - clearance, textAnchor: "middle" as const }
   }
+  if (resolvedSide === "bottom") {
+    return { x: centerX, y: centerY + clearance, textAnchor: "middle" as const }
+  }
+  if (resolvedSide === "left") {
+    return { x: centerX - clearance, y: centerY, textAnchor: "end" as const }
+  }
+  return { x: centerX + clearance, y: centerY, textAnchor: "start" as const }
 }
 
 export function SceneEdge({
@@ -40,7 +61,7 @@ export function SceneEdge({
   const labelClearance =
     LABEL_FONT_SIZE / 2 + LABEL_OUTLINE_WIDTH / 2 + 6
   const label = element.label
-    ? labelPosition(points, labelClearance)
+    ? labelPosition(points, labelClearance, element.labelSide)
     : undefined
   const supporting = element.variant === "supporting"
   const returning = element.variant === "return"

@@ -3,7 +3,7 @@ import type { SceneNodeElement } from "@/domain/content-types"
 export const SCENE_NODE_WIDTH = 130
 export const SCENE_NODE_HEIGHT = 80
 export const SCENE_GRID_WIDTH = 1000
-export const SCENE_GRID_HEIGHT = 500
+export const SCENE_GRID_HEIGHT = 600
 
 export function estimatedSceneNodeLabelWidth(label: string) {
   return [...label].reduce((width, character) => {
