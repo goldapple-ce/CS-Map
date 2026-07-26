@@ -38,7 +38,7 @@
 ```
 
 - 인증서 검증의 주체는 브라우저이며, 서버는 인증서 체인을 제공하는 역할로 구분한다.
-- 화살표 라벨의 위치는 renderer가 선분을 기준으로 자동 계산하며 콘텐츠 작성자가 좌표를 입력하지 않는다.
+- 화살표 라벨의 위치는 renderer가 선분을 기준으로 자동 계산하며 콘텐츠 작성자가 라벨 좌표를 입력하지 않는다.
 - DNS Scene은 재귀 Resolver가 Root DNS, `.com` TLD DNS, 권한 DNS를 거쳐 IP 주소를 얻는 과정을 왼쪽에서 오른쪽으로 표시한다.
 - Router Scene은 DNS 이후 실제 목적지로 패킷이 이동하는 학습 흐름으로 배치한다.
 - Server Scene은 다음 구조를 사용한다.
@@ -104,7 +104,7 @@ Proxy Server → Application Server → Database
 
 - 게시 콘텐츠마다 작성자, 검토 상태, 수정일과 공식 또는 1차 출처가 있다.
 - 새 루트 흐름에 맞는 퀴즈가 표시되고 기존 검색 결과 중심 문항은 남지 않는다.
-- 콘텐츠 작성자가 좌표를 입력하지 않으며 기존 결정적 자동 레이아웃을 사용한다.
+- 콘텐츠 작성자는 픽셀 좌표를 입력하지 않는다. 정밀 배치가 필요한 Scene은 5×5 논리 격자 셀만 입력하고, 실제 좌표와 edge 경로는 결정적으로 계산된다.
 
 ## 작업 순서
 
@@ -136,6 +136,8 @@ Proxy Server → Application Server → Database
 - [x] Spring MVC를 DispatcherServlet 중심 분기 구조로 재배치하고 반환 edge를 점선으로 구분한다.
 - [x] Dispatcher 주변의 불필요한 왕복 edge를 줄이고 return edge의 접속 방향을 분리한다.
 - [x] Request Topic을 제거하고 View를 DispatcherServlet 아래에 배치한다.
+- [x] 빌드 시 ELK 자동 배치를 도입해 Topic 위치·직교 edge 경로·edge별 접점을 함께 계산하고 기존 수동 경로 계산은 fallback으로 유지한다.
+- [x] 정밀 Scene용 5×5 논리 격자와 고정 Topic 장애물을 피하는 직교 edge routing을 추가하고 Spring MVC 배치를 격자로 전환한다.
 
 ### 4단계 — 연결 정리와 사용자 확인
 
@@ -151,7 +153,7 @@ Proxy Server → Application Server → Database
   - 학습용 일반 서버 가정과 제품별 사실을 구분하는 기준을 반영한다.
 - `TECHNICAL_DESIGN.md`
   - 새 Scene 트리, canonical URL과 기존 DNS 콘텐츠 재배치 결과를 반영한다.
-  - Scene·Concept·Context·Occurrence 및 자동 레이아웃 구조는 변경하지 않는다.
+  - Scene·Concept·Context·Occurrence는 유지하고 자동 레이아웃을 빌드 시 ELK가 생성하는 구조로 보강한다.
 - 콘텐츠 데이터
   - 루트와 하위 Scene YAML·Markdown을 새 흐름으로 교체하거나 추가한다.
   - NGINX, Spring, SQL, NoSQL의 공통 설명이 여러 맥락에서 필요하면 Concept로 분리할 수 있게 ID를 설계한다.

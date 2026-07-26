@@ -15,6 +15,17 @@ export type Source = {
 
 export type LayoutHint = "horizontal" | "branch"
 
+export type SceneGridPlacement = {
+  x: number
+  y: number
+}
+
+export type SceneGridLayout = {
+  type: "grid"
+  columns: 5
+  rows: 5
+}
+
 type SceneElementBase = {
   id: ContentId
   label?: string
@@ -22,6 +33,7 @@ type SceneElementBase = {
 
 export type SceneNodeElement = SceneElementBase & {
   kind: "node"
+  grid?: SceneGridPlacement
   groupId?: ContentId
   targetSceneId?: ContentId
   navigateToSceneId?: ContentId
@@ -130,6 +142,7 @@ export type Scene = {
   status: ContentStatus
   ariaLabel: string
   layoutHint?: LayoutHint
+  layout?: SceneGridLayout
   elements: SceneElement[]
   contentRef: string
   contexts: Context[]

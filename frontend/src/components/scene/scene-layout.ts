@@ -5,6 +5,7 @@ import type {
   SceneGroupElement,
   SceneNodeElement,
 } from "@/domain/content-types"
+import { sceneLayoutIndex } from "@/content/generated/scene-layout-index"
 
 export type LayoutBox = {
   x: number
@@ -25,6 +26,28 @@ export type SceneLayout = {
   groups: ReadonlyMap<string, LayoutBox>
   edges: ReadonlyMap<string, readonly LayoutPoint[]>
   annotations: ReadonlyMap<string, LayoutBox>
+}
+
+export type SerializedSceneLayout = {
+  width: number
+  height: number
+  nodes: Readonly<Record<string, LayoutBox>>
+  groups: Readonly<Record<string, LayoutBox>>
+  edges: Readonly<Record<string, readonly LayoutPoint[]>>
+  annotations: Readonly<Record<string, LayoutBox>>
+}
+
+const generatedLayoutCache = new Map<string, SceneLayout>()
+
+function deserializeSceneLayout(layout: SerializedSceneLayout): SceneLayout {
+  return {
+    width: layout.width,
+    height: layout.height,
+    nodes: new Map(Object.entries(layout.nodes)),
+    groups: new Map(Object.entries(layout.groups)),
+    edges: new Map(Object.entries(layout.edges)),
+    annotations: new Map(Object.entries(layout.annotations)),
+  }
 }
 
 const MIN_SCENE_WIDTH = 1280
@@ -232,6 +255,16 @@ function edgePoints(
 }
 
 export function createSceneLayout(scene: Scene): SceneLayout {
+  const cachedLayout = generatedLayoutCache.get(scene.id)
+  if (cachedLayout) return cachedLayout
+
+  const generatedLayout = sceneLayoutIndex[scene.id]
+  if (generatedLayout) {
+    const layout = deserializeSceneLayout(generatedLayout)
+    generatedLayoutCache.set(scene.id, layout)
+    return layout
+  }
+
   const nodes = scene.elements.filter(
     (element): element is SceneNodeElement => element.kind === "node"
   )

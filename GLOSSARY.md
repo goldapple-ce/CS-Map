@@ -54,7 +54,11 @@ Scene의 부모·자식 관계와 각 Scene 내부 레이아웃을 이용해 모
 
 ### Scene Layout — 장면 레이아웃
 
-한 Scene 안의 node, group, edge, annotation을 배치한 결과다. 작성자가 좌표를 직접 입력하는 대신 콘텐츠 순서, 관계, `layoutHint`를 바탕으로 계산한다.
+한 Scene 안의 node, group, edge, annotation을 배치한 결과다. 기본적으로 콘텐츠 순서, 관계와 `layoutHint`를 바탕으로 계산하며, 정밀한 구성이 필요한 Scene은 5×5 Logical Grid를 사용할 수 있다.
+
+### Logical Grid — 논리 격자
+
+Scene 안의 Topic 위치를 콘텐츠 작성자가 예측 가능하게 지정하기 위한 5×5 셀 체계다. `x`, `y`는 1~5의 셀 번호이며 픽셀 좌표가 아니다. 실제 좌표, Topic 크기, 간격과 연결선 경로는 빌드 단계에서 계산한다.
 
 ### Camera — 카메라
 

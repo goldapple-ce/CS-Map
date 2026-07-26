@@ -14,6 +14,8 @@ const contentRefSchema = z
 
 const statusSchema = z.enum(["draft", "review", "published", "planned"])
 
+const gridCoordinateSchema = z.number().int().min(1).max(5)
+
 const contributorSchema = z
   .object({ id: contentIdSchema, displayName: z.string().min(1) })
   .strict()
@@ -39,6 +41,10 @@ const sceneElementSchema = z.discriminatedUnion("kind", [
       id: contentIdSchema,
       kind: z.literal("node"),
       label: z.string().min(1).optional(),
+      grid: z
+        .object({ x: gridCoordinateSchema, y: gridCoordinateSchema })
+        .strict()
+        .optional(),
       groupId: contentIdSchema.optional(),
       targetSceneId: contentIdSchema.optional(),
       navigateToSceneId: contentIdSchema.optional(),
@@ -216,6 +222,14 @@ export const sceneSchema = z
     status: statusSchema,
     ariaLabel: z.string().min(1),
     layoutHint: z.enum(["horizontal", "branch"]).optional(),
+    layout: z
+      .object({
+        type: z.literal("grid"),
+        columns: z.literal(5),
+        rows: z.literal(5),
+      })
+      .strict()
+      .optional(),
     elements: z.array(sceneElementSchema).default([]),
     contentRef: contentRefSchema,
     contexts: z.array(contextSchema).default([]),
@@ -228,6 +242,44 @@ export const sceneSchema = z
     updatedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   })
   .strict()
+  .superRefine((scene, context) => {
+    const nodes = scene.elements.flatMap((element, elementIndex) =>
+      element.kind === "node" ? [{ element, elementIndex }] : []
+    )
+    if (scene.layout?.type === "grid") {
+      const occupiedCells = new Map<string, string>()
+      nodes.forEach(({ element: node, elementIndex }) => {
+        if (!node.grid) {
+          context.addIssue({
+            code: "custom",
+            path: ["elements", elementIndex, "grid"],
+            message: "Every node in a grid scene must define grid coordinates",
+          })
+          return
+        }
+        const cell = `${node.grid.x},${node.grid.y}`
+        const occupant = occupiedCells.get(cell)
+        if (occupant) {
+          context.addIssue({
+            code: "custom",
+            path: ["elements", elementIndex, "grid"],
+            message: `Grid cell ${cell} is already occupied by ${occupant}`,
+          })
+          return
+        }
+        occupiedCells.set(cell, node.id)
+      })
+    } else {
+      nodes.forEach(({ element: node, elementIndex }) => {
+        if (!node.grid) return
+        context.addIssue({
+          code: "custom",
+          path: ["elements", elementIndex, "grid"],
+          message: "Node grid coordinates require a grid scene layout",
+        })
+      })
+    }
+  })
 
 export const conceptSchema = z
   .object({

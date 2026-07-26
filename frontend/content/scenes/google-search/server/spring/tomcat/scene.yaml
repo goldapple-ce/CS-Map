@@ -21,9 +21,9 @@ contexts: []
 occurrences: []
 conceptRefs: []
 elements:
-  # - id: http-request
-  #   kind: node
-  #   label: HTTP 요청
+  - id: http-request
+    kind: node
+    label: HTTP 요청
   - id: connector-endpoint
     kind: node
     label: Connector / Endpoint
@@ -75,7 +75,12 @@ elements:
     fromElementId: filter-chain
     toElementId: dispatcher-servlet
 relationships:
-  # - { type: flows-to, fromElementId: http-request, toElementId: connector-endpoint, label: 연결 수신 }
+  - {
+      type: flows-to,
+      fromElementId: http-request,
+      toElementId: connector-endpoint,
+      label: 연결 수신,
+    }
   - {
       type: flows-to,
       fromElementId: connector-endpoint,

@@ -6,7 +6,7 @@ title: Spring MVC 요청과 View 렌더링
 summary: DispatcherServlet이 HandlerMapping과 HandlerAdapter를 조정하고 ViewResolver를 통해 서버 측 View를 렌더링하는 흐름입니다.
 status: published
 ariaLabel: DispatcherServlet을 중심으로 위쪽 HandlerMapping, 가운데 HandlerAdapter, 아래쪽 ViewResolver가 분기되고 DispatcherServlet 아래 View에서 HTML을 렌더링하는 Spring MVC 흐름
-layoutHint: horizontal
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
 updatedAt: 2026-07-26
@@ -30,24 +30,31 @@ elements:
   - id: dispatcher-servlet
     kind: node
     label: DispatcherServlet
+    grid: { x: 1, y: 2 }
   - id: rendered-view
     kind: node
     label: View / HTML 렌더링
+    grid: { x: 1, y: 4 }
   - id: handler-mapping
     kind: node
     label: HandlerMapping
+    grid: { x: 3, y: 1 }
   - id: handler-adapter
     kind: node
     label: HandlerAdapter
+    grid: { x: 3, y: 2 }
   - id: view-resolver
     kind: node
     label: ViewResolver
+    grid: { x: 3, y: 3 }
   - id: controller
     kind: node
     label: Controller
+    grid: { x: 5, y: 2 }
   - id: model
     kind: node
     label: Model
+    grid: { x: 4, y: 4 }
   - id: dispatcher-to-mapping
     kind: edge
     label: ① Handler 조회
@@ -99,12 +106,57 @@ elements:
     toElementId: rendered-view
     variant: supporting
 relationships:
-  - { type: flows-to, fromElementId: dispatcher-servlet, toElementId: handler-mapping, label: ① Handler 조회 }
-  - { type: flows-to, fromElementId: handler-mapping, toElementId: controller, label: ② 선택된 Handler }
-  - { type: flows-to, fromElementId: dispatcher-servlet, toElementId: handler-adapter, label: ③ 실행 Adapter 선택 }
-  - { type: flows-to, fromElementId: handler-adapter, toElementId: controller, label: ④ Controller 호출 }
-  - { type: flows-to, fromElementId: controller, toElementId: view-resolver, label: ⑤ View 이름 반환 }
-  - { type: flows-to, fromElementId: controller, toElementId: model, label: ⑤ Model 구성 }
-  - { type: flows-to, fromElementId: dispatcher-servlet, toElementId: view-resolver, label: ⑥ View 해석 요청 }
-  - { type: supports, fromElementId: view-resolver, toElementId: rendered-view, label: ⑦ 실제 View 선택 }
-  - { type: supports, fromElementId: model, toElementId: rendered-view, label: Model 적용 }
+  - {
+      type: flows-to,
+      fromElementId: dispatcher-servlet,
+      toElementId: handler-mapping,
+      label: ① Handler 조회,
+    }
+  - {
+      type: flows-to,
+      fromElementId: handler-mapping,
+      toElementId: controller,
+      label: ② 선택된 Handler,
+    }
+  - {
+      type: flows-to,
+      fromElementId: dispatcher-servlet,
+      toElementId: handler-adapter,
+      label: ③ 실행 Adapter 선택,
+    }
+  - {
+      type: flows-to,
+      fromElementId: handler-adapter,
+      toElementId: controller,
+      label: ④ Controller 호출,
+    }
+  - {
+      type: flows-to,
+      fromElementId: controller,
+      toElementId: view-resolver,
+      label: ⑤ View 이름 반환,
+    }
+  - {
+      type: flows-to,
+      fromElementId: controller,
+      toElementId: model,
+      label: ⑤ Model 구성,
+    }
+  - {
+      type: flows-to,
+      fromElementId: dispatcher-servlet,
+      toElementId: view-resolver,
+      label: ⑥ View 해석 요청,
+    }
+  - {
+      type: supports,
+      fromElementId: view-resolver,
+      toElementId: rendered-view,
+      label: ⑦ 실제 View 선택,
+    }
+  - {
+      type: supports,
+      fromElementId: model,
+      toElementId: rendered-view,
+      label: Model 적용,
+    }
