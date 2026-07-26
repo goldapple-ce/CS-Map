@@ -26,6 +26,8 @@ type WorldRendererProps = {
   onSelectTopic: (sceneId: string, elementId: string, label: string) => void
 }
 
+const MAX_CONTEXT_RENDER_SCALE = 128
+
 function nodeState(
   element: SceneNodeElement,
   sceneId: string,
@@ -68,15 +70,16 @@ export function WorldRenderer({
 
   const visibleScenes = [...layout.scenes.values()].filter((positioned) => {
     const projectedWidth = positioned.bounds.width * camera.scale
+    const renderScale = positioned.scale * camera.scale
+    const isFocused = positioned.scene.id === focusedSceneId
+    const isAncestor = ancestors.has(positioned.scene.id)
     return (
       boundsIntersect(positioned.bounds, visibleBounds) &&
-      (positioned.scene.id === layout.rootSceneId ||
-        ancestors.has(positioned.scene.id) ||
-        projectedWidth >= 220)
+      (isFocused ||
+        (isAncestor && renderScale <= MAX_CONTEXT_RENDER_SCALE) ||
+        (!isAncestor && projectedWidth >= 220))
     )
   })
-  const translateX = viewport.width / 2 - camera.centerX * camera.scale
-  const translateY = viewport.height / 2 - camera.centerY * camera.scale
 
   return (
     <svg
@@ -104,12 +107,16 @@ export function WorldRenderer({
         </marker>
       </defs>
 
-      <g
-        transform={`translate(${translateX} ${translateY}) scale(${camera.scale})`}
-      >
+      <g>
         {visibleScenes.map((positioned) => {
           const { scene, localLayout } = positioned
           const renderScale = positioned.scale * camera.scale
+          const screenX =
+            viewport.width / 2 +
+            (positioned.x - camera.centerX) * camera.scale
+          const screenY =
+            viewport.height / 2 +
+            (positioned.y - camera.centerY) * camera.scale
           const density = nodeDensity(renderScale)
           const isFocused = scene.id === focusedSceneId
           const edges = scene.elements.filter(
@@ -123,7 +130,7 @@ export function WorldRenderer({
             <g
               key={scene.id}
               data-world-scene-id={scene.id}
-              transform={`translate(${positioned.x} ${positioned.y}) scale(${positioned.scale})`}
+              transform={`translate(${screenX} ${screenY}) scale(${renderScale})`}
             >
               {edges.map((element) => {
                 const points = localLayout.edges.get(element.id)

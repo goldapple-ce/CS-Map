@@ -433,6 +433,8 @@ type HistoryEntry = {
 - 배치 구현은 도메인 모델 밖의 build adapter로 둔다. 콘텐츠 작성자는 1~5의 `row`, `col` 셀 위치만 작성하며 픽셀 `x`, `y`, `width`, `height`, port와 bend point는 작성하지 않는다.
 - Vite 개발 플러그인은 `scene.yaml`, `concept.yaml`, Scene layout builder 또는 공통 Topic metrics 저장을 감지하면 기존 콘텐츠 빌드 파이프라인을 순차 실행한다. 생성 인덱스 갱신이 끝난 뒤 브라우저를 자동 새로고침하여 현재 Scene 데이터와 배치를 다시 로드한다. 배포 빌드는 기존 `prebuild` 경로를 사용한다.
 - 화면 투영 크기에 따른 LOD와 Viewport 교차 검사로 실제 DOM 렌더링 범위를 제한한다.
+- `WorldRenderer`는 월드 전체에 거대한 `translate + scale` 행렬을 적용하지 않는다. 각 Scene의 월드 원점에서 카메라 중심을 먼저 뺀 뒤 카메라 배율을 곱해 Viewport 중심 기준 화면 좌표를 계산하고, Scene의 월드 배율과 카메라 배율을 곱한 최종 화면 배율로 Scene별 transform을 만든다. 이 카메라 상대 투영은 깊은 Scene에서도 큰 이동값과 작은 중첩 좌표의 상쇄로 발생하는 SVG 정밀도 손실을 피한다.
+- 집중 Scene과 자손의 표시 기준은 유지한다. 조상 Scene은 논리적 월드와 탐색 상태에는 계속 존재하지만 비집중 상태의 최종 화면 배율이 `128`을 넘으면 DOM/SVG 렌더링에서 제외한다. 이는 고정 depth 제한이 아니라 현재 Viewport와 카메라에 따른 투영 배율 기반 가상화다.
 - `SceneNode`는 `targetSceneId` 또는 `navigateToSceneId`가 있으면 제목 아래에 `[내부 보기]`를 표시한다. 둘 다 없는 말단 Topic에는 별도 표식을 추가하지 않으며 작성 YAML에도 표시 전용 필드를 추가하지 않는다.
 - `[내부 보기]`는 LOD와 관계없이 `text-sm`으로 Topic label 아래에 표시한다. 배경의 Scene에서는 별도 크기 보정 없이 월드 transform에 따라 자연스럽게 축소된다.
 - 이동 대상이 있는 Topic button의 접근성 이름과 hover·focus 미리보기는 화면 표시와 같은 `내부 보기` 용어를 사용한다.
