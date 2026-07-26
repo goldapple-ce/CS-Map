@@ -154,6 +154,12 @@ edge의 `fromSide`와 `toSide`는 각각 출발 Topic과 도착 Topic에서 사�
 
 `childSceneId`와 `navigateToSceneId`가 없는 Topic이다. 클릭하면 URL이나 카메라를 바꾸지 않고 Explanation Panel에서 해당 Topic을 선택하며, 별도 설명이 없으면 이를 명시적으로 안내한다.
 
+### Internal View Indicator — 내부 보기 표시
+
+다른 Scene으로 이어지는 Topic의 제목 아래에 표시하는 `[내부 보기]` 문구다.
+
+`childSceneId` 또는 `navigateToSceneId`가 있는 Topic에만 표시하며, 이동 대상이 없는 말단 Topic에는 별도 표식을 추가하지 않는다. 모든 LOD에서 같은 문구를 유지하되 화면 투영 크기에 맞는 글자 크기를 사용한다.
+
 ## 콘텐츠 모델
 
 ### Concept — 공통 개념

@@ -8,12 +8,11 @@ export type SceneNodeState = "interactive" | "selected"
 export type SceneNodeDensity = "far" | "medium" | "near"
 
 const sceneNodeVariants = cva(
-  "flex size-full cursor-pointer flex-col items-center justify-center gap-0.5 rounded-xl border border-border bg-card/90 px-8 text-center shadow-sm transition-[background-color,color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
+  "relative flex size-full cursor-pointer flex-col items-center justify-center gap-5 rounded-xl border border-border bg-card/90 px-8 text-center shadow-sm transition-[background-color,color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
   {
     variants: {
       state: {
-        interactive:
-          "font-medium hover:bg-muted/70 hover:text-foreground",
+        interactive: "font-medium hover:bg-muted/70 hover:text-foreground",
         selected: "bg-muted font-medium ring-2 ring-ring/30",
       },
     },
@@ -40,6 +39,20 @@ const stateLabels: Record<SceneNodeState, string> = {
   selected: "선택됨",
 }
 
+const sceneNodeChildLabelVariants = cva(
+  "leading-none font-medium whitespace-nowrap text-muted-foreground",
+  {
+    variants: {
+      density: {
+        far: "text-3xl",
+        medium: "text-2xl",
+        near: "text-xl",
+      },
+    },
+    defaultVariants: { density: "near" },
+  }
+)
+
 type SceneNodeProps = {
   element: SceneNodeElement
   layout: LayoutBox
@@ -61,16 +74,21 @@ export function SceneNode({
 }: SceneNodeProps) {
   const { x, y, width, height } = layout
   const label = element.label ?? element.id
-  const navigationSceneId =
-    element.targetSceneId ?? element.navigateToSceneId
-  const preview = element.targetSceneId
-    ? `${label} 내부 흐름으로 확대합니다.`
-    : element.navigateToSceneId
-      ? `${label} Topic으로 이동합니다.`
-      : `${label} 설명을 엽니다.`
+  const navigationSceneId = element.targetSceneId ?? element.navigateToSceneId
+  const preview = navigationSceneId
+    ? `${label} 내부 내용을 봅니다.`
+    : `${label} 설명을 엽니다.`
   const content = (
     <>
       <span className={sceneNodeLabelVariants({ density })}>{label}</span>
+      {navigationSceneId ? (
+        <span
+          aria-hidden="true"
+          className={sceneNodeChildLabelVariants({ density })}
+        >
+          [내부 보기]
+        </span>
+      ) : null}
     </>
   )
 
@@ -81,11 +99,7 @@ export function SceneNode({
         type="button"
         data-scene-node-id={element.id}
         disabled={navigationDisabled}
-        aria-label={
-          element.targetSceneId
-            ? `${label} 하위 장면 열기`
-            : `${label} Topic으로 이동`
-        }
+        aria-label={`${label} 내부 보기`}
         className={cn(sceneNodeVariants({ state }))}
         onClick={() => onEnterScene(navigationSceneId, element.id)}
       >

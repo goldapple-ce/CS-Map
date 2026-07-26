@@ -430,6 +430,9 @@ type HistoryEntry = {
 - 배치 구현은 도메인 모델 밖의 build adapter로 둔다. 콘텐츠 작성자는 1~5의 `row`, `col` 셀 위치만 작성하며 픽셀 `x`, `y`, `width`, `height`, port와 bend point는 작성하지 않는다.
 - Vite 개발 플러그인은 `scene.yaml`, `concept.yaml`, Scene layout builder 또는 공통 Topic metrics 저장을 감지하면 기존 콘텐츠 빌드 파이프라인을 순차 실행한다. 생성 인덱스 갱신이 끝난 뒤 브라우저를 자동 새로고침하여 현재 Scene 데이터와 배치를 다시 로드한다. 배포 빌드는 기존 `prebuild` 경로를 사용한다.
 - 화면 투영 크기에 따른 LOD와 Viewport 교차 검사로 실제 DOM 렌더링 범위를 제한한다.
+- `SceneNode`는 `targetSceneId` 또는 `navigateToSceneId`가 있으면 제목 아래에 `[내부 보기]`를 표시한다. 둘 다 없는 말단 Topic에는 별도 표식을 추가하지 않으며 작성 YAML에도 표시 전용 필드를 추가하지 않는다.
+- `[내부 보기]`는 `near`, `medium`, `far` LOD별 글자 크기를 사용해 Topic label 아래에서 계속 읽을 수 있게 한다.
+- 이동 대상이 있는 Topic button의 접근성 이름과 hover·focus 미리보기는 화면 표시와 같은 `내부 보기` 용어를 사용한다.
 
 ### 9.2 진입 전환
 
@@ -538,6 +541,7 @@ read files
 - 그림에는 장면 전체 텍스트 요약을 제공한다.
 - 선택 상태를 색상만으로 구분하지 않는다.
 - hover 미리보기와 같은 정보를 keyboard focus에서도 제공한다.
+- 다른 Scene으로 이어지는 Topic은 보이는 `[내부 보기]` 문구와 접근성 이름으로 말단 Topic과 구분한다.
 - 자동 접근성 검사는 수동 키보드·스크린 리더 검수를 대체하지 않는다.
 
 ## 14. 오류 처리
