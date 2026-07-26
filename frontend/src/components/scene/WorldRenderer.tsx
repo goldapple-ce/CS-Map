@@ -133,7 +133,6 @@ export function WorldRenderer({
                     element={element}
                     points={points}
                     contextual={!isFocused}
-                    density={density}
                   />
                 ) : null
               })}

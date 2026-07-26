@@ -6,8 +6,10 @@ import type {
 import { sceneLayoutIndex } from "@/content/generated/scene-layout-index"
 import {
   estimatedSceneNodeWidth,
-  MIN_SCENE_NODE_WIDTH,
+  SCENE_GRID_HEIGHT,
+  SCENE_GRID_WIDTH,
   SCENE_NODE_HEIGHT,
+  SCENE_NODE_WIDTH,
 } from "@/components/scene/scene-node-metrics"
 
 export type LayoutBox = {
@@ -273,10 +275,10 @@ export function createSceneLayout(scene: Scene): SceneLayout {
   const contentWidth =
     layerWidths.reduce((sum, width) => sum + width, 0) +
     layerGaps.reduce((sum, gap) => sum + gap, 0)
-  const sceneWidth = Math.max(
-    MIN_SCENE_WIDTH,
-    HORIZONTAL_MARGIN * 2 + contentWidth
-  )
+  const sceneWidth =
+    scene.layout?.type === "grid"
+      ? SCENE_GRID_WIDTH
+      : Math.max(MIN_SCENE_WIDTH, HORIZONTAL_MARGIN * 2 + contentWidth)
   const tallestLayer = Math.max(
     ...layers.map(
       (layer) =>
@@ -285,10 +287,10 @@ export function createSceneLayout(scene: Scene): SceneLayout {
     ),
     0
   )
-  const sceneHeight = Math.max(
-    MIN_SCENE_HEIGHT,
-    tallestLayer + VERTICAL_MARGIN * 2
-  )
+  const sceneHeight =
+    scene.layout?.type === "grid"
+      ? SCENE_GRID_HEIGHT
+      : Math.max(MIN_SCENE_HEIGHT, tallestLayer + VERTICAL_MARGIN * 2)
   const centerY = sceneHeight / 2
   const nodeLayouts = new Map<string, LayoutBox>()
   let columnX = (sceneWidth - contentWidth) / 2
@@ -306,7 +308,7 @@ export function createSceneLayout(scene: Scene): SceneLayout {
         : centerY - layerHeight / 2
 
     layer.forEach((node, index) => {
-      const width = nodeWidths.get(node.id) ?? MIN_SCENE_NODE_WIDTH
+      const width = nodeWidths.get(node.id) ?? SCENE_NODE_WIDTH
       nodeLayouts.set(node.id, {
         x: columnX + (layerWidth - width) / 2,
         y: firstY + index * (SCENE_NODE_HEIGHT + ROW_GAP),

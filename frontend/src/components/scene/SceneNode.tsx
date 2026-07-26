@@ -1,14 +1,21 @@
 import { cva } from "class-variance-authority"
 
 import type { LayoutBox } from "@/components/scene/scene-layout"
+import { estimatedSceneNodeLabelWidth } from "@/components/scene/scene-node-metrics"
 import type { SceneNodeElement } from "@/domain/content-types"
 import { cn } from "@/lib/utils"
 
 export type SceneNodeState = "interactive" | "selected"
 export type SceneNodeDensity = "far" | "medium" | "near"
 
+const sceneNodeLabelFontSizes: Record<SceneNodeDensity, number> = {
+  far: 36,
+  medium: 30,
+  near: 24,
+}
+
 const sceneNodeVariants = cva(
-  "relative flex size-full cursor-pointer flex-col items-center justify-center gap-5 rounded-xl border border-border bg-card/90 px-8 text-center shadow-sm transition-[background-color,color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
+  "relative flex size-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card/90 text-center shadow-sm transition-[background-color,color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
   {
     variants: {
       state: {
@@ -21,26 +28,7 @@ const sceneNodeVariants = cva(
 )
 
 const sceneNodeLabelVariants = cva(
-  "leading-none font-medium whitespace-nowrap",
-  {
-    variants: {
-      density: {
-        far: "text-4xl",
-        medium: "text-3xl",
-        near: "text-2xl",
-      },
-    },
-    defaultVariants: { density: "near" },
-  }
-)
-
-const stateLabels: Record<SceneNodeState, string> = {
-  interactive: "탐색 대상",
-  selected: "선택됨",
-}
-
-const sceneNodeChildLabelVariants = cva(
-  "leading-none font-medium whitespace-nowrap text-muted-foreground",
+  "inline-block origin-center leading-none font-medium whitespace-nowrap",
   {
     variants: {
       density: {
@@ -52,6 +40,11 @@ const sceneNodeChildLabelVariants = cva(
     defaultVariants: { density: "near" },
   }
 )
+
+const stateLabels: Record<SceneNodeState, string> = {
+  interactive: "탐색 대상",
+  selected: "선택됨",
+}
 
 type SceneNodeProps = {
   element: SceneNodeElement
@@ -74,17 +67,26 @@ export function SceneNode({
 }: SceneNodeProps) {
   const { x, y, width, height } = layout
   const label = element.label ?? element.id
+  const labelFontSize = sceneNodeLabelFontSizes[density]
+  const estimatedLabelWidth =
+    estimatedSceneNodeLabelWidth(label) * (labelFontSize / 36)
+  const labelScale = Math.min(1, (width - 12) / estimatedLabelWidth)
   const navigationSceneId = element.targetSceneId ?? element.navigateToSceneId
   const preview = navigationSceneId
     ? `${label} 내부 내용을 봅니다.`
     : `${label} 설명을 엽니다.`
   const content = (
     <>
-      <span className={sceneNodeLabelVariants({ density })}>{label}</span>
+      <span
+        className={sceneNodeLabelVariants({ density })}
+        style={{ transform: `scale(${labelScale})` }}
+      >
+        {label}
+      </span>
       {navigationSceneId ? (
         <span
           aria-hidden="true"
-          className={sceneNodeChildLabelVariants({ density })}
+          className="text-xs leading-none whitespace-nowrap text-muted-foreground"
         >
           [내부 보기]
         </span>

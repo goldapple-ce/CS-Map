@@ -10,8 +10,10 @@ import type {
 import type { SerializedSceneLayout } from "../src/components/scene/scene-layout.ts"
 import {
   estimatedSceneNodeWidth,
-  MIN_SCENE_NODE_WIDTH,
+  SCENE_GRID_HEIGHT,
+  SCENE_GRID_WIDTH,
   SCENE_NODE_HEIGHT,
+  SCENE_NODE_WIDTH,
 } from "../src/components/scene/scene-node-metrics.ts"
 import type {
   Scene,
@@ -21,10 +23,6 @@ import type {
 
 const MIN_SCENE_WIDTH = 1280
 const MIN_SCENE_HEIGHT = 720
-const HORIZONTAL_MARGIN = 72
-const GRID_COLUMN_GAP = 220
-const GRID_ROW_GAP = 96
-const GRID_VERTICAL_MARGIN = 88
 
 const elk = new ELK()
 
@@ -203,39 +201,10 @@ async function buildGridSceneLayout(
 ): Promise<SerializedSceneLayout> {
   const columns = scene.layout?.columns ?? 5
   const rows = scene.layout?.rows ?? 5
-  const columnWidths = Array.from(
-    { length: columns },
-    () => MIN_SCENE_NODE_WIDTH
-  )
-  for (const node of nodes) {
-    if (!node.grid) continue
-    columnWidths[node.grid.col - 1] = Math.max(
-      columnWidths[node.grid.col - 1] ?? MIN_SCENE_NODE_WIDTH,
-      estimatedSceneNodeWidth(node)
-    )
-  }
-
-  const gridWidth =
-    columnWidths.reduce((sum, width) => sum + width, 0) +
-    Math.max(columns - 1, 0) * GRID_COLUMN_GAP
-  const gridHeight =
-    rows * SCENE_NODE_HEIGHT + Math.max(rows - 1, 0) * GRID_ROW_GAP
-  const sceneWidth = Math.max(
-    MIN_SCENE_WIDTH,
-    gridWidth + HORIZONTAL_MARGIN * 2
-  )
-  const sceneHeight = Math.max(
-    MIN_SCENE_HEIGHT,
-    gridHeight + GRID_VERTICAL_MARGIN * 2
-  )
-  const gridStartX = (sceneWidth - gridWidth) / 2
-  const gridStartY = (sceneHeight - gridHeight) / 2
-  const columnStarts: number[] = []
-  let nextColumnX = gridStartX
-  for (const width of columnWidths) {
-    columnStarts.push(nextColumnX)
-    nextColumnX += width + GRID_COLUMN_GAP
-  }
+  const sceneWidth = SCENE_GRID_WIDTH
+  const sceneHeight = SCENE_GRID_HEIGHT
+  const cellWidth = sceneWidth / columns
+  const cellHeight = sceneHeight / rows
 
   const nodeLayouts = Object.fromEntries(
     nodes.map((node) => {
@@ -244,18 +213,16 @@ async function buildGridSceneLayout(
           `Grid scene ${scene.id} is missing coordinates for node ${node.id}`
         )
       }
-      const width = estimatedSceneNodeWidth(node)
-      const columnWidth = columnWidths[node.grid.col - 1] ?? width
       return [
         node.id,
         {
           x:
-            (columnStarts[node.grid.col - 1] ?? gridStartX) +
-            (columnWidth - width) / 2,
+            (node.grid.col - 1) * cellWidth +
+            (cellWidth - SCENE_NODE_WIDTH) / 2,
           y:
-            gridStartY +
-            (node.grid.row - 1) * (SCENE_NODE_HEIGHT + GRID_ROW_GAP),
-          width,
+            (node.grid.row - 1) * cellHeight +
+            (cellHeight - SCENE_NODE_HEIGHT) / 2,
+          width: SCENE_NODE_WIDTH,
           height: SCENE_NODE_HEIGHT,
         },
       ]

@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { contentRepository } from "@/content/content-repository"
 import {
   cameraForBounds,
+  cameraForGridScene,
   cameraForWidth,
   type CameraState,
   type ViewportSize,
@@ -212,7 +213,9 @@ export function SceneViewport({
       savedCamera ??
       (embedded
         ? cameraForWidth(positioned.bounds, viewport)
-        : cameraForBounds(positioned.bounds, viewport))
+        : positioned.scene.layout?.type === "grid"
+          ? cameraForGridScene(positioned.bounds, positioned.scale, viewport)
+          : cameraForBounds(positioned.bounds, viewport))
     pendingAnnouncementRef.current = `${positioned.scene.title} Topic으로 이동했습니다.`
     onSceneReady(sceneId, positioned.scene.title)
     animateCamera(target, !initializedRef.current)
@@ -253,7 +256,13 @@ export function SceneViewport({
       ? worldState.layout.scenes.get(worldState.layout.rootSceneId)
       : undefined
   const rootCamera = rootPositioned
-    ? cameraForBounds(rootPositioned.bounds, viewport)
+    ? rootPositioned.scene.layout?.type === "grid"
+      ? cameraForGridScene(
+          rootPositioned.bounds,
+          rootPositioned.scale,
+          viewport
+        )
+      : cameraForBounds(rootPositioned.bounds, viewport)
     : undefined
   const relativeZoom = rootCamera
     ? Math.round((camera.scale / rootCamera.scale) * 100)

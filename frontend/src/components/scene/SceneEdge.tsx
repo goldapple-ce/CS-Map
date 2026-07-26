@@ -1,22 +1,14 @@
 import type { LayoutPoint } from "@/components/scene/scene-layout"
-import type { SceneNodeDensity } from "@/components/scene/SceneNode"
 import type { SceneEdgeElement } from "@/domain/content-types"
 
 type SceneEdgeProps = {
   element: SceneEdgeElement
   points: readonly LayoutPoint[]
   contextual?: boolean
-  density?: SceneNodeDensity
 }
 
-const labelMetrics: Record<
-  SceneNodeDensity,
-  { fontSize: number; outlineWidth: number }
-> = {
-  far: { fontSize: 30, outlineWidth: 12 },
-  medium: { fontSize: 25, outlineWidth: 10 },
-  near: { fontSize: 21, outlineWidth: 8 },
-}
+const LABEL_FONT_SIZE = 12
+const LABEL_OUTLINE_WIDTH = 4
 
 function labelPosition(points: readonly LayoutPoint[], clearance: number) {
   let longestSegment = { start: points[0], end: points[1], length: -1 }
@@ -43,12 +35,10 @@ export function SceneEdge({
   element,
   points,
   contextual = false,
-  density = "near",
 }: SceneEdgeProps) {
   if (points.length < 2) return null
-  const labelMetric = labelMetrics[density]
   const labelClearance =
-    labelMetric.fontSize / 2 + labelMetric.outlineWidth / 2 + 6
+    LABEL_FONT_SIZE / 2 + LABEL_OUTLINE_WIDTH / 2 + 6
   const label = element.label
     ? labelPosition(points, labelClearance)
     : undefined
@@ -83,14 +73,12 @@ export function SceneEdge({
               : "var(--foreground)"
           }
           stroke="var(--background)"
-          strokeWidth={labelMetric.outlineWidth}
+          strokeWidth={LABEL_OUTLINE_WIDTH}
           strokeLinejoin="round"
           paintOrder="stroke"
-          fontSize={labelMetric.fontSize}
-          fontWeight="600"
           opacity={contextual ? "0.35" : secondary ? "0.72" : "0.82"}
           aria-hidden="true"
-          className="pointer-events-none select-none"
+          className="pointer-events-none select-none text-xs"
         >
           {element.label}
         </text>

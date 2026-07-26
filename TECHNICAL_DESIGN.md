@@ -412,29 +412,32 @@ type HistoryEntry = {
 - SVG는 연결선과 도형을 담당한다.
 - 클릭 가능한 텍스트·버튼은 SVG 접근 가능 요소 또는 위치가 동기화된 HTML overlay로 표현한다.
 - 장면 데이터는 픽셀 좌표를 저장하지 않는다. 모든 MVP Scene은 node마다 1~5 범위의 5×5 논리 격자 셀을 저장한다.
-- 논리 격자 스키마는 모든 node의 셀 지정, 좌표 범위와 셀 중복을 검증한다. 셀 번호를 실제 좌표로 투영할 때 노드 라벨 너비, 공통 행·열 간격과 주석 영역을 반영해 Scene bounds를 결정한다.
-- Topic 너비 추정은 `scene-node-metrics.ts`에 단일화한다. 최대 LOD의 36px 라벨을 기준으로 한글·영문·공백 폭을 보수적으로 계산하고 좌우 32px padding을 더한다. 빌드 배치와 런타임 fallback은 같은 계산을 사용한다.
+- 논리 격자 스키마는 모든 node의 셀 지정, 좌표 범위와 셀 중복을 검증한다. 모든 5×5 Scene의 논리적 bounds는 `1000×500`, 각 셀은 `200×100`, 각 Topic은 `130×80`으로 고정한다. Topic은 지정된 셀 중앙에 배치되어 가로 70, 세로 20의 셀 내부 여유를 화살표 경로에 제공한다.
+- Topic 제목의 최대 LOD 예상 너비는 `scene-node-metrics.ts`에서 한글·영문·공백별로 계산한다. 제목이 Topic의 가용 너비를 넘으면 Topic box를 확장하거나 줄바꿈하지 않고 현재 LOD 글자 크기에 축소 비율을 적용해 한 줄로 맞춘다.
 - 논리 격자 node는 `grid: { row, col }`을 사용한다. `row`는 세로 셀, `col`은 가로 셀이며 둘 다 1~5 범위다.
 - 콘텐츠 빌드 단계의 Scene layout adapter가 논리 격자를 로컬 Topic 좌표로 투영하고 직교 edge 경로를 계산해 `scene-layout-index.ts`를 생성한다.
 - 기존 ELK layered adapter는 격자가 없는 이전 콘텐츠를 위한 fallback으로만 남기며 Scene·Relationship 도메인 모델을 ELK 타입에 결합하지 않는다. 런타임 renderer는 생성 인덱스를 읽고, 인덱스가 없는 개발·복구 상황에서만 기존 결정적 배치를 fallback으로 사용한다.
 - 생성된 로컬 Scene 배치를 기존 재귀 월드 배치가 조합해 월드 bounds와 자식 Scene 중첩 영역을 계산하므로 카메라, URL과 Semantic Zoom 상태 모델은 바뀌지 않는다.
-- `SceneEdge`는 `label`이 있으면 edge 경로에서 가장 긴 선분의 중점을 선택해 보이는 라벨을 배치한다. 진행 edge는 추정 라벨 너비만큼 인접 열 간격을 확보하며 콘텐츠에는 라벨 좌표를 저장하지 않는다.
+- `SceneEdge`는 `label`이 있으면 edge 경로에서 가장 긴 선분의 중점을 선택해 보이는 라벨을 배치하며 콘텐츠에는 라벨 좌표를 저장하지 않는다.
 - ELK edge router는 주요 흐름, 반환, 지원 관계별 port 방향을 사용하고 수평·수직 선분만 사용하는 직교 꺾은선을 계산한다. 각 edge는 별도 port를 가져 동일 Topic 사이의 여러 선도 접점과 lane을 공유하지 않는다.
 - 논리 격자 Scene은 고정 Topic 위치를 바꾸지 않는 libavoid router로 직교 edge를 계산한다. 노드 장애물 회피, 교차 비용과 평행 선분 nudging을 빌드 단계에서 적용하며 콘텐츠에는 접점과 bend point를 저장하지 않는다.
 - edge의 선택적 `fromSide`·`toSide`는 `top`·`right`·`bottom`·`left` 값을 사용한다. build adapter는 같은 면을 사용하는 edge별 port를 해당 면에 분산 생성하고 ELK JSON edge가 그 port를 참조하게 한다. 힌트가 없는 endpoint는 libavoid의 자동 pin 선택을 사용한다.
 - 출발과 도착 요소가 같은 self edge는 depth 계산에서 제외하고 해당 노드 위쪽을 돌아 다시 노드로 들어오는 loop 경로로 표시한다.
 - 동일한 두 Topic 사이에 edge가 여러 개 존재하면 격자 router가 평행 선분을 서로 밀어 별도 lane을 계산한다. 방향과 `flow`·`return`·`supporting` 시각 구분은 renderer가 유지한다.
 - `supports` 관계는 격자 위치를 바꾸지 않고 다른 edge와 함께 자동 routing하며 점선으로 표시한다.
-- 기본 Topic 크기와 열·행 간격은 확대된 Scene에서도 라벨과 진행 방향을 구분할 수 있는 크기로 유지하며, edge 라벨 너비가 더 크면 열 간격을 추가로 확장한다.
-- 보이는 edge 라벨은 배경색 halo로 선과 분리하고, edge 그룹의 접근성 이름과 SVG `title`은 그대로 유지한다.
+- 고정 Topic 크기와 셀 내부 간격은 모든 Scene에서 동일하게 유지한다.
+- 보이는 edge 라벨은 LOD와 관계없이 `text-xs`로 표시한다. 배경색 halo는 고정 4px이며 선에서 떨어지는 거리도 이 고정 글자 크기에서 계산한다. edge 그룹의 접근성 이름과 SVG `title`은 그대로 유지한다.
 - 배치 구현은 도메인 모델 밖의 build adapter로 둔다. 콘텐츠 작성자는 1~5의 `row`, `col` 셀 위치만 작성하며 픽셀 `x`, `y`, `width`, `height`, port와 bend point는 작성하지 않는다.
 - Vite 개발 플러그인은 `scene.yaml`, `concept.yaml`, Scene layout builder 또는 공통 Topic metrics 저장을 감지하면 기존 콘텐츠 빌드 파이프라인을 순차 실행한다. 생성 인덱스 갱신이 끝난 뒤 브라우저를 자동 새로고침하여 현재 Scene 데이터와 배치를 다시 로드한다. 배포 빌드는 기존 `prebuild` 경로를 사용한다.
 - 화면 투영 크기에 따른 LOD와 Viewport 교차 검사로 실제 DOM 렌더링 범위를 제한한다.
 - `SceneNode`는 `targetSceneId` 또는 `navigateToSceneId`가 있으면 제목 아래에 `[내부 보기]`를 표시한다. 둘 다 없는 말단 Topic에는 별도 표식을 추가하지 않으며 작성 YAML에도 표시 전용 필드를 추가하지 않는다.
-- `[내부 보기]`는 `near`, `medium`, `far` LOD별 글자 크기를 사용해 Topic label 아래에서 계속 읽을 수 있게 한다.
+- `[내부 보기]`는 LOD와 관계없이 `text-sm`으로 Topic label 아래에 표시한다. 배경의 Scene에서는 별도 크기 보정 없이 월드 transform에 따라 자연스럽게 축소된다.
 - 이동 대상이 있는 Topic button의 접근성 이름과 hover·focus 미리보기는 화면 표시와 같은 `내부 보기` 용어를 사용한다.
 
 ### 9.2 진입 전환
+
+- 일반 5×5 Scene의 목표 배율은 공통 Scene bounds `1000×500`과 현재 Viewport 크기로 계산한다. 자식 Scene의 월드 배율은 가로 비율 `130/1000`과 세로 비율 `80/500` 중 작은 `0.13`이며, 같은 단계의 Scene은 같은 월드 배율을 갖는다. 집중 카메라가 이 월드 배율을 역으로 상쇄하므로 단계가 하나 깊어질 때 표시 퍼센트는 직전 단계의 약 `7.69배`가 된다. 집중 Scene은 단계와 관계없이 같은 LOD를 사용하지만 배경의 조상·자손 Scene에는 `far`와 `medium` LOD를 계속 적용한다.
+- 카메라 중심은 각 Scene의 실제 bounds 중심을 사용한다. 홈페이지의 embedded 표현, 저장된 뒤로 가기 카메라와 grid가 아닌 fallback Scene은 기존 맞춤 계산을 유지한다.
 
 ```text
 1. 클릭 Topic의 월드 bounds 조회

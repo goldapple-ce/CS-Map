@@ -1,4 +1,8 @@
 import type { WorldBounds } from "@/components/scene/world-layout"
+import {
+  SCENE_GRID_HEIGHT,
+  SCENE_GRID_WIDTH,
+} from "@/components/scene/scene-node-metrics"
 
 export type CameraState = {
   centerX: number
@@ -24,6 +28,23 @@ export function cameraForBounds(
     scale: Math.min(
       usableWidth / Math.max(bounds.width, 0.0001),
       usableHeight / Math.max(bounds.height, 0.0001)
+    ),
+  }
+}
+
+export function cameraForGridScene(
+  bounds: WorldBounds,
+  worldScale: number,
+  viewport: ViewportSize
+): CameraState {
+  return {
+    centerX: bounds.x + bounds.width / 2,
+    centerY: bounds.y + bounds.height / 2,
+    scale: Math.min(
+      viewport.width /
+        Math.max(SCENE_GRID_WIDTH * worldScale, 0.0001),
+      viewport.height /
+        Math.max(SCENE_GRID_HEIGHT * worldScale, 0.0001)
     ),
   }
 }

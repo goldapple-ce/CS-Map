@@ -158,7 +158,7 @@ edge의 `fromSide`와 `toSide`는 각각 출발 Topic과 도착 Topic에서 사�
 
 다른 Scene으로 이어지는 Topic의 제목 아래에 표시하는 `[내부 보기]` 문구다.
 
-`childSceneId` 또는 `navigateToSceneId`가 있는 Topic에만 표시하며, 이동 대상이 없는 말단 Topic에는 별도 표식을 추가하지 않는다. 모든 LOD에서 같은 문구를 유지하되 화면 투영 크기에 맞는 글자 크기를 사용한다.
+`childSceneId` 또는 `navigateToSceneId`가 있는 Topic에만 고정된 글자 크기로 표시하며, 이동 대상이 없는 말단 Topic에는 별도 표식을 추가하지 않는다. 배경의 Scene에서는 월드 transform에 따라 Topic과 함께 자연스럽게 축소된다.
 
 ## 콘텐츠 모델
 

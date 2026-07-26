@@ -70,7 +70,6 @@ export function SceneRenderer({
               key={element.id}
               element={element}
               points={points}
-              density="near"
             />
           ) : null
         })}
