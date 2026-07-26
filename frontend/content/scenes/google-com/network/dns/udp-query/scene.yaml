@@ -18,12 +18,10 @@ nodes:
     label: IP Packet
     row: 3
     col: 4
-    planned: true
   network-interface:
     label: 네트워크 인터페이스
     row: 2
     col: 5
-    planned: true
   dns-server-port:
     label: 이름 서버 UDP 53
     row: 4

@@ -33,7 +33,7 @@ Linux socket 계층은 사용자 프로세스와 UDP·IP 같은 protocol 구현 
 
 ## 관련 개념
 
-IP 처리, 송신 queue와 Network Driver는 독립적인 내부 구조를 가지므로 준비 중 Topic으로 표시됩니다. 아래 UDP Concept는 상위 UDP DNS 질의 장면과 동일한 공통 설명이며, 현재 패널에는 Kernel 처리라는 별도 맥락이 결합됩니다.
+IP 처리, 송신 queue와 Network Driver는 현재 흐름의 말단 Topic입니다. 각 Topic은 선택할 수 있고, 아직 별도 설명이 없으면 Explanation Panel에서 이를 알려줍니다. 아래 UDP Concept는 상위 UDP DNS 질의 장면과 동일한 공통 설명이며, 현재 패널에는 Kernel 처리라는 별도 맥락이 결합됩니다.
 
 ## 출처
 

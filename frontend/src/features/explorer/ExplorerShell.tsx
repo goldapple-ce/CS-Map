@@ -10,7 +10,7 @@ import {
 import { contentRepository } from "@/content/content-repository"
 import {
   ExplanationPanel,
-  type PlannedSelection,
+  type TopicSelection,
 } from "@/features/explanation/ExplanationPanel"
 import type { CameraState } from "@/features/explorer/camera"
 import { ExplorerHeader } from "@/features/explorer/ExplorerHeader"
@@ -56,7 +56,7 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
   const [reducedMotion, setReducedMotion] = useState(false)
   const [restoreScrollTop, setRestoreScrollTop] = useState(0)
   const [explanationTitle, setExplanationTitle] = useState("google.com 접속")
-  const [plannedSelection, setPlannedSelection] = useState<PlannedSelection>()
+  const [topicSelection, setTopicSelection] = useState<TopicSelection>()
   const [outlineOpen, setOutlineOpen] = useState(false)
 
   useEffect(() => {
@@ -124,7 +124,7 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
       }
     }
     if (sceneId) restorePanel(sceneId)
-    setPlannedSelection(undefined)
+    setTopicSelection(undefined)
     previousSceneIdRef.current = sceneId
   }, [captureScene, restorePanel, sceneId])
 
@@ -223,15 +223,14 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
     explanationScrollTopRef.current = scrollTop
   }, [])
 
-  const showPlanned = useCallback(
-    (elementId: string, label: string) => {
-      if (!sceneId) return
-      setPlannedSelection({ sceneId, elementId, label })
+  const selectTopic = useCallback(
+    (ownerSceneId: string, elementId: string, label: string) => {
+      setTopicSelection({ sceneId: ownerSceneId, elementId, label })
       panelCollapsedRef.current = false
       setPanelCollapsed(false)
       explanationPanelRef.current?.expand()
     },
-    [explanationPanelRef, sceneId]
+    [explanationPanelRef]
   )
 
   return (
@@ -265,13 +264,15 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
           >
             <SceneViewport
               sceneId={sceneId}
+              selectedSceneId={topicSelection?.sceneId}
+              selectedElementId={topicSelection?.elementId}
               routeNotFound={routeNotFound}
               navigationDisabled={navigationDisabled}
               reducedMotion={reducedMotion}
               outlineTriggerRef={outlineTriggerRef}
               onOpenOutline={() => setOutlineOpen(true)}
               onEnterScene={enterScene}
-              onShowPlanned={showPlanned}
+              onSelectTopic={selectTopic}
               onSceneReady={handleSceneReady}
               onCameraChange={handleCameraChange}
               onAnimationChange={handleAnimationChange}
@@ -305,11 +306,11 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
             <ExplanationPanel
               sceneId={sceneId}
               title={explanationTitle}
-              plannedSelection={plannedSelection}
+              topicSelection={topicSelection}
               readingMode={panelMode === "reading"}
               restoreScrollTop={restoreScrollTop}
               onScrollTopChange={handleExplanationScroll}
-              onClearPlanned={() => setPlannedSelection(undefined)}
+              onClearTopic={() => setTopicSelection(undefined)}
               onCollapse={collapseExplanation}
               onToggleReadingMode={toggleReadingMode}
             />

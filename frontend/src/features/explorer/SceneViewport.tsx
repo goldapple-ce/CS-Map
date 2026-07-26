@@ -33,6 +33,8 @@ type WorldLoadState =
 
 type SceneViewportProps = {
   sceneId?: string
+  selectedSceneId?: string
+  selectedElementId?: string
   routeNotFound: boolean
   navigationDisabled: boolean
   reducedMotion: boolean
@@ -40,7 +42,7 @@ type SceneViewportProps = {
   presentation?: "explorer" | "embedded"
   onOpenOutline?: () => void
   onEnterScene: (request: SceneNavigationRequest) => void
-  onShowPlanned: (elementId: string, label: string) => void
+  onSelectTopic: (sceneId: string, elementId: string, label: string) => void
   onSceneReady: (sceneId: string, title: string) => void
   onCameraChange: (camera: CameraState) => void
   onAnimationChange: (animating: boolean) => void
@@ -50,6 +52,8 @@ const DEFAULT_CAMERA: CameraState = { centerX: 640, centerY: 360, scale: 1 }
 
 export function SceneViewport({
   sceneId,
+  selectedSceneId,
+  selectedElementId,
   routeNotFound,
   navigationDisabled,
   reducedMotion,
@@ -57,7 +61,7 @@ export function SceneViewport({
   presentation = "explorer",
   onOpenOutline,
   onEnterScene,
-  onShowPlanned,
+  onSelectTopic,
   onSceneReady,
   onCameraChange,
   onAnimationChange,
@@ -347,9 +351,11 @@ export function SceneViewport({
             camera={camera}
             viewport={viewport}
             focusedSceneId={sceneId}
+            selectedSceneId={selectedSceneId}
+            selectedElementId={selectedElementId}
             navigationDisabled={navigationDisabled || animating}
             onEnterScene={enterScene}
-            onShowPlanned={onShowPlanned}
+            onSelectTopic={onSelectTopic}
           />
         ) : null}
       </div>

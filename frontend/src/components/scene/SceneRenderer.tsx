@@ -12,6 +12,7 @@ type SceneRendererProps = {
   selectedElementId?: string
   navigationDisabled?: boolean
   onEnterScene?: (sceneId: string, elementId: string) => void
+  onSelectTopic?: (elementId: string, label: string) => void
 }
 
 function nodeState(
@@ -19,13 +20,7 @@ function nodeState(
   selectedElementId?: string
 ): SceneNodeState {
   if (element.id === selectedElementId) return "selected"
-  if (
-    (element.targetSceneId || element.navigateToSceneId) &&
-    element.status !== "planned"
-  )
-    return "interactive"
-  if (element.status === "planned") return "planned"
-  return "static"
+  return "interactive"
 }
 
 export function SceneRenderer({
@@ -33,6 +28,7 @@ export function SceneRenderer({
   selectedElementId,
   navigationDisabled = false,
   onEnterScene,
+  onSelectTopic,
 }: SceneRendererProps) {
   const layout = createSceneLayout(scene)
   const edges = scene.elements.filter(
@@ -88,6 +84,7 @@ export function SceneRenderer({
               state={nodeState(element, selectedElementId)}
               navigationDisabled={navigationDisabled}
               onEnterScene={onEnterScene}
+              onSelectTopic={onSelectTopic}
             />
           ) : null
         })}

@@ -1,6 +1,6 @@
 export type ContentId = string
 
-export type ContentStatus = "draft" | "review" | "published" | "planned"
+export type ContentStatus = "draft" | "review" | "published"
 
 export type Contributor = {
   id: ContentId
@@ -36,7 +36,6 @@ export type SceneNodeElement = SceneElementBase & {
   grid?: SceneGridPlacement
   targetSceneId?: ContentId
   navigateToSceneId?: ContentId
-  status?: "published" | "planned"
 }
 
 export type SceneEdgeElement = SceneElementBase & {

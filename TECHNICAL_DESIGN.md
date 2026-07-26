@@ -61,7 +61,7 @@ shadcn/ui primitives
         │
         ▼
 project components
-  SceneNode, PlannedNode, ExplanationPanel, ExplorerShell...
+  SceneNode, ExplanationPanel, ExplorerShell...
         │
         ▼
 Tailwind semantic utilities + cva variants
@@ -76,7 +76,7 @@ computed layout geometry only
 - 원시 UI에 변경이 필요하면 wrapper를 우선하고, 생성 코드 수정이 불가피한 경우 이유를 기록한다.
 - `bg-background`, `text-foreground`, `border-border`, `text-muted-foreground`, `ring-ring` 같은 의미 기반 token을 사용한다.
 - `bg-blue-500`처럼 색상 의도가 드러나지 않는 원시 palette utility를 feature 전반에 흩뿌리지 않는다.
-- `interactive`, `planned`, `static`, `selected` 등 반복 상태는 `cva` variant로 관리한다.
+- `interactive`, `selected` 등 반복 상태는 `cva` variant로 관리한다.
 - Tailwind가 빌드 시 발견할 수 없는 런타임 class 문자열을 조립하지 않는다.
 - 실행 중 계산되는 장면 좌표와 transform만 React `style`로 전달한다.
 - `src/index.css`는 Tailwind/shadcn import, theme variable, document-level 기본값만 가진다.
@@ -181,7 +181,6 @@ project/
 │  │     ├─ SceneRenderer.tsx
 │  │     ├─ SceneNode.tsx
 │  │     ├─ SceneEdge.tsx
-│  │     └─ PlannedNode.tsx
 │  └─ lib/
 │     └─ utils.ts
 ├─ content/
@@ -225,7 +224,6 @@ type SceneNode = {
   col: 1 | 2 | 3 | 4 | 5;
   childSceneId?: ContentId;
   navigateToSceneId?: ContentId;
-  planned?: true;
 };
 
 type SceneEdge = {
@@ -538,7 +536,7 @@ read files
 - Enter와 Space로 장면에 진입할 수 있다.
 - 진입 후 장면 제목으로 포커스를 이동하고 변화 내용을 live region으로 간단히 알린다.
 - 그림에는 장면 전체 텍스트 요약을 제공한다.
-- 색상만으로 `published`, `planned`, `selected`를 구분하지 않는다.
+- 선택 상태를 색상만으로 구분하지 않는다.
 - hover 미리보기와 같은 정보를 keyboard focus에서도 제공한다.
 - 자동 접근성 검사는 수동 키보드·스크린 리더 검수를 대체하지 않는다.
 
@@ -547,7 +545,7 @@ read files
 | 상황              | 처리                                           |
 | ----------------- | ---------------------------------------------- |
 | 없는 URL          | 탐색 shell 안에서 not-found와 루트 복귀 제공   |
-| planned node 클릭 | 이동하지 않고 예정 내용 표시                   |
+| 말단 node 클릭    | URL·카메라를 유지하고 Explanation Panel에 설명 유무 표시 |
 | 콘텐츠 로딩 실패  | 현재 장면 유지, 재시도와 오류 요약 제공        |
 | 깨진 참조         | 빌드 실패; 운영 환경에 게시하지 않음           |
 | 전환 중 중복 클릭 | 첫 전환만 처리하고 이후 입력 무시 또는 큐 제거 |
@@ -568,7 +566,7 @@ read files
 ### 15.2 컴포넌트 테스트
 
 - published node 활성화
-- planned node 비이동
+- 말단 node 클릭과 설명 없음 상태
 - 키보드 진입
 - 설명 패널 접기·reading mode
 - 긴 설명 독립 스크롤

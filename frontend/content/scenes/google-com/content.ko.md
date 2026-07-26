@@ -21,7 +21,7 @@
 
 ## 내부 구조
 
-사용자/브라우저, DNS, Router, Server는 각각 별도의 내부 Scene으로 확장됩니다. 아직 `준비 중`으로 표시된 Topic은 전체 흐름상의 위치만 공개된 상태이며 빈 Scene으로 이동하지 않습니다.
+사용자/브라우저, DNS, Router, Server는 각각 별도의 내부 Scene으로 확장됩니다. 하위 Scene이 없는 Topic도 선택할 수 있으며, 별도 설명이 없으면 Explanation Panel에서 이를 알려줍니다.
 
 ## 실패 상황
 

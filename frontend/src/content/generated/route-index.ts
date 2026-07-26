@@ -4,7 +4,7 @@ import type { RouteIndexEntry } from "@/content/repository"
 export const routeIndex: readonly RouteIndexEntry[] = [
   {
     "id": "google-search-root",
-    "title": "google.com 접속",
+    "title": "google.com에 접속하는 전체 흐름",
     "path": "/explore/google-com",
     "order": 0,
     "status": "published",
@@ -24,7 +24,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "title": "UDP DNS 질의",
     "path": "/explore/google-com/dns/udp-query",
     "parentId": "google-search-dns",
-    "order": 0,
+    "order": 2,
     "status": "published",
     "moduleKey": "/content/scenes/google-com/network/dns/udp-query/scene.yaml"
   },
@@ -33,7 +33,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "title": "Socket과 Kernel",
     "path": "/explore/google-com/dns/udp-query/socket-kernel",
     "parentId": "google-search-dns-udp-query",
-    "order": 0,
+    "order": 1,
     "status": "published",
     "moduleKey": "/content/scenes/google-com/network/dns/udp-query/socket-kernel/scene.yaml"
   },
@@ -69,7 +69,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "title": "NoSQL 문서형 Database 예시",
     "path": "/explore/google-com/server/database/nosql",
     "parentId": "google-com-server-database",
-    "order": 1,
+    "order": 2,
     "status": "published",
     "moduleKey": "/content/scenes/google-com/server/database/nosql/scene.yaml"
   },
@@ -78,7 +78,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "title": "SQL과 관계형 데이터 처리",
     "path": "/explore/google-com/server/database/sql",
     "parentId": "google-com-server-database",
-    "order": 0,
+    "order": 1,
     "status": "published",
     "moduleKey": "/content/scenes/google-com/server/database/sql/scene.yaml"
   },
@@ -147,7 +147,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
   },
   {
     "id": "google-com-user-browser",
-    "title": "사용자와 브라우저",
+    "title": "사용자, 브라우저와 Server",
     "path": "/explore/google-com/user-browser",
     "parentId": "google-search-root",
     "order": 0,

@@ -22,7 +22,7 @@
 - Scene depth must not have a hard-coded maximum.
 - Reuse common concepts; do not duplicate their core explanations per context.
 - Context-specific implementations belong under their occurrence, such as server cache → distributed cache → Redis.
-- Planned content must not navigate to an empty scene.
+- Every Topic node must be clickable. A node without a child or navigation target opens an explicit no-description state in the Explanation Panel without changing the URL or camera.
 
 ## Implementation discipline
 

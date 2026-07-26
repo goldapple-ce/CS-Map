@@ -114,7 +114,7 @@ World Viewport 상단에 표시되는 퍼센트다. 루트 Scene 전체가 현�
 
 ### Topic — 토픽
 
-사용자가 현재 보고 있거나 클릭해 더 자세히 탐색할 수 있는 지식 대상의 사용자용 명칭이다. 게시된 Topic은 보통 하위 Scene으로 연결되고, 준비 중 Topic은 위치와 예정 설명만 보여줄 수 있다.
+사용자가 현재 보고 있거나 클릭해 더 자세히 탐색할 수 있는 지식 대상의 사용자용 명칭이다. 모든 Topic은 클릭할 수 있으며, 하위 Scene이 없는 Topic은 Explanation Panel에서 설명 유무를 알려준다.
 
 - 권장 표현: `Topic`, `토픽`
 - 구분: Topic은 사용자 경험의 표현이고, Scene은 공간과 데이터 구조의 표현이다.
@@ -143,8 +143,6 @@ Scene 내부를 구성하는 요소의 총칭이다.
 
 - `node`: 처리 단계나 대상을 나타내며 하위 Scene 진입점이 될 수 있다.
 - `edge`: 데이터 이동 또는 실행 순서를 나타내는 연결선과 화살표다.
-- `group`: 여러 요소의 의미상 범위를 묶는다.
-- `annotation`: 흐름을 보충하는 짧은 주석이다.
 
 edge의 `fromSide`와 `toSide`는 각각 출발 Topic과 도착 Topic에서 사용할 면을 지정하는 선택적 Port Side Hint다. 값은 `top`, `right`, `bottom`, `left`이며, 중간 연결선 경로를 직접 작성하는 좌표가 아니다.
 
@@ -152,9 +150,9 @@ edge의 `fromSide`와 `toSide`는 각각 출발 Topic과 도착 Topic에서 사�
 
 공간 중첩과 주요 탐색 경로를 만드는 대표 계층이다. 자식 Scene은 부모 Scene의 특정 node 영역 안에 자동 배치된다.
 
-### Planned Topic — 준비 중 토픽
+### Leaf Topic — 말단 토픽
 
-전체 흐름에서 위치와 예정 내용은 보여주지만 게시된 하위 Scene이 없는 Topic이다. 클릭해도 빈 Scene으로 이동하거나 URL을 변경하지 않는다.
+`childSceneId`와 `navigateToSceneId`가 없는 Topic이다. 클릭하면 URL이나 카메라를 바꾸지 않고 Explanation Panel에서 해당 Topic을 선택하며, 별도 설명이 없으면 이를 명시적으로 안내한다.
 
 ## 콘텐츠 모델
 

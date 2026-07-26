@@ -45,7 +45,6 @@ edges:
 - `childSceneId`는 현재 node 안에 중첩되는 자식 Scene을 가리킨다.
 - `navigateToSceneId`는 월드의 다른 위치에 이미 존재하는 Scene으로 이동할 때만 사용한다.
 - node `label`은 화면 표시 이름이며, `row`와 `col`은 1~5 논리 격자 셀이다.
-- 자식 Scene이 아직 없지만 준비 중임을 표시해야 하는 node만 `planned: true`를 추가한다.
 - `edges`는 화면 연결선과 흐름 의미의 단일 원본이다.
 - edge는 필요할 때만 `variant`, `fromSide`, `toSide` 힌트를 추가할 수 있다.
 - Scene의 표시 제목은 같은 디렉터리 `content.ko.md`의 첫 번째 H1에서 읽는다.
@@ -75,7 +74,7 @@ Scene 디렉터리에 퀴즈가 있을 때만 `quiz.ko.yaml`을 추가한다.
 - Group 영역과 `groupId`는 제거하며 node의 5×5 논리 격자 위치만 유지한다.
 - `contains`는 `childSceneId`, 교차 이동은 `navigateToSceneId`, 흐름은 `edges`에서 자동 도출한다.
 - `related`, `prerequisite`, `used-by` 등 별도 Relationship 모델은 Scene 작성 형식과 렌더링에서 제거한다.
-- 모든 존재하는 Scene 파일은 탐색 가능한 콘텐츠로 간주하고, 준비 중 Topic은 자식 Scene 파일 없이 node 상태로만 표시한다.
+- 모든 존재하는 Scene 파일은 탐색 가능한 콘텐츠로 간주한다. 하위 Scene이 없는 node도 클릭 가능하며 Explanation Panel에서 설명 유무를 표시한다.
 - Scene 제목, 부모, 자식 순서와 URL은 Markdown H1, node key, `childSceneId`와 디렉터리 구조를 이용해 결정적으로 생성한다.
 - 기존 `/explore/google-com` 경로와 제작된 하위 경로는 유지하고 직접 URL 접근과 목차 검색을 깨뜨리지 않는다.
 
@@ -132,6 +131,7 @@ Scene 디렉터리에 퀴즈가 있을 때만 `quiz.ko.yaml`을 추가한다.
 - [x] 모든 Scene YAML을 최소 형식으로 변환하고 기존 필수 Annotation 설명과 참고 링크를 필요한 Markdown으로 이동한다.
 - [x] 기존 퀴즈를 `quiz.ko.yaml` 질문·답변 형식으로 옮기고 Explanation Panel의 퀴즈 UI를 `정답 보기` 방식으로 변경한다.
 - [x] 기존 생성 인덱스를 새 파이프라인 결과와 맞게 갱신한다.
+- [x] `planned` 상태를 제거하고 모든 Topic을 클릭 가능하게 하며 말단 Topic에는 Explanation Panel의 설명 없음 상태를 제공한다.
 
 ### 4단계 — 사용자 확인
 

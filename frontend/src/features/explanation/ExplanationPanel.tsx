@@ -15,7 +15,7 @@ import type { Concept, Scene } from "@/domain/content-types"
 import { MarkdownContent } from "@/features/explanation/MarkdownContent"
 import { QuizPanel } from "@/features/explanation/QuizPanel"
 
-export type PlannedSelection = {
+export type TopicSelection = {
   sceneId: string
   elementId: string
   label: string
@@ -41,11 +41,11 @@ type ExplanationState =
 type ExplanationPanelProps = {
   sceneId?: string
   title: string
-  plannedSelection?: PlannedSelection
+  topicSelection?: TopicSelection
   readingMode: boolean
   restoreScrollTop: number
   onScrollTopChange: (scrollTop: number) => void
-  onClearPlanned: () => void
+  onClearTopic: () => void
   onCollapse: () => void
   onToggleReadingMode: () => void
 }
@@ -53,11 +53,11 @@ type ExplanationPanelProps = {
 export function ExplanationPanel({
   sceneId,
   title,
-  plannedSelection,
+  topicSelection,
   readingMode,
   restoreScrollTop,
   onScrollTopChange,
-  onClearPlanned,
+  onClearTopic,
   onCollapse,
   onToggleReadingMode,
 }: ExplanationPanelProps) {
@@ -124,8 +124,8 @@ export function ExplanationPanel({
   }, [restoreScrollTop, sceneId])
 
   useEffect(() => {
-    if (plannedSelection) setActiveTab("explanation")
-  }, [plannedSelection])
+    if (topicSelection) setActiveTab("explanation")
+  }, [topicSelection])
 
   useEffect(() => {
     const viewport = scrollAreaRef.current?.querySelector<HTMLElement>(
@@ -134,19 +134,19 @@ export function ExplanationPanel({
     if (!viewport) return
 
     viewport.scrollTop =
-      plannedSelection || activeTab === "quiz"
+      topicSelection || activeTab === "quiz"
         ? 0
         : explanationScrollTopRef.current
     const handleScroll = () => {
-      if (plannedSelection || activeTab !== "explanation") return
+      if (topicSelection || activeTab !== "explanation") return
       explanationScrollTopRef.current = viewport.scrollTop
       onScrollTopChange(viewport.scrollTop)
     }
     viewport.addEventListener("scroll", handleScroll, { passive: true })
     return () => viewport.removeEventListener("scroll", handleScroll)
-  }, [activeTab, onScrollTopChange, plannedSelection, sceneId])
+  }, [activeTab, onScrollTopChange, topicSelection, sceneId])
 
-  const panelTitle = plannedSelection?.label ?? title
+  const panelTitle = topicSelection?.label ?? title
 
   return (
     <aside
@@ -156,8 +156,8 @@ export function ExplanationPanel({
       <div className="flex shrink-0 items-start gap-3 border-b border-border px-5 py-4">
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-            {plannedSelection
-              ? "Planned topic"
+            {topicSelection
+              ? "Topic"
               : activeTab === "quiz"
                 ? "Quiz"
                 : "Explanation"}
@@ -193,7 +193,7 @@ export function ExplanationPanel({
       </div>
 
       <Tabs
-        value={plannedSelection ? "explanation" : activeTab}
+        value={topicSelection ? "explanation" : activeTab}
         onValueChange={(value) => {
           if (value === "explanation" || value === "quiz") {
             setActiveTab(value)
@@ -201,7 +201,7 @@ export function ExplanationPanel({
         }}
         className="min-h-0 flex-1"
       >
-        {!plannedSelection ? (
+        {!topicSelection ? (
           <div className="shrink-0 border-b border-border px-5 py-2.5">
             <TabsList aria-label="Topic 콘텐츠">
               <TabsTrigger value="explanation">
@@ -224,27 +224,26 @@ export function ExplanationPanel({
               className="data-hidden:hidden"
             >
               <article className="mx-auto max-w-3xl space-y-10 px-6 py-7">
-                {plannedSelection ? (
+                {topicSelection ? (
                   <section className="space-y-5">
                     <div className="space-y-2">
                       <p className="text-sm font-medium text-muted-foreground">
-                        준비 중
+                        Topic 설명
                       </p>
                       <h3 className="text-2xl font-semibold tracking-tight">
-                        {plannedSelection.label}
+                        {topicSelection.label}
                       </h3>
                     </div>
                     <p className="text-sm leading-7 text-muted-foreground">
-                      이 Topic은 전체 흐름에서 예정된 위치를 보여주지만, 아직
-                      검토된 상세 장면과 설명이 게시되지 않았습니다. 현재 URL과
-                      카메라 위치는 변경되지 않습니다.
+                      이 Topic에는 아직 작성된 상세 설명이 없습니다. 현재 Scene의
+                      흐름과 연결 관계는 지도에서 계속 확인할 수 있습니다.
                     </p>
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={onClearPlanned}
+                      onClick={onClearTopic}
                     >
-                      현재 Topic 설명으로 돌아가기
+                      현재 Scene 설명으로 돌아가기
                     </Button>
                   </section>
                 ) : state.status === "loading" || state.status === "idle" ? (

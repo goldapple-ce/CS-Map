@@ -13,7 +13,6 @@ nodes:
     label: 전송 System Call
     row: 3
     col: 3
-    planned: true
   kernel-socket-layer:
     label: Kernel Socket 계층
     row: 1
@@ -26,12 +25,10 @@ nodes:
     label: IP 계층
     row: 5
     col: 4
-    planned: true
   network-driver:
     label: Network Driver
     row: 3
     col: 5
-    planned: true
 edges:
   - from: resolver-process
     to: socket-descriptor

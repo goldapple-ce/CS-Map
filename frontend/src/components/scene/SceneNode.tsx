@@ -4,22 +4,20 @@ import type { LayoutBox } from "@/components/scene/scene-layout"
 import type { SceneNodeElement } from "@/domain/content-types"
 import { cn } from "@/lib/utils"
 
-export type SceneNodeState = "interactive" | "planned" | "static" | "selected"
+export type SceneNodeState = "interactive" | "selected"
 export type SceneNodeDensity = "far" | "medium" | "near"
 
 const sceneNodeVariants = cva(
-  "flex size-full flex-col items-center justify-center gap-0.5 rounded-xl border border-border bg-card/90 px-8 text-center shadow-sm transition-[background-color,color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
+  "flex size-full cursor-pointer flex-col items-center justify-center gap-0.5 rounded-xl border border-border bg-card/90 px-8 text-center shadow-sm transition-[background-color,color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
   {
     variants: {
       state: {
         interactive:
-          "cursor-pointer font-medium hover:bg-muted/70 hover:text-foreground",
-        planned: "text-muted-foreground",
-        static: "text-foreground",
+          "font-medium hover:bg-muted/70 hover:text-foreground",
         selected: "bg-muted font-medium ring-2 ring-ring/30",
       },
     },
-    defaultVariants: { state: "static" },
+    defaultVariants: { state: "interactive" },
   }
 )
 
@@ -37,21 +35,8 @@ const sceneNodeLabelVariants = cva(
   }
 )
 
-const sceneNodeStatusVariants = cva("text-muted-foreground", {
-  variants: {
-    density: {
-      far: "text-xl",
-      medium: "text-lg",
-      near: "text-base",
-    },
-  },
-  defaultVariants: { density: "near" },
-})
-
 const stateLabels: Record<SceneNodeState, string> = {
   interactive: "탐색 대상",
-  planned: "준비 중",
-  static: "현재 흐름",
   selected: "선택됨",
 }
 
@@ -62,7 +47,7 @@ type SceneNodeProps = {
   density?: SceneNodeDensity
   navigationDisabled?: boolean
   onEnterScene?: (sceneId: string, elementId: string) => void
-  onShowPlanned?: (elementId: string, label: string) => void
+  onSelectTopic?: (elementId: string, label: string) => void
 }
 
 export function SceneNode({
@@ -72,7 +57,7 @@ export function SceneNode({
   density = "near",
   navigationDisabled = false,
   onEnterScene,
-  onShowPlanned,
+  onSelectTopic,
 }: SceneNodeProps) {
   const { x, y, width, height } = layout
   const label = element.label ?? element.id
@@ -82,15 +67,10 @@ export function SceneNode({
     ? `${label} 내부 흐름으로 확대합니다.`
     : element.navigateToSceneId
       ? `${label} Topic으로 이동합니다.`
-      : state === "planned"
-        ? `${label} 상세 장면은 준비 중입니다.`
-        : undefined
+      : `${label} 설명을 엽니다.`
   const content = (
     <>
       <span className={sceneNodeLabelVariants({ density })}>{label}</span>
-      {state === "planned" ? (
-        <span className={sceneNodeStatusVariants({ density })}>준비 중</span>
-      ) : null}
     </>
   )
 
@@ -112,15 +92,15 @@ export function SceneNode({
         {content}
       </button>
     )
-  } else if (state === "planned" && onShowPlanned) {
+  } else if (onSelectTopic) {
     nodeContent = (
       <button
         type="button"
         data-scene-node-id={element.id}
         disabled={navigationDisabled}
-        aria-label={`${label}, 준비 중 내용 보기`}
-        className={cn(sceneNodeVariants({ state }), "cursor-pointer")}
-        onClick={() => onShowPlanned(element.id, label)}
+        aria-label={`${label} 설명 열기`}
+        className={cn(sceneNodeVariants({ state }))}
+        onClick={() => onSelectTopic(element.id, label)}
       >
         {content}
       </button>

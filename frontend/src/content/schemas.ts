@@ -12,7 +12,7 @@ const contentRefSchema = z
   .min(1)
   .regex(/^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$))[a-zA-Z0-9._/-]+$/)
 
-const statusSchema = z.enum(["draft", "review", "published", "planned"])
+const statusSchema = z.enum(["draft", "review", "published"])
 const gridCoordinateSchema = z.number().int().min(1).max(5)
 const portSideSchema = z.enum(["top", "right", "bottom", "left"])
 
@@ -35,16 +35,14 @@ const sceneNodeSchema = z
     col: gridCoordinateSchema,
     childSceneId: contentIdSchema.optional(),
     navigateToSceneId: contentIdSchema.optional(),
-    planned: z.literal(true).optional(),
   })
   .strict()
   .refine(
     (node) =>
-      !(node.childSceneId && node.navigateToSceneId) &&
-      !(node.planned && (node.childSceneId || node.navigateToSceneId)),
+      !(node.childSceneId && node.navigateToSceneId),
     {
       message:
-        "Use one navigation target, or planned: true without a navigation target",
+        "Use either childSceneId or navigateToSceneId, not both",
     }
   )
 
@@ -149,7 +147,6 @@ export function normalizeSceneDocument(
         ...(node.navigateToSceneId
           ? { navigateToSceneId: node.navigateToSceneId }
           : {}),
-        ...(node.planned ? { status: "planned" as const } : {}),
       })),
       ...document.edges.map((edge, index) => ({
         id: `edge-${edge.from}-${edge.to}-${index + 1}`,

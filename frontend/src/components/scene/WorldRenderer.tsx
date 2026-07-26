@@ -19,19 +19,22 @@ type WorldRendererProps = {
   camera: CameraState
   viewport: ViewportSize
   focusedSceneId: string
+  selectedSceneId?: string
+  selectedElementId?: string
   navigationDisabled: boolean
   onEnterScene: (sceneId: string, elementId: string) => void
-  onShowPlanned: (elementId: string, label: string) => void
+  onSelectTopic: (sceneId: string, elementId: string, label: string) => void
 }
 
-function nodeState(element: SceneNodeElement): SceneNodeState {
-  if (
-    (element.targetSceneId || element.navigateToSceneId) &&
-    element.status !== "planned"
-  )
-    return "interactive"
-  if (element.status === "planned") return "planned"
-  return "static"
+function nodeState(
+  element: SceneNodeElement,
+  sceneId: string,
+  selectedSceneId: string | undefined,
+  selectedElementId: string | undefined,
+): SceneNodeState {
+  return sceneId === selectedSceneId && element.id === selectedElementId
+    ? "selected"
+    : "interactive"
 }
 
 function nodeDensity(renderScale: number): SceneNodeDensity {
@@ -45,9 +48,11 @@ export function WorldRenderer({
   camera,
   viewport,
   focusedSceneId,
+  selectedSceneId,
+  selectedElementId,
   navigationDisabled,
   onEnterScene,
-  onShowPlanned,
+  onSelectTopic,
 }: WorldRendererProps) {
   const visibleBounds = visibleWorldBounds(camera, viewport)
   const ancestors = getSceneAncestors(layout, focusedSceneId)
@@ -143,11 +148,18 @@ export function WorldRenderer({
                     key={element.id}
                     element={element}
                     layout={box}
-                    state={nodeState(element)}
+                    state={nodeState(
+                      element,
+                      scene.id,
+                      selectedSceneId,
+                      selectedElementId
+                    )}
                     density={density}
                     navigationDisabled={navigationDisabled}
                     onEnterScene={onEnterScene}
-                    onShowPlanned={onShowPlanned}
+                    onSelectTopic={(elementId, label) =>
+                      onSelectTopic(scene.id, elementId, label)
+                    }
                   />
                 )
               })}

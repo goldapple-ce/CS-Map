@@ -98,7 +98,7 @@ export function HomeRoute() {
               reducedMotion
               presentation="embedded"
               onEnterScene={enterScene}
-              onShowPlanned={() => navigate(rootPath)}
+              onSelectTopic={() => navigate(rootPath)}
               onSceneReady={() => undefined}
               onCameraChange={() => undefined}
               onAnimationChange={() => undefined}

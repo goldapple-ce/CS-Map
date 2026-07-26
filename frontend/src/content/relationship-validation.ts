@@ -64,9 +64,6 @@ export function validateContentGraph(
       if (node.targetSceneId && node.navigateToSceneId) {
         issues.push(makeIssue(scene.id, `elements.${node.id}`, "Node must use either childSceneId or navigateToSceneId, not both"))
       }
-      if (node.status === "planned" && (node.targetSceneId || node.navigateToSceneId)) {
-        issues.push(makeIssue(scene.id, `elements.${node.id}`, "Planned nodes must not navigate to a Scene"))
-      }
       if (node.targetSceneId) {
         const target = scenesById.get(node.targetSceneId)
         if (!target) {
