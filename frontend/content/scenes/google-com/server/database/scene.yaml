@@ -1,0 +1,34 @@
+id: google-com-server-database
+summary: Application Server의 데이터 요청을 관계형 SQL 방식과 문서형 NoSQL 예시로 나누어 살펴봅니다.
+nodes:
+  data-request:
+    label: 데이터 요청
+    row: 3
+    col: 1
+  sql:
+    label: SQL / 관계형 DB
+    row: 2
+    col: 3
+    childSceneId: google-com-server-sql
+  nosql:
+    label: NoSQL / 문서형 예시
+    row: 4
+    col: 3
+    childSceneId: google-com-server-nosql
+  data-result:
+    label: 데이터 결과
+    row: 3
+    col: 5
+edges:
+  - from: data-request
+    to: sql
+    label: 관계·제약 중심
+  - from: data-request
+    to: nosql
+    label: 문서 모델 예시
+  - from: sql
+    to: data-result
+    label: row 결과
+  - from: nosql
+    to: data-result
+    label: document 결과

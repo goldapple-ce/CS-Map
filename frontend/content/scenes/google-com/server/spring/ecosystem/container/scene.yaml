@@ -1,0 +1,50 @@
+id: google-com-server-spring-container
+summary: ApplicationContext가 설정 정보를 읽고 BeanDefinition을 등록한 뒤 Bean을 생성하고 의존성을 연결하는 애플리케이션 시작 흐름입니다.
+nodes:
+  configuration-metadata:
+    label: 설정 정보
+    row: 3
+    col: 1
+  bean-definition:
+    label: BeanDefinition 등록
+    row: 3
+    col: 2
+  application-context:
+    label: ApplicationContext 초기화
+    row: 3
+    col: 3
+  bean-creation:
+    label: Bean 생성
+    row: 1
+    col: 4
+  dependency-injection:
+    label: 의존성 주입
+    row: 3
+    col: 4
+  initialization-callback:
+    label: 초기화 Callback
+    row: 5
+    col: 4
+  ready-beans:
+    label: 사용 가능한 Bean
+    row: 3
+    col: 5
+edges:
+  - from: configuration-metadata
+    to: bean-definition
+    label: 구성 해석
+  - from: bean-definition
+    to: application-context
+    label: definition 보관
+  - from: application-context
+    to: bean-creation
+    label: instance 생성
+  - from: bean-creation
+    to: dependency-injection
+    label: collaborator 연결
+  - from: dependency-injection
+    to: initialization-callback
+    label: 초기화 진행
+  - from: initialization-callback
+    to: ready-beans
+    label: 사용 준비

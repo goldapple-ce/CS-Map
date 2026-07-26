@@ -1,0 +1,64 @@
+id: google-com-server-spring-mvc
+summary: DispatcherServlet이 HandlerMapping과 HandlerAdapter를 조정하고 ViewResolver를 통해 서버 측 View를 렌더링하는 흐름입니다.
+nodes:
+  dispatcher-servlet:
+    label: DispatcherServlet
+    row: 2
+    col: 1
+  rendered-view:
+    label: View / HTML 렌더링
+    row: 4
+    col: 1
+  handler-mapping:
+    label: HandlerMapping
+    row: 1
+    col: 3
+  handler-adapter:
+    label: HandlerAdapter
+    row: 2
+    col: 3
+  view-resolver:
+    label: ViewResolver
+    row: 3
+    col: 3
+  controller:
+    label: Controller
+    row: 2
+    col: 5
+  model:
+    label: Model
+    row: 4
+    col: 5
+edges:
+  - from: dispatcher-servlet
+    to: handler-mapping
+    label: ① Handler 조회
+  - from: handler-mapping
+    to: controller
+    label: ② 선택된 Handler
+    variant: return
+  - from: dispatcher-servlet
+    to: handler-adapter
+    label: ③ 실행 Adapter 선택
+  - from: handler-adapter
+    to: controller
+    label: ④ Controller 호출
+  - from: controller
+    to: view-resolver
+    label: ⑤ View 이름 반환
+    variant: return
+  - from: controller
+    to: model
+    label: ⑤ Model 구성
+    variant: return
+  - from: dispatcher-servlet
+    to: view-resolver
+    label: ⑥ View 해석 요청
+  - from: view-resolver
+    to: rendered-view
+    label: ⑦ 실제 View 선택
+    variant: supporting
+  - from: model
+    to: rendered-view
+    label: Model 적용
+    variant: supporting

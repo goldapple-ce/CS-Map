@@ -1,0 +1,33 @@
+id: google-search-root
+summary: 브라우저 주소창에 google.com을 입력한 뒤 이름 확인과 네트워크 경로를 거쳐 서버에 도달하는 주요 학습 흐름입니다.
+nodes:
+  user-browser:
+    label: 사용자 / 브라우저
+    row: 3
+    col: 1
+    childSceneId: google-com-user-browser
+  dns:
+    label: DNS
+    row: 3
+    col: 2
+    childSceneId: google-search-dns
+  router:
+    label: Router
+    row: 3
+    col: 4
+    childSceneId: google-search-network
+  server:
+    label: Server
+    row: 3
+    col: 5
+    childSceneId: google-com-server
+edges:
+  - from: user-browser
+    to: dns
+    label: 이름 확인
+  - from: dns
+    to: router
+    label: 목적지 주소 확인
+  - from: router
+    to: server
+    label: 서버로 전송

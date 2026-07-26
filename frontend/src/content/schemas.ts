@@ -1,10 +1,6 @@
 import { z } from "zod"
 
-import type {
-  Concept,
-  Scene,
-  SelfCheckQuestion,
-} from "@/domain/content-types"
+import type { Concept, Scene, SelfCheckQuestion } from "@/domain/content-types"
 
 const contentIdSchema = z
   .string()
@@ -32,125 +28,6 @@ const sourceSchema = z
   })
   .strict()
 
-const legacySceneElementSchema = z.discriminatedUnion("kind", [
-  z
-    .object({
-      id: contentIdSchema,
-      kind: z.literal("node"),
-      label: z.string().min(1).optional(),
-      grid: z
-        .object({ row: gridCoordinateSchema, col: gridCoordinateSchema })
-        .strict()
-        .optional(),
-      groupId: contentIdSchema.optional(),
-      targetSceneId: contentIdSchema.optional(),
-      navigateToSceneId: contentIdSchema.optional(),
-      conceptId: contentIdSchema.optional(),
-      status: z.enum(["published", "planned"]).optional(),
-    })
-    .strict(),
-  z
-    .object({
-      id: contentIdSchema,
-      kind: z.literal("group"),
-      label: z.string().min(1).optional(),
-    })
-    .strict(),
-  z
-    .object({
-      id: contentIdSchema,
-      kind: z.literal("edge"),
-      label: z.string().min(1).optional(),
-      fromElementId: contentIdSchema,
-      toElementId: contentIdSchema,
-      variant: z.enum(["flow", "supporting", "return"]).optional(),
-      fromSide: portSideSchema.optional(),
-      toSide: portSideSchema.optional(),
-    })
-    .strict(),
-  z
-    .object({
-      id: contentIdSchema,
-      kind: z.literal("annotation"),
-      label: z.string().min(1).optional(),
-    })
-    .strict(),
-])
-
-const contextSchema = z
-  .object({
-    id: contentIdSchema,
-    summary: z.string().min(1),
-    contentRef: contentRefSchema.optional(),
-  })
-  .strict()
-
-const occurrenceSchema = z
-  .object({
-    id: contentIdSchema,
-    conceptId: contentIdSchema,
-    contextId: contentIdSchema,
-    elementId: contentIdSchema.optional(),
-    implementationSceneIds: z.array(contentIdSchema).default([]),
-  })
-  .strict()
-
-const conceptUsageSchema = z
-  .object({
-    conceptId: contentIdSchema,
-    occurrenceId: contentIdSchema,
-    contextId: contentIdSchema,
-  })
-  .strict()
-
-const quizQuestionSchema = z
-  .object({
-    id: contentIdSchema,
-    prompt: z.string().min(1),
-    options: z
-      .array(
-        z.object({ id: contentIdSchema, label: z.string().min(1) }).strict()
-      )
-      .min(2),
-    correctOptionId: contentIdSchema,
-    explanation: z.string().min(1),
-  })
-  .strict()
-
-const topicQuizSchema = z
-  .object({ questions: z.array(quizQuestionSchema).min(1) })
-  .strict()
-
-const legacyRelationshipSchema = z.object({ type: z.string().min(1) }).passthrough()
-
-const legacySceneSchema = z
-  .object({
-    id: contentIdSchema,
-    slug: contentIdSchema,
-    scenarioId: contentIdSchema,
-    parentId: contentIdSchema.optional(),
-    title: z.string().min(1),
-    summary: z.string().min(1),
-    status: statusSchema,
-    ariaLabel: z.string().min(1),
-    layoutHint: z.enum(["horizontal", "branch"]).optional(),
-    layout: z
-      .object({ type: z.literal("grid"), columns: z.literal(5), rows: z.literal(5) })
-      .strict()
-      .optional(),
-    elements: z.array(legacySceneElementSchema).default([]),
-    contentRef: contentRefSchema,
-    contexts: z.array(contextSchema).default([]),
-    occurrences: z.array(occurrenceSchema).default([]),
-    conceptRefs: z.array(conceptUsageSchema).default([]),
-    quiz: topicQuizSchema.optional(),
-    relationships: z.array(legacyRelationshipSchema).default([]),
-    sources: z.array(sourceSchema).default([]),
-    author: contributorSchema.optional(),
-    updatedAt: z.string().optional(),
-  })
-  .strict()
-
 const sceneNodeSchema = z
   .object({
     label: z.string().min(1),
@@ -158,11 +35,18 @@ const sceneNodeSchema = z
     col: gridCoordinateSchema,
     childSceneId: contentIdSchema.optional(),
     navigateToSceneId: contentIdSchema.optional(),
+    planned: z.literal(true).optional(),
   })
   .strict()
-  .refine((node) => !(node.childSceneId && node.navigateToSceneId), {
-    message: "Use either childSceneId or navigateToSceneId, not both",
-  })
+  .refine(
+    (node) =>
+      !(node.childSceneId && node.navigateToSceneId) &&
+      !(node.planned && (node.childSceneId || node.navigateToSceneId)),
+    {
+      message:
+        "Use one navigation target, or planned: true without a navigation target",
+    }
+  )
 
 const sceneEdgeSchema = z
   .object({
@@ -175,7 +59,7 @@ const sceneEdgeSchema = z
   })
   .strict()
 
-export const minimalSceneSchema = z
+export const sceneDocumentSchema = z
   .object({
     id: contentIdSchema,
     summary: z.string().min(1),
@@ -199,19 +83,30 @@ export const minimalSceneSchema = z
     }
     scene.edges.forEach((edge, index) => {
       if (!scene.nodes[edge.from]) {
-        context.addIssue({ code: "custom", path: ["edges", index, "from"], message: `Unknown node: ${edge.from}` })
+        context.addIssue({
+          code: "custom",
+          path: ["edges", index, "from"],
+          message: `Unknown node: ${edge.from}`,
+        })
       }
       if (!scene.nodes[edge.to]) {
-        context.addIssue({ code: "custom", path: ["edges", index, "to"], message: `Unknown node: ${edge.to}` })
+        context.addIssue({
+          code: "custom",
+          path: ["edges", index, "to"],
+          message: `Unknown node: ${edge.to}`,
+        })
       }
     })
   })
 
-export const sceneDocumentSchema = z.union([minimalSceneSchema, legacySceneSchema])
-
 export const sceneQuizSchema = z
   .array(
-    z.object({ question: z.string().min(1), answer: z.string().min(1) }).strict()
+    z
+      .object({
+        question: z.string().min(1),
+        answer: z.string().min(1),
+      })
+      .strict()
   )
   .min(1)
 
@@ -222,24 +117,12 @@ export type SceneDerivedMetadata = {
   slug: string
   scenarioId: string
   parentId?: string
-  status?: Scene["status"]
-}
-
-export function isMinimalSceneDocument(
-  document: SceneDocument
-): document is z.infer<typeof minimalSceneSchema> {
-  return "nodes" in document
 }
 
 export function sceneDocumentChildren(document: SceneDocument) {
-  if (isMinimalSceneDocument(document)) {
-    return Object.entries(document.nodes).flatMap(([nodeId, node], order) =>
-      node.childSceneId ? [{ nodeId, childSceneId: node.childSceneId, order }] : []
-    )
-  }
-  return document.elements.flatMap((element, order) =>
-    element.kind === "node" && element.targetSceneId
-      ? [{ nodeId: element.id, childSceneId: element.targetSceneId, order }]
+  return Object.entries(document.nodes).flatMap(([nodeId, node], order) =>
+    node.childSceneId
+      ? [{ nodeId, childSceneId: node.childSceneId, order }]
       : []
   )
 }
@@ -249,68 +132,40 @@ export function normalizeSceneDocument(
   metadata: SceneDerivedMetadata,
   selfCheckQuiz?: SelfCheckQuestion[]
 ): Scene {
-  if (isMinimalSceneDocument(document)) {
-    return {
-      id: document.id,
-      ...metadata,
-      status: metadata.status ?? "published",
-      summary: document.summary,
-      ariaLabel: document.summary,
-      layout: { type: "grid", columns: 5, rows: 5 },
-      elements: [
-        ...Object.entries(document.nodes).map(([id, node]) => ({
-          id,
-          kind: "node" as const,
-          label: node.label,
-          grid: { row: node.row, col: node.col },
-          ...(node.childSceneId ? { targetSceneId: node.childSceneId } : {}),
-          ...(node.navigateToSceneId ? { navigateToSceneId: node.navigateToSceneId } : {}),
-        })),
-        ...document.edges.map((edge, index) => ({
-          id: `edge-${edge.from}-${edge.to}-${index + 1}`,
-          kind: "edge" as const,
-          fromElementId: edge.from,
-          toElementId: edge.to,
-          ...(edge.label ? { label: edge.label } : {}),
-          ...(edge.variant ? { variant: edge.variant } : {}),
-          ...(edge.fromSide ? { fromSide: edge.fromSide } : {}),
-          ...(edge.toSide ? { toSide: edge.toSide } : {}),
-        })),
-      ],
-      contentRef: "content.ko.md",
-      contexts: [],
-      occurrences: [],
-      conceptRefs: [],
-      ...(selfCheckQuiz ? { selfCheckQuiz } : {}),
-    }
-  }
-
   return {
     id: document.id,
     ...metadata,
-    status: metadata.status ?? document.status,
+    status: "published",
     summary: document.summary,
     ariaLabel: document.summary,
-    ...(document.layoutHint ? { layoutHint: document.layoutHint } : {}),
-    ...(document.layout ? { layout: document.layout } : {}),
-    elements: document.elements.flatMap((element) => {
-      if (element.kind === "group" || element.kind === "annotation") return []
-      if (element.kind === "edge") return [element]
-      return [{
-        id: element.id,
-        kind: element.kind,
-        ...(element.label ? { label: element.label } : {}),
-        ...(element.grid ? { grid: element.grid } : {}),
-        ...(element.targetSceneId ? { targetSceneId: element.targetSceneId } : {}),
-        ...(element.navigateToSceneId ? { navigateToSceneId: element.navigateToSceneId } : {}),
-        ...(element.status ? { status: element.status } : {}),
-      }]
-    }),
+    layout: { type: "grid", columns: 5, rows: 5 },
+    elements: [
+      ...Object.entries(document.nodes).map(([id, node]) => ({
+        id,
+        kind: "node" as const,
+        label: node.label,
+        grid: { row: node.row, col: node.col },
+        ...(node.childSceneId ? { targetSceneId: node.childSceneId } : {}),
+        ...(node.navigateToSceneId
+          ? { navigateToSceneId: node.navigateToSceneId }
+          : {}),
+        ...(node.planned ? { status: "planned" as const } : {}),
+      })),
+      ...document.edges.map((edge, index) => ({
+        id: `edge-${edge.from}-${edge.to}-${index + 1}`,
+        kind: "edge" as const,
+        fromElementId: edge.from,
+        toElementId: edge.to,
+        ...(edge.label ? { label: edge.label } : {}),
+        ...(edge.variant ? { variant: edge.variant } : {}),
+        ...(edge.fromSide ? { fromSide: edge.fromSide } : {}),
+        ...(edge.toSide ? { toSide: edge.toSide } : {}),
+      })),
+    ],
     contentRef: "content.ko.md",
-    contexts: document.contexts,
-    occurrences: document.occurrences,
-    conceptRefs: document.conceptRefs,
-    ...(document.quiz ? { quiz: document.quiz } : {}),
+    contexts: [],
+    occurrences: [],
+    conceptRefs: [],
     ...(selfCheckQuiz ? { selfCheckQuiz } : {}),
   }
 }

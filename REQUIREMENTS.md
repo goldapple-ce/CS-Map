@@ -351,6 +351,7 @@ type SceneNode = {
   col: 1 | 2 | 3 | 4 | 5;
   childSceneId?: string;
   navigateToSceneId?: string;
+  planned?: true;
 };
 
 type SceneEdge = {

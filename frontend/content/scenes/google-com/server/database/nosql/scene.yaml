@@ -1,0 +1,29 @@
+id: google-com-server-nosql
+summary: MongoDB를 예로 들어 field와 value로 구성된 document를 collection에 저장하고 index와 query로 찾는 흐름입니다.
+nodes:
+  document-query:
+    label: Document Query
+    row: 3
+    col: 1
+  collection-index:
+    label: Collection / Index
+    row: 3
+    col: 2
+  bson-document:
+    label: BSON Document
+    row: 3
+    col: 4
+  document-result:
+    label: Document 결과
+    row: 3
+    col: 5
+edges:
+  - from: document-query
+    to: collection-index
+    label: filter 적용
+  - from: collection-index
+    to: bson-document
+    label: document 탐색
+  - from: bson-document
+    to: document-result
+    label: 결과 반환

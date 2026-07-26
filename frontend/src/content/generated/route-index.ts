@@ -8,7 +8,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "path": "/explore/google-com",
     "order": 0,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/scene.yaml"
   },
   {
     "id": "google-search-dns",
@@ -17,7 +17,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-search-root",
     "order": 1,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/network/dns/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/network/dns/scene.yaml"
   },
   {
     "id": "google-search-dns-udp-query",
@@ -26,7 +26,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-search-dns",
     "order": 0,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/network/dns/udp-query/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/network/dns/udp-query/scene.yaml"
   },
   {
     "id": "google-search-dns-socket-kernel",
@@ -35,7 +35,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-search-dns-udp-query",
     "order": 0,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/network/dns/udp-query/socket-kernel/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/network/dns/udp-query/socket-kernel/scene.yaml"
   },
   {
     "id": "google-search-network",
@@ -44,7 +44,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-search-root",
     "order": 2,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/network/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/network/scene.yaml"
   },
   {
     "id": "google-com-server",
@@ -53,7 +53,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-search-root",
     "order": 3,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/scene.yaml"
   },
   {
     "id": "google-com-server-database",
@@ -62,7 +62,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-com-server",
     "order": 2,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/database/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/database/scene.yaml"
   },
   {
     "id": "google-com-server-nosql",
@@ -71,7 +71,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-com-server-database",
     "order": 1,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/database/nosql/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/database/nosql/scene.yaml"
   },
   {
     "id": "google-com-server-sql",
@@ -80,7 +80,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-com-server-database",
     "order": 0,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/database/sql/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/database/sql/scene.yaml"
   },
   {
     "id": "google-com-server-nginx",
@@ -89,7 +89,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-com-server",
     "order": 0,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/nginx/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/nginx/scene.yaml"
   },
   {
     "id": "google-com-server-spring",
@@ -98,7 +98,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-com-server",
     "order": 1,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/spring/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/scene.yaml"
   },
   {
     "id": "google-com-server-spring-ecosystem",
@@ -107,7 +107,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-com-server-spring",
     "order": 1,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/scene.yaml"
   },
   {
     "id": "google-com-server-spring-container",
@@ -116,7 +116,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-com-server-spring-ecosystem",
     "order": 0,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/container/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/container/scene.yaml"
   },
   {
     "id": "google-com-server-spring-mvc",
@@ -125,7 +125,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-com-server-spring-ecosystem",
     "order": 2,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/mvc/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/mvc/scene.yaml"
   },
   {
     "id": "google-com-server-spring-security",
@@ -134,7 +134,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-com-server-spring-ecosystem",
     "order": 1,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/security/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/security/scene.yaml"
   },
   {
     "id": "google-com-server-spring-tomcat",
@@ -143,7 +143,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-com-server-spring",
     "order": 0,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/spring/tomcat/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/tomcat/scene.yaml"
   },
   {
     "id": "google-com-user-browser",
@@ -152,6 +152,6 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "parentId": "google-search-root",
     "order": 0,
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/user-browser/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/user-browser/scene.yaml"
   }
 ]

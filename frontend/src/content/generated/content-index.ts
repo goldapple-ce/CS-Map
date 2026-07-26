@@ -8,7 +8,8 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-search-root",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/network/dns/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/network/dns/scene.yaml",
+    "title": "DNS 이름 확인"
   },
   {
     "id": "google-search-dns-udp-query",
@@ -16,7 +17,8 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-search-dns",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/network/dns/udp-query/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/network/dns/udp-query/scene.yaml",
+    "title": "UDP DNS 질의"
   },
   {
     "id": "google-search-dns-socket-kernel",
@@ -24,7 +26,8 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-search-dns-udp-query",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/network/dns/udp-query/socket-kernel/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/network/dns/udp-query/socket-kernel/scene.yaml",
+    "title": "Socket과 Kernel"
   },
   {
     "id": "google-search-network",
@@ -32,14 +35,16 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-search-root",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/network/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/network/scene.yaml",
+    "title": "Router와 인터넷 경로"
   },
   {
     "id": "google-search-root",
     "slug": "google-com",
     "scenarioId": "google-com",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/scene.yaml",
+    "title": "google.com에 접속하는 전체 흐름"
   },
   {
     "id": "google-com-server-nosql",
@@ -47,7 +52,8 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-com-server-database",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/database/nosql/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/database/nosql/scene.yaml",
+    "title": "NoSQL 문서형 Database 예시"
   },
   {
     "id": "google-com-server-database",
@@ -55,7 +61,8 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-com-server",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/database/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/database/scene.yaml",
+    "title": "Database 선택과 데이터 처리"
   },
   {
     "id": "google-com-server-sql",
@@ -63,7 +70,8 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-com-server-database",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/database/sql/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/database/sql/scene.yaml",
+    "title": "SQL과 관계형 데이터 처리"
   },
   {
     "id": "google-com-server-nginx",
@@ -71,7 +79,8 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-com-server",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/nginx/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/nginx/scene.yaml",
+    "title": "NGINX Reverse Proxy"
   },
   {
     "id": "google-com-server",
@@ -79,7 +88,8 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-search-root",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/scene.yaml",
+    "title": "일반적인 Server 요청 처리"
   },
   {
     "id": "google-com-server-spring-container",
@@ -87,7 +97,8 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-com-server-spring-ecosystem",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/container/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/container/scene.yaml",
+    "title": "Spring Container 초기화"
   },
   {
     "id": "google-com-server-spring-mvc",
@@ -95,7 +106,8 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-com-server-spring-ecosystem",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/mvc/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/mvc/scene.yaml",
+    "title": "Spring MVC 요청과 View 렌더링"
   },
   {
     "id": "google-com-server-spring-ecosystem",
@@ -103,7 +115,8 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-com-server-spring",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/scene.yaml",
+    "title": "Spring 생태계의 요청 처리"
   },
   {
     "id": "google-com-server-spring-security",
@@ -111,7 +124,8 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-com-server-spring-ecosystem",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/security/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/security/scene.yaml",
+    "title": "Spring Security 요청 흐름"
   },
   {
     "id": "google-com-server-spring",
@@ -119,7 +133,8 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-com-server",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/spring/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/scene.yaml",
+    "title": "Spring 기반 애플리케이션"
   },
   {
     "id": "google-com-server-spring-tomcat",
@@ -127,7 +142,8 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-com-server-spring",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/server/spring/tomcat/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/tomcat/scene.yaml",
+    "title": "Tomcat 요청 전달"
   },
   {
     "id": "google-com-user-browser",
@@ -135,7 +151,8 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "scenarioId": "google-com",
     "parentId": "google-search-root",
     "status": "published",
-    "moduleKey": "/content/scenes/google-search/user-browser/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/user-browser/scene.yaml",
+    "title": "사용자, 브라우저와 Server"
   }
 ]
 export const conceptIndex: readonly ConceptIndexEntry[] = [

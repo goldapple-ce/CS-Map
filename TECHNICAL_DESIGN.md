@@ -225,6 +225,7 @@ type SceneNode = {
   col: 1 | 2 | 3 | 4 | 5;
   childSceneId?: ContentId;
   navigateToSceneId?: ContentId;
+  planned?: true;
 };
 
 type SceneEdge = {
@@ -274,7 +275,7 @@ TCP 역시 하나의 `tcp` Concept를 공유하고, HTTPS 연결과 DB 연결은
 ### 6.1 장면 디렉터리
 
 ```text
-content/scenes/google-search/network/dns/
+content/scenes/google-com/network/dns/
 ├─ scene.yaml
 ├─ content.ko.md
 └─ assets/
@@ -283,7 +284,7 @@ content/scenes/google-search/network/dns/
 
 `scene.yaml`은 `id`, `summary`, `nodes`, `edges`만 가진다. `content.ko.md`는 첫 H1의 표시 제목과 긴 설명을 가진다. 퀴즈가 있으면 같은 디렉터리에 질문·답변 배열인 `quiz.ko.yaml`을 둔다.
 
-현재 콘텐츠 디렉터리와 `google-search-*` 영구 ID는 기존 참조를 깨뜨리지 않기 위해 유지한다. 사용자에게 노출되는 루트 slug와 canonical URL은 새 시나리오를 반영한 `google-com`을 사용한다. 새 하위 Scene은 의미에 맞는 ID를 사용하며, 기존 ID를 일괄 변경해야 할 필요가 생기면 별도의 migration으로 처리한다.
+루트 콘텐츠 디렉터리 이름은 canonical URL과 같은 `google-com`을 사용한다. 기존 `google-search-*` 영구 ID는 내부 참조를 깨뜨리지 않기 위해 유지한다. 새 하위 Scene은 의미에 맞는 ID를 사용하며, 기존 ID를 일괄 변경해야 할 필요가 생기면 별도의 migration으로 처리한다.
 
 ### 6.2 공통 개념 디렉터리
 

@@ -1,0 +1,51 @@
+id: google-com-server-spring-security
+summary: Servlet FilterChain에서 Spring Security의 FilterChainProxy와 SecurityFilterChain을 거쳐 허용된 요청이 DispatcherServlet로 전달되는 흐름입니다.
+nodes:
+  servlet-filter-chain:
+    label: Servlet FilterChain
+    row: 3
+    col: 1
+  delegating-filter-proxy:
+    label: DelegatingFilterProxy
+    row: 3
+    col: 2
+  filter-chain-proxy:
+    label: FilterChainProxy
+    row: 3
+    col: 3
+  security-filter-chain:
+    label: SecurityFilterChain 선택
+    row: 1
+    col: 4
+  authentication:
+    label: 인증
+    row: 3
+    col: 4
+  authorization:
+    label: 인가
+    row: 5
+    col: 4
+  dispatcher-servlet:
+    label: DispatcherServlet
+    row: 3
+    col: 5
+    navigateToSceneId: google-com-server-spring-mvc
+edges:
+  - from: servlet-filter-chain
+    to: delegating-filter-proxy
+    label: filter 호출
+  - from: delegating-filter-proxy
+    to: filter-chain-proxy
+    label: Spring Bean 위임
+  - from: filter-chain-proxy
+    to: security-filter-chain
+    label: 요청 조건 비교
+  - from: security-filter-chain
+    to: authentication
+    label: 인증 filter 실행
+  - from: authentication
+    to: authorization
+    label: 권한 판단
+  - from: authorization
+    to: dispatcher-servlet
+    label: 허용된 요청 전달

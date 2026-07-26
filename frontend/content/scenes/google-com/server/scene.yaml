@@ -1,0 +1,25 @@
+id: google-com-server
+summary: Proxy Server가 요청을 받아 Application Server로 전달하고, 필요한 데이터는 Database에서 조회하는 학습용 흐름입니다.
+nodes:
+  nginx:
+    label: Proxy Server
+    row: 3
+    col: 1
+    childSceneId: google-com-server-nginx
+  spring:
+    label: Spring
+    row: 3
+    col: 3
+    childSceneId: google-com-server-spring
+  database:
+    label: Database
+    row: 3
+    col: 5
+    childSceneId: google-com-server-database
+edges:
+  - from: nginx
+    to: spring
+    label: 요청 전달
+  - from: spring
+    to: database
+    label: 데이터 요청

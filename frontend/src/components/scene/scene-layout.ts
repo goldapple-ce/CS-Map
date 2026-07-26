@@ -34,9 +34,6 @@ export type SerializedSceneLayout = {
   height: number
   nodes: Readonly<Record<string, LayoutBox>>
   edges: Readonly<Record<string, readonly LayoutPoint[]>>
-  /** Legacy generated fields are ignored until the content index is rebuilt. */
-  groups?: Readonly<Record<string, LayoutBox>>
-  annotations?: Readonly<Record<string, LayoutBox>>
 }
 
 const generatedLayoutCache = new Map<string, SceneLayout>()

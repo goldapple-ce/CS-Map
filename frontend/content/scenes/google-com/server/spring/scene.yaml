@@ -1,0 +1,17 @@
+id: google-com-server-spring
+summary: Tomcat이 Servlet 요청을 처리해 Spring 생태계로 전달하는 일반적인 Spring 웹 애플리케이션 구조입니다.
+nodes:
+  tomcat:
+    label: Tomcat
+    row: 3
+    col: 2
+    childSceneId: google-com-server-spring-tomcat
+  ecosystem:
+    label: Spring 생태계
+    row: 3
+    col: 4
+    childSceneId: google-com-server-spring-ecosystem
+edges:
+  - from: tomcat
+    to: ecosystem
+    label: Servlet 요청 전달

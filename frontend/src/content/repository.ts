@@ -7,7 +7,7 @@ import type {
 
 export type SceneIndexEntry = {
   id: ContentId
-  title?: string
+  title: string
   slug: string
   scenarioId: ContentId
   parentId?: ContentId

@@ -8,7 +8,6 @@ import type { ConceptIndexEntry, RouteIndexEntry, SceneIndexEntry } from "../src
 import { validateContentGraph } from "../src/content/relationship-validation.ts"
 import {
   conceptSchema,
-  isMinimalSceneDocument,
   normalizeSceneDocument,
   sceneDocumentChildren,
   sceneDocumentSchema,
@@ -115,16 +114,14 @@ async function prepareScenes(files: readonly ContentFile<SceneDocument>[]) {
     resolving.add(document.id)
     const owner = ownerByChildId.get(document.id)
     const parentFile = owner ? documentsById.get(owner.parentId) : undefined
-    const legacy = isMinimalSceneDocument(document) ? undefined : document
     const parentMetadata = parentFile
       ? resolveMetadata(parentFile.value, parentFile.filePath, "")
       : undefined
     const metadata: SceneDerivedMetadata = {
       title,
-      slug: legacy?.slug ?? owner?.nodeId ?? path.basename(path.dirname(filePath)),
-      scenarioId: legacy?.scenarioId ?? parentMetadata?.scenarioId ?? document.id,
+      slug: owner?.nodeId ?? path.basename(path.dirname(filePath)),
+      scenarioId: parentMetadata?.scenarioId ?? document.id,
       ...(owner ? { parentId: owner.parentId } : {}),
-      status: legacy?.status ?? "published",
     }
     metadataCache.set(document.id, metadata)
     resolving.delete(document.id)

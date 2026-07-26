@@ -4,7 +4,7 @@ import type { SerializedSceneLayout } from "@/components/scene/scene-layout"
 export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> = {
   "google-search-dns": {
     "width": 2508,
-    "height": 1262,
+    "height": 1180,
     "nodes": {
       "browser-os-cache": {
         "x": 72,
@@ -18,7 +18,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "width": 310,
         "height": 124
       },
-      "dns-query-transport": {
+      "udp-query": {
         "x": 1186,
         "y": 528,
         "width": 282,
@@ -49,9 +49,8 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "height": 124
       }
     },
-    "groups": {},
     "edges": {
-      "cache-to-resolver": [
+      "edge-browser-os-cache-recursive-resolver-1": [
         {
           "x": 436,
           "y": 577.6
@@ -61,7 +60,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "resolver-to-query": [
+      "edge-recursive-resolver-udp-query-2": [
         {
           "x": 966,
           "y": 577.6
@@ -71,7 +70,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "query-to-root": [
+      "edge-udp-query-root-dns-3": [
         {
           "x": 1355.2,
           "y": 528
@@ -85,7 +84,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 187.2
         }
       ],
-      "root-to-tld": [
+      "edge-root-dns-com-tld-dns-4": [
         {
           "x": 1796.8,
           "y": 212
@@ -95,7 +94,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 528
         }
       ],
-      "tld-to-authoritative": [
+      "edge-com-tld-dns-authoritative-dns-5": [
         {
           "x": 1796.8,
           "y": 652
@@ -105,7 +104,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 968
         }
       ],
-      "authoritative-to-ip": [
+      "edge-authoritative-dns-ip-response-6": [
         {
           "x": 1920,
           "y": 992.8
@@ -123,19 +122,11 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 627.2
         }
       ]
-    },
-    "annotations": {
-      "referral-note": {
-        "x": 72,
-        "y": 1208,
-        "width": 2364,
-        "height": 28
-      }
     }
   },
   "google-search-dns-udp-query": {
     "width": 2620,
-    "height": 1262,
+    "height": 1180,
     "nodes": {
       "dns-message": {
         "x": 72,
@@ -174,22 +165,8 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "height": 124
       }
     },
-    "groups": {
-      "user-space-group": {
-        "x": 56,
-        "y": 494,
-        "width": 960,
-        "height": 174
-      },
-      "kernel-network-group": {
-        "x": 1204,
-        "y": 274,
-        "width": 1360,
-        "height": 614
-      }
-    },
     "edges": {
-      "message-to-socket": [
+      "edge-dns-message-socket-kernel-1": [
         {
           "x": 390,
           "y": 577.6
@@ -199,7 +176,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "socket-to-udp": [
+      "edge-socket-kernel-udp-datagram-2": [
         {
           "x": 1000,
           "y": 577.6
@@ -209,7 +186,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "udp-to-ip": [
+      "edge-udp-datagram-ip-packet-3": [
         {
           "x": 1492,
           "y": 577.6
@@ -219,7 +196,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "ip-to-interface": [
+      "edge-ip-packet-network-interface-4": [
         {
           "x": 1842.8,
           "y": 528
@@ -233,7 +210,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 407.2
         }
       ],
-      "interface-to-server": [
+      "edge-network-interface-dns-server-port-5": [
         {
           "x": 2312.7,
           "y": 432
@@ -243,19 +220,11 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 748
         }
       ]
-    },
-    "annotations": {
-      "udp-note": {
-        "x": 72,
-        "y": 1208,
-        "width": 2476,
-        "height": 28
-      }
     }
   },
   "google-search-dns-socket-kernel": {
     "width": 2774,
-    "height": 1262,
+    "height": 1180,
     "nodes": {
       "resolver-process": {
         "x": 72,
@@ -300,22 +269,8 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "height": 124
       }
     },
-    "groups": {
-      "process-group": {
-        "x": 56,
-        "y": 494,
-        "width": 1542,
-        "height": 174
-      },
-      "kernel-group": {
-        "x": 1786,
-        "y": 54,
-        "width": 932,
-        "height": 1054
-      }
-    },
     "edges": {
-      "process-to-descriptor": [
+      "edge-resolver-process-socket-descriptor-1": [
         {
           "x": 362,
           "y": 577.6
@@ -325,7 +280,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "descriptor-to-send": [
+      "edge-socket-descriptor-send-system-call-2": [
         {
           "x": 1026,
           "y": 577.6
@@ -335,7 +290,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "send-to-kernel": [
+      "edge-send-system-call-kernel-socket-layer-3": [
         {
           "x": 1447.6,
           "y": 528
@@ -349,7 +304,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 187.2
         }
       ],
-      "socket-to-udp": [
+      "edge-kernel-socket-layer-udp-layer-4": [
         {
           "x": 1959.4,
           "y": 212
@@ -359,7 +314,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 528
         }
       ],
-      "udp-to-ip": [
+      "edge-udp-layer-ip-layer-5": [
         {
           "x": 1968.9,
           "y": 652
@@ -369,7 +324,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 968
         }
       ],
-      "ip-to-driver": [
+      "edge-ip-layer-network-driver-6": [
         {
           "x": 2079,
           "y": 992.8
@@ -387,19 +342,11 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 627.2
         }
       ]
-    },
-    "annotations": {
-      "socket-note": {
-        "x": 72,
-        "y": 1208,
-        "width": 2630,
-        "height": 28
-      }
     }
   },
   "google-search-network": {
     "width": 2450,
-    "height": 1262,
+    "height": 1180,
     "nodes": {
       "user-device": {
         "x": 72,
@@ -444,9 +391,8 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "height": 124
       }
     },
-    "groups": {},
     "edges": {
-      "device-to-gateway": [
+      "edge-user-device-default-gateway-1": [
         {
           "x": 326,
           "y": 577.6
@@ -456,7 +402,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "gateway-to-neighbor": [
+      "edge-default-gateway-neighbor-resolution-2": [
         {
           "x": 954,
           "y": 577.6
@@ -466,7 +412,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "neighbor-to-router": [
+      "edge-neighbor-resolution-home-router-nat-3": [
         {
           "x": 1300,
           "y": 528
@@ -480,7 +426,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 407.2
         }
       ],
-      "router-to-isp": [
+      "edge-home-router-nat-isp-4": [
         {
           "x": 1715.6,
           "y": 432
@@ -490,7 +436,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 748
         }
       ],
-      "isp-to-internet": [
+      "edge-isp-internet-routing-5": [
         {
           "x": 1808,
           "y": 772.8
@@ -508,7 +454,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 407.2
         }
       ],
-      "internet-to-server": [
+      "edge-internet-routing-destination-server-6": [
         {
           "x": 2205.8,
           "y": 432
@@ -518,14 +464,6 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 748
         }
       ]
-    },
-    "annotations": {
-      "router-scope-note": {
-        "x": 72,
-        "y": 1208,
-        "width": 2306,
-        "height": 28
-      }
     }
   },
   "google-search-root": {
@@ -557,9 +495,8 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "height": 124
       }
     },
-    "groups": {},
     "edges": {
-      "user-to-dns": [
+      "edge-user-browser-dns-1": [
         {
           "x": 426,
           "y": 577.6
@@ -569,7 +506,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "dns-to-router": [
+      "edge-dns-router-2": [
         {
           "x": 790,
           "y": 577.6
@@ -579,7 +516,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "router-to-server": [
+      "edge-router-server-3": [
         {
           "x": 1546,
           "y": 577.6
@@ -589,12 +526,11 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ]
-    },
-    "annotations": {}
+    }
   },
   "google-com-server-nosql": {
     "width": 2428,
-    "height": 1262,
+    "height": 1180,
     "nodes": {
       "document-query": {
         "x": 72,
@@ -621,9 +557,8 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "height": 124
       }
     },
-    "groups": {},
     "edges": {
-      "query-to-collection": [
+      "edge-document-query-collection-index-1": [
         {
           "x": 380,
           "y": 577.6
@@ -633,7 +568,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "collection-to-document": [
+      "edge-collection-index-bson-document-2": [
         {
           "x": 972,
           "y": 577.6
@@ -643,7 +578,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "document-to-result": [
+      "edge-bson-document-document-result-3": [
         {
           "x": 1846,
           "y": 577.6
@@ -653,19 +588,11 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ]
-    },
-    "annotations": {
-      "nosql-scope-note": {
-        "x": 72,
-        "y": 1208,
-        "width": 2284,
-        "height": 28
-      }
     }
   },
   "google-com-server-database": {
     "width": 2202,
-    "height": 1262,
+    "height": 1180,
     "nodes": {
       "data-request": {
         "x": 72,
@@ -673,13 +600,13 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "width": 254,
         "height": 124
       },
-      "sql-database": {
+      "sql": {
         "x": 946,
         "y": 308,
         "width": 310,
         "height": 124
       },
-      "nosql-database": {
+      "nosql": {
         "x": 910,
         "y": 748,
         "width": 382,
@@ -692,9 +619,8 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "height": 124
       }
     },
-    "groups": {},
     "edges": {
-      "request-to-sql": [
+      "edge-data-request-sql-1": [
         {
           "x": 224.4,
           "y": 528
@@ -708,7 +634,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 407.2
         }
       ],
-      "request-to-nosql": [
+      "edge-data-request-nosql-2": [
         {
           "x": 224.4,
           "y": 652
@@ -722,7 +648,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 772.8
         }
       ],
-      "sql-to-result": [
+      "edge-sql-data-result-3": [
         {
           "x": 1132,
           "y": 432
@@ -736,7 +662,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 552.8
         }
       ],
-      "nosql-to-result": [
+      "edge-nosql-data-result-4": [
         {
           "x": 1139.2,
           "y": 748
@@ -750,14 +676,6 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 627.2
         }
       ]
-    },
-    "annotations": {
-      "scope-note": {
-        "x": 72,
-        "y": 1208,
-        "width": 2058,
-        "height": 28
-      }
     }
   },
   "google-com-server-sql": {
@@ -795,9 +713,8 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "height": 124
       }
     },
-    "groups": {},
     "edges": {
-      "query-to-plan": [
+      "edge-sql-query-parse-plan-1": [
         {
           "x": 290,
           "y": 577.6
@@ -807,7 +724,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "plan-to-data": [
+      "edge-parse-plan-table-index-2": [
         {
           "x": 774,
           "y": 577.6
@@ -817,7 +734,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "data-to-transaction": [
+      "edge-table-index-transaction-constraint-3": [
         {
           "x": 1276,
           "y": 577.6
@@ -827,7 +744,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "transaction-to-result": [
+      "edge-transaction-constraint-row-result-4": [
         {
           "x": 1976,
           "y": 577.6
@@ -837,8 +754,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ]
-    },
-    "annotations": {}
+    }
   },
   "google-com-server-nginx": {
     "width": 2530,
@@ -875,9 +791,8 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "height": 124
       }
     },
-    "groups": {},
     "edges": {
-      "request-to-location": [
+      "edge-http-request-location-match-1": [
         {
           "x": 372,
           "y": 577.6
@@ -887,7 +802,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "location-to-upstream": [
+      "edge-location-match-upstream-selection-2": [
         {
           "x": 964,
           "y": 577.6
@@ -897,7 +812,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "upstream-to-proxy": [
+      "edge-upstream-selection-proxy-pass-3": [
         {
           "x": 1474,
           "y": 577.6
@@ -907,7 +822,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "proxy-to-response": [
+      "edge-proxy-pass-upstream-response-4": [
         {
           "x": 2020,
           "y": 577.6
@@ -917,14 +832,13 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ]
-    },
-    "annotations": {}
+    }
   },
   "google-com-server": {
     "width": 1964,
-    "height": 1262,
+    "height": 1180,
     "nodes": {
-      "proxy-server": {
+      "nginx": {
         "x": 72,
         "y": 528,
         "width": 272,
@@ -943,9 +857,8 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "height": 124
       }
     },
-    "groups": {},
     "edges": {
-      "proxy-to-application": [
+      "edge-nginx-spring-1": [
         {
           "x": 344,
           "y": 577.6
@@ -955,7 +868,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "application-to-database": [
+      "edge-spring-database-2": [
         {
           "x": 1100,
           "y": 577.6
@@ -965,14 +878,6 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ]
-    },
-    "annotations": {
-      "architecture-note": {
-        "x": 72,
-        "y": 1208,
-        "width": 1820,
-        "height": 28
-      }
     }
   },
   "google-com-server-spring-container": {
@@ -1022,9 +927,8 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "height": 124
       }
     },
-    "groups": {},
     "edges": {
-      "metadata-to-definition": [
+      "edge-configuration-metadata-bean-definition-1": [
         {
           "x": 290,
           "y": 577.6
@@ -1034,7 +938,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "definition-to-context": [
+      "edge-bean-definition-application-context-2": [
         {
           "x": 908,
           "y": 577.6
@@ -1044,7 +948,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "context-to-creation": [
+      "edge-application-context-bean-creation-3": [
         {
           "x": 1431.6,
           "y": 528
@@ -1058,7 +962,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 187.2
         }
       ],
-      "creation-to-injection": [
+      "edge-bean-creation-dependency-injection-4": [
         {
           "x": 1993.4,
           "y": 212
@@ -1068,7 +972,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 528
         }
       ],
-      "injection-to-callback": [
+      "edge-dependency-injection-initialization-callback-5": [
         {
           "x": 1988,
           "y": 652
@@ -1078,7 +982,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 968
         }
       ],
-      "callback-to-ready": [
+      "edge-initialization-callback-ready-beans-6": [
         {
           "x": 2180,
           "y": 992.8
@@ -1096,8 +1000,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 627.2
         }
       ]
-    },
-    "annotations": {}
+    }
   },
   "google-com-server-spring-mvc": {
     "width": 2242,
@@ -1146,9 +1049,8 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "height": 124
       }
     },
-    "groups": {},
     "edges": {
-      "dispatcher-to-mapping": [
+      "edge-dispatcher-servlet-handler-mapping-1": [
         {
           "x": 294,
           "y": 308
@@ -1162,7 +1064,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 187.2
         }
       ],
-      "mapping-to-controller": [
+      "edge-handler-mapping-controller-2": [
         {
           "x": 1342,
           "y": 162.4
@@ -1180,7 +1082,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 332.8
         }
       ],
-      "dispatcher-to-adapter": [
+      "edge-dispatcher-servlet-handler-adapter-3": [
         {
           "x": 442,
           "y": 357.6
@@ -1190,7 +1092,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 357.6
         }
       ],
-      "adapter-to-controller": [
+      "edge-handler-adapter-controller-4": [
         {
           "x": 1342,
           "y": 357.6
@@ -1200,7 +1102,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 357.6
         }
       ],
-      "controller-to-resolver": [
+      "edge-controller-view-resolver-5": [
         {
           "x": 1974.8,
           "y": 432
@@ -1214,7 +1116,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 552.8
         }
       ],
-      "controller-to-model": [
+      "edge-controller-model-6": [
         {
           "x": 2028.1,
           "y": 432
@@ -1224,7 +1126,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 748
         }
       ],
-      "dispatcher-to-resolver": [
+      "edge-dispatcher-servlet-view-resolver-7": [
         {
           "x": 294,
           "y": 432
@@ -1238,7 +1140,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 552.8
         }
       ],
-      "resolver-to-view": [
+      "edge-view-resolver-rendered-view-8": [
         {
           "x": 1100,
           "y": 652
@@ -1252,7 +1154,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 772.8
         }
       ],
-      "model-to-view": [
+      "edge-model-rendered-view-9": [
         {
           "x": 1971,
           "y": 797.6
@@ -1262,35 +1164,33 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 797.6
         }
       ]
-    },
-    "annotations": {}
+    }
   },
   "google-com-server-spring-ecosystem": {
     "width": 2218,
     "height": 1180,
     "nodes": {
-      "spring-container": {
+      "container": {
         "x": 982,
         "y": 88,
         "width": 344,
         "height": 124
       },
-      "spring-security": {
+      "security": {
         "x": 436,
         "y": 528,
         "width": 326,
         "height": 124
       },
-      "spring-mvc": {
+      "mvc": {
         "x": 1546,
         "y": 528,
         "width": 236,
         "height": 124
       }
     },
-    "groups": {},
     "edges": {
-      "container-to-security": [
+      "edge-container-security-1": [
         {
           "x": 1050.8,
           "y": 212
@@ -1304,7 +1204,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 552.8
         }
       ],
-      "container-to-mvc": [
+      "edge-container-mvc-2": [
         {
           "x": 1188.4,
           "y": 212
@@ -1318,7 +1218,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 552.8
         }
       ],
-      "security-to-mvc": [
+      "edge-security-mvc-3": [
         {
           "x": 762,
           "y": 577.6
@@ -1328,8 +1228,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ]
-    },
-    "annotations": {}
+    }
   },
   "google-com-server-spring-security": {
     "width": 3074,
@@ -1378,9 +1277,8 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "height": 124
       }
     },
-    "groups": {},
     "edges": {
-      "servlet-to-delegating": [
+      "edge-servlet-filter-chain-delegating-filter-proxy-1": [
         {
           "x": 470,
           "y": 577.6
@@ -1390,7 +1288,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "delegating-to-proxy": [
+      "edge-delegating-filter-proxy-filter-chain-proxy-2": [
         {
           "x": 1132,
           "y": 577.6
@@ -1400,7 +1298,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "proxy-to-chain": [
+      "edge-filter-chain-proxy-security-filter-chain-3": [
         {
           "x": 1563.2,
           "y": 528
@@ -1414,7 +1312,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 187.2
         }
       ],
-      "chain-to-authentication": [
+      "edge-security-filter-chain-authentication-4": [
         {
           "x": 2122,
           "y": 212
@@ -1424,7 +1322,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 528
         }
       ],
-      "authentication-to-authorization": [
+      "edge-authentication-authorization-5": [
         {
           "x": 2153.6,
           "y": 652
@@ -1434,7 +1332,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 968
         }
       ],
-      "authorization-to-dispatcher": [
+      "edge-authorization-dispatcher-servlet-6": [
         {
           "x": 2240,
           "y": 992.8
@@ -1452,12 +1350,11 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 627.2
         }
       ]
-    },
-    "annotations": {}
+    }
   },
   "google-com-server-spring": {
     "width": 1918,
-    "height": 1262,
+    "height": 1180,
     "nodes": {
       "tomcat": {
         "x": 436,
@@ -1465,16 +1362,15 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "width": 172,
         "height": 124
       },
-      "spring-ecosystem": {
+      "ecosystem": {
         "x": 1192,
         "y": 528,
         "width": 290,
         "height": 124
       }
     },
-    "groups": {},
     "edges": {
-      "tomcat-to-spring": [
+      "edge-tomcat-ecosystem-1": [
         {
           "x": 608,
           "y": 577.6
@@ -1484,14 +1380,6 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ]
-    },
-    "annotations": {
-      "spring-scope-note": {
-        "x": 72,
-        "y": 1208,
-        "width": 1774,
-        "height": 28
-      }
     }
   },
   "google-com-server-spring-tomcat": {
@@ -1541,9 +1429,8 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "height": 124
       }
     },
-    "groups": {},
     "edges": {
-      "request-to-endpoint": [
+      "edge-http-request-connector-endpoint-1": [
         {
           "x": 290,
           "y": 577.6
@@ -1553,7 +1440,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "endpoint-to-protocol": [
+      "edge-connector-endpoint-protocol-processor-2": [
         {
           "x": 918,
           "y": 577.6
@@ -1563,7 +1450,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "protocol-to-adapter": [
+      "edge-protocol-processor-coyote-adapter-3": [
         {
           "x": 1366,
           "y": 528
@@ -1577,7 +1464,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 187.2
         }
       ],
-      "adapter-to-container": [
+      "edge-coyote-adapter-servlet-container-4": [
         {
           "x": 1886,
           "y": 212
@@ -1587,7 +1474,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 528
         }
       ],
-      "container-to-filter": [
+      "edge-servlet-container-filter-chain-5": [
         {
           "x": 1887.8,
           "y": 652
@@ -1597,7 +1484,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 968
         }
       ],
-      "filter-to-dispatcher": [
+      "edge-filter-chain-dispatcher-servlet-6": [
         {
           "x": 2050,
           "y": 992.8
@@ -1615,12 +1502,11 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 627.2
         }
       ]
-    },
-    "annotations": {}
+    }
   },
   "google-com-user-browser": {
     "width": 2010,
-    "height": 1262,
+    "height": 1180,
     "nodes": {
       "certificate-authority": {
         "x": 1256,
@@ -1647,9 +1533,8 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         "height": 124
       }
     },
-    "groups": {},
     "edges": {
-      "ca-to-browser": [
+      "edge-certificate-authority-browser-1": [
         {
           "x": 1352.67,
           "y": 212
@@ -1667,7 +1552,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 528
         }
       ],
-      "ca-to-server": [
+      "edge-certificate-authority-server-2": [
         {
           "x": 1449.33,
           "y": 212
@@ -1685,7 +1570,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 528
         }
       ],
-      "user-to-browser": [
+      "edge-user-browser-3": [
         {
           "x": 244,
           "y": 590
@@ -1695,7 +1580,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 590
         }
       ],
-      "browser-to-server-hello": [
+      "edge-browser-server-4": [
         {
           "x": 1036,
           "y": 552.8
@@ -1705,7 +1590,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 552.8
         }
       ],
-      "server-to-browser-certificate": [
+      "edge-server-browser-5": [
         {
           "x": 1766,
           "y": 577.6
@@ -1715,7 +1600,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 577.6
         }
       ],
-      "browser-to-server-http": [
+      "edge-browser-server-6": [
         {
           "x": 1036,
           "y": 602.4
@@ -1725,7 +1610,7 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 602.4
         }
       ],
-      "server-to-browser-http": [
+      "edge-server-browser-7": [
         {
           "x": 1766,
           "y": 627.2
@@ -1735,14 +1620,6 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
           "y": 627.2
         }
       ]
-    },
-    "annotations": {
-      "trust-context-note": {
-        "x": 72,
-        "y": 1208,
-        "width": 1866,
-        "height": 28
-      }
     }
   }
 }

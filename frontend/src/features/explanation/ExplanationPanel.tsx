@@ -313,7 +313,7 @@ export function ExplanationPanel({
                 ) : (
                   <QuizPanel
                     key={state.scene.id}
-                    questions={state.scene.quiz?.questions ?? []}
+                    questions={state.scene.selfCheckQuiz ?? []}
                   />
                 )}
               </article>

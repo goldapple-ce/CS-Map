@@ -89,7 +89,6 @@ export class FileContentRepository implements ContentRepository {
         slug: entry.slug,
         scenarioId: entry.scenarioId,
         ...(entry.parentId ? { parentId: entry.parentId } : {}),
-        status: entry.status,
       },
       quiz
     )

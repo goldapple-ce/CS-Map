@@ -2,7 +2,7 @@
 
 ## 현재 상태
 
-**2단계 구현 완료 — 3단계 콘텐츠 마이그레이션 대기**
+**3단계 구현 완료 — 사용자 확인 대기**
 
 ## 이번 목표
 
@@ -45,6 +45,7 @@ edges:
 - `childSceneId`는 현재 node 안에 중첩되는 자식 Scene을 가리킨다.
 - `navigateToSceneId`는 월드의 다른 위치에 이미 존재하는 Scene으로 이동할 때만 사용한다.
 - node `label`은 화면 표시 이름이며, `row`와 `col`은 1~5 논리 격자 셀이다.
+- 자식 Scene이 아직 없지만 준비 중임을 표시해야 하는 node만 `planned: true`를 추가한다.
 - `edges`는 화면 연결선과 흐름 의미의 단일 원본이다.
 - edge는 필요할 때만 `variant`, `fromSide`, `toSide` 힌트를 추가할 수 있다.
 - Scene의 표시 제목은 같은 디렉터리 `content.ko.md`의 첫 번째 H1에서 읽는다.
@@ -128,9 +129,9 @@ Scene 디렉터리에 퀴즈가 있을 때만 `quiz.ko.yaml`을 추가한다.
 
 ### 3단계 — 전체 콘텐츠와 퀴즈 마이그레이션
 
-- [ ] 모든 Scene YAML을 최소 형식으로 변환하고 기존 필수 Annotation 설명과 참고 링크를 필요한 Markdown으로 이동한다.
-- [ ] 기존 퀴즈를 `quiz.ko.yaml` 질문·답변 형식으로 옮기고 Explanation Panel의 퀴즈 UI를 `정답 보기` 방식으로 변경한다.
-- [ ] 기존 생성 인덱스를 새 파이프라인 결과와 맞게 갱신한다.
+- [x] 모든 Scene YAML을 최소 형식으로 변환하고 기존 필수 Annotation 설명과 참고 링크를 필요한 Markdown으로 이동한다.
+- [x] 기존 퀴즈를 `quiz.ko.yaml` 질문·답변 형식으로 옮기고 Explanation Panel의 퀴즈 UI를 `정답 보기` 방식으로 변경한다.
+- [x] 기존 생성 인덱스를 새 파이프라인 결과와 맞게 갱신한다.
 
 ### 4단계 — 사용자 확인
 

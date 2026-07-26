@@ -70,23 +70,6 @@ export type ConceptUsage = {
   contextId: ContentId
 }
 
-export type QuizOption = {
-  id: ContentId
-  label: string
-}
-
-export type QuizQuestion = {
-  id: ContentId
-  prompt: string
-  options: QuizOption[]
-  correctOptionId: ContentId
-  explanation: string
-}
-
-export type TopicQuiz = {
-  questions: QuizQuestion[]
-}
-
 export type SelfCheckQuestion = {
   question: string
   answer: string
@@ -108,7 +91,6 @@ export type Scene = {
   contexts: Context[]
   occurrences: Occurrence[]
   conceptRefs: ConceptUsage[]
-  quiz?: TopicQuiz
   selfCheckQuiz?: SelfCheckQuestion[]
 }
 

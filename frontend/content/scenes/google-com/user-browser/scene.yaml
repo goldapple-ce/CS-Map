@@ -1,0 +1,58 @@
+id: google-com-user-browser
+summary: CA의 인증서 서명·발급과 브라우저의 신뢰 기준을 바탕으로 Server 인증 후 HTTP 요청과 응답을 주고받는 흐름입니다.
+nodes:
+  certificate-authority:
+    label: CA (인증기관)
+    row: 1
+    col: 4
+  user:
+    label: 사용자
+    row: 3
+    col: 1
+  browser:
+    label: 브라우저
+    row: 3
+    col: 3
+  server:
+    label: Server
+    row: 3
+    col: 5
+    navigateToSceneId: google-com-server
+edges:
+  - from: certificate-authority
+    to: browser
+    label: 사전 신뢰 기준
+    variant: supporting
+    fromSide: bottom
+    toSide: top
+  - from: certificate-authority
+    to: server
+    label: 인증서 서명·발급
+    variant: supporting
+    fromSide: bottom
+    toSide: top
+  - from: user
+    to: browser
+    label: google.com 입력
+    fromSide: right
+    toSide: left
+  - from: browser
+    to: server
+    label: ClientHello
+    fromSide: right
+    toSide: left
+  - from: server
+    to: browser
+    label: 인증서 체인 제공
+    fromSide: left
+    toSide: right
+  - from: browser
+    to: server
+    label: HTTP 요청
+    fromSide: right
+    toSide: left
+  - from: server
+    to: browser
+    label: HTTP 응답
+    fromSide: left
+    toSide: right

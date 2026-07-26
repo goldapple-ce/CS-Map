@@ -1,0 +1,46 @@
+id: google-search-dns-udp-query
+summary: DNS 질의 메시지가 UDP datagram의 payload가 되어 IP 계층으로 전달되는 흐름입니다.
+nodes:
+  dns-message:
+    label: DNS 질의 메시지
+    row: 3
+    col: 1
+  socket-kernel:
+    label: Socket API와 Kernel
+    row: 3
+    col: 2
+    childSceneId: google-search-dns-socket-kernel
+  udp-datagram:
+    label: UDP Datagram
+    row: 3
+    col: 3
+  ip-packet:
+    label: IP Packet
+    row: 3
+    col: 4
+    planned: true
+  network-interface:
+    label: 네트워크 인터페이스
+    row: 2
+    col: 5
+    planned: true
+  dns-server-port:
+    label: 이름 서버 UDP 53
+    row: 4
+    col: 5
+edges:
+  - from: dns-message
+    to: socket-kernel
+    label: 전송 요청
+  - from: socket-kernel
+    to: udp-datagram
+    label: payload 전달
+  - from: udp-datagram
+    to: ip-packet
+    label: IP 계층으로 전달
+  - from: ip-packet
+    to: network-interface
+    label: 송신 큐
+  - from: network-interface
+    to: dns-server-port
+    label: 네트워크 전달

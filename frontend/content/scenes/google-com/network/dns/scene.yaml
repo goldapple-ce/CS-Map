@@ -1,0 +1,51 @@
+id: google-search-dns
+summary: 캐시와 재귀 Resolver를 거쳐 Root, .com TLD, 권한 DNS의 안내를 따라 google.com의 주소를 얻는 흐름입니다.
+nodes:
+  browser-os-cache:
+    label: 브라우저 / OS 캐시
+    row: 3
+    col: 1
+  recursive-resolver:
+    label: 로컬 / 재귀 DNS
+    row: 3
+    col: 2
+  udp-query:
+    label: DNS 질의 전송
+    row: 3
+    col: 3
+    childSceneId: google-search-dns-udp-query
+  root-dns:
+    label: Root DNS
+    row: 1
+    col: 4
+  com-tld-dns:
+    label: .com TLD DNS
+    row: 3
+    col: 4
+  authoritative-dns:
+    label: 권한 DNS
+    row: 5
+    col: 4
+  ip-response:
+    label: IP 주소 응답
+    row: 3
+    col: 5
+edges:
+  - from: browser-os-cache
+    to: recursive-resolver
+    label: 캐시 miss 시 요청
+  - from: recursive-resolver
+    to: udp-query
+    label: 질의 생성
+  - from: udp-query
+    to: root-dns
+    label: root부터 탐색
+  - from: root-dns
+    to: com-tld-dns
+    label: .com DNS 안내
+  - from: com-tld-dns
+    to: authoritative-dns
+    label: 권한 DNS 안내
+  - from: authoritative-dns
+    to: ip-response
+    label: 주소 record 반환

@@ -1,0 +1,36 @@
+id: google-com-server-nginx
+summary: NGINX가 HTTP 요청을 받고 설정에 따라 upstream Application Server로 전달하는 일반적인 reverse proxy 흐름입니다.
+nodes:
+  http-request:
+    label: HTTP 요청 수신
+    row: 3
+    col: 1
+  location-match:
+    label: Location 규칙 확인
+    row: 3
+    col: 2
+  upstream-selection:
+    label: Upstream 선택
+    row: 3
+    col: 3
+  proxy-pass:
+    label: proxy_pass 전달
+    row: 3
+    col: 4
+  upstream-response:
+    label: 응답 전달
+    row: 3
+    col: 5
+edges:
+  - from: http-request
+    to: location-match
+    label: URI 확인
+  - from: location-match
+    to: upstream-selection
+    label: 설정 적용
+  - from: upstream-selection
+    to: proxy-pass
+    label: 목적지 결정
+  - from: proxy-pass
+    to: upstream-response
+    label: upstream 응답

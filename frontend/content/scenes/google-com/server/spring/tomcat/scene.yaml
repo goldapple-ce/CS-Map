@@ -1,0 +1,51 @@
+id: google-com-server-spring-tomcat
+summary: Tomcat이 HTTP 요청을 Endpoint와 protocol 처리, CoyoteAdapter와 Servlet pipeline을 거쳐 Spring DispatcherServlet로 전달하는 흐름입니다.
+nodes:
+  http-request:
+    label: HTTP 요청
+    row: 3
+    col: 1
+  connector-endpoint:
+    label: Connector / Endpoint
+    row: 3
+    col: 2
+  protocol-processor:
+    label: Protocol Processor
+    row: 3
+    col: 3
+  coyote-adapter:
+    label: CoyoteAdapter
+    row: 1
+    col: 4
+  servlet-container:
+    label: Servlet Container
+    row: 3
+    col: 4
+  filter-chain:
+    label: FilterChain
+    row: 5
+    col: 4
+  dispatcher-servlet:
+    label: Spring DispatcherServlet
+    row: 3
+    col: 5
+    navigateToSceneId: google-com-server-spring-mvc
+edges:
+  - from: http-request
+    to: connector-endpoint
+    label: 연결 수신
+  - from: connector-endpoint
+    to: protocol-processor
+    label: protocol 처리
+  - from: protocol-processor
+    to: coyote-adapter
+    label: Servlet 진입 준비
+  - from: coyote-adapter
+    to: servlet-container
+    label: request 변환
+  - from: servlet-container
+    to: filter-chain
+    label: filter 구성
+  - from: filter-chain
+    to: dispatcher-servlet
+    label: Servlet 요청 전달
