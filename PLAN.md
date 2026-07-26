@@ -2,7 +2,7 @@
 
 ## 현재 상태
 
-**계획 작성 완료 — 사용자 승인 대기**
+**2단계 구현 완료 — 3단계 콘텐츠 마이그레이션 대기**
 
 ## 이번 목표
 
@@ -117,14 +117,14 @@ Scene 디렉터리에 퀴즈가 있을 때만 `quiz.ko.yaml`을 추가한다.
 
 ### 1단계 — 영구 문서와 최소 스키마 확정
 
-- [ ] `AGENTS.md`, `REQUIREMENTS.md`, `TECHNICAL_DESIGN.md`, `GLOSSARY.md`에서 메타데이터·객관식 퀴즈·Annotation·Group·Relationship 규칙을 새 결정에 맞게 수정한다.
-- [ ] 최소 Scene YAML, 선택적 edge 힌트와 질문·답변 `quiz.ko.yaml` 스키마를 구현한다.
+- [x] `AGENTS.md`, `REQUIREMENTS.md`, `TECHNICAL_DESIGN.md`, `GLOSSARY.md`에서 메타데이터·객관식 퀴즈·Annotation·Group·Relationship 규칙을 새 결정에 맞게 수정한다.
+- [x] 최소 Scene YAML, 선택적 edge 힌트와 질문·답변 `quiz.ko.yaml` 스키마를 구현한다.
 
 ### 2단계 — 파서·생성 파이프라인 전환
 
-- [ ] Markdown H1, Scene 디렉터리, node key와 `childSceneId`에서 제목·부모·순서·URL을 파생하도록 콘텐츠 빌드와 repository를 전환한다.
-- [ ] 새 node·edge 형식을 기존 레이아웃과 World renderer가 사용할 정규화 데이터로 변환하고 Annotation·Group·Relationship 의존성을 제거한다.
-- [ ] Vite 개발 감시 대상에 `content.ko.md`와 `quiz.ko.yaml`을 포함한다.
+- [x] Markdown H1, Scene 디렉터리, node key와 `childSceneId`에서 제목·부모·순서·URL을 파생하도록 콘텐츠 빌드와 repository를 전환한다.
+- [x] 새 node·edge 형식을 기존 레이아웃과 World renderer가 사용할 정규화 데이터로 변환하고 Annotation·Group·Relationship 의존성을 제거한다.
+- [x] Vite 개발 감시 대상에 `content.ko.md`와 `quiz.ko.yaml`을 포함한다.
 
 ### 3단계 — 전체 콘텐츠와 퀴즈 마이그레이션
 

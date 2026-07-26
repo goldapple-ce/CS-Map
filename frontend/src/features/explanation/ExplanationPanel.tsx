@@ -293,27 +293,6 @@ export function ExplanationPanel({
                         </section>
                       )
                     )}
-
-                    <section className="space-y-3 border-t border-border pt-6">
-                      <h3 className="text-lg font-semibold tracking-tight">
-                        확인 가능한 출처
-                      </h3>
-                      <ul className="space-y-2 text-sm leading-7 text-muted-foreground">
-                        {state.scene.sources.map((source) => (
-                          <li key={source.url}>
-                            <a
-                              href={source.url}
-                              target="_blank"
-                              rel="noreferrer noopener"
-                              className="font-medium text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
-                            >
-                              {source.title}
-                            </a>{" "}
-                            <span>({source.type})</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </section>
                   </>
                 )}
               </article>

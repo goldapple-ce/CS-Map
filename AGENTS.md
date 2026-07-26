@@ -20,7 +20,6 @@
 - Primary navigation is click-based semantic zoom inside one persistent viewport.
 - The map and long-form explanation panel must coexist on desktop.
 - Scene depth must not have a hard-coded maximum.
-- Separate Scene, Concept, Context, and Occurrence data.
 - Reuse common concepts; do not duplicate their core explanations per context.
 - Context-specific implementations belong under their occurrence, such as server cache → distributed cache → Redis.
 - Planned content must not navigate to an empty scene.
@@ -87,9 +86,10 @@
 
 - If `CONTENT_GUIDE.md` is present, follow it for every new scene or concept.
 - Distinguish verified facts, general architecture examples, and product-specific assumptions.
-- Prefer primary or official sources.
 - Never imply knowledge of private Google internals without a public source.
-- Every published content item needs an author, review status, updated date, and sources.
+- Keep Scene YAML limited to `id`, `summary`, `nodes`, and `edges`; derive display and navigation data during the content build.
+- Do not require author, review status, updated date, or structured sources in Scene YAML. Put useful references in the Scene Markdown when needed.
+- Do not add Annotation, Group, or a separate Relationship collection to Scene authoring data. Express containment on nodes and visible flow with edges.
 
 ## Interaction discipline
 

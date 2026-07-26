@@ -34,15 +34,9 @@ type SceneElementBase = {
 export type SceneNodeElement = SceneElementBase & {
   kind: "node"
   grid?: SceneGridPlacement
-  groupId?: ContentId
   targetSceneId?: ContentId
   navigateToSceneId?: ContentId
-  conceptId?: ContentId
   status?: "published" | "planned"
-}
-
-export type SceneGroupElement = SceneElementBase & {
-  kind: "group"
 }
 
 export type SceneEdgeElement = SceneElementBase & {
@@ -54,15 +48,7 @@ export type SceneEdgeElement = SceneElementBase & {
   toSide?: "top" | "right" | "bottom" | "left"
 }
 
-export type SceneAnnotationElement = SceneElementBase & {
-  kind: "annotation"
-}
-
-export type SceneElement =
-  | SceneNodeElement
-  | SceneGroupElement
-  | SceneEdgeElement
-  | SceneAnnotationElement
+export type SceneElement = SceneNodeElement | SceneEdgeElement
 
 export type Context = {
   id: ContentId
@@ -101,38 +87,10 @@ export type TopicQuiz = {
   questions: QuizQuestion[]
 }
 
-export type Relationship =
-  | { type: "contains"; elementId: ContentId; targetSceneId: ContentId }
-  | {
-      type: "flows-to"
-      fromElementId: ContentId
-      toElementId: ContentId
-      label?: string
-    }
-  | {
-      type: "supports"
-      fromElementId: ContentId
-      toElementId: ContentId
-      label?: string
-    }
-  | { type: "uses-concept"; occurrenceId: ContentId }
-  | {
-      type: "related-to"
-      sourceConceptId: ContentId
-      targetConceptId: ContentId
-      summary: string
-    }
-  | {
-      type: "related" | "prerequisite" | "used-by"
-      sourceSceneId: ContentId
-      targetSceneId: ContentId
-      summary?: string
-    }
-  | {
-      type: "implemented-by"
-      occurrenceId: ContentId
-      targetSceneId: ContentId
-    }
+export type SelfCheckQuestion = {
+  question: string
+  answer: string
+}
 
 export type Scene = {
   id: ContentId
@@ -151,10 +109,7 @@ export type Scene = {
   occurrences: Occurrence[]
   conceptRefs: ConceptUsage[]
   quiz?: TopicQuiz
-  relationships: Relationship[]
-  sources: Source[]
-  author: Contributor
-  updatedAt: string
+  selfCheckQuiz?: SelfCheckQuestion[]
 }
 
 export type Concept = {

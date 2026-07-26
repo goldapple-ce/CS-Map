@@ -1,9 +1,4 @@
-import type {
-  Concept,
-  ContentId,
-  Relationship,
-  Scene,
-} from "@/domain/content-types"
+import type { Concept, ContentId, Scene } from "@/domain/content-types"
 
 export type ContentValidationIssue = {
   contentId?: ContentId
@@ -33,13 +28,10 @@ export function validateContentGraph(
 ): ContentValidationIssue[] {
   const issues: ContentValidationIssue[] = []
   const scenesById = new Map(scenes.map((scene) => [scene.id, scene]))
-  const conceptsById = new Map(concepts.map((concept) => [concept.id, concept]))
 
   for (const id of findDuplicates([
     ...scenes.map(({ id }) => id),
     ...concepts.map(({ id }) => id),
-    ...scenes.flatMap(({ contexts }) => contexts.map(({ id }) => id)),
-    ...scenes.flatMap(({ occurrences }) => occurrences.map(({ id }) => id)),
   ])) {
     issues.push(makeIssue(id, "id", `Duplicate content ID: ${id}`))
   }
@@ -49,535 +41,68 @@ export function validateContentGraph(
   for (const pathKey of findDuplicates(
     scenes.map(({ parentId, slug }) => `${parentId ?? "root"}/${slug}`)
   )) {
-    issues.push(
-      makeIssue(undefined, "slug", `Duplicate scene path segment: ${pathKey}`)
-    )
+    issues.push(makeIssue(undefined, "slug", `Duplicate scene path segment: ${pathKey}`))
   }
 
   for (const scene of scenes) {
-    validateScene(scene, scenesById, conceptsById, issues)
-  }
-  validateContainsCycles(scenes, issues)
-  validateImplementationCycles(scenes, issues)
+    const nodes = scene.elements.filter((element) => element.kind === "node")
+    const edges = scene.elements.filter((element) => element.kind === "edge")
+    const nodesById = new Map(nodes.map((node) => [node.id, node]))
 
-  return issues
-}
-
-function validateScene(
-  scene: Scene,
-  scenesById: ReadonlyMap<ContentId, Scene>,
-  conceptsById: ReadonlyMap<ContentId, Concept>,
-  issues: ContentValidationIssue[]
-) {
-  const elementsById = new Map(scene.elements.map((item) => [item.id, item]))
-  const contextsById = new Map(scene.contexts.map((item) => [item.id, item]))
-  const occurrencesById = new Map(
-    scene.occurrences.map((item) => [item.id, item])
-  )
-
-  for (const [path, ids] of [
-    ["elements", scene.elements.map(({ id }) => id)],
-    ["contexts", scene.contexts.map(({ id }) => id)],
-    ["occurrences", scene.occurrences.map(({ id }) => id)],
-  ] as const) {
-    for (const id of findDuplicates(ids)) {
-      issues.push(makeIssue(scene.id, path, `Duplicate local ID: ${id}`))
+    for (const id of findDuplicates(scene.elements.map(({ id }) => id))) {
+      issues.push(makeIssue(scene.id, "elements", `Duplicate local ID: ${id}`))
     }
-  }
-
-  if (scene.parentId && !scenesById.has(scene.parentId)) {
-    issues.push(
-      makeIssue(scene.id, "parentId", `Unknown parent scene: ${scene.parentId}`)
-    )
-  }
-  if (
-    scene.status === "published" &&
-    scene.parentId &&
-    scenesById.get(scene.parentId)?.status !== "published"
-  ) {
-    issues.push(
-      makeIssue(
-        scene.id,
-        "parentId",
-        `Published scene requires a published parent: ${scene.parentId}`
-      )
-    )
-  }
-  if (
-    scene.parentId &&
-    scenesById.get(scene.parentId)?.scenarioId !== scene.scenarioId
-  ) {
-    issues.push(
-      makeIssue(
-        scene.id,
-        "scenarioId",
-        `Child scene must share its parent scenario: ${scene.scenarioId}`
-      )
-    )
-  }
-
-  for (const element of scene.elements) {
-    if (element.kind === "edge") {
-      const from = elementsById.get(element.fromElementId)
-      const to = elementsById.get(element.toElementId)
-      if (from?.kind !== "node") {
-        issues.push(
-          makeIssue(
-            scene.id,
-            `elements.${element.id}.fromElementId`,
-            `Edge source must be a node: ${element.fromElementId}`
-          )
-        )
+    for (const edge of edges) {
+      if (!nodesById.has(edge.fromElementId)) {
+        issues.push(makeIssue(scene.id, `elements.${edge.id}.fromElementId`, `Unknown node: ${edge.fromElementId}`))
       }
-      if (to?.kind !== "node") {
-        issues.push(
-          makeIssue(
-            scene.id,
-            `elements.${element.id}.toElementId`,
-            `Edge target must be a node: ${element.toElementId}`
-          )
-        )
+      if (!nodesById.has(edge.toElementId)) {
+        issues.push(makeIssue(scene.id, `elements.${edge.id}.toElementId`, `Unknown node: ${edge.toElementId}`))
       }
-      continue
     }
-    if (element.kind !== "node") continue
-
-    if (
-      element.groupId &&
-      elementsById.get(element.groupId)?.kind !== "group"
-    ) {
-      issues.push(
-        makeIssue(
-          scene.id,
-          `elements.${element.id}.groupId`,
-          `Node group must refer to a group element: ${element.groupId}`
-        )
-      )
-    }
-    if (element.conceptId && !conceptsById.has(element.conceptId)) {
-      issues.push(
-        makeIssue(
-          scene.id,
-          `elements.${element.id}.conceptId`,
-          `Unknown concept: ${element.conceptId}`
-        )
-      )
-    }
-    if (
-      element.status === "planned" &&
-      (element.targetSceneId || element.navigateToSceneId)
-    ) {
-      issues.push(
-        makeIssue(
-          scene.id,
-          `elements.${element.id}`,
-          "Planned elements must not navigate to a scene"
-        )
-      )
-      continue
-    }
-    if (element.targetSceneId && element.navigateToSceneId) {
-      issues.push(
-        makeIssue(
-          scene.id,
-          `elements.${element.id}`,
-          "Node must use either targetSceneId or navigateToSceneId, not both"
-        )
-      )
-      continue
-    }
-    if (element.targetSceneId) {
-      const target = scenesById.get(element.targetSceneId)
-      if (!target) {
-        issues.push(
-          makeIssue(
-            scene.id,
-            `elements.${element.id}.targetSceneId`,
-            `Unknown target scene: ${element.targetSceneId}`
-          )
-        )
-      } else {
-        if (target.parentId !== scene.id) {
-          issues.push(
-            makeIssue(
-              scene.id,
-              `elements.${element.id}.targetSceneId`,
-              `Target ${target.id} must declare parentId ${scene.id}`
-            )
-          )
-        }
-        if (scene.status === "published" && target.status !== "published") {
-          issues.push(
-            makeIssue(
-              scene.id,
-              `elements.${element.id}.targetSceneId`,
-              `Published scene cannot navigate to ${target.status} scene ${target.id}`
-            )
-          )
+    for (const node of nodes) {
+      if (node.targetSceneId && node.navigateToSceneId) {
+        issues.push(makeIssue(scene.id, `elements.${node.id}`, "Node must use either childSceneId or navigateToSceneId, not both"))
+      }
+      if (node.status === "planned" && (node.targetSceneId || node.navigateToSceneId)) {
+        issues.push(makeIssue(scene.id, `elements.${node.id}`, "Planned nodes must not navigate to a Scene"))
+      }
+      if (node.targetSceneId) {
+        const target = scenesById.get(node.targetSceneId)
+        if (!target) {
+          issues.push(makeIssue(scene.id, `elements.${node.id}.childSceneId`, `Unknown child Scene: ${node.targetSceneId}`))
+        } else if (target.parentId !== scene.id) {
+          issues.push(makeIssue(scene.id, `elements.${node.id}.childSceneId`, `Child ${target.id} must derive parent ${scene.id}`))
         }
       }
-    }
-    if (element.navigateToSceneId) {
-      const target = scenesById.get(element.navigateToSceneId)
-      if (!target) {
-        issues.push(
-          makeIssue(
-            scene.id,
-            `elements.${element.id}.navigateToSceneId`,
-            `Unknown navigation target scene: ${element.navigateToSceneId}`
-          )
-        )
-      } else if (scene.status === "published" && target.status !== "published") {
-        issues.push(
-          makeIssue(
-            scene.id,
-            `elements.${element.id}.navigateToSceneId`,
-            `Published scene cannot navigate to ${target.status} scene ${target.id}`
-          )
-        )
+      if (node.navigateToSceneId && !scenesById.has(node.navigateToSceneId)) {
+        issues.push(makeIssue(scene.id, `elements.${node.id}.navigateToSceneId`, `Unknown navigation target Scene: ${node.navigateToSceneId}`))
       }
     }
   }
 
-  for (const occurrence of scene.occurrences) {
-    checkReference(
-      conceptsById,
-      occurrence.conceptId,
-      scene.id,
-      `occurrences.${occurrence.id}.conceptId`,
-      "concept",
-      issues
-    )
-    checkReference(
-      contextsById,
-      occurrence.contextId,
-      scene.id,
-      `occurrences.${occurrence.id}.contextId`,
-      "context",
-      issues
-    )
-    if (occurrence.elementId) {
-      checkReference(
-        elementsById,
-        occurrence.elementId,
-        scene.id,
-        `occurrences.${occurrence.id}.elementId`,
-        "element",
-        issues
-      )
-    }
-    for (const targetId of occurrence.implementationSceneIds) {
-      checkReference(
-        scenesById,
-        targetId,
-        scene.id,
-        `occurrences.${occurrence.id}.implementationSceneIds`,
-        "implementation scene",
-        issues
-      )
-      if (
-        scene.status === "published" &&
-        scenesById.get(targetId)?.status !== "published"
-      ) {
-        issues.push(
-          makeIssue(
-            scene.id,
-            `occurrences.${occurrence.id}.implementationSceneIds`,
-            `Published scene requires published implementation scene: ${targetId}`
-          )
-        )
-      }
-    }
-  }
-
-  for (const usage of scene.conceptRefs) {
-    checkReference(
-      conceptsById,
-      usage.conceptId,
-      scene.id,
-      "conceptRefs",
-      "concept",
-      issues
-    )
-    const occurrence = occurrencesById.get(usage.occurrenceId)
-    if (
-      occurrence &&
-      (occurrence.conceptId !== usage.conceptId ||
-        occurrence.contextId !== usage.contextId)
-    ) {
-      issues.push(
-        makeIssue(
-          scene.id,
-          "conceptRefs",
-          `Usage ${usage.occurrenceId} must match its occurrence concept and context`
-        )
-      )
-    }
-    checkReference(
-      occurrencesById,
-      usage.occurrenceId,
-      scene.id,
-      "conceptRefs",
-      "occurrence",
-      issues
-    )
-    checkReference(
-      contextsById,
-      usage.contextId,
-      scene.id,
-      "conceptRefs",
-      "context",
-      issues
-    )
-  }
-
-  for (const relationship of scene.relationships) {
-    validateRelationship(
-      relationship,
-      scene,
-      elementsById,
-      occurrencesById,
-      scenesById,
-      conceptsById,
-      issues
-    )
-  }
-
-  const relationPairs = new Set(
-    scene.relationships.flatMap((relationship) =>
-      relationship.type === "flows-to" || relationship.type === "supports"
-        ? [`${relationship.fromElementId}->${relationship.toElementId}`]
-        : []
-    )
-  )
-  const edgePairs = new Set(
-    scene.elements.flatMap((element) =>
-      element.kind === "edge"
-        ? [`${element.fromElementId}->${element.toElementId}`]
-        : []
-    )
-  )
-  for (const edge of scene.elements) {
-    if (edge.kind !== "edge") continue
-    const expectedType =
-      edge.variant === "supporting" ? "supports" : "flows-to"
-    const matched = scene.relationships.some(
-      (relationship) =>
-        (relationship.type === "flows-to" ||
-          relationship.type === "supports") &&
-        relationship.type === expectedType &&
-        relationship.fromElementId === edge.fromElementId &&
-        relationship.toElementId === edge.toElementId
-    )
-    if (!matched) {
-      issues.push(
-        makeIssue(
-          scene.id,
-          `elements.${edge.id}`,
-          `Edge variant requires a matching ${expectedType} relationship`
-        )
-      )
-    }
-  }
-  for (const pair of edgePairs) {
-    if (!relationPairs.has(pair)) {
-      issues.push(
-        makeIssue(
-          scene.id,
-          "elements",
-          `Edge must match a flows-to or supports relationship: ${pair}`
-        )
-      )
-    }
-  }
-  for (const pair of relationPairs) {
-    if (!edgePairs.has(pair)) {
-      issues.push(
-        makeIssue(
-          scene.id,
-          "relationships",
-          `Element relationship requires a matching edge: ${pair}`
-        )
-      )
-    }
-  }
-
-  if (scene.parentId) {
-    const parent = scenesById.get(scene.parentId)
-    const linked = parent?.elements.some(
-      (element) => element.kind === "node" && element.targetSceneId === scene.id
-    )
-    if (parent && !linked) {
-      issues.push(
-        makeIssue(
-          scene.id,
-          "parentId",
-          `Parent ${parent.id} has no element targeting child ${scene.id}`
-        )
-      )
-    }
-  }
-}
-
-function checkReference(
-  index: { has(id: string): boolean },
-  id: string,
-  ownerId: ContentId,
-  path: string,
-  label: string,
-  issues: ContentValidationIssue[]
-) {
-  if (!index.has(id)) {
-    issues.push(makeIssue(ownerId, path, `Unknown ${label}: ${id}`))
-  }
-}
-
-function validateRelationship(
-  relationship: Relationship,
-  scene: Scene,
-  elements: ReadonlyMap<ContentId, Scene["elements"][number]>,
-  occurrences: ReadonlyMap<ContentId, unknown>,
-  scenes: ReadonlyMap<ContentId, Scene>,
-  concepts: ReadonlyMap<ContentId, Concept>,
-  issues: ContentValidationIssue[]
-) {
-  const check = (
-    index: { has(id: string): boolean },
-    id: string,
-    label: string
-  ) => checkReference(index, id, scene.id, "relationships", label, issues)
-
-  if (relationship.type === "contains") {
-    check(elements, relationship.elementId, "element")
-    check(scenes, relationship.targetSceneId, "scene")
-    const element = elements.get(relationship.elementId)
-    if (
-      element?.kind !== "node" ||
-      element.targetSceneId !== relationship.targetSceneId
-    ) {
-      issues.push(
-        makeIssue(
-          scene.id,
-          "relationships",
-          `Contains relationship must match element ${relationship.elementId}`
-        )
-      )
-    }
-  } else if (
-    relationship.type === "flows-to" ||
-    relationship.type === "supports"
-  ) {
-    check(elements, relationship.fromElementId, "element")
-    check(elements, relationship.toElementId, "element")
-    if (elements.get(relationship.fromElementId)?.kind !== "node") {
-      issues.push(
-        makeIssue(
-          scene.id,
-          "relationships",
-          `Relationship source must be a node: ${relationship.fromElementId}`
-        )
-      )
-    }
-    if (elements.get(relationship.toElementId)?.kind !== "node") {
-      issues.push(
-        makeIssue(
-          scene.id,
-          "relationships",
-          `Relationship target must be a node: ${relationship.toElementId}`
-        )
-      )
-    }
-  } else if (relationship.type === "uses-concept") {
-    check(occurrences, relationship.occurrenceId, "occurrence")
-  } else if (relationship.type === "implemented-by") {
-    check(occurrences, relationship.occurrenceId, "occurrence")
-    check(scenes, relationship.targetSceneId, "scene")
-  } else if (relationship.type === "related-to") {
-    check(concepts, relationship.sourceConceptId, "concept")
-    check(concepts, relationship.targetConceptId, "concept")
-  } else {
-    check(scenes, relationship.sourceSceneId, "scene")
-    check(scenes, relationship.targetSceneId, "scene")
-  }
-}
-
-function validateContainsCycles(
-  scenes: readonly Scene[],
-  issues: ContentValidationIssue[]
-) {
   const adjacency = new Map(
     scenes.map((scene) => [
       scene.id,
       scene.elements.flatMap((element) =>
-        element.kind === "node" && element.targetSceneId
-          ? [element.targetSceneId]
-          : []
+        element.kind === "node" && element.targetSceneId ? [element.targetSceneId] : []
       ),
     ])
   )
-  const visiting = new Set<ContentId>()
-  const visited = new Set<ContentId>()
-
-  const visit = (id: ContentId, path: ContentId[]) => {
-    if (visiting.has(id)) {
-      issues.push(
-        makeIssue(
-          id,
-          "elements.targetSceneId",
-          `Contains cycle: ${[...path, id].join(" -> ")}`
-        )
-      )
+  const visiting = new Set<string>()
+  const visited = new Set<string>()
+  const visit = (sceneId: string) => {
+    if (visiting.has(sceneId)) {
+      issues.push(makeIssue(sceneId, "nodes.childSceneId", "Child Scene cycle detected"))
       return
     }
-    if (visited.has(id)) return
-    visiting.add(id)
-    for (const childId of adjacency.get(id) ?? []) visit(childId, [...path, id])
-    visiting.delete(id)
-    visited.add(id)
+    if (visited.has(sceneId)) return
+    visiting.add(sceneId)
+    for (const childId of adjacency.get(sceneId) ?? []) visit(childId)
+    visiting.delete(sceneId)
+    visited.add(sceneId)
   }
+  for (const scene of scenes) visit(scene.id)
 
-  for (const scene of scenes) visit(scene.id, [])
-}
-
-function validateImplementationCycles(
-  scenes: readonly Scene[],
-  issues: ContentValidationIssue[]
-) {
-  const adjacency = new Map(
-    scenes.map((scene) => [
-      scene.id,
-      [
-        ...scene.occurrences.flatMap(
-          ({ implementationSceneIds }) => implementationSceneIds
-        ),
-        ...scene.relationships.flatMap((relationship) =>
-          relationship.type === "implemented-by"
-            ? [relationship.targetSceneId]
-            : []
-        ),
-      ],
-    ])
-  )
-  const visiting = new Set<ContentId>()
-  const visited = new Set<ContentId>()
-
-  const visit = (id: ContentId, path: ContentId[]) => {
-    if (visiting.has(id)) {
-      issues.push(
-        makeIssue(
-          id,
-          "occurrences.implementationSceneIds",
-          `Implementation cycle: ${[...path, id].join(" -> ")}`
-        )
-      )
-      return
-    }
-    if (visited.has(id)) return
-    visiting.add(id)
-    for (const childId of adjacency.get(id) ?? []) visit(childId, [...path, id])
-    visiting.delete(id)
-    visited.add(id)
-  }
-
-  for (const scene of scenes) visit(scene.id, [])
+  return issues
 }

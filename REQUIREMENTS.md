@@ -217,10 +217,10 @@ MVP의 루트 장면은 다음 질문에서 시작한다.
 | FR-INFO-015 | MUST     | 독립적인 내부 구조나 별도 흐름을 가진 개념은 긴 본문 안에 모두 포함하지 않고 클릭 가능한 하위 장면으로 제공해야 한다.               |
 | FR-INFO-016 | MUST     | 현재 장면의 관계, 예시, 장단점, 실패 상황 및 주의사항은 불필요하게 별도 장면으로 쪼개지 않고 현재 설명에 포함할 수 있어야 한다.     |
 | FR-INFO-017 | MUST     | 설명 패널은 현재 Topic의 `설명`과 `퀴즈` 탭을 제공해야 한다.                                                                        |
-| FR-INFO-018 | MUST     | Topic은 선택적으로 정적 객관식 퀴즈 문항과 선택지, 정답, 해설을 가질 수 있어야 한다.                                                |
-| FR-INFO-019 | MUST     | 사용자는 답을 선택한 뒤 정답 여부와 해설을 확인할 수 있어야 한다.                                                                   |
+| FR-INFO-018 | MUST     | Topic은 선택적으로 질문과 답변으로 구성된 자기 점검 문항을 가질 수 있어야 한다.                                                     |
+| FR-INFO-019 | MUST     | 사용자는 각 질문에서 `정답 보기`를 실행해 답변을 확인할 수 있어야 한다.                                                             |
 | FR-INFO-020 | MUST     | 퀴즈가 없는 Topic은 빈 화면 대신 준비된 퀴즈가 없다는 안내를 표시해야 한다.                                                         |
-| FR-INFO-021 | MUST     | 퀴즈의 선택·정답·오답 상태는 색상 외의 텍스트와 아이콘으로도 구분해야 하며 키보드로 조작할 수 있어야 한다.                          |
+| FR-INFO-021 | MUST     | 질문 이동과 답변 공개는 키보드로 조작할 수 있어야 한다.                                                                              |
 | FR-INFO-022 | MUST     | MVP 퀴즈는 점수, 진도, 결과 이력을 저장하지 않아야 한다.                                                                            |
 
 ### 8.4 공통 개념 재사용
@@ -278,20 +278,14 @@ MVP의 루트 장면은 다음 질문에서 시작한다.
 
 ### 9.1 장면 필수 정보
 
-게시되는 장면은 최소한 다음 정보를 가져야 한다.
+Scene YAML은 최소한 다음 정보만 작성한다.
 
 - 영구적인 고유 ID
-- 사람이 읽을 수 있는 제목과 URL slug
 - 현재 장면의 한 문장 요약
-- 현재 무슨 일이 일어나는지에 대한 구조화된 전체 설명
-- 요소별 역할
-- 데이터 또는 제어 흐름의 방향
-- 클릭 가능한 하위 장면 참조
-- 관련 공통 개념 참조
-- 현재 맥락 설명
-- 작성자 및 최종 검토일
-- 근거 자료 또는 출처
-- 게시 상태
+- node의 표시 이름, 5×5 논리 격자 위치와 선택적 자식 Scene 또는 교차 이동 참조
+- node 사이의 edge와 선택적 라벨·방향 힌트
+
+표시 제목은 같은 디렉터리의 `content.ko.md` 첫 H1에서 읽는다. URL, 부모, 자식 순서와 탐색 인덱스는 Scene 디렉터리, node key와 `childSceneId`에서 결정적으로 파생한다. 작성자, 검토 상태, 수정일과 구조화된 출처는 Scene YAML에 요구하지 않으며 필요한 참고 링크는 Markdown에 작성할 수 있다.
 
 ### 9.2 설명 콘텐츠 구성
 
@@ -326,134 +320,51 @@ MVP의 루트 장면은 다음 질문에서 시작한다.
 - `게시됨`, `준비 중`, `선택됨` 상태를 색상만으로 구분하지 않는다.
 - 그림만으로 이해하기 어려운 장면은 동등한 텍스트 설명을 제공한다.
 
-### 9.4 정확성과 출처
+### 9.4 정확성
 
 - 사실 설명은 신뢰할 수 있는 1차 자료 또는 공식 문서를 우선 근거로 삼는다.
 - 일반적인 시스템 설계와 특정 기업의 실제 구현을 구분한다.
 - 불확실하거나 구현에 따라 다른 내용은 단정적으로 표현하지 않는다.
-- 콘텐츠에 작성자, 검토 상태, 수정일과 출처를 남긴다.
+- 참고 링크가 필요하면 Markdown 본문에 넣을 수 있으나 구조화된 출처 메타데이터는 강제하지 않는다.
 
-### 9.5 콘텐츠 상태
+### 9.5 준비 중 Topic
 
-```text
-draft → review → published
-```
-
-- `draft`: 작성 중이며 일반 사용자에게 노출하지 않는다.
-- `review`: 정확성 및 연결 관계를 검토 중이다.
-- `published`: 일반 사용자가 탐색할 수 있다.
-- 하위 콘텐츠가 없는 게시 대상은 단말 노드가 될 수 있다.
-- 작성 예정임을 보여줄 필요가 있을 때만 `준비 중` 대상으로 노출한다.
+- Scene 파일이 존재하면 탐색 가능한 콘텐츠로 간주한다.
+- 하위 콘텐츠가 없는 Topic은 단말 node가 될 수 있다.
+- 작성 예정임을 보여줄 필요가 있을 때만 자식 Scene 참조가 없는 `준비 중` node로 노출한다.
 
 ## 10. 데이터 요구사항
 
-아래 모델은 개념적 기준이며 구체적인 저장 형식은 기술 설계에서 확정한다.
+Scene 작성 모델은 다음 최소 형식을 사용한다. 파생 데이터와 렌더링 전용 필드는 기술 설계의 정규화 계층에서 만든다.
 
 ```ts
-type ContentStatus = "draft" | "review" | "published" | "planned";
-
 type Scene = {
   id: string;
-  slug: string;
-  title: string;
   summary: string;
-  content: ContentDocument;
-  parentId?: string;
-  elements: SceneElement[];
-  conceptRefs: ConceptReference[];
-  context: ContextExplanation;
-  quiz?: TopicQuiz;
-  sources: Source[];
-  author: Contributor;
-  status: ContentStatus;
-  updatedAt: string;
+  nodes: Record<string, SceneNode>;
+  edges: SceneEdge[];
 };
 
-type ContentDocument = {
-  sections: ContentSection[];
+type SceneNode = {
+  label: string;
+  row: 1 | 2 | 3 | 4 | 5;
+  col: 1 | 2 | 3 | 4 | 5;
+  childSceneId?: string;
+  navigateToSceneId?: string;
 };
 
-type ContentSection = {
-  id: string;
-  type:
-    | "overview"
-    | "why"
-    | "flow"
-    | "internals"
-    | "example"
-    | "tradeoff"
-    | "failure"
-    | "security"
-    | "practice"
-    | "related"
-    | "sources"
-    | "custom";
-  title: string;
-  body: RichContent;
-};
-
-type SceneElement =
-  | SceneNodeElement
-  | SceneGroupElement
-  | SceneEdgeElement
-  | SceneAnnotationElement;
-
-type SceneNodeElement = {
-  id: string;
-  kind: "node";
+type SceneEdge = {
+  from: string;
+  to: string;
   label?: string;
-  groupId?: string;
-  targetSceneId?: string;
-  conceptId?: string;
+  variant?: "flow" | "supporting" | "return";
+  fromSide?: "top" | "right" | "bottom" | "left";
+  toSide?: "top" | "right" | "bottom" | "left";
 };
 
-type SceneEdgeElement = {
-  id: string;
-  kind: "edge";
-  label?: string;
-  fromElementId: string;
-  toElementId: string;
-  variant?: "flow" | "supporting";
-};
-
-type SceneGroupElement = {
-  id: string;
-  kind: "group";
-  label?: string;
-};
-
-type SceneAnnotationElement = {
-  id: string;
-  kind: "annotation";
-  label?: string;
-};
-
-type Concept = {
-  id: string;
-  slug: string;
-  title: string;
-  aliases: string[];
-  explanation: string;
-  childConceptRefs: ConceptReference[];
-  sources: Source[];
-};
-
-type ContextExplanation = {
-  scenarioId: string;
-  occurrenceId: string;
-  explanation: string;
-};
-
-type TopicQuiz = {
-  questions: QuizQuestion[];
-};
-
-type QuizQuestion = {
-  id: string;
-  prompt: string;
-  options: { id: string; label: string }[];
-  correctOptionId: string;
-  explanation: string;
+type SelfCheckQuestion = {
+  question: string;
+  answer: string;
 };
 ```
 
@@ -461,16 +372,13 @@ type QuizQuestion = {
 
 콘텐츠를 빌드 또는 게시하기 전에 다음을 자동 검증해야 한다.
 
-- 중복 ID와 slug
-- 존재하지 않는 장면·개념 참조
+- 중복 Scene ID와 같은 Scene 안의 중복 node 위치
+- 존재하지 않는 Scene과 node 참조
 - 의도하지 않은 부모-자식 순환 참조
 - 부모와 자식 관계의 불일치
-- 게시 장면이 비게시 필수 장면에 의존하는 경우
 - 필수 필드 누락
-- 잘못된 URL 또는 출처 형식
+- Markdown 첫 H1 누락
 - 접근 불가능한 고립 장면
-
-교차 관계는 순환할 수 있으므로, 부모-자식 확대 관계와 관련 개념 관계를 서로 다른 타입으로 관리해야 한다.
 
 ## 11. 기술 요구사항 및 MVP 기술 기준
 
@@ -634,7 +542,7 @@ MVP의 기본 기술 기준은 다음과 같다. 정확한 라이브러리와 �
 - 공통 개념과 맥락 설명의 올바른 결합
 - 긴 설명의 독립 스크롤과 지도 유지
 - 패널 접기·확장 및 이전 장면 복귀 시 읽기 상태 복원
-- 설명·퀴즈 탭 전환, 정답·해설 확인과 퀴즈 없는 Topic 안내
+- 설명·퀴즈 탭 전환, 질문별 답변 공개와 퀴즈 없는 Topic 안내
 - 키보드 탐색과 포커스
 - 주요 장면의 시각적 회귀
 
@@ -668,7 +576,7 @@ MVP의 기본 기술 기준은 다음과 같다. 정확한 라이브러리와 �
 15. 사용자가 설명 패널을 독립적으로 스크롤하면서 현재 장면을 계속 확인할 수 있다.
 16. 짧은 미리보기와 장면의 전체 설명이 구분되어 제공된다.
 17. 독립적인 내부 구조를 가진 설명 항목을 하위 장면으로 연결할 수 있다.
-18. 설명 패널에서 Topic별 퀴즈를 풀고 정답과 해설을 확인할 수 있으며 결과는 저장되지 않는다.
+18. 설명 패널에서 Topic별 질문의 답변을 공개해 확인할 수 있으며 결과는 저장되지 않는다.
 
 ## 16. 성공 지표
 
@@ -694,7 +602,7 @@ MVP 공개 후 다음 지표를 통해 제품 가설을 검증한다.
 - 탐색 깊이에 제품·데이터 구조 차원의 최대값을 두지 않는다.
 - 기본 탐색은 클릭 기반이다.
 - 설명은 하위 장면으로 계속 확장된다.
-- Topic별 정적 퀴즈는 MVP에 포함하지만 회원, 진도, 점수와 퀴즈 결과 저장은 제외한다.
+- Topic별 질문·답변 자기 점검은 MVP에 포함하지만 회원, 진도, 점수와 결과 저장은 제외한다.
 - 데스크톱을 우선 지원한다.
 - 초기 콘텐츠는 주 작성자가 제공하되 외부 기여 가능성을 보존한다.
 - 공통 원리와 맥락별 구현을 분리한다.

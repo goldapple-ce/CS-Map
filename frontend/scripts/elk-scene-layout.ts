@@ -22,8 +22,6 @@ import type {
 const MIN_SCENE_WIDTH = 1280
 const MIN_SCENE_HEIGHT = 720
 const HORIZONTAL_MARGIN = 72
-const ANNOTATION_HEIGHT = 28
-const ANNOTATION_GAP = 6
 const GRID_COLUMN_GAP = 220
 const GRID_ROW_GAP = 96
 const GRID_VERTICAL_MARGIN = 88
@@ -222,26 +220,16 @@ async function buildGridSceneLayout(
     Math.max(columns - 1, 0) * GRID_COLUMN_GAP
   const gridHeight =
     rows * SCENE_NODE_HEIGHT + Math.max(rows - 1, 0) * GRID_ROW_GAP
-  const annotations = scene.elements.filter(
-    (element) => element.kind === "annotation"
-  )
-  const annotationAreaHeight =
-    annotations.length === 0
-      ? 0
-      : 54 +
-        annotations.length * ANNOTATION_HEIGHT +
-        Math.max(annotations.length - 1, 0) * ANNOTATION_GAP
   const sceneWidth = Math.max(
     MIN_SCENE_WIDTH,
     gridWidth + HORIZONTAL_MARGIN * 2
   )
   const sceneHeight = Math.max(
     MIN_SCENE_HEIGHT,
-    gridHeight + GRID_VERTICAL_MARGIN * 2 + annotationAreaHeight
+    gridHeight + GRID_VERTICAL_MARGIN * 2
   )
   const gridStartX = (sceneWidth - gridWidth) / 2
-  const gridStartY =
-    (sceneHeight - annotationAreaHeight - gridHeight) / 2
+  const gridStartY = (sceneHeight - gridHeight) / 2
   const columnStarts: number[] = []
   let nextColumnX = gridStartX
   for (const width of columnWidths) {
@@ -326,56 +314,11 @@ async function buildGridSceneLayout(
     })
   )
 
-  const groups = scene.elements.filter((element) => element.kind === "group")
-  const groupLayouts = Object.fromEntries(
-    groups.flatMap((group) => {
-      const memberBoxes = nodes.flatMap((node) => {
-        const box = node.groupId === group.id ? nodeLayouts[node.id] : undefined
-        return box ? [box] : []
-      })
-      if (memberBoxes.length === 0) return []
-      const left = Math.min(...memberBoxes.map(({ x }) => x))
-      const top = Math.min(...memberBoxes.map(({ y }) => y))
-      const right = Math.max(...memberBoxes.map(({ x, width }) => x + width))
-      const bottom = Math.max(
-        ...memberBoxes.map(({ y, height }) => y + height)
-      )
-      return [
-        [
-          group.id,
-          {
-            x: left - 16,
-            y: top - 34,
-            width: right - left + 32,
-            height: bottom - top + 50,
-          },
-        ] as const,
-      ]
-    })
-  )
-
-  const annotationLayouts = Object.fromEntries(
-    annotations.map((annotation, index) => [
-      annotation.id,
-      {
-        x: HORIZONTAL_MARGIN,
-        y:
-          sceneHeight -
-          54 -
-          index * (ANNOTATION_HEIGHT + ANNOTATION_GAP),
-        width: sceneWidth - HORIZONTAL_MARGIN * 2,
-        height: ANNOTATION_HEIGHT,
-      },
-    ])
-  )
-
   return {
     width: sceneWidth,
     height: sceneHeight,
     nodes: nodeLayouts,
-    groups: groupLayouts,
     edges: edgeLayouts,
-    annotations: annotationLayouts,
   }
 }
 
@@ -387,10 +330,6 @@ export async function buildSceneLayout(
   )
   const edges = scene.elements.filter(
     (element): element is SceneEdgeElement => element.kind === "edge"
-  )
-  const groups = scene.elements.filter((element) => element.kind === "group")
-  const annotations = scene.elements.filter(
-    (element) => element.kind === "annotation"
   )
 
   if (scene.layout?.type === "grid") {
@@ -428,21 +367,12 @@ export async function buildSceneLayout(
   const result = await elk.layout(graph)
   const graphWidth = rounded(result.width)
   const graphHeight = rounded(result.height)
-  const annotationAreaHeight =
-    annotations.length === 0
-      ? 0
-      : 54 +
-        annotations.length * ANNOTATION_HEIGHT +
-        Math.max(annotations.length - 1, 0) * ANNOTATION_GAP
   const sceneWidth = Math.max(MIN_SCENE_WIDTH, graphWidth)
-  const sceneHeight = Math.max(
-    MIN_SCENE_HEIGHT,
-    graphHeight + annotationAreaHeight
-  )
+  const sceneHeight = Math.max(MIN_SCENE_HEIGHT, graphHeight)
   const offsetX = (sceneWidth - graphWidth) / 2
   const offsetY = Math.max(
     0,
-    (sceneHeight - annotationAreaHeight - graphHeight) / 2
+    (sceneHeight - graphHeight) / 2
   )
 
   const nodeLayouts = Object.fromEntries(
@@ -469,54 +399,10 @@ export async function buildSceneLayout(
       .filter(([, points]) => points.length >= 2)
   )
 
-  const groupLayouts = Object.fromEntries(
-    groups.flatMap((group) => {
-      const memberBoxes = nodes.flatMap((node) => {
-        const box = node.groupId === group.id ? nodeLayouts[node.id] : undefined
-        return box ? [box] : []
-      })
-      if (memberBoxes.length === 0) return []
-      const left = Math.min(...memberBoxes.map(({ x }) => x))
-      const top = Math.min(...memberBoxes.map(({ y }) => y))
-      const right = Math.max(...memberBoxes.map(({ x, width }) => x + width))
-      const bottom = Math.max(
-        ...memberBoxes.map(({ y, height }) => y + height)
-      )
-      return [
-        [
-          group.id,
-          {
-            x: left - 16,
-            y: top - 34,
-            width: right - left + 32,
-            height: bottom - top + 50,
-          },
-        ] as const,
-      ]
-    })
-  )
-
-  const annotationLayouts = Object.fromEntries(
-    annotations.map((annotation, index) => [
-      annotation.id,
-      {
-        x: HORIZONTAL_MARGIN,
-        y:
-          sceneHeight -
-          54 -
-          index * (ANNOTATION_HEIGHT + ANNOTATION_GAP),
-        width: sceneWidth - HORIZONTAL_MARGIN * 2,
-        height: ANNOTATION_HEIGHT,
-      },
-    ])
-  )
-
   return {
     width: sceneWidth,
     height: sceneHeight,
     nodes: nodeLayouts,
-    groups: groupLayouts,
     edges: edgeLayouts,
-    annotations: annotationLayouts,
   }
 }

@@ -1,13 +1,9 @@
-import { SceneAnnotation } from "@/components/scene/SceneAnnotation"
 import { SceneEdge } from "@/components/scene/SceneEdge"
-import { SceneGroup } from "@/components/scene/SceneGroup"
 import { SceneNode, type SceneNodeState } from "@/components/scene/SceneNode"
 import { createSceneLayout } from "@/components/scene/scene-layout"
 import type {
   Scene,
-  SceneAnnotationElement,
   SceneEdgeElement,
-  SceneGroupElement,
   SceneNodeElement,
 } from "@/domain/content-types"
 
@@ -25,7 +21,7 @@ function nodeState(
   if (element.id === selectedElementId) return "selected"
   if (
     (element.targetSceneId || element.navigateToSceneId) &&
-    element.status === "published"
+    element.status !== "planned"
   )
     return "interactive"
   if (element.status === "planned") return "planned"
@@ -39,15 +35,8 @@ export function SceneRenderer({
   onEnterScene,
 }: SceneRendererProps) {
   const layout = createSceneLayout(scene)
-  const groups = scene.elements.filter(
-    (element): element is SceneGroupElement => element.kind === "group"
-  )
   const edges = scene.elements.filter(
     (element): element is SceneEdgeElement => element.kind === "edge"
-  )
-  const annotations = scene.elements.filter(
-    (element): element is SceneAnnotationElement =>
-      element.kind === "annotation"
   )
   const nodes = scene.elements.filter(
     (element): element is SceneNodeElement => element.kind === "node"
@@ -78,16 +67,6 @@ export function SceneRenderer({
           </marker>
         </defs>
 
-        {groups.map((element) => {
-          const elementLayout = layout.groups.get(element.id)
-          return elementLayout ? (
-            <SceneGroup
-              key={element.id}
-              element={element}
-              layout={elementLayout}
-            />
-          ) : null
-        })}
         {edges.map((element) => {
           const points = layout.edges.get(element.id)
           return points ? (
@@ -96,16 +75,6 @@ export function SceneRenderer({
               element={element}
               points={points}
               density="near"
-            />
-          ) : null
-        })}
-        {annotations.map((element) => {
-          const elementLayout = layout.annotations.get(element.id)
-          return elementLayout ? (
-            <SceneAnnotation
-              key={element.id}
-              element={element}
-              layout={elementLayout}
             />
           ) : null
         })}

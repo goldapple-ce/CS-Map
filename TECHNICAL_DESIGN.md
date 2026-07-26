@@ -199,100 +199,53 @@ project/
 
 ## 5. 도메인 모델
 
-### 5.1 관계 타입
+### 5.1 작성 관계
 
-관계를 반드시 구분한다.
-
-| 관계             | 의미                  |          순환 허용 | 중앙 지도 사용 |
-| ---------------- | --------------------- | -----------------: | -------------: |
-| `contains`       | 내부 장면으로 확대    |             아니오 |             예 |
-| `flows-to`       | 실제 데이터·제어 흐름 | 장면 내부에서 가능 |             예 |
-| `supports`       | 사전 신뢰·지원 관계   |                 예 | 구분된 점선 edge |
-| `related`        | 관련 지식 연결        |                 예 |  구분된 연결선 |
-| `prerequisite`   | 선수 지식 연결        |                 예 |  구분된 연결선 |
-| `used-by`        | 사용 관계 연결        |                 예 |  구분된 연결선 |
-| `uses-concept`   | 공통 원리 참조        |                 예 |      패널 중심 |
-| `related-to`     | 비교·인과·최적화 관계 |                 예 |      패널 중심 |
-| `implemented-by` | 맥락별 구현체         |             아니오 |             예 |
-
-부모-자식 확대 그래프만 비순환이어야 한다. 관련 개념 그래프의 순환은 정상이다.
+- node의 `childSceneId`가 부모·자식 중첩과 Semantic Zoom 진입의 단일 원본이다.
+- node의 `navigateToSceneId`는 월드의 다른 위치로 이동하는 교차 탐색만 표현한다.
+- `edges`가 보이는 연결선과 Scene 내부 흐름 의미의 단일 원본이다.
+- 별도 Annotation, Group 또는 Relationship collection은 두지 않는다.
+- 부모·자식 확대 그래프는 비순환이어야 하며 edge는 Scene 내부에서 순환할 수 있다.
 
 ### 5.2 핵심 타입
 
 ```ts
 type ContentId = string;
 
-type Scene = {
+type SceneDocument = {
   id: ContentId;
-  slug: string;
-  scenarioId: ContentId;
-  parentId?: ContentId;
-  title: string;
   summary: string;
-  status: "draft" | "review" | "published" | "planned";
-  ariaLabel: string;
-  layoutHint?: "horizontal" | "branch";
-  layout?: {
-    type: "grid";
-    columns: 5;
-    rows: 5;
-  };
-  elements: SceneElement[];
-  contentRef: string;
-  conceptRefs: ConceptUsage[];
-  quiz?: TopicQuiz;
-  sources: Source[];
-  author: Contributor;
-  updatedAt: string;
+  nodes: Record<ContentId, SceneNode>;
+  edges: SceneEdge[];
 };
 
-type Concept = {
-  id: ContentId;
-  slug: string;
-  title: string;
-  aliases: string[];
-  contentRef: string;
-  sources: Source[];
-};
-
-type ConceptUsage = {
-  conceptId: ContentId;
-  occurrenceId: ContentId;
-  contextSummary: string;
-  contextContentRef?: string;
-};
-
-type TopicQuiz = {
-  questions: QuizQuestion[];
-};
-
-type QuizQuestion = {
-  id: ContentId;
-  prompt: string;
-  options: { id: ContentId; label: string }[];
-  correctOptionId: ContentId;
-  explanation: string;
-};
-
-type SceneElement = {
-  id: string;
-  kind: "node" | "group" | "edge" | "annotation";
-  label?: string;
-  groupId?: ContentId;
-  fromElementId?: ContentId;
-  toElementId?: ContentId;
-  variant?: "flow" | "supporting" | "return";
-  targetSceneId?: ContentId;
+type SceneNode = {
+  label: string;
+  row: 1 | 2 | 3 | 4 | 5;
+  col: 1 | 2 | 3 | 4 | 5;
+  childSceneId?: ContentId;
   navigateToSceneId?: ContentId;
-  conceptId?: ContentId;
-  status?: "published" | "planned";
+};
+
+type SceneEdge = {
+  from: ContentId;
+  to: ContentId;
+  label?: string;
+  variant?: "flow" | "supporting" | "return";
+  fromSide?: "top" | "right" | "bottom" | "left";
+  toSide?: "top" | "right" | "bottom" | "left";
+};
+
+type SelfCheckQuestion = {
+  question: string;
+  answer: string;
 };
 ```
 
-`targetSceneId`는 node 안에 중첩되는 자식 Scene만 가리키며 대상 Scene의
-`parentId`가 현재 Scene이어야 한다. 이미 월드의 다른 위치에 배치된 Scene으로
-이동하는 교차 탐색은 `navigateToSceneId`를 사용한다. 교차 탐색은 카메라와 URL만
-대상 Scene으로 이동하며 월드 중첩이나 `contains` 관계를 추가하지 않는다.
+런타임 `Scene`에는 Markdown H1에서 읽은 `title`, 디렉터리와 node 참조에서 파생한
+`slug`, `parentId`, `scenarioId`, URL 순서, 그리고 renderer용 node·edge 배열이
+추가된다. 이 필드는 작성 YAML에 다시 저장하지 않는다. `childSceneId`는 런타임의
+중첩 대상 참조로, `navigateToSceneId`는 교차 탐색 참조로 정규화한다.
 
 Scene edge의 `flow`는 주요 진행 방향, `supporting`은 사전 준비나 지원 관계,
 `return`은 handler 선택 결과나 처리 결과처럼 호출 지점으로 되돌아오는 흐름을
@@ -328,7 +281,7 @@ content/scenes/google-search/network/dns/
    └─ dns-query.svg
 ```
 
-`scene.yaml`은 구조, 위치, 관계와 메타데이터를 가진다. `content.ko.md`는 긴 설명 섹션을 가진다.
+`scene.yaml`은 `id`, `summary`, `nodes`, `edges`만 가진다. `content.ko.md`는 첫 H1의 표시 제목과 긴 설명을 가진다. 퀴즈가 있으면 같은 디렉터리에 질문·답변 배열인 `quiz.ko.yaml`을 둔다.
 
 현재 콘텐츠 디렉터리와 `google-search-*` 영구 ID는 기존 참조를 깨뜨리지 않기 위해 유지한다. 사용자에게 노출되는 루트 slug와 canonical URL은 새 시나리오를 반영한 `google-com`을 사용한다. 새 하위 Scene은 의미에 맞는 ID를 사용하며, 기존 ID를 일괄 변경해야 할 필요가 생기면 별도의 migration으로 처리한다.
 
@@ -347,7 +300,7 @@ content/concepts/tcp/
 ### 6.3 Vite 콘텐츠 로딩
 
 - `predev`와 `prebuild` 단계에서 콘텐츠 검증과 route index 생성을 실행한다.
-- route index에는 장면 ID, URL path, 상태, 부모와 lazy module key만 포함하고 긴 본문은 포함하지 않는다.
+- route index에는 파생된 장면 ID, 제목, URL path, 부모, 순서와 lazy module key만 포함하고 긴 본문은 포함하지 않는다.
 - Vite의 정적인 `import.meta.glob` 패턴으로 장면 YAML과 Markdown loader map을 만든다.
 - loader map은 eager import가 아니라 장면별 lazy import를 기본으로 한다.
 - `SceneRepository`가 route index와 loader map을 결합하며 UI는 Vite API를 직접 사용하지 않는다.
@@ -361,7 +314,7 @@ content/concepts/tcp/
 - 임의 JSX, script, inline event handler를 허용하지 않는다.
 - 제목에 안정적인 section ID를 부여한다.
 - 장면 내 링크는 일반 URL 대신 검증 가능한 콘텐츠 참조 문법을 사용한다.
-- 외부 링크는 출처 목록과 연결한다.
+- 필요한 외부 참고 링크는 Markdown 본문에 직접 작성한다.
 
 ## 7. 탐색 상태 머신
 
@@ -543,11 +496,11 @@ failure, security, practice, related, sources, custom
 
 ### 10.3 Topic 퀴즈
 
-- `Scene.quiz.questions`는 선택적 데이터이며 콘텐츠 YAML에서 관리한다.
-- 각 문항은 ID, 질문, 두 개 이상의 선택지, 선택지 중 하나를 가리키는 정답 ID와 해설을 가진다.
-- 스키마는 Topic 안의 문항 ID, 문항 안의 선택지 ID 중복과 존재하지 않는 정답 ID를 거부한다.
+- Scene 디렉터리의 선택적 `quiz.ko.yaml`은 `{ question, answer }` 배열만 가진다.
+- 질문과 답변은 모두 필수이며 문항 ID, 선택지, 정답 선택지 ID와 별도 해설은 두지 않는다.
+- `ExplanationPanel`은 질문마다 `정답 보기` 동작으로 답변을 공개한다.
 - `ExplanationPanel`은 접근 가능한 tabs primitive로 설명과 퀴즈를 전환한다.
-- `QuizPanel`은 답안 선택, 정답·오답의 텍스트·아이콘 표시와 해설 공개를 담당한다.
+- `QuizPanel`은 질문 표시와 답변 공개를 담당한다.
 - 퀴즈 UI 상태는 현재 브라우저 메모리에만 존재하며 Topic 이동 시 초기화한다. 점수, 진도와 결과 이력을 저장하지 않는다.
 - 퀴즈가 없는 Topic에는 명시적인 빈 상태를 표시한다.
 

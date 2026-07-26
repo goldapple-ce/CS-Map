@@ -50,7 +50,7 @@ Explanation Panel의 긴 설명 안에서 Markdown 제목 위치로 이동하기
 
 ### Quiz Tab — 퀴즈 탭
 
-Explanation Panel에서 현재 Topic의 이해를 확인하는 정적 문항 영역이다. 답을 선택하고 정답과 해설을 확인할 수 있지만 MVP에서는 점수, 진도와 결과 이력을 저장하지 않는다.
+Explanation Panel에서 현재 Topic의 이해를 확인하는 정적 문항 영역이다. `정답 보기`로 답변을 확인할 수 있지만 MVP에서는 점수, 진도와 결과 이력을 저장하지 않는다.
 
 ## 공간과 카메라
 
@@ -68,7 +68,7 @@ Scene의 부모·자식 관계와 각 Scene 내부 레이아웃을 이용해 모
 
 ### Scene Layout — 장면 레이아웃
 
-한 Scene 안의 node, group, edge, annotation을 배치한 결과다. MVP의 모든 Scene은 5×5 Logical Grid로 node 위치를 지정하고 실제 크기와 연결선 경로는 빌드 단계에서 계산한다.
+한 Scene 안의 node와 edge를 배치한 결과다. MVP의 모든 Scene은 5×5 Logical Grid로 node 위치를 지정하고 실제 크기와 연결선 경로는 빌드 단계에서 계산한다.
 
 ### Logical Grid — 논리 격자
 
@@ -176,19 +176,13 @@ Concept: 캐시의 공통 원리
    └─ Occurrence: 검색 결과 캐시 node에서 실제로 등장
 ```
 
-### Relationship — 관계
+### Child Scene — 자식 Scene
 
-콘텐츠 사이의 연결 의미다. 모든 관계가 공간 중첩을 만들지는 않는다.
+Scene node의 `childSceneId`가 가리키는 중첩 Scene이다. 별도 Relationship 목록을 작성하지 않고 이 참조에서 부모·자식 공간 관계를 파생한다.
 
-- `contains`: 부모 node 안의 자식 Scene으로 확대되는 관계
-- `flows-to`: 데이터 이동 또는 실행 순서
-- `related`, `related-to`: 관련 지식 연결
-- `prerequisite`: 선수 지식 연결
-- `used-by`: 사용 관계
-- `uses-concept`: Scene의 Occurrence가 공통 Concept를 참조하는 관계
-- `implemented-by`: 특정 Occurrence의 구체 구현 Scene 연결
+### Edge — 연결선
 
-공간 배치는 `contains`와 부모·자식 관계를 중심으로 계산한다. 관련 지식 관계는 부모·자식 배치 대신 보조 연결선이나 이동 링크로 사용한다.
+Scene의 두 Topic 사이에 보이는 흐름이다. `from`, `to`, 선택적 `label`과 선 모양 힌트가 화면 연결선과 흐름 의미의 단일 원본이다.
 
 ## 상태 복원
 

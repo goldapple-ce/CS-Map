@@ -1,8 +1,6 @@
 import type {
   Scene,
-  SceneAnnotationElement,
   SceneEdgeElement,
-  SceneGroupElement,
   SceneNodeElement,
 } from "@/domain/content-types"
 import { sceneLayoutIndex } from "@/content/generated/scene-layout-index"
@@ -28,18 +26,17 @@ export type SceneLayout = {
   width: number
   height: number
   nodes: ReadonlyMap<string, LayoutBox>
-  groups: ReadonlyMap<string, LayoutBox>
   edges: ReadonlyMap<string, readonly LayoutPoint[]>
-  annotations: ReadonlyMap<string, LayoutBox>
 }
 
 export type SerializedSceneLayout = {
   width: number
   height: number
   nodes: Readonly<Record<string, LayoutBox>>
-  groups: Readonly<Record<string, LayoutBox>>
   edges: Readonly<Record<string, readonly LayoutPoint[]>>
-  annotations: Readonly<Record<string, LayoutBox>>
+  /** Legacy generated fields are ignored until the content index is rebuilt. */
+  groups?: Readonly<Record<string, LayoutBox>>
+  annotations?: Readonly<Record<string, LayoutBox>>
 }
 
 const generatedLayoutCache = new Map<string, SceneLayout>()
@@ -49,9 +46,7 @@ function deserializeSceneLayout(layout: SerializedSceneLayout): SceneLayout {
     width: layout.width,
     height: layout.height,
     nodes: new Map(Object.entries(layout.nodes)),
-    groups: new Map(Object.entries(layout.groups)),
     edges: new Map(Object.entries(layout.edges)),
-    annotations: new Map(Object.entries(layout.annotations)),
   }
 }
 
@@ -79,24 +74,27 @@ function calculateDepths(scene: Scene, nodes: readonly SceneNodeElement[]) {
   const outgoing = new Map<string, string[]>()
   const flowNodeIds = new Set<string>()
 
-  for (const relationship of scene.relationships) {
+  const edges = scene.elements.filter(
+    (element): element is SceneEdgeElement => element.kind === "edge"
+  )
+  for (const edge of edges) {
     if (
-      relationship.type !== "flows-to" ||
-      !nodeIds.has(relationship.fromElementId) ||
-      !nodeIds.has(relationship.toElementId) ||
-      relationship.fromElementId === relationship.toElementId
+      edge.variant === "supporting" ||
+      !nodeIds.has(edge.fromElementId) ||
+      !nodeIds.has(edge.toElementId) ||
+      edge.fromElementId === edge.toElementId
     ) {
       continue
     }
     incoming.set(
-      relationship.toElementId,
-      (incoming.get(relationship.toElementId) ?? 0) + 1
+      edge.toElementId,
+      (incoming.get(edge.toElementId) ?? 0) + 1
     )
-    flowNodeIds.add(relationship.fromElementId)
-    flowNodeIds.add(relationship.toElementId)
-    const targets = outgoing.get(relationship.fromElementId) ?? []
-    targets.push(relationship.toElementId)
-    outgoing.set(relationship.fromElementId, targets)
+    flowNodeIds.add(edge.fromElementId)
+    flowNodeIds.add(edge.toElementId)
+    const targets = outgoing.get(edge.fromElementId) ?? []
+    targets.push(edge.toElementId)
+    outgoing.set(edge.fromElementId, targets)
   }
 
   const roots = nodes.filter(
@@ -122,10 +120,9 @@ function calculateDepths(scene: Scene, nodes: readonly SceneNodeElement[]) {
     let changed = false
     for (const node of nodes) {
       if (depths.has(node.id)) continue
-      const targetDepths = scene.relationships.flatMap((relationship) =>
-        relationship.type === "supports" &&
-        relationship.fromElementId === node.id
-          ? [depths.get(relationship.toElementId)]
+      const targetDepths = edges.flatMap((edge) =>
+        edge.variant === "supporting" && edge.fromElementId === node.id
+          ? [depths.get(edge.toElementId)]
           : []
       )
       const resolvedDepths = targetDepths.filter(
@@ -140,26 +137,6 @@ function calculateDepths(scene: Scene, nodes: readonly SceneNodeElement[]) {
 
   for (const node of nodes) {
     if (!depths.has(node.id)) depths.set(node.id, 0)
-  }
-
-  for (const node of nodes) {
-    const hasFlow =
-      (incoming.get(node.id) ?? 0) > 0 ||
-      (outgoing.get(node.id)?.length ?? 0) > 0
-    if (hasFlow || !node.groupId) continue
-    const peerDepths = nodes.flatMap((peer) =>
-      peer.id !== node.id && peer.groupId === node.groupId
-        ? [depths.get(peer.id) ?? 0]
-        : []
-    )
-    if (peerDepths.length > 0) {
-      depths.set(
-        node.id,
-        Math.round(
-          peerDepths.reduce((sum, depth) => sum + depth, 0) / peerDepths.length
-        )
-      )
-    }
   }
 
   return depths
@@ -261,15 +238,8 @@ export function createSceneLayout(scene: Scene): SceneLayout {
   const nodes = scene.elements.filter(
     (element): element is SceneNodeElement => element.kind === "node"
   )
-  const groups = scene.elements.filter(
-    (element): element is SceneGroupElement => element.kind === "group"
-  )
   const edges = scene.elements.filter(
     (element): element is SceneEdgeElement => element.kind === "edge"
-  )
-  const annotations = scene.elements.filter(
-    (element): element is SceneAnnotationElement =>
-      element.kind === "annotation"
   )
   const depths = calculateDepths(scene, nodes)
   const maxDepth = Math.max(...depths.values(), 0)
@@ -350,26 +320,6 @@ export function createSceneLayout(scene: Scene): SceneLayout {
     columnX += layerWidth + (layerGaps[depth] ?? 0)
   })
 
-  const groupLayouts = new Map<string, LayoutBox>()
-  for (const group of groups) {
-    const memberBoxes = nodes.flatMap((node) => {
-      const box =
-        node.groupId === group.id ? nodeLayouts.get(node.id) : undefined
-      return box ? [box] : []
-    })
-    if (memberBoxes.length === 0) continue
-    const left = Math.min(...memberBoxes.map(({ x }) => x))
-    const top = Math.min(...memberBoxes.map(({ y }) => y))
-    const right = Math.max(...memberBoxes.map(({ x, width }) => x + width))
-    groupLayouts.set(group.id, {
-      x: left - 16,
-      y: top - 34,
-      width: right - left + 32,
-      height:
-        Math.max(...memberBoxes.map(({ y, height }) => y + height)) - top + 50,
-    })
-  }
-
   const edgeLayouts = new Map<string, readonly LayoutPoint[]>()
   const edgesByPair = new Map<string, SceneEdgeElement[]>()
   for (const edge of edges) {
@@ -405,22 +355,10 @@ export function createSceneLayout(scene: Scene): SceneLayout {
     }
   }
 
-  const annotationLayouts = new Map<string, LayoutBox>()
-  annotations.forEach((annotation, index) => {
-    annotationLayouts.set(annotation.id, {
-      x: HORIZONTAL_MARGIN,
-      y: sceneHeight - 54 - index * 34,
-      width: sceneWidth - HORIZONTAL_MARGIN * 2,
-      height: 28,
-    })
-  })
-
   return {
     width: sceneWidth,
     height: sceneHeight,
     nodes: nodeLayouts,
-    groups: groupLayouts,
     edges: edgeLayouts,
-    annotations: annotationLayouts,
   }
 }

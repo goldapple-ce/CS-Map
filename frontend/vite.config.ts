@@ -24,10 +24,12 @@ function contentHotReload(): Plugin {
     },
     async handleHotUpdate({ file, server }) {
       const contentDirectory = path.resolve(__dirname, "content")
-      const isContentYaml =
+      const isContentFile =
         file.startsWith(`${contentDirectory}${path.sep}`) &&
-        ["scene.yaml", "concept.yaml"].includes(path.basename(file))
-      if (!isContentYaml && !layoutSources.includes(file)) return
+        ["scene.yaml", "concept.yaml", "content.ko.md", "quiz.ko.yaml"].includes(
+          path.basename(file)
+        )
+      if (!isContentFile && !layoutSources.includes(file)) return
 
       rebuildQueue = rebuildQueue.catch(() => undefined).then(async () => {
         await execFileAsync(

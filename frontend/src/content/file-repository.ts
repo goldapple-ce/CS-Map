@@ -7,7 +7,12 @@ import type {
   LoadedConcept,
   LoadedScene,
 } from "@/content/repository"
-import { parseConcept, parseScene } from "@/content/schemas"
+import {
+  normalizeSceneDocument,
+  parseConcept,
+  parseSceneDocument,
+  parseSceneQuiz,
+} from "@/content/schemas"
 import type { ContentId } from "@/domain/content-types"
 
 type RawLoader = () => Promise<unknown>
@@ -27,6 +32,11 @@ const markdownModules = import.meta.glob(
   { query: "?raw", import: "default" }
 ) as Record<string, RawLoader>
 
+const quizModules = import.meta.glob("/content/scenes/**/quiz.ko.yaml", {
+  query: "?raw",
+  import: "default",
+}) as Record<string, RawLoader>
+
 async function loadRaw(modules: Record<string, RawLoader>, moduleKey: string) {
   const loader = modules[moduleKey]
   if (!loader) throw new Error(`Content module is not indexed: ${moduleKey}`)
@@ -40,6 +50,10 @@ async function loadRaw(modules: Record<string, RawLoader>, moduleKey: string) {
 function siblingModuleKey(moduleKey: string, contentRef: string) {
   const directory = moduleKey.slice(0, moduleKey.lastIndexOf("/") + 1)
   return `${directory}${contentRef}`
+}
+
+function markdownTitle(markdown: string) {
+  return markdown.match(/^#\s+(.+?)\s*$/m)?.[1]
 }
 
 export class FileContentRepository implements ContentRepository {
@@ -56,10 +70,28 @@ export class FileContentRepository implements ContentRepository {
     if (!entry) throw new Error(`Unknown scene: ${id}`)
 
     const raw = await loadRaw(sceneModules, entry.moduleKey)
-    const scene = parseScene(parse(raw))
     const markdown = await loadRaw(
       markdownModules,
-      siblingModuleKey(entry.moduleKey, scene.contentRef)
+      siblingModuleKey(entry.moduleKey, "content.ko.md")
+    )
+    const title = markdownTitle(markdown)
+    if (!title) throw new Error(`Scene Markdown requires a first H1: ${id}`)
+    const document = parseSceneDocument(parse(raw))
+    const quizKey = siblingModuleKey(entry.moduleKey, "quiz.ko.yaml")
+    const quizLoader = quizModules[quizKey]
+    const quiz = quizLoader
+      ? parseSceneQuiz(parse(await loadRaw(quizModules, quizKey)))
+      : undefined
+    const scene = normalizeSceneDocument(
+      document,
+      {
+        title,
+        slug: entry.slug,
+        scenarioId: entry.scenarioId,
+        ...(entry.parentId ? { parentId: entry.parentId } : {}),
+        status: entry.status,
+      },
+      quiz
     )
     return { scene, markdown }
   }
