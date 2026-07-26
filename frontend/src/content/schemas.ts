@@ -15,6 +15,7 @@ const contentRefSchema = z
 const statusSchema = z.enum(["draft", "review", "published", "planned"])
 
 const gridCoordinateSchema = z.number().int().min(1).max(5)
+const portSideSchema = z.enum(["top", "right", "bottom", "left"])
 
 const contributorSchema = z
   .object({ id: contentIdSchema, displayName: z.string().min(1) })
@@ -67,6 +68,8 @@ const sceneElementSchema = z.discriminatedUnion("kind", [
       fromElementId: contentIdSchema,
       toElementId: contentIdSchema,
       variant: z.enum(["flow", "supporting", "return"]).optional(),
+      fromSide: portSideSchema.optional(),
+      toSide: portSideSchema.optional(),
     })
     .strict(),
   z

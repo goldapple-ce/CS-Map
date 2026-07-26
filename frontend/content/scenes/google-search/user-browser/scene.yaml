@@ -53,37 +53,51 @@ elements:
     fromElementId: certificate-authority
     toElementId: browser
     variant: supporting
+    fromSide: bottom
+    toSide: top
   - id: ca-to-server
     kind: edge
     label: 인증서 서명·발급
     fromElementId: certificate-authority
     toElementId: server
     variant: supporting
+    fromSide: bottom
+    toSide: top
   - id: user-to-browser
     kind: edge
     label: google.com 입력
     fromElementId: user
     toElementId: browser
+    fromSide: right
+    toSide: left
   - id: browser-to-server-hello
     kind: edge
     label: ClientHello
     fromElementId: browser
     toElementId: server
+    fromSide: right
+    toSide: left
   - id: server-to-browser-certificate
     kind: edge
     label: 인증서 체인 제공
     fromElementId: server
     toElementId: browser
+    fromSide: left
+    toSide: right
   - id: browser-to-server-http
     kind: edge
     label: HTTP 요청
     fromElementId: browser
     toElementId: server
+    fromSide: right
+    toSide: left
   - id: server-to-browser-http
     kind: edge
     label: HTTP 응답
     fromElementId: server
     toElementId: browser
+    fromSide: left
+    toSide: right
 relationships:
   - {
       type: supports,

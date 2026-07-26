@@ -154,6 +154,57 @@ function rounded(value: number | undefined) {
   return Math.round((value ?? 0) * 100) / 100
 }
 
+type GridPortSide = NonNullable<SceneEdgeElement["fromSide"]>
+
+function portPosition(
+  width: number,
+  height: number,
+  side: GridPortSide,
+  index: number,
+  count: number
+) {
+  const ratio = (index + 1) / (count + 1)
+  if (side === "top") return { x: width * ratio, y: 0 }
+  if (side === "right") return { x: width, y: height * ratio }
+  if (side === "bottom") return { x: width * ratio, y: height }
+  return { x: 0, y: height * ratio }
+}
+
+function createHintedPorts(
+  node: SceneNodeElement,
+  box: { width: number; height: number },
+  edges: readonly SceneEdgeElement[]
+) {
+  const endpoints = edges.flatMap((edge) => {
+    const result: { id: string; side: GridPortSide }[] = []
+    if (edge.fromElementId === node.id && edge.fromSide) {
+      result.push({ id: `${edge.id}::source`, side: edge.fromSide })
+    }
+    if (edge.toElementId === node.id && edge.toSide) {
+      result.push({ id: `${edge.id}::target`, side: edge.toSide })
+    }
+    return result
+  })
+
+  return endpoints.map((endpoint) => {
+    const sameSide = endpoints.filter(({ side }) => side === endpoint.side)
+    const index = sameSide.findIndex(({ id }) => id === endpoint.id)
+    return {
+      id: endpoint.id,
+      ...portPosition(
+        box.width,
+        box.height,
+        endpoint.side,
+        index,
+        sameSide.length
+      ),
+      width: 0,
+      height: 0,
+      properties: { "elk.port.side": endpoint.side.toUpperCase() },
+    }
+  })
+}
+
 async function buildGridSceneLayout(
   scene: Scene,
   nodes: readonly SceneNodeElement[],
@@ -234,11 +285,20 @@ async function buildGridSceneLayout(
       y: 0,
       width: sceneWidth,
       height: sceneHeight,
-      children: nodes.map((node) => ({ id: node.id, ...nodeLayouts[node.id] })),
+      children: nodes.map((node) => {
+        const box = nodeLayouts[node.id]
+        return {
+          id: node.id,
+          ...box,
+          ports: createHintedPorts(node, box, edges),
+        }
+      }),
       edges: edges.map((edge) => ({
         id: edge.id,
-        sources: [edge.fromElementId],
-        targets: [edge.toElementId],
+        sources: [
+          edge.fromSide ? `${edge.id}::source` : edge.fromElementId,
+        ],
+        targets: [edge.toSide ? `${edge.id}::target` : edge.toElementId],
       })),
     },
     {

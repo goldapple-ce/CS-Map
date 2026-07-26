@@ -50,6 +50,8 @@ export type SceneEdgeElement = SceneElementBase & {
   fromElementId: ContentId
   toElementId: ContentId
   variant?: "flow" | "supporting" | "return"
+  fromSide?: "top" | "right" | "bottom" | "left"
+  toSide?: "top" | "right" | "bottom" | "left"
 }
 
 export type SceneAnnotationElement = SceneElementBase & {

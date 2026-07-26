@@ -466,6 +466,7 @@ type HistoryEntry = {
 - `SceneEdge`는 `label`이 있으면 edge 경로에서 가장 긴 선분의 중점을 선택해 보이는 라벨을 배치한다. 진행 edge는 추정 라벨 너비만큼 인접 열 간격을 확보하며 콘텐츠에는 라벨 좌표를 저장하지 않는다.
 - ELK edge router는 주요 흐름, 반환, 지원 관계별 port 방향을 사용하고 수평·수직 선분만 사용하는 직교 꺾은선을 계산한다. 각 edge는 별도 port를 가져 동일 Topic 사이의 여러 선도 접점과 lane을 공유하지 않는다.
 - 논리 격자 Scene은 고정 Topic 위치를 바꾸지 않는 libavoid router로 직교 edge를 계산한다. 노드 장애물 회피, 교차 비용과 평행 선분 nudging을 빌드 단계에서 적용하며 콘텐츠에는 접점과 bend point를 저장하지 않는다.
+- edge의 선택적 `fromSide`·`toSide`는 `top`·`right`·`bottom`·`left` 값을 사용한다. build adapter는 같은 면을 사용하는 edge별 port를 해당 면에 분산 생성하고 ELK JSON edge가 그 port를 참조하게 한다. 힌트가 없는 endpoint는 libavoid의 자동 pin 선택을 사용한다.
 - 출발과 도착 요소가 같은 self edge는 depth 계산에서 제외하고 해당 노드 위쪽을 돌아 다시 노드로 들어오는 loop 경로로 표시한다.
 - 동일한 두 Topic 사이에 edge가 여러 개 존재하면 격자 router가 평행 선분을 서로 밀어 별도 lane을 계산한다. 방향과 `flow`·`return`·`supporting` 시각 구분은 renderer가 유지한다.
 - `supports` 관계는 격자 위치를 바꾸지 않고 다른 edge와 함께 자동 routing하며 점선으로 표시한다.
