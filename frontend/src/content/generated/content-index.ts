@@ -96,36 +96,18 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "title": "Spring Container 초기화",
     "slug": "container",
     "scenarioId": "google-search-root",
-    "parentId": "google-com-server-spring-ecosystem",
+    "parentId": "google-com-server-spring",
     "status": "published",
-    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/container/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/container/scene.yaml"
   },
   {
     "id": "google-com-server-spring-mvc",
     "title": "Spring MVC 요청과 View 렌더링",
     "slug": "mvc",
     "scenarioId": "google-search-root",
-    "parentId": "google-com-server-spring-ecosystem",
-    "status": "published",
-    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/mvc/scene.yaml"
-  },
-  {
-    "id": "google-com-server-spring-ecosystem",
-    "title": "Spring 생태계의 요청 처리",
-    "slug": "ecosystem",
-    "scenarioId": "google-search-root",
     "parentId": "google-com-server-spring",
     "status": "published",
-    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/scene.yaml"
-  },
-  {
-    "id": "google-com-server-spring-security",
-    "title": "Spring Security 요청 흐름",
-    "slug": "security",
-    "scenarioId": "google-search-root",
-    "parentId": "google-com-server-spring-ecosystem",
-    "status": "published",
-    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/security/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/mvc/scene.yaml"
   },
   {
     "id": "google-com-server-spring",
@@ -135,6 +117,15 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
     "parentId": "google-com-server",
     "status": "published",
     "moduleKey": "/content/scenes/google-com/server/spring/scene.yaml"
+  },
+  {
+    "id": "google-com-server-spring-security",
+    "title": "Spring Security 요청 흐름",
+    "slug": "security",
+    "scenarioId": "google-search-root",
+    "parentId": "google-com-server-spring",
+    "status": "published",
+    "moduleKey": "/content/scenes/google-com/server/spring/security/scene.yaml"
   },
   {
     "id": "google-com-server-spring-tomcat",

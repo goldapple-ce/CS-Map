@@ -1,4 +1,5 @@
 id: google-search-dns-udp-query
+title: UDP DNS 질의
 summary: DNS 질의 메시지가 UDP datagram의 payload가 되어 IP 계층으로 전달되는 흐름입니다.
 nodes:
   dns-message:

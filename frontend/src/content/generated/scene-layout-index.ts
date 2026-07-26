@@ -1150,65 +1150,81 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
       ]
     }
   },
-  "google-com-server-spring-ecosystem": {
+  "google-com-server-spring": {
     "width": 1000,
     "height": 500,
     "nodes": {
+      "tomcat": {
+        "x": 35,
+        "y": 210,
+        "width": 130,
+        "height": 80
+      },
       "container": {
-        "x": 435,
-        "y": 10,
+        "x": 635,
+        "y": 110,
         "width": 130,
         "height": 80
       },
       "security": {
-        "x": 235,
+        "x": 435,
         "y": 210,
         "width": 130,
         "height": 80
       },
       "mvc": {
-        "x": 635,
+        "x": 835,
         "y": 210,
         "width": 130,
         "height": 80
       }
     },
     "edges": {
-      "edge-container-security-1": [
+      "edge-tomcat-security-1": [
         {
-          "x": 461,
-          "y": 90
-        },
-        {
-          "x": 461,
-          "y": 224
-        },
-        {
-          "x": 365,
-          "y": 224
-        }
-      ],
-      "edge-container-mvc-2": [
-        {
-          "x": 513,
-          "y": 90
-        },
-        {
-          "x": 513,
-          "y": 224
-        },
-        {
-          "x": 635,
-          "y": 224
-        }
-      ],
-      "edge-security-mvc-3": [
-        {
-          "x": 365,
+          "x": 165,
           "y": 242
         },
         {
+          "x": 435,
+          "y": 242
+        }
+      ],
+      "edge-container-security-2": [
+        {
           "x": 635,
+          "y": 150
+        },
+        {
+          "x": 500,
+          "y": 150
+        },
+        {
+          "x": 500,
+          "y": 210
+        }
+      ],
+      "edge-container-mvc-3": [
+        {
+          "x": 765,
+          "y": 150
+        },
+        {
+          "x": 900,
+          "y": 150
+        },
+        {
+          "x": 900,
+          "y": 210
+        }
+      ],
+      "edge-security-mvc-4": [
+        {
+          "x": 565,
+          "y": 242
+        },
+        {
+          "x": 835,
           "y": 242
         }
       ]
@@ -1328,36 +1344,6 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
         {
           "x": 861,
           "y": 290
-        }
-      ]
-    }
-  },
-  "google-com-server-spring": {
-    "width": 1000,
-    "height": 500,
-    "nodes": {
-      "tomcat": {
-        "x": 235,
-        "y": 210,
-        "width": 130,
-        "height": 80
-      },
-      "ecosystem": {
-        "x": 635,
-        "y": 210,
-        "width": 130,
-        "height": 80
-      }
-    },
-    "edges": {
-      "edge-tomcat-ecosystem-1": [
-        {
-          "x": 365,
-          "y": 242
-        },
-        {
-          "x": 635,
-          "y": 242
         }
       ]
     }

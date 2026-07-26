@@ -60,6 +60,7 @@ const sceneEdgeSchema = z
 export const sceneDocumentSchema = z
   .object({
     id: contentIdSchema,
+    title: z.string().min(1),
     summary: z.string().min(1),
     nodes: z.record(contentIdSchema, sceneNodeSchema),
     edges: z.array(sceneEdgeSchema).default([]),
@@ -111,7 +112,6 @@ export const sceneQuizSchema = z
 export type SceneDocument = z.infer<typeof sceneDocumentSchema>
 
 export type SceneDerivedMetadata = {
-  title: string
   slug: string
   scenarioId: string
   parentId?: string
@@ -132,6 +132,7 @@ export function normalizeSceneDocument(
 ): Scene {
   return {
     id: document.id,
+    title: document.title,
     ...metadata,
     status: "published",
     summary: document.summary,

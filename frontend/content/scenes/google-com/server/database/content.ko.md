@@ -1,5 +1,3 @@
-# Database 선택과 데이터 처리
-
 ## 개요
 
 Application Server는 데이터를 읽거나 변경하기 위해 Database를 사용할 수 있습니다. 이 Scene은 관계형 Database와 SQL, 그리고 NoSQL 중 문서형 Database를 대표 예시로 비교합니다.

@@ -101,40 +101,31 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "moduleKey": "/content/scenes/google-com/server/spring/scene.yaml"
   },
   {
-    "id": "google-com-server-spring-ecosystem",
-    "title": "Spring 생태계의 요청 처리",
-    "path": "/explore/google-com/server/spring/ecosystem",
+    "id": "google-com-server-spring-container",
+    "title": "Spring Container 초기화",
+    "path": "/explore/google-com/server/spring/container",
     "parentId": "google-com-server-spring",
     "order": 1,
     "status": "published",
-    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/scene.yaml"
-  },
-  {
-    "id": "google-com-server-spring-container",
-    "title": "Spring Container 초기화",
-    "path": "/explore/google-com/server/spring/ecosystem/container",
-    "parentId": "google-com-server-spring-ecosystem",
-    "order": 0,
-    "status": "published",
-    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/container/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/container/scene.yaml"
   },
   {
     "id": "google-com-server-spring-mvc",
     "title": "Spring MVC 요청과 View 렌더링",
-    "path": "/explore/google-com/server/spring/ecosystem/mvc",
-    "parentId": "google-com-server-spring-ecosystem",
-    "order": 2,
+    "path": "/explore/google-com/server/spring/mvc",
+    "parentId": "google-com-server-spring",
+    "order": 3,
     "status": "published",
-    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/mvc/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/mvc/scene.yaml"
   },
   {
     "id": "google-com-server-spring-security",
     "title": "Spring Security 요청 흐름",
-    "path": "/explore/google-com/server/spring/ecosystem/security",
-    "parentId": "google-com-server-spring-ecosystem",
-    "order": 1,
+    "path": "/explore/google-com/server/spring/security",
+    "parentId": "google-com-server-spring",
+    "order": 2,
     "status": "published",
-    "moduleKey": "/content/scenes/google-com/server/spring/ecosystem/security/scene.yaml"
+    "moduleKey": "/content/scenes/google-com/server/spring/security/scene.yaml"
   },
   {
     "id": "google-com-server-spring-tomcat",

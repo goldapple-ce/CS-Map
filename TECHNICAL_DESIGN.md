@@ -213,6 +213,7 @@ type ContentId = string;
 
 type SceneDocument = {
   id: ContentId;
+  title: string;
   summary: string;
   nodes: Record<ContentId, SceneNode>;
   edges: SceneEdge[];
@@ -241,9 +242,9 @@ type SelfCheckQuestion = {
 };
 ```
 
-런타임 `Scene`에는 Markdown H1에서 읽은 `title`, 디렉터리와 node 참조에서 파생한
+런타임 `Scene`에는 작성 YAML에서 읽은 `title`, 디렉터리와 node 참조에서 파생한
 `slug`, `parentId`, `scenarioId`, URL 순서, 그리고 renderer용 node·edge 배열이
-추가된다. 이 필드는 작성 YAML에 다시 저장하지 않는다. `childSceneId`는 런타임의
+추가된다. 파생 필드는 작성 YAML에 다시 저장하지 않는다. `childSceneId`는 런타임의
 중첩 대상 참조로, `navigateToSceneId`는 교차 탐색 참조로 정규화한다.
 
 Scene edge의 `flow`는 주요 진행 방향, `supporting`은 사전 준비나 지원 관계,
@@ -280,7 +281,7 @@ content/scenes/google-com/network/dns/
    └─ dns-query.svg
 ```
 
-`scene.yaml`은 `id`, `summary`, `nodes`, `edges`만 가진다. `content.ko.md`는 첫 H1의 표시 제목과 긴 설명을 가진다. 퀴즈가 있으면 같은 디렉터리에 질문·답변 배열인 `quiz.ko.yaml`을 둔다.
+`scene.yaml`은 `id`, `title`, `summary`, `nodes`, `edges`를 가진다. `title`은 Scene 표시 제목의 단일 원본이며 `content.ko.md`는 이를 H1으로 반복하지 않고 긴 설명만 가진다. 퀴즈가 있으면 같은 디렉터리에 질문·답변 배열인 `quiz.ko.yaml`을 둔다.
 
 루트 콘텐츠 디렉터리 이름은 canonical URL과 같은 `google-com`을 사용한다. 기존 `google-search-*` 영구 ID는 내부 참조를 깨뜨리지 않기 위해 유지한다. 새 하위 Scene은 의미에 맞는 ID를 사용하며, 기존 ID를 일괄 변경해야 할 필요가 생기면 별도의 migration으로 처리한다.
 

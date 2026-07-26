@@ -1,5 +1,3 @@
-# NGINX Reverse Proxy
-
 ## 개요
 
 NGINX는 외부 요청을 받은 뒤 설정된 주소의 upstream server로 요청을 전달하는 reverse proxy로 사용할 수 있습니다. `proxy_pass`는 전달할 server의 protocol과 주소, 선택적인 URI를 지정합니다.

@@ -1,5 +1,3 @@
-# Spring Container 초기화
-
 ## 개요
 
 Spring IoC Container는 설정 정보를 바탕으로 애플리케이션 객체인 Bean을 생성하고 설정하며 서로 연결합니다. `ApplicationContext`는 `BeanFactory` 기능을 포함하고 애플리케이션에서 주로 사용하는 Container 인터페이스입니다.

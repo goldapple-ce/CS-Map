@@ -1,5 +1,3 @@
-# Spring Security 요청 흐름
-
 ## 개요
 
 Spring Security의 Servlet 지원은 Servlet Filter를 기반으로 합니다. `FilterChainProxy`가 현재 요청에 적용할 `SecurityFilterChain`을 선택하고, 그 안의 Security Filter들이 정해진 순서로 요청을 검사합니다.

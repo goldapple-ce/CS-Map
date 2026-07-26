@@ -1,5 +1,3 @@
-# 일반적인 Server 요청 처리
-
 ## 개요
 
 이 Scene은 외부 요청이 `Proxy Server → Application Server → Database`로 이어지는 일반적인 웹 서비스 구성을 보여줍니다. 각 역할을 이해하기 위해 NGINX, Spring, SQL과 NoSQL을 구현 예시로 연결합니다.

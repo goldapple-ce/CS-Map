@@ -1,4 +1,5 @@
 id: google-com-server-database
+title: Database 선택과 데이터 처리
 summary: Application Server의 데이터 요청을 관계형 SQL 방식과 문서형 NoSQL 예시로 나누어 살펴봅니다.
 nodes:
   data-request:

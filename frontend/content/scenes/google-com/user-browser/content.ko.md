@@ -1,5 +1,3 @@
-# 사용자, 브라우저와 Server
-
 ## 개요
 
 Server는 실제 접속 전에 CA 계층을 통해 인증서를 서명·발급받습니다. 이후 사용자가 브라우저에 `google.com`을 입력하고 목적지까지의 네트워크 경로가 준비되면 브라우저는 HTTPS 통신을 위한 TLS handshake를 진행합니다. Server 인증과 handshake가 완료된 뒤 브라우저가 암호화된 HTTP 요청을 보내고 Server가 HTTP 응답을 반환합니다.

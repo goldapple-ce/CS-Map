@@ -1,5 +1,3 @@
-# Socket과 Kernel
-
 ## 개요
 
 Socket은 사용자 프로세스가 커널 네트워크 프로토콜을 사용하는 인터페이스입니다. Linux의 `socket(2)`는 통신 endpoint를 만들고 file descriptor를 반환하며, `SOCK_DGRAM`은 datagram 방식의 통신 의미를 선택합니다.

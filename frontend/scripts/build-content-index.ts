@@ -68,10 +68,6 @@ function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : String(error)
 }
 
-function markdownTitle(markdown: string) {
-  return markdown.match(/^#\s+(.+?)\s*$/m)?.[1]
-}
-
 async function loadOptionalQuiz(directory: string, errors: string[]) {
   const quizPath = path.join(directory, "quiz.ko.yaml")
   let source: string
@@ -107,7 +103,7 @@ async function prepareScenes(files: readonly ContentFile<SceneDocument>[]) {
 
   const metadataCache = new Map<string, SceneDerivedMetadata>()
   const resolving = new Set<string>()
-  const resolveMetadata = (document: SceneDocument, filePath: string, title: string): SceneDerivedMetadata => {
+  const resolveMetadata = (document: SceneDocument, filePath: string): SceneDerivedMetadata => {
     const cached = metadataCache.get(document.id)
     if (cached) return cached
     if (resolving.has(document.id)) throw new Error(`Child Scene cycle detected at ${document.id}`)
@@ -115,10 +111,9 @@ async function prepareScenes(files: readonly ContentFile<SceneDocument>[]) {
     const owner = ownerByChildId.get(document.id)
     const parentFile = owner ? documentsById.get(owner.parentId) : undefined
     const parentMetadata = parentFile
-      ? resolveMetadata(parentFile.value, parentFile.filePath, "")
+      ? resolveMetadata(parentFile.value, parentFile.filePath)
       : undefined
     const metadata: SceneDerivedMetadata = {
-      title,
       slug: owner?.nodeId ?? path.basename(path.dirname(filePath)),
       scenarioId: parentMetadata?.scenarioId ?? document.id,
       ...(owner ? { parentId: owner.parentId } : {}),
@@ -132,22 +127,16 @@ async function prepareScenes(files: readonly ContentFile<SceneDocument>[]) {
   for (const file of files) {
     const directory = path.dirname(file.filePath)
     const markdownPath = path.join(directory, "content.ko.md")
-    let markdown = ""
     try {
-      markdown = await readFile(markdownPath, "utf8")
+      await readFile(markdownPath, "utf8")
     } catch {
       errors.push(`${relative(file.filePath)}: missing Markdown content content.ko.md`)
       continue
     }
-    const title = markdownTitle(markdown)
-    if (!title) {
-      errors.push(`${relative(markdownPath)}: first H1 is required for the Scene title`)
-      continue
-    }
     const quiz = await loadOptionalQuiz(directory, errors)
     try {
-      const metadata = resolveMetadata(file.value, file.filePath, title)
-      prepared.push({ filePath: file.filePath, document: file.value, value: normalizeSceneDocument(file.value, { ...metadata, title }, quiz) })
+      const metadata = resolveMetadata(file.value, file.filePath)
+      prepared.push({ filePath: file.filePath, document: file.value, value: normalizeSceneDocument(file.value, metadata, quiz) })
     } catch (error) {
       errors.push(`${relative(file.filePath)}: ${errorMessage(error)}`)
     }

@@ -285,11 +285,12 @@ MVP의 루트 장면은 다음 질문에서 시작한다.
 Scene YAML은 최소한 다음 정보만 작성한다.
 
 - 영구적인 고유 ID
+- 현재 Scene의 표시 제목
 - 현재 장면의 한 문장 요약
 - node의 표시 이름, 5×5 논리 격자 위치와 선택적 자식 Scene 또는 교차 이동 참조
 - node 사이의 edge와 선택적 라벨·방향 힌트
 
-표시 제목은 같은 디렉터리의 `content.ko.md` 첫 H1에서 읽는다. URL, 부모, 자식 순서와 탐색 인덱스는 Scene 디렉터리, node key와 `childSceneId`에서 결정적으로 파생한다. 작성자, 검토 상태, 수정일과 구조화된 출처는 Scene YAML에 요구하지 않으며 필요한 참고 링크는 Markdown에 작성할 수 있다.
+표시 제목은 `scene.yaml`의 `title`을 단일 원본으로 사용한다. `content.ko.md`는 제목을 반복하지 않고 긴 설명만 작성한다. URL, 부모, 자식 순서와 탐색 인덱스는 Scene 디렉터리, node key와 `childSceneId`에서 결정적으로 파생한다. 작성자, 검토 상태, 수정일과 구조화된 출처는 Scene YAML에 요구하지 않으며 필요한 참고 링크는 Markdown에 작성할 수 있다.
 
 ### 9.2 설명 콘텐츠 구성
 
@@ -382,7 +383,7 @@ type SelfCheckQuestion = {
 - 의도하지 않은 부모-자식 순환 참조
 - 부모와 자식 관계의 불일치
 - 필수 필드 누락
-- Markdown 첫 H1 누락
+- Scene 제목과 Markdown 설명 파일 누락
 - 접근 불가능한 고립 장면
 
 ## 11. 기술 요구사항 및 MVP 기술 기준

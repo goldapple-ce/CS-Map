@@ -1,4 +1,5 @@
 id: google-com-server-nosql
+title: NoSQL 문서형 Database 예시
 summary: MongoDB를 예로 들어 field와 value로 구성된 document를 collection에 저장하고 index와 query로 찾는 흐름입니다.
 nodes:
   document-query:

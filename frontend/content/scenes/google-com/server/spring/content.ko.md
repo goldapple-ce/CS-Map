@@ -1,5 +1,3 @@
-# Spring 기반 애플리케이션
-
 ## 개요
 
 이 Scene은 Tomcat이 HTTP 요청을 Servlet 요청으로 처리한 뒤 Spring 기반 애플리케이션으로 전달하는 일반적인 구성을 보여줍니다. Tomcat과 Spring 생태계를 각각 선택하면 요청이 내부에서 어디로 이어지는지 더 자세히 볼 수 있습니다.

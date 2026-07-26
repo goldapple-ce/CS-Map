@@ -1,5 +1,3 @@
-# SQL과 관계형 데이터 처리
-
 ## 개요
 
 관계형 Database는 데이터를 주로 table의 row와 column으로 구성하고 SQL로 정의·조회·변경합니다. PostgreSQL은 관계형 개념과 SQL을 학습하기 위한 구체적인 제품 예시입니다.

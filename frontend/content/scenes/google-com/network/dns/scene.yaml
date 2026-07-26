@@ -1,4 +1,5 @@
 id: google-search-dns
+title: DNS 이름 확인
 summary: 캐시와 재귀 Resolver를 거쳐 Root, .com TLD, 권한 DNS의 안내를 따라 google.com의 주소를 얻는 흐름입니다.
 nodes:
   browser-os-cache:

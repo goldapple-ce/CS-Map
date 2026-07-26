@@ -52,10 +52,6 @@ function siblingModuleKey(moduleKey: string, contentRef: string) {
   return `${directory}${contentRef}`
 }
 
-function markdownTitle(markdown: string) {
-  return markdown.match(/^#\s+(.+?)\s*$/m)?.[1]
-}
-
 export class FileContentRepository implements ContentRepository {
   listRoutes() {
     return routeIndex
@@ -74,8 +70,6 @@ export class FileContentRepository implements ContentRepository {
       markdownModules,
       siblingModuleKey(entry.moduleKey, "content.ko.md")
     )
-    const title = markdownTitle(markdown)
-    if (!title) throw new Error(`Scene Markdown requires a first H1: ${id}`)
     const document = parseSceneDocument(parse(raw))
     const quizKey = siblingModuleKey(entry.moduleKey, "quiz.ko.yaml")
     const quizLoader = quizModules[quizKey]
@@ -85,7 +79,6 @@ export class FileContentRepository implements ContentRepository {
     const scene = normalizeSceneDocument(
       document,
       {
-        title,
         slug: entry.slug,
         scenarioId: entry.scenarioId,
         ...(entry.parentId ? { parentId: entry.parentId } : {}),

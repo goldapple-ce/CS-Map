@@ -1,4 +1,5 @@
 id: google-com-server
+title: 일반적인 Server 요청 처리
 summary: Proxy Server가 요청을 받아 Application Server로 전달하고, 필요한 데이터는 Database에서 조회하는 학습용 흐름입니다.
 nodes:
   nginx:

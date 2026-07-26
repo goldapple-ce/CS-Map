@@ -1,4 +1,5 @@
 id: google-com-user-browser
+title: 사용자, 브라우저와 Server
 summary: CA의 인증서 서명·발급과 브라우저의 신뢰 기준을 바탕으로 Server 인증 후 HTTP 요청과 응답을 주고받는 흐름입니다.
 nodes:
   certificate-authority:

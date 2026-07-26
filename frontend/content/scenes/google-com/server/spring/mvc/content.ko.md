@@ -1,5 +1,3 @@
-# Spring MVC 요청과 View 렌더링
-
 ## 개요
 
 Spring MVC는 `DispatcherServlet`을 front controller로 사용합니다. `DispatcherServlet`이 handler 조회, Controller 실행과 View 선택을 직접 수행하는 대신 `HandlerMapping`, `HandlerAdapter`, `ViewResolver`에 각 역할을 위임하고 전체 순서를 조정합니다.

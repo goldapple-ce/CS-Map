@@ -1,17 +1,45 @@
 id: google-com-server-spring
+title: Spring 기반 애플리케이션
 summary: Tomcat이 Servlet 요청을 처리해 Spring 생태계로 전달하는 일반적인 Spring 웹 애플리케이션 구조입니다.
 nodes:
   tomcat:
     label: Tomcat
     row: 3
-    col: 2
+    col: 1
     childSceneId: google-com-server-spring-tomcat
-  ecosystem:
-    label: Spring 생태계
-    row: 3
+  container:
+    label: Spring Container
+    row: 2
     col: 4
-    childSceneId: google-com-server-spring-ecosystem
+    childSceneId: google-com-server-spring-container
+  security:
+    label: Spring Security
+    row: 3
+    col: 3
+    childSceneId: google-com-server-spring-security
+  mvc:
+    label: Spring MVC
+    row: 3
+    col: 5
+    childSceneId: google-com-server-spring-mvc
+
 edges:
   - from: tomcat
-    to: ecosystem
+    to: security
     label: Servlet 요청 전달
+
+  - from: container
+    to: security
+    label: Security Bean 제공
+    variant: supporting
+    fromSide: left
+    toSide: top
+  - from: container
+    fromSide: right
+    to: mvc
+    toSide: top
+    label: MVC Bean 제공
+    variant: supporting
+  - from: security
+    to: mvc
+    label: 허용된 요청 전달

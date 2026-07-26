@@ -1,5 +1,3 @@
-# UDP DNS 질의
-
 ## 개요
 
 Resolver가 만든 DNS 메시지는 UDP를 사용할 때 하나의 datagram payload로 전달됩니다. 이 장면은 DNS 메시지가 Socket API, UDP와 IP 계층을 거쳐 이름 서버의 UDP 53번 port를 향하는 흐름을 보여줍니다.

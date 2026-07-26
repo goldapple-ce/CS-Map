@@ -1,5 +1,3 @@
-# NoSQL 문서형 Database 예시
-
 ## 개요
 
 NoSQL은 관계형 table 모델 이외의 여러 데이터 모델을 묶어 부르는 넓은 표현입니다. 이 Scene은 그중 MongoDB 같은 문서형 Database를 예로 들어 BSON document의 저장과 조회를 설명합니다.

@@ -1,4 +1,5 @@
 id: google-com-server-spring-security
+title: Spring Security 요청 흐름
 summary: Servlet FilterChain에서 Spring Security의 FilterChainProxy와 SecurityFilterChain을 거쳐 허용된 요청이 DispatcherServlet로 전달되는 흐름입니다.
 nodes:
   servlet-filter-chain:

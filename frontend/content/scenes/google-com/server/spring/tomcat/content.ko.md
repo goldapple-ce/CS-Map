@@ -1,5 +1,3 @@
-# Tomcat 요청 전달
-
 ## 개요
 
 Tomcat은 HTTP 요청을 받은 뒤 protocol 처리와 Servlet Container의 요청 pipeline을 거쳐 애플리케이션의 Filter와 Servlet로 전달합니다. 이 Scene은 Spring MVC의 `DispatcherServlet`에 도달하는 지점까지만 표시합니다.
