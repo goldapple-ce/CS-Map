@@ -6,7 +6,7 @@ title: NoSQL 문서형 Database 예시
 summary: MongoDB를 예로 들어 field와 value로 구성된 document를 collection에 저장하고 index와 query로 찾는 흐름입니다.
 status: published
 ariaLabel: 문서 query, collection과 index, BSON document 처리와 document 결과로 이어지는 문서형 Database 예시
-layoutHint: horizontal
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
 updatedAt: 2026-07-25
@@ -24,15 +24,19 @@ elements:
   - id: document-query
     kind: node
     label: Document Query
+    grid: { row: 3, col: 1 }
   - id: collection-index
     kind: node
     label: Collection / Index
+    grid: { row: 3, col: 2 }
   - id: bson-document
     kind: node
     label: BSON Document
+    grid: { row: 3, col: 4 }
   - id: document-result
     kind: node
     label: Document 결과
+    grid: { row: 3, col: 5 }
   - id: nosql-scope-note
     kind: annotation
     label: 이 흐름은 NoSQL 전체가 아니라 MongoDB 같은 문서형 Database의 대표 예시입니다.

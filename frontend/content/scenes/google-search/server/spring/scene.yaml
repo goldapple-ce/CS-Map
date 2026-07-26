@@ -6,7 +6,7 @@ title: Spring 기반 애플리케이션
 summary: Tomcat이 Servlet 요청을 처리해 Spring 생태계로 전달하는 일반적인 Spring 웹 애플리케이션 구조입니다.
 status: published
 ariaLabel: Tomcat Servlet Container에서 Spring 생태계로 요청이 전달되는 Spring 기반 애플리케이션 학습 구조
-layoutHint: horizontal
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
 updatedAt: 2026-07-26
@@ -27,11 +27,13 @@ elements:
   - id: tomcat
     kind: node
     label: Tomcat
+    grid: { row: 3, col: 2 }
     status: published
     targetSceneId: google-com-server-spring-tomcat
   - id: spring-ecosystem
     kind: node
     label: Spring 생태계
+    grid: { row: 3, col: 4 }
     status: published
     targetSceneId: google-com-server-spring-ecosystem
   - id: spring-scope-note

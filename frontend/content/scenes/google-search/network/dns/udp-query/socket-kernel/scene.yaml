@@ -6,7 +6,7 @@ title: Socket과 Kernel
 summary: 사용자 프로세스가 Socket API로 UDP 전송을 요청하고 커널 네트워크 스택이 datagram을 처리하는 경계입니다.
 status: published
 ariaLabel: 사용자 프로세스의 socket file descriptor와 전송 system call이 커널 socket 계층, UDP, IP와 네트워크 드라이버로 이어지는 흐름
-layoutHint: horizontal
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
 updatedAt: 2026-07-24
@@ -43,32 +43,39 @@ elements:
   - id: resolver-process
     kind: node
     label: Resolver 코드
+    grid: { row: 3, col: 1 }
     groupId: process-group
   - id: socket-descriptor
     kind: node
     label: Socket file descriptor
+    grid: { row: 3, col: 2 }
     groupId: process-group
   - id: send-system-call
     kind: node
     label: 전송 System Call
+    grid: { row: 3, col: 3 }
     groupId: process-group
     status: planned
   - id: kernel-socket-layer
     kind: node
     label: Kernel Socket 계층
+    grid: { row: 1, col: 4 }
     groupId: kernel-group
   - id: udp-layer
     kind: node
     label: UDP 계층
+    grid: { row: 3, col: 4 }
     groupId: kernel-group
   - id: ip-layer
     kind: node
     label: IP 계층
+    grid: { row: 5, col: 4 }
     groupId: kernel-group
     status: planned
   - id: network-driver
     kind: node
     label: Network Driver
+    grid: { row: 3, col: 5 }
     groupId: kernel-group
     status: planned
   - id: socket-note

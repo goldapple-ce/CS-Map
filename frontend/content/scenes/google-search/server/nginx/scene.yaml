@@ -6,7 +6,7 @@ title: NGINX Reverse Proxy
 summary: NGINX가 HTTP 요청을 받고 설정에 따라 upstream Application Server로 전달하는 일반적인 reverse proxy 흐름입니다.
 status: published
 ariaLabel: HTTP 요청 수신, location 규칙 확인, upstream 선택, proxy pass와 응답 전달로 이어지는 NGINX reverse proxy 예시
-layoutHint: horizontal
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
 updatedAt: 2026-07-25
@@ -24,18 +24,23 @@ elements:
   - id: http-request
     kind: node
     label: HTTP 요청 수신
+    grid: { row: 3, col: 1 }
   - id: location-match
     kind: node
     label: Location 규칙 확인
+    grid: { row: 3, col: 2 }
   - id: upstream-selection
     kind: node
     label: Upstream 선택
+    grid: { row: 3, col: 3 }
   - id: proxy-pass
     kind: node
     label: proxy_pass 전달
+    grid: { row: 3, col: 4 }
   - id: upstream-response
     kind: node
     label: 응답 전달
+    grid: { row: 3, col: 5 }
   - id: request-to-location
     kind: edge
     label: URI 확인

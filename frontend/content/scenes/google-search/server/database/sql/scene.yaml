@@ -6,7 +6,7 @@ title: SQL과 관계형 데이터 처리
 summary: SQL query가 해석되고 table과 index를 이용해 row를 찾은 뒤 transaction과 constraint 아래 결과를 반환하는 흐름입니다.
 status: published
 ariaLabel: SQL query, parse와 plan, table과 index 접근, transaction과 constraint, row 결과로 이어지는 관계형 데이터 처리 흐름
-layoutHint: horizontal
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
 updatedAt: 2026-07-25
@@ -24,18 +24,23 @@ elements:
   - id: sql-query
     kind: node
     label: SQL Query
+    grid: { row: 3, col: 1 }
   - id: parse-plan
     kind: node
     label: Parse / Plan
+    grid: { row: 3, col: 2 }
   - id: table-index
     kind: node
     label: Table / Index
+    grid: { row: 3, col: 3 }
   - id: transaction-constraint
     kind: node
     label: Transaction / Constraint
+    grid: { row: 3, col: 4 }
   - id: row-result
     kind: node
     label: Row 결과
+    grid: { row: 3, col: 5 }
   - id: query-to-plan
     kind: edge
     label: 구문·실행 계획

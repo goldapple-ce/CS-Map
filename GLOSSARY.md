@@ -54,7 +54,7 @@ Scene의 부모·자식 관계와 각 Scene 내부 레이아웃을 이용해 모
 
 ### Scene Layout — 장면 레이아웃
 
-한 Scene 안의 node, group, edge, annotation을 배치한 결과다. 기본적으로 콘텐츠 순서, 관계와 `layoutHint`를 바탕으로 계산하며, 정밀한 구성이 필요한 Scene은 5×5 Logical Grid를 사용할 수 있다.
+한 Scene 안의 node, group, edge, annotation을 배치한 결과다. MVP의 모든 Scene은 5×5 Logical Grid로 node 위치를 지정하고 실제 크기와 연결선 경로는 빌드 단계에서 계산한다.
 
 ### Logical Grid — 논리 격자
 

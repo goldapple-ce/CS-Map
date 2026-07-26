@@ -6,7 +6,7 @@ title: 일반적인 Server 요청 처리
 summary: Proxy Server가 요청을 받아 Application Server로 전달하고, 필요한 데이터는 Database에서 조회하는 학습용 흐름입니다.
 status: published
 ariaLabel: Proxy Server에서 Application Server와 Database로 이어지는 일반적인 서버 요청 처리 예시
-layoutHint: horizontal
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author:
   id: cs-map-team
@@ -29,16 +29,19 @@ elements:
   - id: proxy-server
     kind: node
     label: Proxy Server
+    grid: { row: 3, col: 1 }
     status: published
     targetSceneId: google-com-server-nginx
   - id: spring
     kind: node
     label: Spring
+    grid: { row: 3, col: 3 }
     status: published
     targetSceneId: google-com-server-spring
   - id: database
     kind: node
     label: Database
+    grid: { row: 3, col: 5 }
     status: published
     targetSceneId: google-com-server-database
   - id: architecture-note

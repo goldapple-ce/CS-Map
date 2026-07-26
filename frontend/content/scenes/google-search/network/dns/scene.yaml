@@ -6,7 +6,7 @@ title: DNS 이름 확인
 summary: 캐시와 재귀 Resolver를 거쳐 Root, .com TLD, 권한 DNS의 안내를 따라 google.com의 주소를 얻는 흐름입니다.
 status: published
 ariaLabel: 브라우저와 운영체제 캐시, 재귀 Resolver, DNS 질의 전송, Root DNS, com TLD DNS, 권한 DNS와 IP 응답으로 이어지는 흐름
-layoutHint: horizontal
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author:
   id: cs-map-team
@@ -29,26 +29,33 @@ elements:
   - id: browser-os-cache
     kind: node
     label: 브라우저 / OS 캐시
+    grid: { row: 3, col: 1 }
   - id: recursive-resolver
     kind: node
     label: 로컬 / 재귀 DNS
+    grid: { row: 3, col: 2 }
   - id: dns-query-transport
     kind: node
     label: DNS 질의 전송
+    grid: { row: 3, col: 3 }
     status: published
     targetSceneId: google-search-dns-udp-query
   - id: root-dns
     kind: node
     label: Root DNS
+    grid: { row: 1, col: 4 }
   - id: com-tld-dns
     kind: node
     label: .com TLD DNS
+    grid: { row: 3, col: 4 }
   - id: authoritative-dns
     kind: node
     label: 권한 DNS
+    grid: { row: 5, col: 4 }
   - id: ip-response
     kind: node
     label: IP 주소 응답
+    grid: { row: 3, col: 5 }
   - id: referral-note
     kind: annotation
     label: Root와 .com TLD DNS는 보통 최종 IP가 아니라 다음으로 질의할 권한 DNS의 위치를 안내합니다.

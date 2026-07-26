@@ -6,7 +6,7 @@ title: UDP DNS 질의
 summary: DNS 질의 메시지가 UDP datagram의 payload가 되어 IP 계층으로 전달되는 흐름입니다.
 status: published
 ariaLabel: DNS 질의 메시지가 Socket API, UDP datagram, IP 계층과 네트워크 인터페이스를 거쳐 이름 서버로 전송되는 흐름
-layoutHint: horizontal
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
 updatedAt: 2026-07-24
@@ -43,30 +43,36 @@ elements:
   - id: dns-message
     kind: node
     label: DNS 질의 메시지
+    grid: { row: 3, col: 1 }
     groupId: user-space-group
   - id: socket-kernel
     kind: node
     label: Socket API와 Kernel
+    grid: { row: 3, col: 2 }
     groupId: user-space-group
     status: published
     targetSceneId: google-search-dns-socket-kernel
   - id: udp-datagram
     kind: node
     label: UDP Datagram
+    grid: { row: 3, col: 3 }
     groupId: kernel-network-group
   - id: ip-packet
     kind: node
     label: IP Packet
+    grid: { row: 3, col: 4 }
     groupId: kernel-network-group
     status: planned
   - id: network-interface
     kind: node
     label: 네트워크 인터페이스
+    grid: { row: 2, col: 5 }
     groupId: kernel-network-group
     status: planned
   - id: dns-server-port
     kind: node
     label: 이름 서버 UDP 53
+    grid: { row: 4, col: 5 }
     groupId: kernel-network-group
   - id: udp-note
     kind: annotation

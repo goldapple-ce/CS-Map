@@ -139,6 +139,7 @@ Proxy Server → Application Server → Database
 - [x] 빌드 시 ELK 자동 배치를 도입해 Topic 위치·직교 edge 경로·edge별 접점을 함께 계산하고 기존 수동 경로 계산은 fallback으로 유지한다.
 - [x] 정밀 Scene용 5×5 논리 격자와 고정 Topic 장애물을 피하는 직교 edge routing을 추가하고 Spring MVC 배치를 격자로 전환한다.
 - [x] 논리 격자 필드를 `row`·`col`로 정리하고 콘텐츠 YAML 저장 시 배치 인덱스를 재생성해 개발 화면을 자동 갱신한다.
+- [x] 현재 MVP의 모든 Scene을 5×5 논리 격자로 전환하고 긴 순차 흐름과 분기를 같은 열의 여러 행에 재배치한다.
 
 ### 4단계 — 연결 정리와 사용자 확인
 

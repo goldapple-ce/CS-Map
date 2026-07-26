@@ -6,7 +6,7 @@ title: 사용자와 브라우저
 summary: CA의 인증서 서명·발급과 브라우저의 신뢰 기준을 바탕으로 Server 인증 후 HTTP 요청과 응답을 주고받는 흐름입니다.
 status: published
 ariaLabel: 브라우저 위의 CA가 브라우저 신뢰 기준과 Server 인증서 발급에 연결되고 사용자, 브라우저와 Server가 TLS 및 HTTP 메시지를 주고받는 흐름
-layoutHint: branch
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author:
   id: cs-map-team
@@ -29,15 +29,19 @@ elements:
   - id: certificate-authority
     kind: node
     label: CA (인증기관)
+    grid: { row: 1, col: 4 }
   - id: user
     kind: node
     label: 사용자
+    grid: { row: 3, col: 1 }
   - id: browser
     kind: node
     label: 브라우저
+    grid: { row: 3, col: 3 }
   - id: server
     kind: node
     label: Server
+    grid: { row: 3, col: 5 }
     status: published
     navigateToSceneId: google-com-server
   - id: trust-context-note

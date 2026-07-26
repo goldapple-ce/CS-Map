@@ -6,7 +6,7 @@ title: Database 선택과 데이터 처리
 summary: Application Server의 데이터 요청을 관계형 SQL 방식과 문서형 NoSQL 예시로 나누어 살펴봅니다.
 status: published
 ariaLabel: 애플리케이션 데이터 요청이 SQL 또는 문서형 NoSQL 저장 방식으로 나뉘어 결과로 이어지는 비교 흐름
-layoutHint: branch
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
 updatedAt: 2026-07-25
@@ -24,19 +24,23 @@ elements:
   - id: data-request
     kind: node
     label: 데이터 요청
+    grid: { row: 3, col: 1 }
   - id: sql-database
     kind: node
     label: SQL / 관계형 DB
+    grid: { row: 2, col: 3 }
     status: published
     targetSceneId: google-com-server-sql
   - id: nosql-database
     kind: node
     label: NoSQL / 문서형 예시
+    grid: { row: 4, col: 3 }
     status: published
     targetSceneId: google-com-server-nosql
   - id: data-result
     kind: node
     label: 데이터 결과
+    grid: { row: 3, col: 5 }
   - id: scope-note
     kind: annotation
     label: NoSQL은 여러 모델을 포함하며, 이 Scene에서는 MongoDB 같은 문서형 Database를 대표 예시로 사용합니다.

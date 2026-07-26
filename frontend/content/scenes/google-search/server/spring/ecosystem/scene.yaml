@@ -6,7 +6,7 @@ title: Spring 생태계의 요청 처리
 summary: Spring Security가 요청을 검사하고 Spring MVC로 전달하며 Spring Container가 두 영역의 Bean을 생성하고 연결하는 구조입니다.
 status: published
 ariaLabel: 위쪽 Spring Container가 Spring Security와 Spring MVC를 지원하고 Spring Security에서 Spring MVC로 요청이 이어지는 구조
-layoutHint: branch
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
 updatedAt: 2026-07-26
@@ -27,16 +27,19 @@ elements:
   - id: spring-container
     kind: node
     label: Spring Container
+    grid: { row: 1, col: 3 }
     status: published
     targetSceneId: google-com-server-spring-container
   - id: spring-security
     kind: node
     label: Spring Security
+    grid: { row: 3, col: 2 }
     status: published
     targetSceneId: google-com-server-spring-security
   - id: spring-mvc
     kind: node
     label: Spring MVC
+    grid: { row: 3, col: 4 }
     status: published
     targetSceneId: google-com-server-spring-mvc
   - id: container-to-security

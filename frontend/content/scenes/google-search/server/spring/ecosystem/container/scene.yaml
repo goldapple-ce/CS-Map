@@ -6,7 +6,7 @@ title: Spring Container 초기화
 summary: ApplicationContext가 설정 정보를 읽고 BeanDefinition을 등록한 뒤 Bean을 생성하고 의존성을 연결하는 애플리케이션 시작 흐름입니다.
 status: published
 ariaLabel: 설정 정보, BeanDefinition 등록, ApplicationContext 초기화, Bean 생성, 의존성 주입, 초기화 callback과 사용 가능한 Bean으로 이어지는 흐름
-layoutHint: horizontal
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
 updatedAt: 2026-07-26
@@ -27,24 +27,31 @@ elements:
   - id: configuration-metadata
     kind: node
     label: 설정 정보
+    grid: { row: 3, col: 1 }
   - id: bean-definition
     kind: node
     label: BeanDefinition 등록
+    grid: { row: 3, col: 2 }
   - id: application-context
     kind: node
     label: ApplicationContext 초기화
+    grid: { row: 3, col: 3 }
   - id: bean-creation
     kind: node
     label: Bean 생성
+    grid: { row: 1, col: 4 }
   - id: dependency-injection
     kind: node
     label: 의존성 주입
+    grid: { row: 3, col: 4 }
   - id: initialization-callback
     kind: node
     label: 초기화 Callback
+    grid: { row: 5, col: 4 }
   - id: ready-beans
     kind: node
     label: 사용 가능한 Bean
+    grid: { row: 3, col: 5 }
   - id: metadata-to-definition
     kind: edge
     label: 구성 해석

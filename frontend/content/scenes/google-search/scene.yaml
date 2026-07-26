@@ -5,7 +5,7 @@ title: google.com 접속
 summary: 브라우저 주소창에 google.com을 입력한 뒤 이름 확인과 네트워크 경로를 거쳐 서버에 도달하는 주요 학습 흐름입니다.
 status: published
 ariaLabel: 사용자와 브라우저에서 DNS, Router, Server로 이어지는 google.com 접속 학습 흐름
-layoutHint: horizontal
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author:
   id: cs-map-team
@@ -25,21 +25,25 @@ elements:
   - id: user-browser
     kind: node
     label: 사용자 / 브라우저
+    grid: { row: 3, col: 1 }
     status: published
     targetSceneId: google-com-user-browser
   - id: dns
     kind: node
     label: DNS
+    grid: { row: 3, col: 2 }
     status: published
     targetSceneId: google-search-dns
   - id: router
     kind: node
     label: Router
+    grid: { row: 3, col: 4 }
     status: published
     targetSceneId: google-search-network
   - id: server
     kind: node
     label: Server
+    grid: { row: 3, col: 5 }
     status: published
     targetSceneId: google-com-server
   - id: user-to-dns

@@ -30,7 +30,7 @@
 | UI 원시 컴포넌트 | shadcn/ui                                   | 접근 가능한 UI 기반과 의미 기반 theme token 제공                      |
 | variant          | class-variance-authority                    | 노드와 패널의 반복 상태를 중앙화                                      |
 | 장면 렌더링      | SVG + HTML overlay                          | 선·도형과 접근 가능한 텍스트·버튼을 함께 처리                         |
-| 장면 배치        | ELK layered + 5×5 논리 격자 (빌드 시 실행) | 일반 Scene 자동 배치와 정밀 Scene의 제한된 위치 제어를 함께 제공      |
+| 장면 배치        | 5×5 논리 격자 (빌드 시 실행)               | 모든 MVP Scene의 Topic 위치를 제한된 셀 안에서 예측 가능하게 제어     |
 | 격자 edge routing | elkjs-libavoid (빌드 시 실행)               | 고정 Topic을 움직이지 않고 직교 edge의 장애물 회피와 lane 분리를 계산 |
 | 전환             | CSS transform 우선, 필요 시 Motion          | 프로토타입은 단순하게 시작하고 shared layout 전환을 선택적으로 사용   |
 | 상태 관리        | 명시적 reducer + 얇은 store adapter         | 탐색 상태 머신을 라이브러리와 분리                                    |
@@ -457,21 +457,21 @@ type HistoryEntry = {
 - 각 하위 장면은 부모의 확대 대상 노드 영역 안에 로컬 좌표계로 중첩된다.
 - SVG는 연결선과 도형을 담당한다.
 - 클릭 가능한 텍스트·버튼은 SVG 접근 가능 요소 또는 위치가 동기화된 HTML overlay로 표현한다.
-- 장면 데이터는 픽셀 좌표를 저장하지 않는다. 일반 Scene은 노드 순서, 그룹 소속과 관계로 자동 배치하고, 정밀한 Scene은 node마다 1~5 범위의 5×5 논리 격자 셀을 저장할 수 있다.
+- 장면 데이터는 픽셀 좌표를 저장하지 않는다. 모든 MVP Scene은 node마다 1~5 범위의 5×5 논리 격자 셀을 저장한다.
 - 논리 격자 스키마는 모든 node의 셀 지정, 좌표 범위와 셀 중복을 검증한다. 셀 번호를 실제 좌표로 투영할 때 노드 라벨 너비, 공통 행·열 간격과 주석 영역을 반영해 Scene bounds를 결정한다.
 - 논리 격자 node는 `grid: { row, col }`을 사용한다. `row`는 세로 셀, `col`은 가로 셀이며 둘 다 1~5 범위다.
-- 콘텐츠 빌드 단계의 ELK layered adapter가 로컬 Topic 좌표, 직교 edge 경로와 edge별 port를 결정적으로 계산하고 `scene-layout-index.ts`를 생성한다.
-- ELK adapter는 renderer 계층에만 속하며 Scene·Relationship 도메인 모델을 ELK 타입에 결합하지 않는다. 런타임 renderer는 생성 인덱스를 읽고, 인덱스가 없는 개발·복구 상황에서만 기존 결정적 배치를 fallback으로 사용한다.
+- 콘텐츠 빌드 단계의 Scene layout adapter가 논리 격자를 로컬 Topic 좌표로 투영하고 직교 edge 경로를 계산해 `scene-layout-index.ts`를 생성한다.
+- 기존 ELK layered adapter는 격자가 없는 이전 콘텐츠를 위한 fallback으로만 남기며 Scene·Relationship 도메인 모델을 ELK 타입에 결합하지 않는다. 런타임 renderer는 생성 인덱스를 읽고, 인덱스가 없는 개발·복구 상황에서만 기존 결정적 배치를 fallback으로 사용한다.
 - 생성된 로컬 Scene 배치를 기존 재귀 월드 배치가 조합해 월드 bounds와 자식 Scene 중첩 영역을 계산하므로 카메라, URL과 Semantic Zoom 상태 모델은 바뀌지 않는다.
 - `SceneEdge`는 `label`이 있으면 edge 경로에서 가장 긴 선분의 중점을 선택해 보이는 라벨을 배치한다. 진행 edge는 추정 라벨 너비만큼 인접 열 간격을 확보하며 콘텐츠에는 라벨 좌표를 저장하지 않는다.
 - ELK edge router는 주요 흐름, 반환, 지원 관계별 port 방향을 사용하고 수평·수직 선분만 사용하는 직교 꺾은선을 계산한다. 각 edge는 별도 port를 가져 동일 Topic 사이의 여러 선도 접점과 lane을 공유하지 않는다.
 - 논리 격자 Scene은 고정 Topic 위치를 바꾸지 않는 libavoid router로 직교 edge를 계산한다. 노드 장애물 회피, 교차 비용과 평행 선분 nudging을 빌드 단계에서 적용하며 콘텐츠에는 접점과 bend point를 저장하지 않는다.
 - 출발과 도착 요소가 같은 self edge는 depth 계산에서 제외하고 해당 노드 위쪽을 돌아 다시 노드로 들어오는 loop 경로로 표시한다.
-- 동일한 두 Topic 사이에 edge가 여러 개 존재하면 ELK가 edge별 port, 라벨 크기와 다른 경로를 함께 고려해 별도 lane을 계산한다. 방향과 `flow`·`return`·`supporting` 시각 구분은 renderer가 유지한다.
-- `supports` 관계는 주요 흐름보다 낮은 방향 우선순위와 위·아래 port를 사용하며 점선 edge로 표시한다.
+- 동일한 두 Topic 사이에 edge가 여러 개 존재하면 격자 router가 평행 선분을 서로 밀어 별도 lane을 계산한다. 방향과 `flow`·`return`·`supporting` 시각 구분은 renderer가 유지한다.
+- `supports` 관계는 격자 위치를 바꾸지 않고 다른 edge와 함께 자동 routing하며 점선으로 표시한다.
 - 기본 Topic 크기와 열·행 간격은 확대된 Scene에서도 라벨과 진행 방향을 구분할 수 있는 크기로 유지하며, edge 라벨 너비가 더 크면 열 간격을 추가로 확장한다.
 - 보이는 edge 라벨은 배경색 halo로 선과 분리하고, edge 그룹의 접근성 이름과 SVG `title`은 그대로 유지한다.
-- 배치 구현은 도메인 모델 밖의 build adapter로 둔다. 콘텐츠 작성자는 일반 Scene에서는 좌표를 쓰지 않고, 논리 격자 Scene에서는 1~5의 셀 위치만 작성한다. 픽셀 `x`, `y`, `width`, `height`, port와 bend point는 작성하지 않는다.
+- 배치 구현은 도메인 모델 밖의 build adapter로 둔다. 콘텐츠 작성자는 1~5의 `row`, `col` 셀 위치만 작성하며 픽셀 `x`, `y`, `width`, `height`, port와 bend point는 작성하지 않는다.
 - Vite 개발 플러그인은 `scene.yaml` 또는 `concept.yaml` 저장을 감지하면 기존 콘텐츠 빌드 파이프라인을 순차 실행한다. 생성 인덱스 갱신이 끝난 뒤 브라우저를 자동 새로고침하여 현재 Scene 데이터와 배치를 다시 로드한다. 배포 빌드는 기존 `prebuild` 경로를 사용한다.
 - 화면 투영 크기에 따른 LOD와 Viewport 교차 검사로 실제 DOM 렌더링 범위를 제한한다.
 

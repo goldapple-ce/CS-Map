@@ -6,7 +6,7 @@ title: Spring Security 요청 흐름
 summary: Servlet FilterChain에서 Spring Security의 FilterChainProxy와 SecurityFilterChain을 거쳐 허용된 요청이 DispatcherServlet로 전달되는 흐름입니다.
 status: published
 ariaLabel: Servlet FilterChain, DelegatingFilterProxy, FilterChainProxy, SecurityFilterChain 선택, 인증, 인가와 DispatcherServlet로 이어지는 요청 흐름
-layoutHint: horizontal
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
 updatedAt: 2026-07-26
@@ -21,24 +21,31 @@ elements:
   - id: servlet-filter-chain
     kind: node
     label: Servlet FilterChain
+    grid: { row: 3, col: 1 }
   - id: delegating-filter-proxy
     kind: node
     label: DelegatingFilterProxy
+    grid: { row: 3, col: 2 }
   - id: filter-chain-proxy
     kind: node
     label: FilterChainProxy
+    grid: { row: 3, col: 3 }
   - id: security-filter-chain
     kind: node
     label: SecurityFilterChain 선택
+    grid: { row: 1, col: 4 }
   - id: authentication
     kind: node
     label: 인증
+    grid: { row: 3, col: 4 }
   - id: authorization
     kind: node
     label: 인가
+    grid: { row: 5, col: 4 }
   - id: dispatcher-servlet
     kind: node
     label: DispatcherServlet
+    grid: { row: 3, col: 5 }
     status: published
     navigateToSceneId: google-com-server-spring-mvc
   - id: servlet-to-delegating

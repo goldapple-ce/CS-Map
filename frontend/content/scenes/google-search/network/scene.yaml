@@ -6,7 +6,7 @@ title: Router와 인터넷 경로
 summary: 장치가 기본 게이트웨이의 링크 계층 주소를 확인하고 공유기와 ISP를 거쳐 목적지 네트워크로 packet을 전달하는 흐름입니다.
 status: published
 ariaLabel: 사용자 장치에서 기본 게이트웨이, ARP 또는 NDP, 공유기와 NAT, ISP, 인터넷 라우팅과 목적지 서버로 이어지는 흐름
-layoutHint: horizontal
+layout: { type: grid, columns: 5, rows: 5 }
 contentRef: content.ko.md
 author:
   id: cs-map-team
@@ -32,24 +32,31 @@ elements:
   - id: user-device
     kind: node
     label: 사용자 장치
+    grid: { row: 3, col: 1 }
   - id: default-gateway
     kind: node
     label: 기본 게이트웨이 선택
+    grid: { row: 3, col: 2 }
   - id: neighbor-resolution
     kind: node
     label: ARP / NDP
+    grid: { row: 3, col: 3 }
   - id: home-router-nat
     kind: node
     label: 공유기 / NAT
+    grid: { row: 2, col: 4 }
   - id: isp
     kind: node
     label: ISP
+    grid: { row: 4, col: 4 }
   - id: internet-routing
     kind: node
     label: 인터넷 라우팅
+    grid: { row: 2, col: 5 }
   - id: destination-server
     kind: node
     label: 목적지 서버
+    grid: { row: 4, col: 5 }
   - id: router-scope-note
     kind: annotation
     label: NAT는 모든 경로에 필수인 단계가 아니며, 가정용 IPv4 공유기를 사용하는 일반적인 예시로 표시합니다.
