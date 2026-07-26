@@ -37,7 +37,7 @@ export type SceneEdgeElement = SceneElementBase & {
   kind: "edge"
   fromElementId: ContentId
   toElementId: ContentId
-  variant?: "flow" | "supporting"
+  variant?: "flow" | "supporting" | "return"
 }
 
 export type SceneAnnotationElement = SceneElementBase & {

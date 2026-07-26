@@ -60,7 +60,7 @@ const sceneElementSchema = z.discriminatedUnion("kind", [
       label: z.string().min(1).optional(),
       fromElementId: contentIdSchema,
       toElementId: contentIdSchema,
-      variant: z.enum(["flow", "supporting"]).optional(),
+      variant: z.enum(["flow", "supporting", "return"]).optional(),
     })
     .strict(),
   z

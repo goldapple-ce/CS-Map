@@ -31,9 +31,9 @@ elements:
     label: Proxy Server
     status: published
     targetSceneId: google-com-server-nginx
-  - id: application-server
+  - id: spring
     kind: node
-    label: Application Server
+    label: Spring
     status: published
     targetSceneId: google-com-server-spring
   - id: database
@@ -48,15 +48,37 @@ elements:
     kind: edge
     label: 요청 전달
     fromElementId: proxy-server
-    toElementId: application-server
+    toElementId: spring
   - id: application-to-database
     kind: edge
     label: 데이터 요청
-    fromElementId: application-server
+    fromElementId: spring
     toElementId: database
 relationships:
-  - { type: contains, elementId: proxy-server, targetSceneId: google-com-server-nginx }
-  - { type: contains, elementId: application-server, targetSceneId: google-com-server-spring }
-  - { type: contains, elementId: database, targetSceneId: google-com-server-database }
-  - { type: flows-to, fromElementId: proxy-server, toElementId: application-server, label: 요청 전달 }
-  - { type: flows-to, fromElementId: application-server, toElementId: database, label: 데이터 요청 }
+  - {
+      type: contains,
+      elementId: proxy-server,
+      targetSceneId: google-com-server-nginx,
+    }
+  - {
+      type: contains,
+      elementId: spring,
+      targetSceneId: google-com-server-spring,
+    }
+  - {
+      type: contains,
+      elementId: database,
+      targetSceneId: google-com-server-database,
+    }
+  - {
+      type: flows-to,
+      fromElementId: proxy-server,
+      toElementId: spring,
+      label: 요청 전달,
+    }
+  - {
+      type: flows-to,
+      fromElementId: spring,
+      toElementId: database,
+      label: 데이터 요청,
+    }

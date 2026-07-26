@@ -1,0 +1,110 @@
+id: google-com-server-spring-mvc
+slug: mvc
+scenarioId: google-com
+parentId: google-com-server-spring-ecosystem
+title: Spring MVC 요청과 View 렌더링
+summary: DispatcherServlet이 HandlerMapping과 HandlerAdapter를 조정하고 ViewResolver를 통해 서버 측 View를 렌더링하는 흐름입니다.
+status: published
+ariaLabel: DispatcherServlet을 중심으로 위쪽 HandlerMapping, 가운데 HandlerAdapter, 아래쪽 ViewResolver가 분기되고 DispatcherServlet 아래 View에서 HTML을 렌더링하는 Spring MVC 흐름
+layoutHint: horizontal
+contentRef: content.ko.md
+author: { id: cs-map-team, displayName: CS Map Team }
+updatedAt: 2026-07-26
+sources:
+  - title: Spring Framework — DispatcherServlet
+    url: https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-servlet.html
+    type: primary
+  - title: Spring Framework — DispatcherServlet Processing
+    url: https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-servlet/sequence.html
+    type: primary
+  - title: Spring Framework — View Resolution
+    url: https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-servlet/viewresolver.html
+    type: primary
+  - title: Spring Framework — View Technologies
+    url: https://docs.spring.io/spring-framework/reference/web/webmvc-view.html
+    type: primary
+contexts: []
+occurrences: []
+conceptRefs: []
+elements:
+  - id: dispatcher-servlet
+    kind: node
+    label: DispatcherServlet
+  - id: rendered-view
+    kind: node
+    label: View / HTML 렌더링
+  - id: handler-mapping
+    kind: node
+    label: HandlerMapping
+  - id: handler-adapter
+    kind: node
+    label: HandlerAdapter
+  - id: view-resolver
+    kind: node
+    label: ViewResolver
+  - id: controller
+    kind: node
+    label: Controller
+  - id: model
+    kind: node
+    label: Model
+  - id: dispatcher-to-mapping
+    kind: edge
+    label: ① Handler 조회
+    fromElementId: dispatcher-servlet
+    toElementId: handler-mapping
+  - id: mapping-to-controller
+    kind: edge
+    label: ② 선택된 Handler
+    fromElementId: handler-mapping
+    toElementId: controller
+    variant: return
+  - id: dispatcher-to-adapter
+    kind: edge
+    label: ③ 실행 Adapter 선택
+    fromElementId: dispatcher-servlet
+    toElementId: handler-adapter
+  - id: adapter-to-controller
+    kind: edge
+    label: ④ Controller 호출
+    fromElementId: handler-adapter
+    toElementId: controller
+  - id: controller-to-resolver
+    kind: edge
+    label: ⑤ View 이름 반환
+    fromElementId: controller
+    toElementId: view-resolver
+    variant: return
+  - id: controller-to-model
+    kind: edge
+    label: ⑤ Model 구성
+    fromElementId: controller
+    toElementId: model
+    variant: return
+  - id: dispatcher-to-resolver
+    kind: edge
+    label: ⑥ View 해석 요청
+    fromElementId: dispatcher-servlet
+    toElementId: view-resolver
+  - id: resolver-to-view
+    kind: edge
+    label: ⑦ 실제 View 선택
+    fromElementId: view-resolver
+    toElementId: rendered-view
+    variant: supporting
+  - id: model-to-view
+    kind: edge
+    label: Model 적용
+    fromElementId: model
+    toElementId: rendered-view
+    variant: supporting
+relationships:
+  - { type: flows-to, fromElementId: dispatcher-servlet, toElementId: handler-mapping, label: ① Handler 조회 }
+  - { type: flows-to, fromElementId: handler-mapping, toElementId: controller, label: ② 선택된 Handler }
+  - { type: flows-to, fromElementId: dispatcher-servlet, toElementId: handler-adapter, label: ③ 실행 Adapter 선택 }
+  - { type: flows-to, fromElementId: handler-adapter, toElementId: controller, label: ④ Controller 호출 }
+  - { type: flows-to, fromElementId: controller, toElementId: view-resolver, label: ⑤ View 이름 반환 }
+  - { type: flows-to, fromElementId: controller, toElementId: model, label: ⑤ Model 구성 }
+  - { type: flows-to, fromElementId: dispatcher-servlet, toElementId: view-resolver, label: ⑥ View 해석 요청 }
+  - { type: supports, fromElementId: view-resolver, toElementId: rendered-view, label: ⑦ 실제 View 선택 }
+  - { type: supports, fromElementId: model, toElementId: rendered-view, label: Model 적용 }

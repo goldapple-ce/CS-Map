@@ -274,7 +274,7 @@ type SceneElement = {
   groupId?: ContentId;
   fromElementId?: ContentId;
   toElementId?: ContentId;
-  variant?: "flow" | "supporting";
+  variant?: "flow" | "supporting" | "return";
   targetSceneId?: ContentId;
   navigateToSceneId?: ContentId;
   conceptId?: ContentId;
@@ -286,6 +286,12 @@ type SceneElement = {
 `parentId`가 현재 Scene이어야 한다. 이미 월드의 다른 위치에 배치된 Scene으로
 이동하는 교차 탐색은 `navigateToSceneId`를 사용한다. 교차 탐색은 카메라와 URL만
 대상 Scene으로 이동하며 월드 중첩이나 `contains` 관계를 추가하지 않는다.
+
+Scene edge의 `flow`는 주요 진행 방향, `supporting`은 사전 준비나 지원 관계,
+`return`은 handler 선택 결과나 처리 결과처럼 호출 지점으로 되돌아오는 흐름을
+뜻한다. `supporting`과 `return`은 점선으로 표시하지만 관계 의미는 구분한다.
+위쪽에 있는 supporting 또는 return source가 아래쪽 Topic으로 연결되면 대상의
+위쪽 중앙 port를 사용해 주요 좌우 흐름과 접속선을 분리한다.
 
 ### 5.3 공통 개념과 사용 위치 예시
 
@@ -403,6 +409,11 @@ type HistoryEntry = {
 /explore/google-com/server
 /explore/google-com/server/nginx
 /explore/google-com/server/spring
+/explore/google-com/server/spring/tomcat
+/explore/google-com/server/spring/ecosystem
+/explore/google-com/server/spring/ecosystem/security
+/explore/google-com/server/spring/ecosystem/mvc
+/explore/google-com/server/spring/ecosystem/container
 /explore/google-com/server/database
 /explore/google-com/server/database/sql
 /explore/google-com/server/database/nosql

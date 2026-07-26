@@ -1,0 +1,108 @@
+id: google-com-server-spring-tomcat
+slug: tomcat
+scenarioId: google-com
+parentId: google-com-server-spring
+title: Tomcat 요청 전달
+summary: Tomcat이 HTTP 요청을 Endpoint와 protocol 처리, CoyoteAdapter와 Servlet pipeline을 거쳐 Spring DispatcherServlet로 전달하는 흐름입니다.
+status: published
+ariaLabel: HTTP 요청에서 Connector와 Endpoint, Protocol Processor, CoyoteAdapter, Servlet Container, FilterChain과 Spring DispatcherServlet로 이어지는 Tomcat 요청 흐름
+layoutHint: horizontal
+contentRef: content.ko.md
+author: { id: cs-map-team, displayName: CS Map Team }
+updatedAt: 2026-07-26
+sources:
+  - title: Apache Tomcat — Request Process Flow
+    url: https://tomcat.apache.org/tomcat-11.0-doc/architecture/requestProcess.html
+    type: primary
+  - title: Apache Tomcat — Architecture Overview
+    url: https://tomcat.apache.org/tomcat-11.0-doc/architecture/index.html
+    type: primary
+contexts: []
+occurrences: []
+conceptRefs: []
+elements:
+  # - id: http-request
+  #   kind: node
+  #   label: HTTP 요청
+  - id: connector-endpoint
+    kind: node
+    label: Connector / Endpoint
+  - id: protocol-processor
+    kind: node
+    label: Protocol Processor
+  - id: coyote-adapter
+    kind: node
+    label: CoyoteAdapter
+  - id: servlet-container
+    kind: node
+    label: Servlet Container
+  - id: filter-chain
+    kind: node
+    label: FilterChain
+  - id: dispatcher-servlet
+    kind: node
+    label: Spring DispatcherServlet
+    status: published
+    navigateToSceneId: google-com-server-spring-mvc
+  - id: request-to-endpoint
+    kind: edge
+    label: 연결 수신
+    fromElementId: http-request
+    toElementId: connector-endpoint
+  - id: endpoint-to-protocol
+    kind: edge
+    label: protocol 처리
+    fromElementId: connector-endpoint
+    toElementId: protocol-processor
+  - id: protocol-to-adapter
+    kind: edge
+    label: Servlet 진입 준비
+    fromElementId: protocol-processor
+    toElementId: coyote-adapter
+  - id: adapter-to-container
+    kind: edge
+    label: request 변환
+    fromElementId: coyote-adapter
+    toElementId: servlet-container
+  - id: container-to-filter
+    kind: edge
+    label: filter 구성
+    fromElementId: servlet-container
+    toElementId: filter-chain
+  - id: filter-to-dispatcher
+    kind: edge
+    label: Servlet 요청 전달
+    fromElementId: filter-chain
+    toElementId: dispatcher-servlet
+relationships:
+  # - { type: flows-to, fromElementId: http-request, toElementId: connector-endpoint, label: 연결 수신 }
+  - {
+      type: flows-to,
+      fromElementId: connector-endpoint,
+      toElementId: protocol-processor,
+      label: protocol 처리,
+    }
+  - {
+      type: flows-to,
+      fromElementId: protocol-processor,
+      toElementId: coyote-adapter,
+      label: Servlet 진입 준비,
+    }
+  - {
+      type: flows-to,
+      fromElementId: coyote-adapter,
+      toElementId: servlet-container,
+      label: request 변환,
+    }
+  - {
+      type: flows-to,
+      fromElementId: servlet-container,
+      toElementId: filter-chain,
+      label: filter 구성,
+    }
+  - {
+      type: flows-to,
+      fromElementId: filter-chain,
+      toElementId: dispatcher-servlet,
+      label: Servlet 요청 전달,
+    }

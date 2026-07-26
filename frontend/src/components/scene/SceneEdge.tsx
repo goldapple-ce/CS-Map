@@ -36,6 +36,8 @@ export function SceneEdge({
   if (points.length < 2) return null
   const label = element.label ? labelPosition(points) : undefined
   const supporting = element.variant === "supporting"
+  const returning = element.variant === "return"
+  const secondary = supporting || returning
 
   return (
     <g aria-label={element.label} role={element.label ? "img" : undefined}>
@@ -44,8 +46,8 @@ export function SceneEdge({
         fill="none"
         stroke={contextual ? "var(--muted-foreground)" : "var(--foreground)"}
         strokeWidth={contextual ? "1.2" : "1.75"}
-        opacity={contextual ? "0.2" : supporting ? "0.5" : "0.72"}
-        strokeDasharray={supporting ? "8 7" : undefined}
+        opacity={contextual ? "0.2" : secondary ? "0.58" : "0.72"}
+        strokeDasharray={secondary ? "8 7" : undefined}
         strokeLinecap="round"
         strokeLinejoin="round"
         markerEnd="url(#scene-arrowhead)"
@@ -59,7 +61,7 @@ export function SceneEdge({
           textAnchor={label.textAnchor}
           dominantBaseline="middle"
           fill={
-            contextual || supporting
+            contextual || secondary
               ? "var(--muted-foreground)"
               : "var(--foreground)"
           }
@@ -69,7 +71,7 @@ export function SceneEdge({
           paintOrder="stroke"
           fontSize="18"
           fontWeight="600"
-          opacity={contextual ? "0.35" : supporting ? "0.68" : "0.82"}
+          opacity={contextual ? "0.35" : secondary ? "0.72" : "0.82"}
           aria-hidden="true"
           className="pointer-events-none select-none"
         >

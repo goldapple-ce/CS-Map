@@ -153,7 +153,7 @@ function edgePoints(
   source: LayoutBox,
   target: LayoutBox,
   laneOffset?: number,
-  supporting = false
+  preferTopEntry = false
 ): LayoutPoint[] {
   const sourceCenterX = source.x + source.width / 2
   const sourceCenterY = source.y + source.height / 2
@@ -179,7 +179,7 @@ function edgePoints(
     target.x >= source.x + source.width ||
     source.x >= target.x + target.width
 
-  if (supporting && sourceCenterY < target.y) {
+  if (preferTopEntry && sourceCenterY < target.y) {
     const targetIsLeftOfSource = targetCenterX < sourceCenterX
     const start = horizontallySeparated
       ? {
@@ -371,7 +371,7 @@ export function createSceneLayout(scene: Scene): SceneLayout {
           source,
           target,
           laneOffsets.get(edge.id),
-          edge.variant === "supporting"
+          edge.variant === "supporting" || edge.variant === "return"
         )
       )
     }

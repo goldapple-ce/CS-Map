@@ -1,0 +1,65 @@
+id: google-com-server-spring-ecosystem
+slug: ecosystem
+scenarioId: google-com
+parentId: google-com-server-spring
+title: Spring 생태계의 요청 처리
+summary: Spring Security가 요청을 검사하고 Spring MVC로 전달하며 Spring Container가 두 영역의 Bean을 생성하고 연결하는 구조입니다.
+status: published
+ariaLabel: 위쪽 Spring Container가 Spring Security와 Spring MVC를 지원하고 Spring Security에서 Spring MVC로 요청이 이어지는 구조
+layoutHint: branch
+contentRef: content.ko.md
+author: { id: cs-map-team, displayName: CS Map Team }
+updatedAt: 2026-07-26
+sources:
+  - title: Spring Security — Servlet Architecture
+    url: https://docs.spring.io/spring-security/reference/servlet/architecture.html
+    type: primary
+  - title: Spring Framework — DispatcherServlet
+    url: https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-servlet.html
+    type: primary
+  - title: Spring Framework — Container Overview
+    url: https://docs.spring.io/spring-framework/reference/core/beans/basics.html
+    type: primary
+contexts: []
+occurrences: []
+conceptRefs: []
+elements:
+  - id: spring-container
+    kind: node
+    label: Spring Container
+    status: published
+    targetSceneId: google-com-server-spring-container
+  - id: spring-security
+    kind: node
+    label: Spring Security
+    status: published
+    targetSceneId: google-com-server-spring-security
+  - id: spring-mvc
+    kind: node
+    label: Spring MVC
+    status: published
+    targetSceneId: google-com-server-spring-mvc
+  - id: container-to-security
+    kind: edge
+    label: Security Bean 제공
+    fromElementId: spring-container
+    toElementId: spring-security
+    variant: supporting
+  - id: container-to-mvc
+    kind: edge
+    label: MVC Bean 제공
+    fromElementId: spring-container
+    toElementId: spring-mvc
+    variant: supporting
+  - id: security-to-mvc
+    kind: edge
+    label: 허용된 요청 전달
+    fromElementId: spring-security
+    toElementId: spring-mvc
+relationships:
+  - { type: contains, elementId: spring-container, targetSceneId: google-com-server-spring-container }
+  - { type: contains, elementId: spring-security, targetSceneId: google-com-server-spring-security }
+  - { type: contains, elementId: spring-mvc, targetSceneId: google-com-server-spring-mvc }
+  - { type: supports, fromElementId: spring-container, toElementId: spring-security, label: Security Bean 제공 }
+  - { type: supports, fromElementId: spring-container, toElementId: spring-mvc, label: MVC Bean 제공 }
+  - { type: flows-to, fromElementId: spring-security, toElementId: spring-mvc, label: 허용된 요청 전달 }

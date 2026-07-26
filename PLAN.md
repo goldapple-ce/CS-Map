@@ -2,7 +2,7 @@
 
 ## 현재 상태
 
-**3단계 구현 완료 — 사용자 확인 대기**
+**3단계 Spring MVC 참고 배치 정정 완료 — 사용자 확인 대기**
 
 ## 이번 목표
 
@@ -18,6 +18,7 @@
 - DNS에는 로컬/재귀 DNS, Root DNS, `.com` TLD DNS, 권한 DNS 등을 포함한다.
 - Router는 DNS 뒤에 배치하고 기본 게이트웨이, 공유기/NAT, ISP와 인터넷 라우팅을 설명한다.
 - Server는 Proxy Server, Application Server, Database로 구성하고 NGINX, Spring, SQL/NoSQL을 하위 학습 대상으로 둔다.
+- Spring 기반 애플리케이션 아래에서 Tomcat, Spring Security, Spring MVC와 Spring Container의 역할을 더 깊게 탐색한다.
 
 ## 범위 결정
 
@@ -50,6 +51,12 @@ Proxy Server → Application Server → Database
 
 - NGINX, Spring, SQL/NoSQL은 이 학습 시나리오에서 사용하는 일반적인 서버 구성 가정이다. Google의 공개적으로 확인된 실제 내부 구현이라고 표현하지 않는다.
 - SQL과 NoSQL은 특정 제품명이 아니라 데이터 저장 방식의 대표 분류로 설명한다.
+- Spring 기반 애플리케이션은 Tomcat과 Spring 생태계로 나누고, Tomcat의 요청이 Servlet FilterChain을 거쳐 Spring MVC로 전달되는 경로를 설명한다.
+- Spring 생태계 Scene은 Spring Security → Spring MVC 요청 흐름과 두 영역에 Bean을 제공하는 Spring Container의 지원 관계를 구분한다.
+- Spring Container는 요청 흐름이 아니라 애플리케이션 시작 시 BeanDefinition, Bean 생성, 의존성 주입과 초기화가 일어나는 흐름으로 설명한다.
+- Spring MVC Scene은 Controller 처리 뒤 논리적인 View 이름과 Model을 반환하고 ViewResolver가 실제 View를 찾아 HTML을 렌더링하는 서버 측 View 경로까지 다룬다.
+- Spring MVC Scene은 DispatcherServlet을 중심으로 HandlerMapping, HandlerAdapter와 ViewResolver가 갈라지는 구조로 배치하고, 조회·호출은 실선, 선택·처리 결과 반환은 점선으로 구분한다.
+- REST의 `@ResponseBody`, HttpMessageConverter, HTTP 전송과 브라우저 렌더링은 Spring MVC View 경로와 구분하고 이번 확장에서는 제외한다.
 - 검색 결과 생성, 검색 색인 처리와 브라우저 응답 렌더링은 이번 PLAN에서 제외한다.
 - 현재 퀴즈 데이터는 새 루트 흐름에 맞는 문항으로 교체한다.
 
@@ -85,6 +92,13 @@ Proxy Server → Application Server → Database
 - Application Server 아래에서 Spring 기반 요청 처리 예시를 확인할 수 있다.
 - Database 아래에서 SQL과 NoSQL의 차이와 사용 예시를 확인할 수 있다.
 - 각 설명은 학습용 일반 서버 구성과 Google의 확인된 내부 구현을 구분한다.
+- Spring Topic에서 Tomcat과 Spring 생태계가 보이고 각각 게시된 하위 Scene으로 진입할 수 있다.
+- Tomcat Scene은 Connector·Protocol Processor·CoyoteAdapter·Servlet 처리·FilterChain을 거쳐 Spring MVC로 요청을 전달한다.
+- Spring 생태계 Scene은 Spring Security, Spring MVC와 Spring Container를 구분하고 Container 지원 관계를 점선으로 표시한다.
+- Spring Security Scene은 Servlet FilterChain에서 SecurityFilterChain의 인증·인가를 거쳐 DispatcherServlet로 전달되는 요청 흐름을 표시한다.
+- Spring MVC Scene은 DispatcherServlet을 중심으로 HandlerMapping·HandlerAdapter·ViewResolver가 분기되고, Controller가 반환한 Model·View 이름에서 View·HTML 렌더링으로 이어지는 서버 측 View 흐름을 표시한다.
+- Spring Container Scene은 설정 정보에서 BeanDefinition·Bean 생성·의존성 주입·초기화로 이어지는 시작 흐름을 표시한다.
+- Spring MVC Scene에는 ViewResolver와 View 렌더링을 표시하되 HttpMessageConverter, HTTP 전송과 브라우저 렌더링은 표시하지 않는다.
 
 ### 콘텐츠 품질
 
@@ -114,6 +128,14 @@ Proxy Server → Application Server → Database
 - [x] NGINX와 Spring 하위 Scene을 작성하고 각 부모 Topic에 연결한다.
 - [x] SQL과 NoSQL 하위 Scene을 작성하고 Database Topic에 연결한다.
 - [x] 일반적인 학습용 가정과 Google 관련 사실을 구분해 설명하고 출처를 기록한다.
+- [x] 기존 Spring Scene을 Tomcat과 Spring 생태계로 진입하는 상위 Scene으로 확장한다.
+- [x] Tomcat의 HTTP 요청이 Servlet FilterChain과 DispatcherServlet로 이어지는 하위 Scene을 작성한다.
+- [x] Spring 생태계 아래에 Spring Security, Spring MVC와 Spring Container Scene을 연결한다.
+- [x] Security 요청 흐름과 Container 초기화 흐름을 작성한다.
+- [x] Spring MVC의 Model·View 이름 반환, ViewResolver와 HTML View 렌더링 흐름을 작성한다.
+- [x] Spring MVC를 DispatcherServlet 중심 분기 구조로 재배치하고 반환 edge를 점선으로 구분한다.
+- [x] Dispatcher 주변의 불필요한 왕복 edge를 줄이고 return edge의 접속 방향을 분리한다.
+- [x] Request Topic을 제거하고 View를 DispatcherServlet 아래에 배치한다.
 
 ### 4단계 — 연결 정리와 사용자 확인
 

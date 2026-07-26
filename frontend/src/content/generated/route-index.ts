@@ -79,6 +79,41 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "moduleKey": "/content/scenes/google-search/server/spring/scene.yaml"
   },
   {
+    "id": "google-com-server-spring-ecosystem",
+    "path": "/explore/google-com/server/spring/ecosystem",
+    "parentId": "google-com-server-spring",
+    "status": "published",
+    "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/scene.yaml"
+  },
+  {
+    "id": "google-com-server-spring-container",
+    "path": "/explore/google-com/server/spring/ecosystem/container",
+    "parentId": "google-com-server-spring-ecosystem",
+    "status": "published",
+    "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/container/scene.yaml"
+  },
+  {
+    "id": "google-com-server-spring-mvc",
+    "path": "/explore/google-com/server/spring/ecosystem/mvc",
+    "parentId": "google-com-server-spring-ecosystem",
+    "status": "published",
+    "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/mvc/scene.yaml"
+  },
+  {
+    "id": "google-com-server-spring-security",
+    "path": "/explore/google-com/server/spring/ecosystem/security",
+    "parentId": "google-com-server-spring-ecosystem",
+    "status": "published",
+    "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/security/scene.yaml"
+  },
+  {
+    "id": "google-com-server-spring-tomcat",
+    "path": "/explore/google-com/server/spring/tomcat",
+    "parentId": "google-com-server-spring",
+    "status": "published",
+    "moduleKey": "/content/scenes/google-search/server/spring/tomcat/scene.yaml"
+  },
+  {
     "id": "google-com-user-browser",
     "path": "/explore/google-com/user-browser",
     "parentId": "google-search-root",

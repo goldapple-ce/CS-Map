@@ -2,71 +2,47 @@ id: google-com-server-spring
 slug: spring
 scenarioId: google-com
 parentId: google-com-server
-title: Spring MVC 요청 처리
-summary: DispatcherServlet이 요청에 맞는 handler를 찾고 Controller 실행과 응답 생성을 조정하는 일반적인 Spring MVC 흐름입니다.
+title: Spring 기반 애플리케이션
+summary: Tomcat이 Servlet 요청을 처리해 Spring 생태계로 전달하는 일반적인 Spring 웹 애플리케이션 구조입니다.
 status: published
-ariaLabel: HTTP 요청에서 DispatcherServlet, HandlerMapping, Controller, 서비스와 데이터 접근, HTTP 응답으로 이어지는 Spring MVC 예시
+ariaLabel: Tomcat Servlet Container에서 Spring 생태계로 요청이 전달되는 Spring 기반 애플리케이션 학습 구조
 layoutHint: horizontal
 contentRef: content.ko.md
 author: { id: cs-map-team, displayName: CS Map Team }
-updatedAt: 2026-07-25
+updatedAt: 2026-07-26
 sources:
+  - title: Apache Tomcat — Request Process Flow
+    url: https://tomcat.apache.org/tomcat-11.0-doc/architecture/requestProcess.html
+    type: primary
+  - title: Spring Security — Servlet Architecture
+    url: https://docs.spring.io/spring-security/reference/servlet/architecture.html
+    type: primary
   - title: Spring Framework — DispatcherServlet
     url: https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-servlet.html
-    type: primary
-  - title: Spring Framework — DispatcherServlet Processing
-    url: https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-servlet/sequence.html
     type: primary
 contexts: []
 occurrences: []
 conceptRefs: []
 elements:
-  - id: http-request
+  - id: tomcat
     kind: node
-    label: HTTP 요청
-  - id: dispatcher-servlet
+    label: Tomcat
+    status: published
+    targetSceneId: google-com-server-spring-tomcat
+  - id: spring-ecosystem
     kind: node
-    label: DispatcherServlet
-  - id: handler-mapping
-    kind: node
-    label: Handler 탐색
-  - id: controller
-    kind: node
-    label: Controller 실행
-  - id: service-data
-    kind: node
-    label: Service / Data Access
-  - id: http-response
-    kind: node
-    label: HTTP 응답
-  - id: request-to-dispatcher
+    label: Spring 생태계
+    status: published
+    targetSceneId: google-com-server-spring-ecosystem
+  - id: spring-scope-note
+    kind: annotation
+    label: Tomcat과 Servlet 기반 Spring 구성을 연결한 일반적인 학습 예시이며 모든 Spring 애플리케이션이 Tomcat을 사용하는 것은 아닙니다.
+  - id: tomcat-to-spring
     kind: edge
-    label: 요청 진입
-    fromElementId: http-request
-    toElementId: dispatcher-servlet
-  - id: dispatcher-to-handler
-    kind: edge
-    label: handler 조회
-    fromElementId: dispatcher-servlet
-    toElementId: handler-mapping
-  - id: handler-to-controller
-    kind: edge
-    label: 실행 대상 결정
-    fromElementId: handler-mapping
-    toElementId: controller
-  - id: controller-to-service
-    kind: edge
-    label: 애플리케이션 로직
-    fromElementId: controller
-    toElementId: service-data
-  - id: service-to-response
-    kind: edge
-    label: 결과 반환
-    fromElementId: service-data
-    toElementId: http-response
+    label: Servlet 요청 전달
+    fromElementId: tomcat
+    toElementId: spring-ecosystem
 relationships:
-  - { type: flows-to, fromElementId: http-request, toElementId: dispatcher-servlet, label: 요청 진입 }
-  - { type: flows-to, fromElementId: dispatcher-servlet, toElementId: handler-mapping, label: handler 조회 }
-  - { type: flows-to, fromElementId: handler-mapping, toElementId: controller, label: 실행 대상 결정 }
-  - { type: flows-to, fromElementId: controller, toElementId: service-data, label: 애플리케이션 로직 }
-  - { type: flows-to, fromElementId: service-data, toElementId: http-response, label: 결과 반환 }
+  - { type: contains, elementId: tomcat, targetSceneId: google-com-server-spring-tomcat }
+  - { type: contains, elementId: spring-ecosystem, targetSceneId: google-com-server-spring-ecosystem }
+  - { type: flows-to, fromElementId: tomcat, toElementId: spring-ecosystem, label: Servlet 요청 전달 }
