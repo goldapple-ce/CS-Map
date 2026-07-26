@@ -8,6 +8,11 @@ import type {
 } from "elkjs/lib/elk-api.js"
 
 import type { SerializedSceneLayout } from "../src/components/scene/scene-layout.ts"
+import {
+  estimatedSceneNodeWidth,
+  MIN_SCENE_NODE_WIDTH,
+  SCENE_NODE_HEIGHT,
+} from "../src/components/scene/scene-node-metrics.ts"
 import type {
   Scene,
   SceneEdgeElement,
@@ -16,8 +21,6 @@ import type {
 
 const MIN_SCENE_WIDTH = 1280
 const MIN_SCENE_HEIGHT = 720
-const MIN_NODE_WIDTH = 144
-const NODE_HEIGHT = 124
 const HORIZONTAL_MARGIN = 72
 const ANNOTATION_HEIGHT = 28
 const ANNOTATION_GAP = 6
@@ -26,16 +29,6 @@ const GRID_ROW_GAP = 96
 const GRID_VERTICAL_MARGIN = 88
 
 const elk = new ELK()
-
-function estimatedNodeWidth(node: SceneNodeElement) {
-  const label = node.label ?? node.id
-  const textWidth = [...label].reduce((width, character) => {
-    if (/\s/u.test(character)) return width + 9
-    if (/[^\u0000-\u00ff]/u.test(character)) return width + 24
-    return width + 14
-  }, 0)
-  return Math.max(MIN_NODE_WIDTH, textWidth + 32)
-}
 
 function estimatedEdgeLabelWidth(label: string) {
   return (
@@ -212,12 +205,15 @@ async function buildGridSceneLayout(
 ): Promise<SerializedSceneLayout> {
   const columns = scene.layout?.columns ?? 5
   const rows = scene.layout?.rows ?? 5
-  const columnWidths = Array.from({ length: columns }, () => MIN_NODE_WIDTH)
+  const columnWidths = Array.from(
+    { length: columns },
+    () => MIN_SCENE_NODE_WIDTH
+  )
   for (const node of nodes) {
     if (!node.grid) continue
     columnWidths[node.grid.col - 1] = Math.max(
-      columnWidths[node.grid.col - 1] ?? MIN_NODE_WIDTH,
-      estimatedNodeWidth(node)
+      columnWidths[node.grid.col - 1] ?? MIN_SCENE_NODE_WIDTH,
+      estimatedSceneNodeWidth(node)
     )
   }
 
@@ -225,7 +221,7 @@ async function buildGridSceneLayout(
     columnWidths.reduce((sum, width) => sum + width, 0) +
     Math.max(columns - 1, 0) * GRID_COLUMN_GAP
   const gridHeight =
-    rows * NODE_HEIGHT + Math.max(rows - 1, 0) * GRID_ROW_GAP
+    rows * SCENE_NODE_HEIGHT + Math.max(rows - 1, 0) * GRID_ROW_GAP
   const annotations = scene.elements.filter(
     (element) => element.kind === "annotation"
   )
@@ -260,7 +256,7 @@ async function buildGridSceneLayout(
           `Grid scene ${scene.id} is missing coordinates for node ${node.id}`
         )
       }
-      const width = estimatedNodeWidth(node)
+      const width = estimatedSceneNodeWidth(node)
       const columnWidth = columnWidths[node.grid.col - 1] ?? width
       return [
         node.id,
@@ -270,9 +266,9 @@ async function buildGridSceneLayout(
             (columnWidth - width) / 2,
           y:
             gridStartY +
-            (node.grid.row - 1) * (NODE_HEIGHT + GRID_ROW_GAP),
+            (node.grid.row - 1) * (SCENE_NODE_HEIGHT + GRID_ROW_GAP),
           width,
-          height: NODE_HEIGHT,
+          height: SCENE_NODE_HEIGHT,
         },
       ]
     })
@@ -421,8 +417,8 @@ export async function buildSceneLayout(
     },
     children: nodes.map((node) => ({
       id: node.id,
-      width: estimatedNodeWidth(node),
-      height: NODE_HEIGHT,
+      width: estimatedSceneNodeWidth(node),
+      height: SCENE_NODE_HEIGHT,
       ports: createPorts(node.id, edges, reverseEdgeIds),
       layoutOptions: { "elk.portConstraints": "FIXED_SIDE" },
     })),

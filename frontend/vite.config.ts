@@ -9,15 +9,25 @@ const execFileAsync = promisify(execFile)
 
 function contentHotReload(): Plugin {
   let rebuildQueue = Promise.resolve()
+  const layoutSources = [
+    path.resolve(__dirname, "scripts/elk-scene-layout.ts"),
+    path.resolve(
+      __dirname,
+      "src/components/scene/scene-node-metrics.ts"
+    ),
+  ]
 
   return {
     name: "cs-map-content-hot-reload",
+    configureServer(server) {
+      server.watcher.add(layoutSources)
+    },
     async handleHotUpdate({ file, server }) {
       const contentDirectory = path.resolve(__dirname, "content")
       const isContentYaml =
         file.startsWith(`${contentDirectory}${path.sep}`) &&
         ["scene.yaml", "concept.yaml"].includes(path.basename(file))
-      if (!isContentYaml) return
+      if (!isContentYaml && !layoutSources.includes(file)) return
 
       rebuildQueue = rebuildQueue.catch(() => undefined).then(async () => {
         await execFileAsync(

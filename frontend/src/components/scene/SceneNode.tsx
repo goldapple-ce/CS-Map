@@ -8,7 +8,7 @@ export type SceneNodeState = "interactive" | "planned" | "static" | "selected"
 export type SceneNodeDensity = "far" | "medium" | "near"
 
 const sceneNodeVariants = cva(
-  "flex size-full flex-col items-center justify-center gap-0.5 rounded-xl border border-border bg-card/90 px-3 text-center shadow-sm transition-[background-color,color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
+  "flex size-full flex-col items-center justify-center gap-0.5 rounded-xl border border-border bg-card/90 px-8 text-center shadow-sm transition-[background-color,color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
   {
     variants: {
       state: {

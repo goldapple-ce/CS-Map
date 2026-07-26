@@ -6,6 +6,11 @@ import type {
   SceneNodeElement,
 } from "@/domain/content-types"
 import { sceneLayoutIndex } from "@/content/generated/scene-layout-index"
+import {
+  estimatedSceneNodeWidth,
+  MIN_SCENE_NODE_WIDTH,
+  SCENE_NODE_HEIGHT,
+} from "@/components/scene/scene-node-metrics"
 
 export type LayoutBox = {
   x: number
@@ -52,23 +57,11 @@ function deserializeSceneLayout(layout: SerializedSceneLayout): SceneLayout {
 
 const MIN_SCENE_WIDTH = 1280
 const MIN_SCENE_HEIGHT = 720
-const MIN_NODE_WIDTH = 144
-const NODE_HEIGHT = 124
 const HORIZONTAL_MARGIN = 72
 const VERTICAL_MARGIN = 88
 const COLUMN_GAP = 112
 const ROW_GAP = 52
 const PARALLEL_EDGE_GAP = 28
-
-function estimatedNodeWidth(node: SceneNodeElement) {
-  const label = node.label ?? node.id
-  const textWidth = [...label].reduce((width, character) => {
-    if (/\s/u.test(character)) return width + 9
-    if (/[^\u0000-\u00ff]/u.test(character)) return width + 24
-    return width + 14
-  }, 0)
-  return Math.max(MIN_NODE_WIDTH, textWidth + 32)
-}
 
 function estimatedEdgeLabelWidth(label: string) {
   return (
@@ -284,7 +277,7 @@ export function createSceneLayout(scene: Scene): SceneLayout {
     nodes.filter((node) => depths.get(node.id) === depth)
   )
   const nodeWidths = new Map(
-    nodes.map((node) => [node.id, estimatedNodeWidth(node)])
+    nodes.map((node) => [node.id, estimatedSceneNodeWidth(node)])
   )
   const layerWidths = layers.map((layer) =>
     Math.max(...layer.map((node) => nodeWidths.get(node.id) ?? 0), 0)
@@ -320,7 +313,8 @@ export function createSceneLayout(scene: Scene): SceneLayout {
   const tallestLayer = Math.max(
     ...layers.map(
       (layer) =>
-        layer.length * NODE_HEIGHT + Math.max(layer.length - 1, 0) * ROW_GAP
+        layer.length * SCENE_NODE_HEIGHT +
+        Math.max(layer.length - 1, 0) * ROW_GAP
     ),
     0
   )
@@ -335,21 +329,22 @@ export function createSceneLayout(scene: Scene): SceneLayout {
   layers.forEach((layer, depth) => {
     const layerWidth = layerWidths[depth] ?? 0
     const layerHeight =
-      layer.length * NODE_HEIGHT + Math.max(layer.length - 1, 0) * ROW_GAP
+      layer.length * SCENE_NODE_HEIGHT +
+      Math.max(layer.length - 1, 0) * ROW_GAP
     const firstY =
       scene.layoutHint === "branch" && layer.length > 1
         ? centerY -
-          NODE_HEIGHT / 2 -
-          (layer.length - 1) * (NODE_HEIGHT + ROW_GAP)
+          SCENE_NODE_HEIGHT / 2 -
+          (layer.length - 1) * (SCENE_NODE_HEIGHT + ROW_GAP)
         : centerY - layerHeight / 2
 
     layer.forEach((node, index) => {
-      const width = nodeWidths.get(node.id) ?? MIN_NODE_WIDTH
+      const width = nodeWidths.get(node.id) ?? MIN_SCENE_NODE_WIDTH
       nodeLayouts.set(node.id, {
         x: columnX + (layerWidth - width) / 2,
-        y: firstY + index * (NODE_HEIGHT + ROW_GAP),
+        y: firstY + index * (SCENE_NODE_HEIGHT + ROW_GAP),
         width,
-        height: NODE_HEIGHT,
+        height: SCENE_NODE_HEIGHT,
       })
     })
     columnX += layerWidth + (layerGaps[depth] ?? 0)
