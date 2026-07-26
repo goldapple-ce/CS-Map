@@ -115,7 +115,7 @@ content/
   파일 파싱, 인덱싱, repository 구현
 
 features/explorer/
-  Viewport, 전환, URL 동기화, history
+  Viewport, 전체 Topic 목차, 전환, URL 동기화, history
 
 features/explanation/
   전체 설명, 섹션 목차, 독립 스크롤, 읽기 모드
@@ -443,6 +443,8 @@ type HistoryEntry = {
 - Vite는 단일 SPA entry와 분할된 정적 자산을 `dist`에 생성한다.
 - React Router의 `/` route는 `HomeRoute`를, `/explore/*` route는 임의 깊이의 장면 path를 해석하는 `ExploreRoute`를 사용한다.
 - 게시된 모든 장면 경로를 콘텐츠 route index에 포함한다.
+- route index는 전체 Topic 목차가 Scene 파일을 모두 선로드하지 않고 계층을 구성할 수 있도록 `title`, `parentId`, `order`, `status`, `path`를 함께 제공한다.
+- `order`는 부모 Scene에서 해당 자식 Scene을 가리키는 node의 작성 순서로 결정하며, 같은 콘텐츠에는 같은 목차 순서가 생성된다.
 - 정적 호스팅은 `/explore/*` 직접 요청을 `/index.html`로 되돌리는 SPA fallback을 제공해야 한다.
 - route index에 없거나 게시되지 않은 경로는 애플리케이션 내부 not-found로 처리한다.
 - 신규 콘텐츠를 게시하면 정적 사이트를 다시 빌드한다.
@@ -489,9 +491,18 @@ type HistoryEntry = {
 7. 배율에 맞는 하위 콘텐츠 LOD 공개와 포커스 이동
 ```
 
+### 9.3 전체 Topic 목차
+
+- 전체 Topic 목차는 생성된 route index를 `parentId`와 `order`로 조립한 임의 깊이 트리다.
+- 펼침 상태는 목차 UI의 로컬 상태이며 집중 Topic, 카메라, URL과 Explanation Panel 상태에 포함하지 않는다.
+- 목차를 열면 현재 Topic의 조상 경로만 자동으로 펼치고, 다른 가지를 펼치거나 접는 동안 탐색 상태를 변경하지 않는다.
+- 게시된 Topic 선택은 현재 Navigation Snapshot을 저장한 뒤 기존 route adapter와 카메라 전환 흐름으로 전달한다.
+- 현재 Topic 재선택, 전환 잠금 상태와 route index에 없는 대상을 별도로 차단해 중복 history와 빈 Scene 진입을 만들지 않는다.
+- 전체 Topic 목차는 Explorer의 공간 탐색을 보조하며 고정 CS 카테고리 메뉴나 별도 화면 전환으로 사용하지 않는다.
+
 프로토타입은 CSS transform으로 시작한다. 요소 간 정확한 shared layout 연결이 필요할 때만 Motion의 layout 기능을 도입한다. 라이브러리를 쓰더라도 탐색 상태 머신은 라이브러리 밖에 둔다.
 
-### 9.3 동작 감소
+### 9.4 동작 감소
 
 `prefers-reduced-motion: reduce`에서는 보간 애니메이션 없이 목표 카메라 위치와 배율을 즉시 적용한다. 월드는 유지하며 정보와 포커스 이동도 동일하게 유지한다.
 

@@ -4,119 +4,153 @@ import type { RouteIndexEntry } from "@/content/repository"
 export const routeIndex: readonly RouteIndexEntry[] = [
   {
     "id": "google-search-root",
+    "title": "google.com 접속",
     "path": "/explore/google-com",
+    "order": 0,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/scene.yaml"
   },
   {
     "id": "google-search-dns",
+    "title": "DNS 이름 확인",
     "path": "/explore/google-com/dns",
     "parentId": "google-search-root",
+    "order": 1,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/network/dns/scene.yaml"
   },
   {
     "id": "google-search-dns-udp-query",
+    "title": "UDP DNS 질의",
     "path": "/explore/google-com/dns/udp-query",
     "parentId": "google-search-dns",
+    "order": 0,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/network/dns/udp-query/scene.yaml"
   },
   {
     "id": "google-search-dns-socket-kernel",
+    "title": "Socket과 Kernel",
     "path": "/explore/google-com/dns/udp-query/socket-kernel",
     "parentId": "google-search-dns-udp-query",
+    "order": 0,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/network/dns/udp-query/socket-kernel/scene.yaml"
   },
   {
     "id": "google-search-network",
+    "title": "Router와 인터넷 경로",
     "path": "/explore/google-com/router",
     "parentId": "google-search-root",
+    "order": 2,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/network/scene.yaml"
   },
   {
     "id": "google-com-server",
+    "title": "일반적인 Server 요청 처리",
     "path": "/explore/google-com/server",
     "parentId": "google-search-root",
+    "order": 3,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/server/scene.yaml"
   },
   {
     "id": "google-com-server-database",
+    "title": "Database 선택과 데이터 처리",
     "path": "/explore/google-com/server/database",
     "parentId": "google-com-server",
+    "order": 2,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/server/database/scene.yaml"
   },
   {
     "id": "google-com-server-nosql",
+    "title": "NoSQL 문서형 Database 예시",
     "path": "/explore/google-com/server/database/nosql",
     "parentId": "google-com-server-database",
+    "order": 1,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/server/database/nosql/scene.yaml"
   },
   {
     "id": "google-com-server-sql",
+    "title": "SQL과 관계형 데이터 처리",
     "path": "/explore/google-com/server/database/sql",
     "parentId": "google-com-server-database",
+    "order": 0,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/server/database/sql/scene.yaml"
   },
   {
     "id": "google-com-server-nginx",
+    "title": "NGINX Reverse Proxy",
     "path": "/explore/google-com/server/nginx",
     "parentId": "google-com-server",
+    "order": 0,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/server/nginx/scene.yaml"
   },
   {
     "id": "google-com-server-spring",
+    "title": "Spring 기반 애플리케이션",
     "path": "/explore/google-com/server/spring",
     "parentId": "google-com-server",
+    "order": 1,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/server/spring/scene.yaml"
   },
   {
     "id": "google-com-server-spring-ecosystem",
+    "title": "Spring 생태계의 요청 처리",
     "path": "/explore/google-com/server/spring/ecosystem",
     "parentId": "google-com-server-spring",
+    "order": 1,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/scene.yaml"
   },
   {
     "id": "google-com-server-spring-container",
+    "title": "Spring Container 초기화",
     "path": "/explore/google-com/server/spring/ecosystem/container",
     "parentId": "google-com-server-spring-ecosystem",
+    "order": 0,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/container/scene.yaml"
   },
   {
     "id": "google-com-server-spring-mvc",
+    "title": "Spring MVC 요청과 View 렌더링",
     "path": "/explore/google-com/server/spring/ecosystem/mvc",
     "parentId": "google-com-server-spring-ecosystem",
+    "order": 2,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/mvc/scene.yaml"
   },
   {
     "id": "google-com-server-spring-security",
+    "title": "Spring Security 요청 흐름",
     "path": "/explore/google-com/server/spring/ecosystem/security",
     "parentId": "google-com-server-spring-ecosystem",
+    "order": 1,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/server/spring/ecosystem/security/scene.yaml"
   },
   {
     "id": "google-com-server-spring-tomcat",
+    "title": "Tomcat 요청 전달",
     "path": "/explore/google-com/server/spring/tomcat",
     "parentId": "google-com-server-spring",
+    "order": 0,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/server/spring/tomcat/scene.yaml"
   },
   {
     "id": "google-com-user-browser",
+    "title": "사용자와 브라우저",
     "path": "/explore/google-com/user-browser",
     "parentId": "google-search-root",
+    "order": 0,
     "status": "published",
     "moduleKey": "/content/scenes/google-search/user-browser/scene.yaml"
   }

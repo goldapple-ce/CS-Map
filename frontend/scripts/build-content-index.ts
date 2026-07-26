@@ -165,6 +165,21 @@ function buildRouteIndex(
   const published = files.filter(({ value }) => value.status === "published")
   const scenesById = new Map(published.map((item) => [item.value.id, item]))
   const paths = new Map<string, string>()
+  const childOrder = new Map<string, number>()
+
+  for (const { value: parent } of published) {
+    let order = 0
+    for (const element of parent.elements) {
+      if (
+        element.kind !== "node" ||
+        !element.targetSceneId ||
+        scenesById.get(element.targetSceneId)?.value.parentId !== parent.id
+      )
+        continue
+      childOrder.set(element.targetSceneId, order)
+      order += 1
+    }
+  }
 
   const resolveRoute = (sceneId: string): string => {
     const cached = paths.get(sceneId)
@@ -184,8 +199,10 @@ function buildRouteIndex(
   return published
     .map(({ filePath, value }) => ({
       id: value.id,
+      title: value.title,
       path: resolveRoute(value.id),
       ...(value.parentId ? { parentId: value.parentId } : {}),
+      order: childOrder.get(value.id) ?? 0,
       status: "published" as const,
       moduleKey: moduleKey(filePath),
     }))

@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react"
+import { ListTree } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 import { WorldRenderer } from "@/components/scene/WorldRenderer"
@@ -29,7 +36,9 @@ type SceneViewportProps = {
   routeNotFound: boolean
   navigationDisabled: boolean
   reducedMotion: boolean
+  outlineTriggerRef?: RefObject<HTMLButtonElement | null>
   presentation?: "explorer" | "embedded"
+  onOpenOutline?: () => void
   onEnterScene: (request: SceneNavigationRequest) => void
   onShowPlanned: (elementId: string, label: string) => void
   onSceneReady: (sceneId: string, title: string) => void
@@ -44,7 +53,9 @@ export function SceneViewport({
   routeNotFound,
   navigationDisabled,
   reducedMotion,
+  outlineTriggerRef,
   presentation = "explorer",
+  onOpenOutline,
   onEnterScene,
   onShowPlanned,
   onSceneReady,
@@ -293,6 +304,21 @@ export function SceneViewport({
         ref={viewportRef}
         className="relative min-h-0 flex-1 overflow-hidden"
       >
+        {onOpenOutline ? (
+          <Button
+            ref={outlineTriggerRef}
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={navigationDisabled || animating}
+            aria-haspopup="dialog"
+            className="absolute top-4 left-4 z-10 bg-background/90 shadow-sm backdrop-blur-sm"
+            onClick={onOpenOutline}
+          >
+            <ListTree aria-hidden="true" />
+            목차
+          </Button>
+        ) : null}
         {routeNotFound ? (
           <div className="flex size-full items-center justify-center p-8">
             <div className="flex max-w-md flex-col items-start gap-4 rounded-xl border border-border bg-background p-6">

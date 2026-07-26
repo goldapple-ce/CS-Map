@@ -23,8 +23,10 @@ export type ConceptIndexEntry = {
 
 export type RouteIndexEntry = {
   id: ContentId
+  title: string
   path: string
   parentId?: ContentId
+  order: number
   status: "published"
   moduleKey: string
 }

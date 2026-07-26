@@ -20,6 +20,7 @@ import {
   type SceneNavigationRequest,
 } from "@/features/explorer/exploration-memory"
 import { SceneViewport } from "@/features/explorer/SceneViewport"
+import { TopicOutline } from "@/features/explorer/TopicOutline"
 
 type PanelMode = "split" | "reading"
 
@@ -48,6 +49,7 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
   const panelSizeRef = useRef(38)
   const explanationScrollTopRef = useRef(0)
   const currentCameraRef = useRef(DEFAULT_CAMERA)
+  const outlineTriggerRef = useRef<HTMLButtonElement>(null)
   const [panelCollapsed, setPanelCollapsed] = useState(false)
   const [panelMode, setPanelMode] = useState<PanelMode>("split")
   const [navigationDisabled, setNavigationDisabled] = useState(false)
@@ -55,6 +57,7 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
   const [restoreScrollTop, setRestoreScrollTop] = useState(0)
   const [explanationTitle, setExplanationTitle] = useState("google.com 접속")
   const [plannedSelection, setPlannedSelection] = useState<PlannedSelection>()
+  const [outlineOpen, setOutlineOpen] = useState(false)
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
@@ -162,6 +165,20 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
     navigate(targetRoute.path)
   }
 
+  const selectOutlineScene = (targetSceneId: string) => {
+    setOutlineOpen(false)
+    if (navigationLockedRef.current || targetSceneId === sceneId) return
+    const targetRoute = contentRepository
+      .listRoutes()
+      .find(({ id }) => id === targetSceneId)
+    if (!targetRoute) return
+    navigationLockedRef.current = true
+    returningRef.current = false
+    setNavigationDisabled(true)
+    captureScene(sceneId)
+    navigate(targetRoute.path)
+  }
+
   const goBack = () => {
     if (navigationLockedRef.current) return
     navigationLockedRef.current = true
@@ -226,6 +243,16 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
         onOpenPanel={openExplanation}
       />
 
+      <TopicOutline
+        open={outlineOpen}
+        routes={contentRepository.listRoutes()}
+        currentSceneId={sceneId}
+        navigationDisabled={navigationDisabled}
+        triggerRef={outlineTriggerRef}
+        onOpenChange={setOutlineOpen}
+        onSelectScene={selectOutlineScene}
+      />
+
       <main className="min-h-0 flex-1">
         <ResizablePanelGroup orientation="horizontal">
           <ResizablePanel
@@ -241,6 +268,8 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
               routeNotFound={routeNotFound}
               navigationDisabled={navigationDisabled}
               reducedMotion={reducedMotion}
+              outlineTriggerRef={outlineTriggerRef}
+              onOpenOutline={() => setOutlineOpen(true)}
               onEnterScene={enterScene}
               onShowPlanned={showPlanned}
               onSceneReady={handleSceneReady}
