@@ -304,7 +304,9 @@ content/concepts/tcp/
 - route index에는 파생된 장면 ID, 제목, URL path, 부모, 순서와 lazy module key만 포함하고 긴 본문은 포함하지 않는다.
 - Vite의 정적인 `import.meta.glob` 패턴으로 장면 YAML과 Markdown loader map을 만든다.
 - loader map은 eager import가 아니라 장면별 lazy import를 기본으로 한다.
-- `SceneRepository`가 route index와 loader map을 결합하며 UI는 Vite API를 직접 사용하지 않는다.
+- `ContentRepository`가 route index와 loader map을 결합하며 UI는 Vite API를 직접 사용하지 않는다.
+- 지도 구성에는 `loadSceneMap`으로 Scene YAML만 읽고, Explanation Panel에는 `loadScene`으로 같은 Scene YAML과 Markdown·선택적 quiz를 결합해 제공한다.
+- Scene 지도, Scene 상세와 Concept 상세 loader는 각각 진행 중 `Promise`와 완료 결과를 메모리 cache에 저장한다. 같은 콘텐츠를 동시에 요청하거나 다시 방문하면 같은 결과를 공유하며, 실패한 `Promise`는 cache에서 제거해 다음 요청에서 다시 시도한다.
 - 생성된 index는 사람이 직접 수정하지 않으며 빌드 또는 개발 시작 시 다시 만든다.
 - 콘텐츠 파일 추가 후 route index 재생성을 검증하는 테스트를 둔다.
 
@@ -446,9 +448,9 @@ type HistoryEntry = {
 - 카메라 중심은 각 Scene의 실제 bounds 중심을 사용한다. 홈페이지의 embedded 표현, 저장된 뒤로 가기 카메라와 grid가 아닌 fallback Scene은 기존 맞춤 계산을 유지한다.
 
 ```text
-1. 클릭 Topic의 월드 bounds 조회
+1. 클릭 Topic과 대상 Scene ID 확인
 2. 현재 카메라와 패널 history snapshot 저장
-3. target Topic과 필요한 조상/자식 데이터 선로드
+3. route index의 `parentId`를 따라 루트부터 대상 Scene까지의 경로를 계산하고 경로의 Scene YAML 준비
 4. bounds가 Viewport 중앙에 맞도록 목표 camera 계산
 5. 하나의 World transform을 scale/translate
 6. URL과 focused Topic 확정
@@ -533,12 +535,16 @@ read files
 
 ## 12. 성능 설계
 
-- 루트 진입 시 현재 장면과 공통 shell만 로드한다.
-- 하위 게시 장면 메타데이터는 미리 가져올 수 있지만 긴 본문은 필요 시 로드한다.
-- 사용자가 노드에 포커스하거나 hover한 경우 해당 target을 prefetch 후보로 삼는다.
-- 화면 밖 장면은 유지하지 않는다. 단, 직전 장면 snapshot은 데이터로 보존한다.
+- route index는 전체 Topic 목차와 부모 경로 계산에 필요한 작은 메타데이터만 가지며 Scene YAML과 긴 본문을 포함하지 않는다.
+- 첫 진입과 직접 URL 접근에서는 route index의 `parentId`를 따라 루트부터 현재 Scene까지의 경로를 계산하고, 해당 경로의 Scene YAML만 활성 집합으로 로드한다. 모든 route의 Scene을 일괄 로드하지 않는다.
+- 현재 Scene이 바뀌는 동안 기존 활성 Scene을 유지하고 대상 경로가 준비되면 새 활성 집합과 월드 배치로 교체한다. 이후 저장된 카메라 또는 대상 Scene bounds로 전환한다.
+- 현재 Scene node의 `childSceneId`와 `navigateToSceneId`를 인접 Scene으로 정의한다. 사용자가 해당 Topic에 포커스하거나 hover하면 대상 Scene YAML을 prefetch하며, 현재 Scene이 준비된 뒤 브라우저 유휴 시간에도 같은 인접 집합을 선택적으로 prefetch한다.
+- prefetch는 repository cache만 채우며 URL, 카메라, 집중 Scene과 history snapshot을 변경하지 않는다. 실패한 prefetch는 다시 요청할 수 있다.
+- `WorldRenderer`는 활성 경로 중 현재 Viewport bounds와 교차하고 LOD·조상 투영 배율 조건을 만족하는 Scene만 DOM/SVG로 렌더링한다. 화면 밖 Scene과 활성 경로 밖 Scene은 렌더링하지 않는다.
+- 화면 밖 Scene의 DOM/SVG와 활성 데이터는 유지하지 않지만 repository cache와 직전 장면의 카메라·패널 history snapshot은 독립적으로 보존한다.
+- Scene 지도, Scene 상세와 Concept 상세는 서로 구분된 메모리 `Promise` cache를 사용한다. Scene 상세 로드는 기존 Scene 지도 cache를 재사용한다.
 - SVG path와 이미지 자산은 장면 단위로 분할한다.
-- 장면별 번들 크기와 전환 지연을 측정할 수 있는 개발 로그를 제공한다.
+- 개발 환경은 `scene`, `scene-detail`, `concept`별 실제 요청 수, cache hit, 실패, prefetch와 최근 로드 시간을 기록한다. `window.__CS_MAP_CONTENT_METRICS__()`로 snapshot을 조회하고 `cs-map:scene-path-ready` Performance entry와 개발 로그로 현재 경로 준비 시간을 확인한다.
 - 성능 수치는 첫 프로토타입의 기준 기기와 대표 장면을 정한 뒤 예산으로 고정한다.
 
 ## 13. 접근성 설계

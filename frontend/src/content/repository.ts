@@ -45,6 +45,8 @@ export type LoadedConcept = {
 export interface ContentRepository {
   listRoutes(): readonly RouteIndexEntry[]
   findRoute(path: string): RouteIndexEntry | undefined
+  loadSceneMap(id: ContentId): Promise<Scene>
   loadScene(id: ContentId): Promise<LoadedScene>
+  prefetchScene(id: ContentId): Promise<void>
   loadConcept(id: ContentId): Promise<LoadedConcept>
 }

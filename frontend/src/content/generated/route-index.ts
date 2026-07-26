@@ -138,7 +138,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
   },
   {
     "id": "google-com-server-spring-filterchain-securityfilterchain-usernamepasswordauthenticationfilter",
-    "title": "SecurityFilterChain",
+    "title": "UsernamePasswordAuthenticationFilter",
     "path": "/explore/google-com/server/spring/security/security-filter-chain/username-password-authentication-filter",
     "parentId": "google-com-server-spring-filterchain-securityfilterchain",
     "order": 2,

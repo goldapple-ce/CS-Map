@@ -15,6 +15,7 @@ import {
 } from "@/components/scene/world-layout"
 import { Button } from "@/components/ui/button"
 import { contentRepository } from "@/content/content-repository"
+import type { RouteIndexEntry } from "@/content/repository"
 import {
   cameraForBounds,
   cameraForGridScene,
@@ -29,7 +30,7 @@ import {
 
 type WorldLoadState =
   | { status: "loading" }
-  | { status: "loaded"; layout: WorldLayout }
+  | { status: "loaded"; focusedSceneId: string; layout: WorldLayout }
   | { status: "error"; message: string }
 
 type SceneViewportProps = {
@@ -50,6 +51,62 @@ type SceneViewportProps = {
 }
 
 const DEFAULT_CAMERA: CameraState = { centerX: 640, centerY: 360, scale: 1 }
+
+type IdleWindow = Window & {
+  requestIdleCallback?: (callback: () => void) => number
+  cancelIdleCallback?: (handle: number) => void
+}
+
+function scenePathIds(
+  sceneId: string,
+  routes: readonly RouteIndexEntry[]
+) {
+  const routesById = new Map(routes.map((route) => [route.id, route]))
+  const path: string[] = []
+  const visited = new Set<string>()
+  let current = routesById.get(sceneId)
+
+  if (!current) throw new Error(`Unknown Scene route: ${sceneId}`)
+
+  while (current) {
+    if (visited.has(current.id)) {
+      throw new Error(`Cyclic Scene route ancestry: ${current.id}`)
+    }
+    visited.add(current.id)
+    path.unshift(current.id)
+    if (!current.parentId) break
+    const parent = routesById.get(current.parentId)
+    if (!parent) {
+      throw new Error(
+        `Scene route ${current.id} references unknown parent: ${current.parentId}`
+      )
+    }
+    current = parent
+  }
+
+  return path
+}
+
+function recordScenePathReady(
+  sceneId: string,
+  requestedSceneCount: number,
+  totalSceneCount: number,
+  startedAt: number
+) {
+  if (!import.meta.env.DEV) return
+  const finishedAt = performance.now()
+  performance.measure("cs-map:scene-path-ready", {
+    start: startedAt,
+    end: finishedAt,
+  })
+  console.info("[CS Map performance]", {
+    metric: "scene-path-ready",
+    sceneId,
+    durationMs: Math.round((finishedAt - startedAt) * 100) / 100,
+    requestedSceneCount,
+    totalSceneCount,
+  })
+}
 
 export function SceneViewport({
   sceneId,
@@ -85,22 +142,39 @@ export function SceneViewport({
   const [worldState, setWorldState] = useState<WorldLoadState>({
     status: "loading",
   })
+  const [loadingSceneId, setLoadingSceneId] = useState<string>()
   const [animating, setAnimating] = useState(false)
   const [announcement, setAnnouncement] = useState("")
 
   useEffect(() => {
+    if (routeNotFound || !sceneId) return
     let active = true
-    Promise.all(
-      contentRepository
-        .listRoutes()
-        .map(({ id }) => contentRepository.loadScene(id))
-    )
+    const routes = contentRepository.listRoutes()
+    const startedAt = performance.now()
+    let pathIds: string[]
+    try {
+      pathIds = scenePathIds(sceneId, routes)
+    } catch (error: unknown) {
+      setWorldState({
+        status: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "현재 Scene 경로를 찾지 못했습니다.",
+      })
+      return
+    }
+    setLoadingSceneId(sceneId)
+    Promise.all(pathIds.map((id) => contentRepository.loadSceneMap(id)))
       .then((loaded) => {
         if (!active) return
+        recordScenePathReady(sceneId, pathIds.length, routes.length, startedAt)
         setWorldState({
           status: "loaded",
-          layout: createWorldLayout(loaded.map(({ scene }) => scene)),
+          focusedSceneId: sceneId,
+          layout: createWorldLayout(loaded),
         })
+        setLoadingSceneId(undefined)
       })
       .catch((error: unknown) => {
         if (!active) return
@@ -111,11 +185,45 @@ export function SceneViewport({
               ? error.message
               : "지식 공간을 불러오지 못했습니다.",
         })
+        setLoadingSceneId(undefined)
       })
     return () => {
       active = false
     }
+  }, [routeNotFound, sceneId])
+
+  const prefetchScene = useCallback((targetSceneId: string) => {
+    void contentRepository.prefetchScene(targetSceneId)
   }, [])
+
+  useEffect(() => {
+    if (worldState.status !== "loaded") return
+    const focusedScene = worldState.layout.scenes.get(
+      worldState.focusedSceneId
+    )?.scene
+    if (!focusedScene) return
+    const targets = new Set(
+      focusedScene.elements.flatMap((element) =>
+        element.kind === "node"
+          ? [element.targetSceneId, element.navigateToSceneId].filter(
+              (id): id is string => Boolean(id)
+            )
+          : []
+      )
+    )
+    if (targets.size === 0) return
+
+    const idleWindow = window as IdleWindow
+    const run = () => {
+      for (const targetSceneId of targets) prefetchScene(targetSceneId)
+    }
+    if (idleWindow.requestIdleCallback) {
+      const handle = idleWindow.requestIdleCallback(run)
+      return () => idleWindow.cancelIdleCallback?.(handle)
+    }
+    const handle = window.setTimeout(run, 200)
+    return () => window.clearTimeout(handle)
+  }, [prefetchScene, worldState])
 
   useEffect(() => {
     const element = viewportRef.current
@@ -202,6 +310,7 @@ export function SceneViewport({
       routeNotFound ||
       !sceneId ||
       worldState.status !== "loaded" ||
+      worldState.focusedSceneId !== sceneId ||
       viewport.width <= 1 ||
       viewport.height <= 1
     )
@@ -248,8 +357,8 @@ export function SceneViewport({
   }
 
   const focusedScene =
-    worldState.status === "loaded" && sceneId
-      ? worldState.layout.scenes.get(sceneId)?.scene
+    worldState.status === "loaded"
+      ? worldState.layout.scenes.get(worldState.focusedSceneId)?.scene
       : undefined
   const rootPositioned =
     worldState.status === "loaded"
@@ -274,7 +383,9 @@ export function SceneViewport({
   return (
     <section
       aria-labelledby="scene-title"
-      aria-busy={worldState.status === "loading" || animating}
+      aria-busy={
+        worldState.status === "loading" || Boolean(loadingSceneId) || animating
+      }
       className={
         embedded
           ? "flex size-full min-h-0 flex-col"
@@ -359,11 +470,12 @@ export function SceneViewport({
             layout={worldState.layout}
             camera={camera}
             viewport={viewport}
-            focusedSceneId={sceneId}
+            focusedSceneId={worldState.focusedSceneId}
             selectedSceneId={selectedSceneId}
             selectedElementId={selectedElementId}
             navigationDisabled={navigationDisabled || animating}
             onEnterScene={enterScene}
+            onPrefetchScene={prefetchScene}
             onSelectTopic={onSelectTopic}
           />
         ) : null}

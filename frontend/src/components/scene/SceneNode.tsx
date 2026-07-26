@@ -53,6 +53,7 @@ type SceneNodeProps = {
   density?: SceneNodeDensity
   navigationDisabled?: boolean
   onEnterScene?: (sceneId: string, elementId: string) => void
+  onPrefetchScene?: (sceneId: string) => void
   onSelectTopic?: (elementId: string, label: string) => void
 }
 
@@ -63,6 +64,7 @@ export function SceneNode({
   density = "near",
   navigationDisabled = false,
   onEnterScene,
+  onPrefetchScene,
   onSelectTopic,
 }: SceneNodeProps) {
   const { x, y, width, height } = layout
@@ -119,6 +121,8 @@ export function SceneNode({
         disabled={navigationDisabled}
         aria-label={`${accessibleLabel} 내부 보기`}
         className={cn(sceneNodeVariants({ state }))}
+        onFocus={() => onPrefetchScene?.(navigationSceneId)}
+        onPointerEnter={() => onPrefetchScene?.(navigationSceneId)}
         onClick={() => onEnterScene(navigationSceneId, element.id)}
       >
         {content}

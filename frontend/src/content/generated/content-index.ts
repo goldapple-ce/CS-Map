@@ -120,7 +120,7 @@ export const sceneIndex: readonly SceneIndexEntry[] = [
   },
   {
     "id": "google-com-server-spring-filterchain-securityfilterchain-usernamepasswordauthenticationfilter",
-    "title": "SecurityFilterChain",
+    "title": "UsernamePasswordAuthenticationFilter",
     "slug": "username-password-authentication-filter",
     "scenarioId": "google-search-root",
     "parentId": "google-com-server-spring-filterchain-securityfilterchain",
