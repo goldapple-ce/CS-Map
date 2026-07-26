@@ -42,7 +42,7 @@ const sceneElementSchema = z.discriminatedUnion("kind", [
       kind: z.literal("node"),
       label: z.string().min(1).optional(),
       grid: z
-        .object({ x: gridCoordinateSchema, y: gridCoordinateSchema })
+        .object({ row: gridCoordinateSchema, col: gridCoordinateSchema })
         .strict()
         .optional(),
       groupId: contentIdSchema.optional(),
@@ -257,7 +257,7 @@ export const sceneSchema = z
           })
           return
         }
-        const cell = `${node.grid.x},${node.grid.y}`
+        const cell = `${node.grid.row},${node.grid.col}`
         const occupant = occupiedCells.get(cell)
         if (occupant) {
           context.addIssue({

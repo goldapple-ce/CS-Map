@@ -16,8 +16,8 @@ export type Source = {
 export type LayoutHint = "horizontal" | "branch"
 
 export type SceneGridPlacement = {
-  x: number
-  y: number
+  row: number
+  col: number
 }
 
 export type SceneGridLayout = {

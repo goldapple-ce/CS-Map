@@ -30,31 +30,31 @@ elements:
   - id: dispatcher-servlet
     kind: node
     label: DispatcherServlet
-    grid: { x: 1, y: 2 }
+    grid: { row: 2, col: 1 }
   - id: rendered-view
     kind: node
     label: View / HTML 렌더링
-    grid: { x: 1, y: 4 }
+    grid: { row: 4, col: 1 }
   - id: handler-mapping
     kind: node
     label: HandlerMapping
-    grid: { x: 3, y: 1 }
+    grid: { row: 1, col: 3 }
   - id: handler-adapter
     kind: node
     label: HandlerAdapter
-    grid: { x: 3, y: 2 }
+    grid: { row: 2, col: 3 }
   - id: view-resolver
     kind: node
     label: ViewResolver
-    grid: { x: 3, y: 3 }
+    grid: { row: 3, col: 3 }
   - id: controller
     kind: node
     label: Controller
-    grid: { x: 5, y: 2 }
+    grid: { row: 2, col: 5 }
   - id: model
     kind: node
     label: Model
-    grid: { x: 4, y: 4 }
+    grid: { row: 4, col: 5 }
   - id: dispatcher-to-mapping
     kind: edge
     label: ① Handler 조회

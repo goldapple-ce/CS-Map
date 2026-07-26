@@ -459,6 +459,7 @@ type HistoryEntry = {
 - 클릭 가능한 텍스트·버튼은 SVG 접근 가능 요소 또는 위치가 동기화된 HTML overlay로 표현한다.
 - 장면 데이터는 픽셀 좌표를 저장하지 않는다. 일반 Scene은 노드 순서, 그룹 소속과 관계로 자동 배치하고, 정밀한 Scene은 node마다 1~5 범위의 5×5 논리 격자 셀을 저장할 수 있다.
 - 논리 격자 스키마는 모든 node의 셀 지정, 좌표 범위와 셀 중복을 검증한다. 셀 번호를 실제 좌표로 투영할 때 노드 라벨 너비, 공통 행·열 간격과 주석 영역을 반영해 Scene bounds를 결정한다.
+- 논리 격자 node는 `grid: { row, col }`을 사용한다. `row`는 세로 셀, `col`은 가로 셀이며 둘 다 1~5 범위다.
 - 콘텐츠 빌드 단계의 ELK layered adapter가 로컬 Topic 좌표, 직교 edge 경로와 edge별 port를 결정적으로 계산하고 `scene-layout-index.ts`를 생성한다.
 - ELK adapter는 renderer 계층에만 속하며 Scene·Relationship 도메인 모델을 ELK 타입에 결합하지 않는다. 런타임 renderer는 생성 인덱스를 읽고, 인덱스가 없는 개발·복구 상황에서만 기존 결정적 배치를 fallback으로 사용한다.
 - 생성된 로컬 Scene 배치를 기존 재귀 월드 배치가 조합해 월드 bounds와 자식 Scene 중첩 영역을 계산하므로 카메라, URL과 Semantic Zoom 상태 모델은 바뀌지 않는다.
@@ -471,6 +472,7 @@ type HistoryEntry = {
 - 기본 Topic 크기와 열·행 간격은 확대된 Scene에서도 라벨과 진행 방향을 구분할 수 있는 크기로 유지하며, edge 라벨 너비가 더 크면 열 간격을 추가로 확장한다.
 - 보이는 edge 라벨은 배경색 halo로 선과 분리하고, edge 그룹의 접근성 이름과 SVG `title`은 그대로 유지한다.
 - 배치 구현은 도메인 모델 밖의 build adapter로 둔다. 콘텐츠 작성자는 일반 Scene에서는 좌표를 쓰지 않고, 논리 격자 Scene에서는 1~5의 셀 위치만 작성한다. 픽셀 `x`, `y`, `width`, `height`, port와 bend point는 작성하지 않는다.
+- Vite 개발 플러그인은 `scene.yaml` 또는 `concept.yaml` 저장을 감지하면 기존 콘텐츠 빌드 파이프라인을 순차 실행한다. 생성 인덱스 갱신이 끝난 뒤 브라우저를 자동 새로고침하여 현재 Scene 데이터와 배치를 다시 로드한다. 배포 빌드는 기존 `prebuild` 경로를 사용한다.
 - 화면 투영 크기에 따른 LOD와 Viewport 교차 검사로 실제 DOM 렌더링 범위를 제한한다.
 
 ### 9.2 진입 전환

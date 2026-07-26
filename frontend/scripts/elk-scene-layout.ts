@@ -164,8 +164,8 @@ async function buildGridSceneLayout(
   const columnWidths = Array.from({ length: columns }, () => MIN_NODE_WIDTH)
   for (const node of nodes) {
     if (!node.grid) continue
-    columnWidths[node.grid.x - 1] = Math.max(
-      columnWidths[node.grid.x - 1] ?? MIN_NODE_WIDTH,
+    columnWidths[node.grid.col - 1] = Math.max(
+      columnWidths[node.grid.col - 1] ?? MIN_NODE_WIDTH,
       estimatedNodeWidth(node)
     )
   }
@@ -210,14 +210,16 @@ async function buildGridSceneLayout(
         )
       }
       const width = estimatedNodeWidth(node)
-      const columnWidth = columnWidths[node.grid.x - 1] ?? width
+      const columnWidth = columnWidths[node.grid.col - 1] ?? width
       return [
         node.id,
         {
           x:
-            (columnStarts[node.grid.x - 1] ?? gridStartX) +
+            (columnStarts[node.grid.col - 1] ?? gridStartX) +
             (columnWidth - width) / 2,
-          y: gridStartY + (node.grid.y - 1) * (NODE_HEIGHT + GRID_ROW_GAP),
+          y:
+            gridStartY +
+            (node.grid.row - 1) * (NODE_HEIGHT + GRID_ROW_GAP),
           width,
           height: NODE_HEIGHT,
         },
