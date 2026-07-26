@@ -91,7 +91,12 @@ export function SceneRenderer({
         {edges.map((element) => {
           const points = layout.edges.get(element.id)
           return points ? (
-            <SceneEdge key={element.id} element={element} points={points} />
+            <SceneEdge
+              key={element.id}
+              element={element}
+              points={points}
+              density="near"
+            />
           ) : null
         })}
         {annotations.map((element) => {

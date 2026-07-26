@@ -140,6 +140,7 @@ export function WorldRenderer({
           const { scene, localLayout } = positioned
           const projectedWidth = positioned.bounds.width * camera.scale
           const renderScale = positioned.scale * camera.scale
+          const density = nodeDensity(renderScale)
           const isFocused = scene.id === focusedSceneId
           const groups = scene.elements.filter(
             (element): element is SceneGroupElement => element.kind === "group"
@@ -181,6 +182,7 @@ export function WorldRenderer({
                     element={element}
                     points={points}
                     contextual={!isFocused}
+                    density={density}
                   />
                 ) : null
               })}
@@ -208,7 +210,7 @@ export function WorldRenderer({
                     element={element}
                     layout={box}
                     state={nodeState(element)}
-                    density={nodeDensity(renderScale)}
+                    density={density}
                     navigationDisabled={navigationDisabled}
                     onEnterScene={onEnterScene}
                     onShowPlanned={onShowPlanned}
