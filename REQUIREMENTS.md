@@ -339,6 +339,8 @@ Scene YAML은 최소한 다음 정보만 작성한다.
 - Scene 파일이 존재하면 탐색 가능한 콘텐츠로 간주한다.
 - 하위 콘텐츠가 없는 Topic은 단말 node가 될 수 있다.
 - 자식 Scene 참조가 없는 node도 클릭 가능한 말단 Topic으로 노출한다.
+- 말단 Topic은 짧은 Markdown `description` 또는 같은 Scene 디렉터리의 Markdown 파일을 가리키는 `contentRef` 중 하나로 개별 설명을 제공할 수 있다.
+- 말단 Topic 설명은 해당 Topic을 선택했을 때 Explanation Panel에 표시하며 URL과 카메라를 변경하지 않는다.
 - 말단 Topic에 별도 설명 데이터가 없으면 Explanation Panel에서 명시적인 빈 상태를 보여준다.
 
 ## 10. 데이터 요구사항
@@ -359,6 +361,8 @@ type SceneNode = {
   col: 1 | 2 | 3 | 4 | 5;
   childSceneId?: string;
   navigateToSceneId?: string;
+  description?: string;
+  contentRef?: string;
 };
 
 type SceneEdge = {
@@ -388,6 +392,8 @@ type SelfCheckQuestion = {
 - 필수 필드 누락
 - Scene 제목과 Markdown 설명 파일 누락
 - 접근 불가능한 고립 장면
+- 같은 node의 `description`·`contentRef` 동시 사용과 이동 가능한 node의 Topic 설명 필드
+- Scene 디렉터리를 벗어나거나 Markdown 파일명이 아닌 Topic `contentRef`
 
 ## 11. 기술 요구사항 및 MVP 기술 기준
 

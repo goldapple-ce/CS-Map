@@ -62,6 +62,10 @@ function siblingModuleKey(moduleKey: string, contentRef: string) {
 export class FileContentRepository implements ContentRepository {
   private readonly sceneMapCache = new Map<ContentId, Promise<Scene>>()
   private readonly sceneCache = new Map<ContentId, Promise<LoadedScene>>()
+  private readonly topicExplanationCache = new Map<
+    string,
+    Promise<string | undefined>
+  >()
   private readonly scenePrefetches = new Map<ContentId, Promise<void>>()
   private readonly conceptCache = new Map<ContentId, Promise<LoadedConcept>>()
 
@@ -150,6 +154,48 @@ export class FileContentRepository implements ContentRepository {
       scene: quiz ? { ...scene, selfCheckQuiz: quiz } : scene,
       markdown,
     }
+  }
+
+  loadTopicExplanation(
+    sceneId: ContentId,
+    elementId: ContentId
+  ): Promise<string | undefined> {
+    const cacheKey = `${sceneId}/${elementId}`
+    const cached = this.topicExplanationCache.get(cacheKey)
+    if (cached) return cached
+
+    let request: Promise<string | undefined>
+    request = this.loadTopicExplanationUncached(sceneId, elementId).catch(
+      (error: unknown) => {
+        if (this.topicExplanationCache.get(cacheKey) === request) {
+          this.topicExplanationCache.delete(cacheKey)
+        }
+        throw error
+      }
+    )
+    this.topicExplanationCache.set(cacheKey, request)
+    return request
+  }
+
+  private async loadTopicExplanationUncached(
+    sceneId: ContentId,
+    elementId: ContentId
+  ) {
+    const entry = sceneIndex.find((item) => item.id === sceneId)
+    if (!entry) throw new Error(`Unknown scene: ${sceneId}`)
+
+    const scene = await this.loadSceneMap(sceneId)
+    const element = scene.elements.find((item) => item.id === elementId)
+    if (!element || element.kind !== "node") {
+      throw new Error(`Unknown Topic ${elementId} in Scene ${sceneId}`)
+    }
+    if (element.description) return element.description
+    if (!element.contentRef) return undefined
+
+    return loadRaw(
+      markdownModules,
+      siblingModuleKey(entry.moduleKey, element.contentRef)
+    )
   }
 
   prefetchScene(id: ContentId): Promise<void> {

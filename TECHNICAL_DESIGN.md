@@ -225,6 +225,8 @@ type SceneNode = {
   col: 1 | 2 | 3 | 4 | 5;
   childSceneId?: ContentId;
   navigateToSceneId?: ContentId;
+  description?: string;
+  contentRef?: string;
 };
 
 type SceneEdge = {
@@ -284,6 +286,8 @@ content/scenes/google-com/network/dns/
 
 `scene.yaml`은 `id`, `title`, `summary`, `nodes`, `edges`를 가진다. `title`은 Scene 표시 제목의 단일 원본이며 `content.ko.md`는 이를 H1으로 반복하지 않고 긴 설명만 가진다. 퀴즈가 있으면 같은 디렉터리에 질문·답변 배열인 `quiz.ko.yaml`을 둔다.
 
+하위 Scene과 교차 이동 대상이 없는 말단 node는 짧은 Markdown 문자열인 `description` 또는 같은 Scene 디렉터리의 `.md` 파일명인 `contentRef` 중 하나를 가질 수 있다. 두 필드는 상호 배타적이며 이동 가능한 node에는 작성하지 않는다. Topic `contentRef`는 `/`와 `..`를 허용하지 않아 현재 Scene 디렉터리를 벗어날 수 없다.
+
 루트 콘텐츠 디렉터리 이름은 canonical URL과 같은 `google-com`을 사용한다. 기존 `google-search-*` 영구 ID는 내부 참조를 깨뜨리지 않기 위해 유지한다. 새 하위 Scene은 의미에 맞는 ID를 사용하며, 기존 ID를 일괄 변경해야 할 필요가 생기면 별도의 migration으로 처리한다.
 
 ### 6.2 공통 개념 디렉터리
@@ -306,6 +310,8 @@ content/concepts/tcp/
 - loader map은 eager import가 아니라 장면별 lazy import를 기본으로 한다.
 - `ContentRepository`가 route index와 loader map을 결합하며 UI는 Vite API를 직접 사용하지 않는다.
 - 지도 구성에는 `loadSceneMap`으로 Scene YAML만 읽고, Explanation Panel에는 `loadScene`으로 같은 Scene YAML과 Markdown·선택적 quiz를 결합해 제공한다.
+- `loadTopicExplanation(sceneId, elementId)`는 정규화된 node의 inline `description`을 반환하거나 해당 node의 `contentRef` Markdown만 선택 시 lazy load한다. 설명 필드가 없으면 명시적인 빈 결과를 반환한다.
+- Topic 설명 loader는 Scene과 element 조합별 진행 중 `Promise`와 완료 결과를 메모리 cache에 저장하고, 실패한 요청은 제거해 다음 선택에서 다시 시도한다.
 - Scene 지도, Scene 상세와 Concept 상세 loader는 각각 진행 중 `Promise`와 완료 결과를 메모리 cache에 저장한다. 같은 콘텐츠를 동시에 요청하거나 다시 방문하면 같은 결과를 공유하며, 실패한 `Promise`는 cache에서 제거해 다음 요청에서 다시 시도한다.
 - 생성된 index는 사람이 직접 수정하지 않으며 빌드 또는 개발 시작 시 다시 만든다.
 - 콘텐츠 파일 추가 후 route index 재생성을 검증하는 테스트를 둔다.
@@ -507,6 +513,8 @@ failure, security, practice, related, sources, custom
 ```
 
 모든 장면에 모든 섹션을 강제하지 않는다. 장면의 학습 목표에 필요한 섹션만 제공한다.
+
+말단 Topic을 선택하면 `ExplanationPanel`은 Scene 전체 설명 대신 해당 Topic의 `description` 또는 `contentRef` Markdown을 같은 `MarkdownContent` renderer로 표시한다. 로딩, 실패와 설명 없음 상태를 구분하며 `현재 Scene 설명으로 돌아가기`는 Topic 선택만 해제한다. 이 동작은 URL, 카메라와 현재 Scene을 변경하지 않는다.
 
 ### 10.3 Topic 퀴즈
 

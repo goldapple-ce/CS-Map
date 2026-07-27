@@ -36,6 +36,8 @@ export type SceneNodeElement = SceneElementBase & {
   grid?: SceneGridPlacement
   targetSceneId?: ContentId
   navigateToSceneId?: ContentId
+  description?: string
+  contentRef?: string
 }
 
 export type SceneEdgeElement = SceneElementBase & {

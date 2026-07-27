@@ -11,6 +11,13 @@ const contentRefSchema = z
   .string()
   .min(1)
   .regex(/^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$))[a-zA-Z0-9._/-]+$/)
+const topicContentRefSchema = z
+  .string()
+  .min(1)
+  .regex(
+    /^[a-zA-Z0-9][a-zA-Z0-9._-]*\.md$/,
+    "Topic contentRef must be a Markdown file in the same Scene directory"
+  )
 
 const statusSchema = z.enum(["draft", "review", "published"])
 const gridCoordinateSchema = z.number().int().min(1).max(5)
@@ -35,16 +42,36 @@ const sceneNodeSchema = z
     col: gridCoordinateSchema,
     childSceneId: contentIdSchema.optional(),
     navigateToSceneId: contentIdSchema.optional(),
+    description: z.string().min(1).optional(),
+    contentRef: topicContentRefSchema.optional(),
   })
   .strict()
-  .refine(
-    (node) =>
-      !(node.childSceneId && node.navigateToSceneId),
-    {
-      message:
-        "Use either childSceneId or navigateToSceneId, not both",
+  .superRefine((node, context) => {
+    if (node.childSceneId && node.navigateToSceneId) {
+      context.addIssue({
+        code: "custom",
+        path: ["navigateToSceneId"],
+        message: "Use either childSceneId or navigateToSceneId, not both",
+      })
     }
-  )
+    if (node.description && node.contentRef) {
+      context.addIssue({
+        code: "custom",
+        path: ["contentRef"],
+        message: "Use either description or contentRef, not both",
+      })
+    }
+    if (
+      (node.description || node.contentRef) &&
+      (node.childSceneId || node.navigateToSceneId)
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: [node.description ? "description" : "contentRef"],
+        message: "Topic explanations are only supported on leaf nodes",
+      })
+    }
+  })
 
 const sceneEdgeSchema = z
   .object({
@@ -149,6 +176,8 @@ export function normalizeSceneDocument(
         ...(node.navigateToSceneId
           ? { navigateToSceneId: node.navigateToSceneId }
           : {}),
+        ...(node.description ? { description: node.description } : {}),
+        ...(node.contentRef ? { contentRef: node.contentRef } : {}),
       })),
       ...document.edges.map((edge, index) => ({
         id: `edge-${edge.from}-${edge.to}-${index + 1}`,

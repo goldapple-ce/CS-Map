@@ -47,6 +47,10 @@ export interface ContentRepository {
   findRoute(path: string): RouteIndexEntry | undefined
   loadSceneMap(id: ContentId): Promise<Scene>
   loadScene(id: ContentId): Promise<LoadedScene>
+  loadTopicExplanation(
+    sceneId: ContentId,
+    elementId: ContentId
+  ): Promise<string | undefined>
   prefetchScene(id: ContentId): Promise<void>
   loadConcept(id: ContentId): Promise<LoadedConcept>
 }

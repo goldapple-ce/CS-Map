@@ -38,6 +38,11 @@ type ExplanationState =
     }
   | { status: "error"; message: string }
 
+type TopicExplanationState =
+  | { status: "idle" | "loading" }
+  | { status: "loaded"; markdown?: string }
+  | { status: "error"; message: string }
+
 type ExplanationPanelProps = {
   sceneId?: string
   title: string
@@ -64,6 +69,8 @@ export function ExplanationPanel({
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const explanationScrollTopRef = useRef(restoreScrollTop)
   const [state, setState] = useState<ExplanationState>({ status: "idle" })
+  const [topicExplanation, setTopicExplanation] =
+    useState<TopicExplanationState>({ status: "idle" })
   const [activeTab, setActiveTab] = useState<"explanation" | "quiz">(
     "explanation"
   )
@@ -125,6 +132,36 @@ export function ExplanationPanel({
 
   useEffect(() => {
     if (topicSelection) setActiveTab("explanation")
+  }, [topicSelection])
+
+  useEffect(() => {
+    if (!topicSelection) {
+      setTopicExplanation({ status: "idle" })
+      return
+    }
+    let active = true
+    setTopicExplanation({ status: "loading" })
+    contentRepository
+      .loadTopicExplanation(topicSelection.sceneId, topicSelection.elementId)
+      .then((markdown) => {
+        if (!active) return
+        setTopicExplanation(
+          markdown ? { status: "loaded", markdown } : { status: "loaded" }
+        )
+      })
+      .catch((error: unknown) => {
+        if (!active) return
+        setTopicExplanation({
+          status: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Topic 설명을 불러오지 못했습니다.",
+        })
+      })
+    return () => {
+      active = false
+    }
   }, [topicSelection])
 
   useEffect(() => {
@@ -226,19 +263,27 @@ export function ExplanationPanel({
               <article className="mx-auto max-w-3xl space-y-10 px-6 py-7">
                 {topicSelection ? (
                   <section className="space-y-5">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Topic 설명
+                    {topicExplanation.status === "loading" ||
+                    topicExplanation.status === "idle" ? (
+                      <p className="text-sm text-muted-foreground">
+                        Topic 설명을 불러오는 중입니다.
                       </p>
-                      <h3 className="text-2xl font-semibold tracking-tight">
-                        {topicSelection.label}
-                      </h3>
-                    </div>
-                    <p className="text-sm leading-7 text-muted-foreground">
-                      이 Topic에는 아직 작성된 상세 설명이 없습니다. 현재
-                      Scene의 흐름과 연결 관계는 지도에서 계속 확인할 수
-                      있습니다.
-                    </p>
+                    ) : topicExplanation.status === "error" ? (
+                      <p className="text-sm text-destructive">
+                        {topicExplanation.message}
+                      </p>
+                    ) : topicExplanation.markdown ? (
+                      <MarkdownContent
+                        markdown={topicExplanation.markdown}
+                        idPrefix={`topic-${topicSelection.sceneId}-${topicSelection.elementId}`}
+                      />
+                    ) : (
+                      <p className="text-sm leading-7 text-muted-foreground">
+                        이 Topic에는 아직 작성된 상세 설명이 없습니다. 현재
+                        Scene의 흐름과 연결 관계는 지도에서 계속 확인할 수
+                        있습니다.
+                      </p>
+                    )}
                     <Button
                       type="button"
                       variant="outline"
