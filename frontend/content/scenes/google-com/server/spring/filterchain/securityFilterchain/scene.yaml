@@ -39,7 +39,7 @@ nodes:
     label: AuthorizationFilter
     row: 5
     col: 5
-
+    contentRef: authorizationfilter.ko.md
 edges:
   - from: filter-chain-proxy
     to: security-context-holder-filter

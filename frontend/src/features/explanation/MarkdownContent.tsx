@@ -91,7 +91,7 @@ export function MarkdownContent({ markdown, idPrefix }: MarkdownContentProps) {
       </code>
     ),
     pre: ({ children }) => (
-      <pre className="overflow-x-auto rounded-lg border border-border bg-muted/40 p-4 text-xs leading-6 [&>code]:bg-transparent [&>code]:p-0">
+      <pre className="overflow-x-auto rounded-lg border border-border bg-muted/40 p-4 text-xs leading-6 [&>code]:bg-transparent [&>code]:p-0 [&>code]:text-foreground!">
         {children}
       </pre>
     ),
