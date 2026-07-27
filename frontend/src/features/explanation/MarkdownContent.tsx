@@ -45,7 +45,7 @@ export function MarkdownContent({ markdown, idPrefix }: MarkdownContentProps) {
       className={
         prominent
           ? "text-xl font-semibold tracking-tight"
-          : "border-b border-border pb-2 text-lg font-semibold tracking-tight"
+          : "pt-4 text-lg font-semibold tracking-tight"
       }
     >
       {children}
@@ -85,7 +85,7 @@ export function MarkdownContent({ markdown, idPrefix }: MarkdownContentProps) {
     ),
     code: ({ children, className }) => (
       <code
-        className={`${className ?? ""} rounded bg-muted px-1.5 py-0.5 font-mono text-[0.9em]`}
+        className={`${className ?? ""} rounded bg-muted px-1.5 py-0.5 font-mono text-[0.9em] text-destructive`}
       >
         {children}
       </code>

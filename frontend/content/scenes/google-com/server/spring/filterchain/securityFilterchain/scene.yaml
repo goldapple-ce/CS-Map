@@ -1,6 +1,6 @@
 id: google-com-server-spring-filterchain-securityfilterchain
 title: SecurityFilterChain
-summary: Servlet FilterChain이 Spring Security의 FilterChainProxy와 SecurityFilterChain으로 처리를 위임한 뒤 원래 FilterChain을 계속 진행하는 흐름입니다.
+summary: Spring Security의 Filter를 엮어 인증 / 인가를 처리합니다.
 nodes:
   filter-chain-proxy:
     label: FilterChainProxy
@@ -62,7 +62,8 @@ edges:
     labelSide: bottom
   - from: exception-translation-filter
     to: authorization-filter
-    label: 인증/인가
+    label: doFilter(인가)
+    labelSide: bottom
 
   - from: security-context-holder-filter
     to: security-context-holder
@@ -75,6 +76,7 @@ edges:
     to: security-context-holder
     toSide: left
   - from: ananymous-authentication-filter
+    # fromSide: right
     to: security-context-holder
     toSide: left
   - from: security-context-holder
