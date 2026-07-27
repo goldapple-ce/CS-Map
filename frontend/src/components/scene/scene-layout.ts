@@ -61,6 +61,7 @@ function estimatedEdgeLabelWidth(label: string) {
   return (
     [...label].reduce((width, character) => {
       if (/\s/u.test(character)) return width + 6
+      // eslint-disable-next-line no-control-regex
       if (/[^\u0000-\u00ff]/u.test(character)) return width + 18
       return width + 10
     }, 0) + 28
@@ -85,10 +86,7 @@ function calculateDepths(scene: Scene, nodes: readonly SceneNodeElement[]) {
     ) {
       continue
     }
-    incoming.set(
-      edge.toElementId,
-      (incoming.get(edge.toElementId) ?? 0) + 1
-    )
+    incoming.set(edge.toElementId, (incoming.get(edge.toElementId) ?? 0) + 1)
     flowNodeIds.add(edge.fromElementId)
     flowNodeIds.add(edge.toElementId)
     const targets = outgoing.get(edge.fromElementId) ?? []
@@ -168,8 +166,7 @@ function edgePoints(
 
   const offset = laneOffset ?? 0
   const horizontallySeparated =
-    target.x >= source.x + source.width ||
-    source.x >= target.x + target.width
+    target.x >= source.x + source.width || source.x >= target.x + target.width
 
   if (preferTopEntry && sourceCenterY < target.y) {
     const targetIsLeftOfSource = targetCenterX < sourceCenterX
@@ -196,12 +193,7 @@ function edgePoints(
     }
     if (start.y === end.y) return [start, end]
     const middleX = (start.x + end.x) / 2
-    return [
-      start,
-      { x: middleX, y: start.y },
-      { x: middleX, y: end.y },
-      end,
-    ]
+    return [start, { x: middleX, y: start.y }, { x: middleX, y: end.y }, end]
   }
 
   const downward = targetCenterY > sourceCenterY
@@ -215,12 +207,7 @@ function edgePoints(
   }
   if (start.x === end.x) return [start, end]
   const middleY = (start.y + end.y) / 2
-  return [
-    start,
-    { x: start.x, y: middleY },
-    { x: end.x, y: middleY },
-    end,
-  ]
+  return [start, { x: start.x, y: middleY }, { x: end.x, y: middleY }, end]
 }
 
 export function createSceneLayout(scene: Scene): SceneLayout {
@@ -298,8 +285,7 @@ export function createSceneLayout(scene: Scene): SceneLayout {
   layers.forEach((layer, depth) => {
     const layerWidth = layerWidths[depth] ?? 0
     const layerHeight =
-      layer.length * SCENE_NODE_HEIGHT +
-      Math.max(layer.length - 1, 0) * ROW_GAP
+      layer.length * SCENE_NODE_HEIGHT + Math.max(layer.length - 1, 0) * ROW_GAP
     const firstY =
       scene.layoutHint === "branch" && layer.length > 1
         ? centerY -

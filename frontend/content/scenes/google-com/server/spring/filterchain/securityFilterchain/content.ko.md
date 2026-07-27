@@ -3,6 +3,8 @@
 Spring Security은 여러 Security Filter가 연결된 `SecurityFilterChain`을 기반으로 동작합니다.
 `SecurityFilterChain` 자체는 Filter를 실행하지 않습니다. 현재 요청에 적용할 조건과 `List<Filter>`를 보관하며, 실제 선택과 실행은 `FilterChainProxy`가 담당합니다.
 
+---
+
 # 주요 Filter 흐름
 
 설정에 따라 실제 Filter 구성은 달라지지만, 주로 많이 사용하는 Filter는 다음과 같은 것들이 있습니다.
@@ -20,6 +22,8 @@ Spring Security은 여러 Security Filter가 연결된 `SecurityFilterChain`을 
 - AuthorizationFilter : 현재 요청의 인가 진입점입니다.
 
 모든 요청이 각 Filter에서 인증되는 것은 아니다. 각 인증 Filter는 자신이 처리할 요청과 일치하지 않으면 다음 Filter로 요청을 전달한다.
+
+---
 
 # 참고 자료
 

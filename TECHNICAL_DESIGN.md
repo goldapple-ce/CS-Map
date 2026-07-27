@@ -312,10 +312,11 @@ content/concepts/tcp/
 
 ### 6.4 Markdown 정책
 
-- Markdown 원문은 Vite의 정적 loader map에 빌드하고, 패널은 허용 목록 기반 React 요소로만 변환한다.
-- 원문 HTML은 해석하지 않고 일반 텍스트로 취급하며 `dangerouslySetInnerHTML`을 사용하지 않는다.
+- Markdown 원문은 Vite의 정적 loader map에 빌드하고, `react-markdown`과 `remark-gfm`으로 CommonMark 및 GFM AST를 허용 목록 기반 React 요소로 변환한다.
+- renderer component map이 제목, 문단, 인용문, 중첩 목록, 링크, code block과 표에 Tailwind 의미 기반 스타일을 적용한다. 자체 줄 단위 Markdown parser는 두지 않는다.
+- 원문 HTML은 `skipHtml`로 제거하고 rehype raw HTML plugin과 `dangerouslySetInnerHTML`을 사용하지 않는다.
 - 임의 JSX, script, inline event handler를 허용하지 않는다.
-- 제목에 안정적인 section ID를 부여한다.
+- 제목의 React 자식에서 평문을 추출하고 기존 정규화·중복 번호 규칙으로 안정적인 section ID를 부여한다.
 - 장면 내 링크는 일반 URL 대신 검증 가능한 콘텐츠 참조 문법을 사용한다.
 - 필요한 외부 참고 링크는 Markdown 본문에 직접 작성한다.
 

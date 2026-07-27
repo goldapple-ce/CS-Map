@@ -1,135 +1,19 @@
-import type { ReactNode } from "react"
+import { isValidElement, type ReactNode } from "react"
+import ReactMarkdown, {
+  defaultUrlTransform,
+  type Components,
+} from "react-markdown"
+import remarkGfm from "remark-gfm"
 
-type MarkdownBlock =
-  | { type: "heading"; level: number; text: string }
-  | { type: "paragraph"; text: string }
-  | { type: "blockquote"; text: string }
-  | { type: "list"; ordered: boolean; items: string[] }
-  | { type: "code"; language?: string; value: string }
-
-function isBlockStart(line: string) {
-  return (
-    /^#{1,3}\s/u.test(line) ||
-    /^>\s?/u.test(line) ||
-    /^(?:[-*]|\d+\.)\s+/u.test(line) ||
-    /^```/u.test(line)
-  )
-}
-
-function parseMarkdown(markdown: string): MarkdownBlock[] {
-  const lines = markdown.replace(/\r\n?/gu, "\n").split("\n")
-  const blocks: MarkdownBlock[] = []
-  let index = 0
-
-  while (index < lines.length) {
-    const line = lines[index] ?? ""
-    if (!line.trim()) {
-      index += 1
-      continue
-    }
-
-    const fence = line.match(/^```([^\s`]*)\s*$/u)
-    if (fence) {
-      const code: string[] = []
-      index += 1
-      while (index < lines.length && !/^```\s*$/u.test(lines[index] ?? "")) {
-        code.push(lines[index] ?? "")
-        index += 1
-      }
-      index += 1
-      blocks.push({
-        type: "code",
-        language: fence[1] || undefined,
-        value: code.join("\n"),
-      })
-      continue
-    }
-
-    const heading = line.match(/^(#{1,3})\s+(.+)$/u)
-    if (heading) {
-      blocks.push({
-        type: "heading",
-        level: heading[1]?.length ?? 2,
-        text: heading[2] ?? "",
-      })
-      index += 1
-      continue
-    }
-
-    if (/^>\s?/u.test(line)) {
-      const quote: string[] = []
-      while (index < lines.length && /^>\s?/u.test(lines[index] ?? "")) {
-        quote.push((lines[index] ?? "").replace(/^>\s?/u, ""))
-        index += 1
-      }
-      blocks.push({ type: "blockquote", text: quote.join(" ") })
-      continue
-    }
-
-    const listItem = line.match(/^([-*]|\d+\.)\s+(.+)$/u)
-    if (listItem) {
-      const ordered = /\d+\./u.test(listItem[1] ?? "")
-      const items: string[] = []
-      while (index < lines.length) {
-        const item = (lines[index] ?? "").match(/^([-*]|\d+\.)\s+(.+)$/u)
-        if (!item || /\d+\./u.test(item[1] ?? "") !== ordered) break
-        items.push(item[2] ?? "")
-        index += 1
-      }
-      blocks.push({ type: "list", ordered, items })
-      continue
-    }
-
-    const paragraph = [line.trim()]
-    index += 1
-    while (
-      index < lines.length &&
-      (lines[index] ?? "").trim() &&
-      !isBlockStart(lines[index] ?? "")
-    ) {
-      paragraph.push((lines[index] ?? "").trim())
-      index += 1
-    }
-    blocks.push({ type: "paragraph", text: paragraph.join(" ") })
+function textContent(node: ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node)
   }
-
-  return blocks
-}
-
-function inlineContent(text: string): ReactNode[] {
-  const tokens = text.split(
-    /(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\(https?:\/\/[^)\s]+\))/gu
-  )
-  return tokens.filter(Boolean).map((token, index) => {
-    if (token.startsWith("**") && token.endsWith("**")) {
-      return <strong key={index}>{token.slice(2, -2)}</strong>
-    }
-    if (token.startsWith("`") && token.endsWith("`")) {
-      return (
-        <code
-          key={index}
-          className="rounded bg-muted px-1.5 py-0.5 font-mono text-[0.9em] text-foreground"
-        >
-          {token.slice(1, -1)}
-        </code>
-      )
-    }
-    const link = token.match(/^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)$/u)
-    if (link) {
-      return (
-        <a
-          key={index}
-          href={link[2]}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="font-medium text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
-        >
-          {link[1]}
-        </a>
-      )
-    }
-    return token
-  })
+  if (Array.isArray(node)) return node.map(textContent).join("")
+  if (isValidElement<{ children?: ReactNode }>(node)) {
+    return textContent(node.props.children)
+  }
+  return ""
 }
 
 function headingId(text: string, used: Map<string, number>, idPrefix: string) {
@@ -144,88 +28,129 @@ function headingId(text: string, used: Map<string, number>, idPrefix: string) {
   return `${idPrefix}-${count === 0 ? base : `${base}-${count + 1}`}`
 }
 
+function externalUrl(url: string) {
+  return /^https?:\/\//u.test(url) ? defaultUrlTransform(url) : ""
+}
+
 type MarkdownContentProps = {
   markdown: string
   idPrefix: string
-  compact?: boolean
 }
 
-export function MarkdownContent({
-  markdown,
-  idPrefix,
-  compact = false,
-}: MarkdownContentProps) {
+export function MarkdownContent({ markdown, idPrefix }: MarkdownContentProps) {
   const usedHeadingIds = new Map<string, number>()
+  const heading = (children: ReactNode, prominent = false) => (
+    <h3
+      id={headingId(textContent(children), usedHeadingIds, idPrefix)}
+      className={
+        prominent
+          ? "text-xl font-semibold tracking-tight"
+          : "border-b border-border pb-2 text-lg font-semibold tracking-tight"
+      }
+    >
+      {children}
+    </h3>
+  )
+  const components: Components = {
+    h1: ({ children }) => heading(children, true),
+    h2: ({ children }) => heading(children),
+    h3: ({ children }) => heading(children),
+    h4: ({ children }) => heading(children),
+    h5: ({ children }) => heading(children),
+    h6: ({ children }) => heading(children),
+    p: ({ children }) => <p className="text-sm leading-6">{children}</p>,
+    blockquote: ({ children }) => (
+      <blockquote className="border-l-2 border-border pl-4 text-sm leading-6">
+        {children}
+      </blockquote>
+    ),
+    ul: ({ children }) => (
+      <ul className="list-disc space-y-2 pl-5 text-sm leading-6">{children}</ul>
+    ),
+    ol: ({ children }) => (
+      <ol className="list-decimal space-y-2 pl-5 text-sm leading-6">
+        {children}
+      </ol>
+    ),
+    li: ({ children }) => <li className="pl-1 [&>p]:inline">{children}</li>,
+    a: ({ children, href }) => (
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer noopener"
+        className="font-medium underline decoration-border underline-offset-4 hover:decoration-foreground"
+      >
+        {children}
+      </a>
+    ),
+    code: ({ children, className }) => (
+      <code
+        className={`${className ?? ""} rounded bg-muted px-1.5 py-0.5 font-mono text-[0.9em]`}
+      >
+        {children}
+      </code>
+    ),
+    pre: ({ children }) => (
+      <pre className="overflow-x-auto rounded-lg border border-border bg-muted/40 p-4 text-xs leading-6 [&>code]:bg-transparent [&>code]:p-0">
+        {children}
+      </pre>
+    ),
+    table: ({ children }) => (
+      <div className="overflow-x-auto rounded-lg border border-border">
+        <table className="w-full border-collapse text-left text-sm">
+          {children}
+        </table>
+      </div>
+    ),
+    th: ({ children }) => (
+      <th className="border-b border-border bg-muted/40 px-3 py-2 font-semibold">
+        {children}
+      </th>
+    ),
+    td: ({ children }) => (
+      <td className="border-b border-border px-3 py-2">{children}</td>
+    ),
+    hr: () => <hr className="my-5 border-border" />,
+  }
 
   return (
-    <div className={compact ? "space-y-4" : "space-y-6"}>
-      {parseMarkdown(markdown).map((block, index) => {
-        if (block.type === "heading") {
-          const id = headingId(block.text, usedHeadingIds, idPrefix)
-          if (block.level === 1) {
-            return (
-              <h3
-                key={index}
-                id={id}
-                className="text-xl font-semibold tracking-tight"
-              >
-                {inlineContent(block.text)}
-              </h3>
-            )
-          }
-          return (
-            <h3
-              key={index}
-              id={id}
-              className="border-b border-border pb-2 text-lg font-semibold tracking-tight"
-            >
-              {inlineContent(block.text)}
-            </h3>
-          )
-        }
-        if (block.type === "paragraph") {
-          return (
-            <p key={index} className="text-sm leading-7 text-muted-foreground">
-              {inlineContent(block.text)}
-            </p>
-          )
-        }
-        if (block.type === "blockquote") {
-          return (
-            <blockquote
-              key={index}
-              className="border-l-2 border-border pl-4 text-sm leading-7 text-muted-foreground"
-            >
-              {inlineContent(block.text)}
-            </blockquote>
-          )
-        }
-        if (block.type === "list") {
-          const List = block.ordered ? "ol" : "ul"
-          return (
-            <List
-              key={index}
-              className={
-                block.ordered
-                  ? "list-decimal space-y-2 pl-5 text-sm leading-7 text-muted-foreground"
-                  : "list-disc space-y-2 pl-5 text-sm leading-7 text-muted-foreground"
-              }
-            >
-              {block.items.map((item, itemIndex) => (
-                <li key={itemIndex}>{inlineContent(item)}</li>
-              ))}
-            </List>
-          )
-        }
-        return (
-          <pre
-            key={index}
-            className="overflow-x-auto rounded-lg border border-border bg-muted/40 p-4 text-xs leading-6 text-foreground"
-          >
-            <code data-language={block.language}>{block.value}</code>
-          </pre>
-        )
-      })}
+    <div className="space-y-3">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={components}
+        allowedElements={[
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+          "p",
+          "blockquote",
+          "ul",
+          "ol",
+          "li",
+          "strong",
+          "em",
+          "del",
+          "code",
+          "pre",
+          "a",
+          "table",
+          "thead",
+          "tbody",
+          "tr",
+          "th",
+          "td",
+          "hr",
+          "br",
+          "input",
+        ]}
+        skipHtml
+        urlTransform={externalUrl}
+      >
+        {markdown}
+      </ReactMarkdown>
     </div>
   )
 }

@@ -235,8 +235,9 @@ export function ExplanationPanel({
                       </h3>
                     </div>
                     <p className="text-sm leading-7 text-muted-foreground">
-                      이 Topic에는 아직 작성된 상세 설명이 없습니다. 현재 Scene의
-                      흐름과 연결 관계는 지도에서 계속 확인할 수 있습니다.
+                      이 Topic에는 아직 작성된 상세 설명이 없습니다. 현재
+                      Scene의 흐름과 연결 관계는 지도에서 계속 확인할 수
+                      있습니다.
                     </p>
                     <Button
                       type="button"
@@ -287,7 +288,6 @@ export function ExplanationPanel({
                           <MarkdownContent
                             markdown={markdown}
                             idPrefix={`concept-${concept.id}-${occurrenceId}`}
-                            compact
                           />
                         </section>
                       )
