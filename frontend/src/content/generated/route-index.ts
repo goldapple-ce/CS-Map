@@ -141,7 +141,7 @@ export const routeIndex: readonly RouteIndexEntry[] = [
     "title": "UsernamePasswordAuthenticationFilter",
     "path": "/explore/google-com/server/spring/security/security-filter-chain/username-password-authentication-filter",
     "parentId": "google-com-server-spring-filterchain-securityfilterchain",
-    "order": 2,
+    "order": 4,
     "status": "published",
     "moduleKey": "/content/scenes/google-com/server/spring/filterchain/securityFilterchain/usernamePasswordAuthenticationFilter/scene.yaml"
   },

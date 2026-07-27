@@ -2,29 +2,81 @@ id: google-com-server-spring-filterchain-securityfilterchain
 title: SecurityFilterChain
 summary: Servlet FilterChain이 Spring Security의 FilterChainProxy와 SecurityFilterChain으로 처리를 위임한 뒤 원래 FilterChain을 계속 진행하는 흐름입니다.
 nodes:
-  security-filter-chain:
-    label: SecurityFilterChain
-    row: 3
+  filter-chain-proxy:
+    label: FilterChainProxy
+    row: 1
     col: 1
   security-context-holder-filter:
-    label: SecurityContextHolderFilter
+    label: SecurityContext\nHolderFilter
     row: 1
-    col: 5
-  username-password-authentication-filter:
-    label: UsernamePassword\nAuthenticationFilter
-    row: 2
-    col: 5
-    childSceneId: google-com-server-spring-filterchain-securityfilterchain-usernamepasswordauthenticationfilter
-
+    col: 2
   oauth2-authorization-request-redirect-filter:
     label: Oauth2Authorization\nRequestRedirectFilter
-    row: 3
-    col: 5
+    row: 2
+    col: 2
   oauth2-login-authentication-filter:
-    label: OauthLogin\nAuthenticationFilter
+    label: Oauth2Login\nAuthenticationFilter
+    row: 3
+    col: 2
+  username-password-authentication-filter:
+    label: UsernamePassword\nAuthenticationFilter
     row: 4
-    col: 5
-  bearer-token-authentication-filter:
-    label: BearerToken\nAuthenticationFilter
+    col: 2
+    childSceneId: google-com-server-spring-filterchain-securityfilterchain-usernamepasswordauthenticationfilter
+  ananymous-authentication-filter:
+    label: Ananymous\nAuthenticationFilter
+    row: 5
+    col: 2
+  security-context-holder:
+    label: SecurityContextHolder
+    row: 2
+    col: 4
+  exception-translation-filter:
+    label: ExcpetionTranslation\nFilter
+    row: 5
+    col: 4
+  authorization-filter:
+    label: AuthorizationFilter
     row: 5
     col: 5
+
+edges:
+  - from: filter-chain-proxy
+    to: security-context-holder-filter
+    label: doFilter
+  - from: security-context-holder-filter
+    to: oauth2-authorization-request-redirect-filter
+    label: doFilter
+  - from: oauth2-authorization-request-redirect-filter
+    to: oauth2-login-authentication-filter
+    label: doFilter
+  - from: oauth2-login-authentication-filter
+    to: username-password-authentication-filter
+    label: doFilter
+  - from: username-password-authentication-filter
+    to: ananymous-authentication-filter
+    label: doFilter
+  - from: ananymous-authentication-filter
+    to: exception-translation-filter
+    label: doFilter
+    labelSide: bottom
+  - from: exception-translation-filter
+    to: authorization-filter
+    label: 인증/인가
+
+  - from: security-context-holder-filter
+    to: security-context-holder
+    label: securityContext 설정
+  - from: oauth2-login-authentication-filter
+    to: security-context-holder
+    toSide: left
+    label: Authentication 등록
+  - from: username-password-authentication-filter
+    to: security-context-holder
+    toSide: left
+  - from: ananymous-authentication-filter
+    to: security-context-holder
+    toSide: left
+  - from: security-context-holder
+    to: authorization-filter
+    label: Authentication 확인

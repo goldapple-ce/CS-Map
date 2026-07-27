@@ -1112,44 +1112,215 @@ export const sceneLayoutIndex: Readonly<Record<string, SerializedSceneLayout>> =
     "width": 1000,
     "height": 600,
     "nodes": {
-      "security-filter-chain": {
+      "filter-chain-proxy": {
         "x": 35,
-        "y": 260,
-        "width": 130,
-        "height": 80
-      },
-      "security-context-holder-filter": {
-        "x": 835,
         "y": 20,
         "width": 130,
         "height": 80
       },
-      "username-password-authentication-filter": {
-        "x": 835,
-        "y": 140,
+      "security-context-holder-filter": {
+        "x": 235,
+        "y": 20,
         "width": 130,
         "height": 80
       },
       "oauth2-authorization-request-redirect-filter": {
-        "x": 835,
-        "y": 260,
+        "x": 235,
+        "y": 140,
         "width": 130,
         "height": 80
       },
       "oauth2-login-authentication-filter": {
-        "x": 835,
+        "x": 235,
+        "y": 260,
+        "width": 130,
+        "height": 80
+      },
+      "username-password-authentication-filter": {
+        "x": 235,
         "y": 380,
         "width": 130,
         "height": 80
       },
-      "bearer-token-authentication-filter": {
+      "ananymous-authentication-filter": {
+        "x": 235,
+        "y": 500,
+        "width": 130,
+        "height": 80
+      },
+      "security-context-holder": {
+        "x": 635,
+        "y": 140,
+        "width": 130,
+        "height": 80
+      },
+      "exception-translation-filter": {
+        "x": 635,
+        "y": 500,
+        "width": 130,
+        "height": 80
+      },
+      "authorization-filter": {
         "x": 835,
         "y": 500,
         "width": 130,
         "height": 80
       }
     },
-    "edges": {}
+    "edges": {
+      "edge-filter-chain-proxy-security-context-holder-filter-1": [
+        {
+          "x": 165,
+          "y": 52
+        },
+        {
+          "x": 235,
+          "y": 52
+        }
+      ],
+      "edge-security-context-holder-filter-oauth2-authorization-request-redirect-filter-2": [
+        {
+          "x": 287,
+          "y": 100
+        },
+        {
+          "x": 287,
+          "y": 140
+        }
+      ],
+      "edge-oauth2-authorization-request-redirect-filter-oauth2-login-authentication-filter-3": [
+        {
+          "x": 287,
+          "y": 220
+        },
+        {
+          "x": 287,
+          "y": 260
+        }
+      ],
+      "edge-oauth2-login-authentication-filter-username-password-authentication-filter-4": [
+        {
+          "x": 287,
+          "y": 340
+        },
+        {
+          "x": 287,
+          "y": 380
+        }
+      ],
+      "edge-username-password-authentication-filter-ananymous-authentication-filter-5": [
+        {
+          "x": 287,
+          "y": 460
+        },
+        {
+          "x": 287,
+          "y": 500
+        }
+      ],
+      "edge-ananymous-authentication-filter-exception-translation-filter-6": [
+        {
+          "x": 365,
+          "y": 532
+        },
+        {
+          "x": 635,
+          "y": 532
+        }
+      ],
+      "edge-exception-translation-filter-authorization-filter-7": [
+        {
+          "x": 765,
+          "y": 532
+        },
+        {
+          "x": 835,
+          "y": 532
+        }
+      ],
+      "edge-security-context-holder-filter-security-context-holder-8": [
+        {
+          "x": 365,
+          "y": 68
+        },
+        {
+          "x": 661,
+          "y": 68
+        },
+        {
+          "x": 661,
+          "y": 140
+        }
+      ],
+      "edge-oauth2-login-authentication-filter-security-context-holder-9": [
+        {
+          "x": 365,
+          "y": 276
+        },
+        {
+          "x": 482,
+          "y": 276
+        },
+        {
+          "x": 482,
+          "y": 160
+        },
+        {
+          "x": 635,
+          "y": 160
+        }
+      ],
+      "edge-username-password-authentication-filter-security-context-holder-10": [
+        {
+          "x": 365,
+          "y": 396
+        },
+        {
+          "x": 500,
+          "y": 396
+        },
+        {
+          "x": 500,
+          "y": 180
+        },
+        {
+          "x": 635,
+          "y": 180
+        }
+      ],
+      "edge-ananymous-authentication-filter-security-context-holder-11": [
+        {
+          "x": 365,
+          "y": 514
+        },
+        {
+          "x": 518,
+          "y": 514
+        },
+        {
+          "x": 518,
+          "y": 200
+        },
+        {
+          "x": 635,
+          "y": 200
+        }
+      ],
+      "edge-security-context-holder-authorization-filter-12": [
+        {
+          "x": 765,
+          "y": 188
+        },
+        {
+          "x": 861,
+          "y": 188
+        },
+        {
+          "x": 861,
+          "y": 500
+        }
+      ]
+    }
   },
   "google-com-server-spring-filterchain-securityfilterchain-usernamepasswordauthenticationfilter": {
     "width": 1000,
