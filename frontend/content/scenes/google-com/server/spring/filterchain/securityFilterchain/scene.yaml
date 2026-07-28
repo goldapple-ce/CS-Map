@@ -24,13 +24,15 @@ nodes:
     col: 2
     childSceneId: google-com-server-spring-filterchain-securityfilterchain-usernamepasswordauthenticationfilter
   ananymous-authentication-filter:
-    label: Ananymous\nAuthenticationFilter
+    label: Anonymous\nAuthenticationFilter
     row: 5
     col: 2
+    contentRef: anonymousauthenticationfilter.ko.md
   security-context-holder:
     label: SecurityContextHolder
     row: 2
     col: 4
+    contentRef: securitycontextholder.ko.md
   exception-translation-filter:
     label: ExcpetionTranslation\nFilter
     row: 5
@@ -41,6 +43,7 @@ nodes:
     row: 5
     col: 5
     contentRef: authorizationfilter.ko.md
+
 edges:
   - from: filter-chain-proxy
     to: security-context-holder-filter
@@ -77,9 +80,12 @@ edges:
     to: security-context-holder
     toSide: left
   - from: ananymous-authentication-filter
-    # fromSide: right
     to: security-context-holder
     toSide: left
   - from: security-context-holder
+    to: exception-translation-filter
+  - from: security-context-holder
+    fromSide: bottom
     to: authorization-filter
     label: Authentication 확인
+    labelSide: right
