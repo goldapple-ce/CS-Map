@@ -10,7 +10,7 @@
 
 ## AuthenticationException
 
-`인증 자체가 실패했다`는 예외입니다. 이 경우에는 `authenticationEntryPoint`를 호출합니다.  
+`인증을 실패했다`는 예외입니다. 이 경우에는 `authenticationEntryPoint`를 호출합니다.  
 그리고 authenticationEntryPoint는 401(Unauthorized)로 사용자에게 보냅니다.
 
 ## AccessDeniedException
@@ -26,7 +26,7 @@ AuthorizationFilter를 읽었다면, "당연히 AccessDeniedException이 뜰텐�
 그럼에도 이 질문을 한 이유가 있습니다. AuthenticatedAuthorizationManager의 경우 인증만 됐다면 허용됩니다.  
 반대로 말하면 AuthenticatedAuthorizationManager가 거부했다는 것은 인증 실패입니다.  
 그럼 당연히 AuthenticationException이 떠야겠지만, 아쉽게도 AuthorizationManager는 AccessDeniedException만 던집니다.  
-이를 해결하기 위해 ExceptionTranslationFilter는 accessDeniedHandler를 호출하기 전에 `isAnonymous(인증 안된 Authentication)인지 확인을 하고, AuthenticationException으로 변경`한 뒤, authenticationEntryPoint를 호출하게 됩니다.
+이를 해결하기 위해 ExceptionTranslationFilter는 accessDeniedHandler를 호출하기 전에 `isAnonymous(익명 사용자)인지 확인을 하고, AuthenticationException으로 변경`한 뒤, authenticationEntryPoint를 호출하게 됩니다.
 
 ---
 
