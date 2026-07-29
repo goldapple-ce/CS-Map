@@ -1,22 +1,18 @@
 # 개요
 
 요청이 시작될 때 `저장되어 있던 SecurityContext`를 불러와 SecurityContextHolder에 설정하는 필터입니다.  
-저장된 SecurityContext를 사용하는 세션 기반의 `Stateful 서버`에서 특히 중요합니다.  
-주로 HttpSession을 사용하는 경우 이전 요청의 로그인 정보를 현재 요청에 복원합니다.
+저장된 SecurityContext를 사용하는 세션 기반의 `Stateful 서버`에서 특히 중요합니다.
 
 ---
 
 # 구조
 
 ```
-요청
--> SecurityContextRepository -> HttpSessionSecurityContextRepository
--> SecurityContextHolderStrategy
+요청 -> SecurityContextRepository ->  SecurityContextHolderStrategy
 ```
 
 - `SecurityContextRepository`: 요청 간에 SecurityContext를 저장하고 불러오는 저장소
-  - `HttpSessionSecurityContextRepository`: HttpSession에 SecurityContext를 저장하는 구현체
-- `SecurityContextHolderStrategy`: SecurityContextHolder가 SecurityContext를 저장하고 조회하는 방식을 담당
+- `SecurityContextHolderStrategy`: 현재 요청의 SecurityContext를 저장하고 조회하는 방식을 담당
 
 ---
 
@@ -37,6 +33,4 @@ Spring Security 6에서는 변경된 SecurityContext를 `다음 요청에서도 
 
 # 참고 자료
 
-[Spring Security - Authentication Architecture](https://docs.spring.io/spring-security/reference/servlet/authentication/architecture.html)
-
-[Spring Security - Persisting Authentication](https://docs.spring.io/spring-security/reference/servlet/authentication/persistence.html)
+- [Spring Security - Authentication Architecture](https://docs.spring.io/spring-security/reference/servlet/authentication/architecture.html)

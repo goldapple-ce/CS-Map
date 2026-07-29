@@ -9,29 +9,34 @@ nodes:
   security-context-holder-filter:
     label: SecurityContext\nHolderFilter
     row: 1
-    col: 2
+    col: 3
     contentRef: securitycontextholderfilter.ko.md
   oauth2-authorization-request-redirect-filter:
     label: Oauth2Authorization\nRequestRedirectFilter
     row: 2
-    col: 2
+    col: 3
   oauth2-login-authentication-filter:
     label: Oauth2Login\nAuthenticationFilter
     row: 3
-    col: 2
+    col: 3
   username-password-authentication-filter:
     label: UsernamePassword\nAuthenticationFilter
     row: 4
-    col: 2
+    col: 3
     childSceneId: google-com-server-spring-filterchain-securityfilterchain-usernamepasswordauthenticationfilter
   ananymous-authentication-filter:
     label: Anonymous\nAuthenticationFilter
     row: 5
-    col: 2
+    col: 3
     contentRef: anonymousauthenticationfilter.ko.md
+  security-context-repository:
+    label: SecurityContext\nRepository
+    row: 2
+    col: 2
+    contentRef: securitycontextrepository.ko.md
   security-context-holder:
     label: SecurityContextHolder
-    row: 2
+    row: 3
     col: 4
     contentRef: securitycontextholder.ko.md
   exception-translation-filter:
@@ -67,16 +72,16 @@ edges:
     labelSide: bottom
   - from: exception-translation-filter
     to: authorization-filter
-    label: doFilter(인가)
+    label: doFilter
     labelSide: bottom
 
   - from: security-context-holder-filter
     to: security-context-holder
-    label: securityContext 설정
+    toSide: left
+    label: securityContext 등록
   - from: oauth2-login-authentication-filter
     to: security-context-holder
     toSide: left
-    label: Authentication 등록
   - from: username-password-authentication-filter
     to: security-context-holder
     toSide: left
@@ -84,9 +89,20 @@ edges:
     to: security-context-holder
     toSide: left
   - from: security-context-holder
+    fromSide: bottom
     to: exception-translation-filter
   - from: security-context-holder
     fromSide: bottom
     to: authorization-filter
     label: Authentication 확인
-    labelSide: right
+
+  - from: security-context-holder-filter
+    to: security-context-repository
+    label: SecurityContext 조회
+    labelSide: left
+  - from: username-password-authentication-filter
+    to: security-context-repository
+    label: SecurityContext 등록
+    labelSide: left
+  - from: oauth2-login-authentication-filter
+    to: security-context-repository
