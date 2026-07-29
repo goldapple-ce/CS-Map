@@ -10,6 +10,7 @@ nodes:
     label: SecurityContext\nHolderFilter
     row: 1
     col: 2
+    contentRef: securitycontextholderfilter.ko.md
   oauth2-authorization-request-redirect-filter:
     label: Oauth2Authorization\nRequestRedirectFilter
     row: 2
