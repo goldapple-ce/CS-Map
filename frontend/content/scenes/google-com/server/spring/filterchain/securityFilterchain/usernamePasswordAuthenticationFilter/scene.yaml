@@ -1,15 +1,17 @@
 id: google-com-server-spring-filterchain-securityfilterchain-usernamepasswordauthenticationfilter
 title: UsernamePasswordAuthenticationFilter
-summary: UsernamePassworAuthenticationFilter가 어떤 흐름으로 이뤄지를 알아봅니다.
+summary: UsernamePasswordAuthenticationFilter의 인증 흐름을 알아봅니다.
 nodes:
   filter-chain-proxy:
     label: FilterChainProxy
     row: 2
     col: 1
+    contentRef: filterchainproxy.ko.md
   username-password-authentication-filter:
     label: UsernamePassword\nAuthenticationFilter
     row: 2
     col: 2
+    contentRef: usernamepasswordauthenticationfilter.ko.md
   username-password-authentication-token:
     label: UsernamePassword\nAuthenticationToken
     row: 1
@@ -19,34 +21,42 @@ nodes:
     label: AuthenticationManager
     row: 2
     col: 4
+    contentRef: authenticationmanager.ko.md
   authentication-provider:
     label: AuthenticationProvider
     row: 3
     col: 4
+    contentRef: authenticationprovider.ko.md
   dao-authentication-provider:
     label: DaoAuthenticationProvider
     row: 3
     col: 5
+    contentRef: daoauthenticationprovider.ko.md
   user-detail-service:
-    label: UserDetailService
+    label: UserDetailsService
     row: 4
     col: 5
+    contentRef: userdetailsservice.ko.md
   user-detail-service-impl:
-    label: UserDetailServiceImpl
+    label: UserDetailsServiceImpl
     row: 5
     col: 5
+    contentRef: userdetailsserviceimpl.ko.md
   security-context-holder:
-    label: SecurityContextHodler
+    label: SecurityContextHolder
     row: 4
     col: 2
+    contentRef: securitycontextholder.ko.md
   security-context-repository:
     label: SecurityContext\nRepository
     row: 4
     col: 3
+    contentRef: securitycontextrepository.ko.md
   provider-manager:
     label: ProviderManager
     row: 2
     col: 5
+    contentRef: providermanager.ko.md
 
 edges:
   - from: filter-chain-proxy
