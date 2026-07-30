@@ -1,23 +1,24 @@
 id: google-com-server-spring-filterchain-securityfilterchain-usernamepasswordauthenticationfilter
 title: UsernamePasswordAuthenticationFilter
-summary: Servlet FilterChain이 Spring Security의 FilterChainProxy와 SecurityFilterChain으로 처리를 위임한 뒤 원래 FilterChain을 계속 진행하는 흐름입니다.
+summary: UsernamePassworAuthenticationFilter가 어떤 흐름으로 이뤄지를 알아봅니다.
 nodes:
   filter-chain-proxy:
     label: FilterChainProxy
-    row: 3
-    col: 1
-  authentication-filter:
-    label: AuthenticationFilter
-    row: 3
-    col: 2
-  authentication-converter:
-    label: authenticationConverter
     row: 2
-    col: 4
+    col: 1
+  username-password-authentication-filter:
+    label: UsernamePassword\nAuthenticationFilter
+    row: 2
+    col: 2
+  username-password-authentication-token:
+    label: UsernamePassword\nAuthenticationToken
+    row: 1
+    col: 3
+    contentRef: usernamepasswordauthenticationtoken.ko.md
   authentication-manager:
     label: AuthenticationManager
-    row: 3
-    col: 3
+    row: 2
+    col: 4
   authentication-provider:
     label: AuthenticationProvider
     row: 3
@@ -30,60 +31,70 @@ nodes:
     label: UserDetailService
     row: 4
     col: 5
+  user-detail-service-impl:
+    label: UserDetailServiceImpl
+    row: 5
+    col: 5
   security-context-holder:
     label: SecurityContextHodler
     row: 4
     col: 2
-  provider-manager:
-    label: ProviderManager
+  security-context-repository:
+    label: SecurityContext\nRepository
     row: 4
     col: 3
+  provider-manager:
+    label: ProviderManager
+    row: 2
+    col: 5
 
 edges:
   - from: filter-chain-proxy
-    to: authentication-filter
-    label: 1. 호출
-  - from: authentication-filter
-    to: authentication-converter
-    label: 2. convert
-    labelSide: bottom
-  - from: authentication-converter
-    to: authentication-filter
-    label: 3. Authentication (ex:UsernamePasswordToken) 제공
-  - from: authentication-filter
+    to: username-password-authentication-filter
+    label: 호출
+  - from: username-password-authentication-filter
+    to: username-password-authentication-token
+    label: 1. 생성
+  - from: username-password-authentication-filter
     to: authentication-manager
-    label: 4. 호출
+    label: 2. authenticate
     labelSide: bottom
   - from: authentication-manager
     to: authentication-provider
-    label: 5. 호출
-    labelSide: bottom
-  - from: authentication-provider
-    to: dao-authentication-provider
-    label: 6. 위임
-    labelSide: bottom
+    label: 3. 위임
+    labelSide: left
   - from: dao-authentication-provider
     to: user-detail-service
-    label: 7. 호출
+    label: 4. 호출
     labelSide: left
+
   - from: user-detail-service
     to: dao-authentication-provider
-    label: 8.UserDetail
-  - from: dao-authentication-provider
-    to: authentication-provider
-    label: 9. 호출
+    label: 5. UserDetail
   - from: authentication-provider
     to: authentication-manager
-    label: 10. 호출
+    label: 6. Authentication
   - from: authentication-manager
-    to: authentication-filter
-    label: 11. 호출
-
-  - from: authentication-filter
+    to: username-password-authentication-filter
+    label: 7. Authentication
+  - from: username-password-authentication-filter
     to: security-context-holder
-    label: 12. Authentication 저장
+    label: 8. AuthenticationContext 저장
+    labelSide: left
+  - from: username-password-authentication-filter
+    fromSide: bottom
+    to: security-context-repository
+    labelSide: left
 
   - from: provider-manager
     to: authentication-manager
+    label: implements
+    variant: supporting
+  - from: dao-authentication-provider
+    to: authentication-provider
+    label: implements
+    variant: supporting
+  - from: user-detail-service-impl
+    to: user-detail-service
     label: implements
     variant: supporting

@@ -1,39 +1,44 @@
-## 개요
+# 개요
 
-Spring Security의 Servlet 지원은 Servlet Filter를 기반으로 합니다. `FilterChainProxy`가 현재 요청에 적용할 `SecurityFilterChain`을 선택하고, 그 안의 Security Filter들이 정해진 순서로 요청을 검사합니다.
+로그인 요청이 들어오면 아이디와 비밀번호를 꺼내 인증을 시도하는 필터입니다.  
+기본 설정에서는 `/login`으로 들어오는 POST 요청을 처리합니다.
 
-## 필요한 이유
+---
 
-보안 검사를 Controller마다 반복하지 않고 요청이 Spring MVC에 도달하기 전 공통 FilterChain에서 적용할 수 있습니다. 인증은 요청 주체가 누구인지 확인하는 과정이고, 인가는 그 주체가 해당 요청을 수행할 수 있는지 판단하는 과정입니다.
+# 구조
 
-## 동작 과정
+- `AuthenticationManager`: 인증 요청을 받는 인터페이스
+  - `ProviderManager`: 여러 AuthenticationProvider 중 인증을 처리할 Provider를 찾는 대표 구현체
+- `AuthenticationProvider`: 특정 인증 방식을 처리하는 인터페이스
+  - `DaoAuthenticationProvider`: 아이디와 비밀번호 인증을 처리하는 구현체
+- `UserDetailsService`: 사용자를 조회하고 UserDetails를 반환
+- `SecurityContextHolder` : 현재 사용자의 인증정보를 담는 저장소
+- `SecurityContextRepository` : 요청 사이의 사용자의 인증정보를 담는 저장소
+- `UsernamePasswordAuthenticationToken` : Authentication 구현체
 
-1. Tomcat의 Servlet FilterChain이 `DelegatingFilterProxy`를 호출합니다.
-2. `DelegatingFilterProxy`가 Spring Container에 등록된 `FilterChainProxy` Bean으로 처리를 위임합니다.
-3. `FilterChainProxy`가 요청 조건과 일치하는 첫 번째 `SecurityFilterChain`을 선택합니다.
-4. 선택된 filter들이 인증 정보와 보안 상태를 처리합니다.
-5. 인가 규칙이 요청을 허용하는지 판단합니다.
-6. 허용된 요청은 원래 Servlet FilterChain을 계속 진행하고, 남은 Filter를 거쳐 대상 Servlet인 `DispatcherServlet`에 도달할 수 있습니다.
+---
 
-## 내부 구조
+# 흐름
 
-모든 요청이 화면과 똑같은 인증 방식을 거치는 것은 아닙니다. 이미 인증된 요청, 공개 경로와 사용하는 인증 방식에 따라 실행되는 Filter가 달라질 수 있습니다. 화면은 인증이 필요한 일반적인 요청의 핵심 순서를 단순화합니다.
+1. 요청에서 username과 password를 꺼내 `인증 전 상태의 UsernamePasswordAuthenticationToken을 생성`합니다.
+2. `AuthenticationManager에게 인증을 요청`합니다.
+   - 일반적으로 AuthenticationManager의 구현체인 `ProviderManager`가 요청을 받습니다.
+3. ProviderManager는 현재 Authentication을 처리할 수 있는 `AuthenticationProvider를 찾습니다.`
+   - 아이디와 비밀번호 인증이라면 보통 `DaoAuthenticationProvider`가 처리합니다.
+4. DaoAuthenticationProvider는 `UserDetailService를 호출`합니다.
+5. UserDetailsService는 `UserDetails를 조회`합니다.
+6. AuthenticationProvider(DaoAuthenticationProvider) : Authentication 반환합니다.
+7. AuthenticationManager(ProviderManager) : Authentication 반환합니다.
+8. `인증된 AuthenticationContext`을 생성합니다.
+9. AuthenticationContext를 `SecurityContextHolder`에 저장합니다.
+10. AuthenticationContext를 `SecurityContextRepository`에 저장합니다.
 
-## 실패 상황
+이렇게 역할을 나누는 이유는 인증 방식마다 처리 과정이 다르기 때문입니다.  
+ProviderManager는 여러 AuthenticationProvider를 관리하며, 전달받은 Authentication을 처리할 수 있는 Provider를 찾아 인증을 맡깁니다.  
+예를 들어 아이디와 비밀번호 인증은 DaoAuthenticationProvider가 처리하고, 다른 인증 방식은 각각 다른 AuthenticationProvider가 처리할 수 있습니다.
 
-- 요청에 맞는 SecurityFilterChain이 예상과 다를 수 있습니다.
-- 인증 정보가 없거나 유효하지 않을 수 있습니다.
-- 인증됐어도 필요한 권한이 없어 요청이 거부될 수 있습니다.
-- Filter 순서나 RequestMatcher 설정이 의도와 다를 수 있습니다.
+---
 
-## 범위
+# 참고 자료
 
-보안 검사 이후의 응답 처리와 오류 응답 생성은 이번 Scene에서 제외합니다.
-
-## 출처
-
-- Spring Security, _Servlet Architecture_
-
-## 참고 자료
-
-- [Spring Security — Servlet Architecture](https://docs.spring.io/spring-security/reference/servlet/architecture.html)
+- [SpringDocs - UsernamePasswordAuthenticationFilter](https://docs.spring.io/spring-security/reference/api/java/org/springframework/security/web/authentication/UsernamePasswordAuthenticationFilter.html)
