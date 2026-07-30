@@ -1,0 +1,104 @@
+id: google-com-server-spring-filterchain-securityfilterchain-oauth2login
+title: OAuth 2.0 Login
+summary: OAuth2AuthorizationRequestRedirectFilter가 로그인을 시작하고 OAuth2LoginAuthenticationFilter가 콜백을 인증하는 Authorization Code 흐름입니다.
+nodes:
+  client:
+    label: 사용자
+    row: 2
+    col: 1
+    contentRef: client.ko.md
+  oauth2-authorization-request-redirect-filter:
+    label: OAuth2Authorization\nRequestRedirectFilter
+    row: 2
+    col: 3
+    contentRef: oauth2authorizationrequestredirectfilter.ko.md
+  oauth2-login-authentication-filter:
+    label: OAuth2Login\nAuthenticationFilter
+    row: 3
+    col: 3
+    childSceneId: google-com-server-spring-filterchain-securityfilterchain-oauth2login-oauth2loginauthenticationfilter
+  authorization-request-repository:
+    label: AuthorizationRequest\nRepository
+    row: 2
+    col: 4
+    contentRef: authorizationrequestrepository.ko.md
+
+  my-server:
+    label: 내 서버
+    row: 1
+    col: 3
+    contentRef: myserver.ko.md
+  authorization-server:
+    label: 인증 서버
+    row: 5
+    col: 3
+    contentRef: authorizationserver.ko.md
+  resource-server:
+    label: 자원 서버
+    row: 5
+    col: 5
+    contentRef: resourceserver.ko.md
+
+edges:
+  - from: client
+    fromSide: right
+    to: oauth2-authorization-request-redirect-filter
+    toSide: left
+    label: 1. 로그인 요청
+    # labelSide: bottom
+  - from: oauth2-authorization-request-redirect-filter
+    to: authorization-request-repository
+    label: 2. 요청자 저장
+  - from: oauth2-authorization-request-redirect-filter
+    fromSide: left
+    to: client
+    toSide: right
+    label: 3. 인증서버 리다이렉트
+    labelSide: bottom
+  - from: client
+    fromSide: bottom
+    to: authorization-server
+    toSide: left
+    label: 4. 로그인 요청
+    labelSide: bottom
+  - from: authorization-server
+    # fromSide: left
+    to: client
+    toSide: bottom
+    label: 5. 인가 코드 발급
+    labelSide: top
+
+  - from: client
+    fromSide: bottom
+    to: oauth2-login-authentication-filter
+    toSide: left
+    label: 6. 인가 코드 전가
+    labelSide: bottom
+  - from: oauth2-login-authentication-filter
+    to: authorization-request-repository
+    label: 7. 요청자 조회
+  - from: oauth2-login-authentication-filter
+    fromSide: bottom
+    to: authorization-server
+    toSide: top
+    label: 8. 인가 코드 전달
+    labelSide: left
+  - from: authorization-server
+    fromSide: top
+    to: oauth2-login-authentication-filter
+    toSide: bottom
+    label: 9. Access 토큰 발급
+  - from: oauth2-login-authentication-filter
+    fromSide: right
+    to: resource-server
+    toSide: top
+    label: 10. 사용자정보 요청
+  - from: resource-server
+    to: oauth2-login-authentication-filter
+    label: 11.userInfo
+    labelSide: left
+  - from: oauth2-login-authentication-filter
+    # fromSide: left
+    to: client
+    toSide: bottom
+    label: 12. 로그인 완료

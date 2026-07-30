@@ -12,13 +12,15 @@ nodes:
     col: 3
     contentRef: securitycontextholderfilter.ko.md
   oauth2-authorization-request-redirect-filter:
-    label: Oauth2Authorization\nRequestRedirectFilter
+    label: OAuth2Authorization\nRequestRedirectFilter
     row: 2
     col: 3
+    childSceneId: google-com-server-spring-filterchain-securityfilterchain-oauth2login
   oauth2-login-authentication-filter:
-    label: Oauth2Login\nAuthenticationFilter
+    label: OAuth2Login\nAuthenticationFilter
     row: 3
     col: 3
+    navigateToSceneId: google-com-server-spring-filterchain-securityfilterchain-oauth2login
   username-password-authentication-filter:
     label: UsernamePassword\nAuthenticationFilter
     row: 4

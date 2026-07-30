@@ -1,0 +1,153 @@
+id: google-com-server-spring-filterchain-securityfilterchain-oauth2login-oauth2loginauthenticationfilter
+title: OAuth2LoginAuthenticationFilter
+summary: OAuth2LoginAuthenticationFilter가 콜백을 인증 요청으로 바꾸고 Code 교환과 사용자 조회를 거쳐 로그인 상태를 저장하는 흐름입니다.
+nodes:
+  filter-chain-proxy:
+    label: FilterChainProxy
+    row: 2
+    col: 1
+    contentRef: filterchainproxy.ko.md
+  oauth2-login-authentication-filter:
+    label: OAuth2Login\nAuthenticationFilter
+    row: 2
+    col: 2
+    contentRef: oauth2loginauthenticationfilter.ko.md
+  authorization-request-repository:
+    label: AuthorizationRequest\nRepository
+    row: 1
+    col: 2
+    contentRef: authorizationrequestrepository.ko.md
+  oauth2-login-authentication-token:
+    label: OAuth2Login\nAuthenticationToken
+    row: 1
+    col: 3
+    contentRef: oauth2loginauthenticationtoken.ko.md
+  authentication-manager:
+    label: AuthenticationManager
+    row: 2
+    col: 3
+    contentRef: authenticationmanager.ko.md
+  provider-manager:
+    label: ProviderManager
+    row: 2
+    col: 4
+    contentRef: providermanager.ko.md
+  authentication-provider:
+    label: AuthenticationProvider
+    row: 3
+    col: 3
+    contentRef: authenticationprovider.ko.md
+  oauth2-login-authentication-provider:
+    label: OAuth2Login\nAuthenticationProvider
+    row: 3
+    col: 4
+    contentRef: oauth2loginauthenticationprovider.ko.md
+  oauth2-authorization-code-authentication-provider:
+    label: OAuth2AuthorizationCode\nAuthenticationProvider
+    row: 3
+    col: 5
+    contentRef: oauth2authorizationcodeauthenticationprovider.ko.md
+
+  oauth2-user-service:
+    label: OAuth2UserService
+    row: 4
+    col: 4
+    contentRef: oauth2userservice.ko.md
+
+  resource-server:
+    label: Resource Server
+    row: 5
+    col: 4
+    contentRef: resourceserver.ko.md
+  authorization-server:
+    label: Authorization Server
+    row: 5
+    col: 5
+    contentRef: authorizationserver.ko.md
+
+  security-context-holder:
+    label: SecurityContextHolder
+    row: 4
+    col: 2
+    contentRef: securitycontextholder.ko.md
+  security-context-repository:
+    label: SecurityContext\nRepository
+    row: 4
+    col: 3
+    contentRef: securitycontextrepository.ko.md
+
+edges:
+  - from: filter-chain-proxy
+    to: oauth2-login-authentication-filter
+    label: 호출
+  - from: authorization-request-repository
+    to: oauth2-login-authentication-filter
+    label: 1. 조회
+    labelSide: left
+  - from: oauth2-login-authentication-filter
+    fromSide: top
+    to: oauth2-login-authentication-token
+    label: 2. 생성
+  - from: oauth2-login-authentication-filter
+    to: authentication-manager
+    label: 3. 호출
+    labelSide: bottom
+  - from: authentication-manager
+    to: authentication-provider
+    label: 4. 위임
+    labelSide: left
+  - from: oauth2-login-authentication-provider
+    fromSide: right
+    to: oauth2-authorization-code-authentication-provider
+    toSide: left
+    label: 5. 호출
+  - from: oauth2-authorization-code-authentication-provider
+    to: authorization-server
+    label: 6. 토큰 요청
+    labelSide: left
+  - from: authorization-server
+    to: oauth2-authorization-code-authentication-provider
+    label: 7. accessToken
+  - from: oauth2-authorization-code-authentication-provider
+    fromSide: left
+    to: oauth2-login-authentication-provider
+    toSide: right
+    label: 8. Token
+    labelSide: bottom
+  - from: oauth2-login-authentication-provider
+    to: oauth2-user-service
+    label: 9. 호출
+    labelSide: left
+  - from: oauth2-user-service
+    to: resource-server
+    label: 10. 호출
+    labelSide: left
+  - from: resource-server
+    to: oauth2-user-service
+    label: 11. UserInfo
+  - from: oauth2-user-service
+    to: oauth2-login-authentication-provider
+    label: 12. OAuth2User
+  - from: authentication-provider
+    to: authentication-manager
+    label: 13. Authentication
+  - from: authentication-manager
+    to: oauth2-login-authentication-filter
+    label: 14. Auth..
+  - from: oauth2-login-authentication-filter
+    to: security-context-holder
+    label: 15. AuthenticationContext 저장
+    labelSide: left
+  - from: oauth2-login-authentication-filter
+    fromSide: bottom
+    to: security-context-repository
+    labelSide: left
+
+  - from: provider-manager
+    to: authentication-manager
+    label: implements
+    variant: supporting
+  - from: oauth2-login-authentication-provider
+    to: authentication-provider
+    label: implements
+    variant: supporting
