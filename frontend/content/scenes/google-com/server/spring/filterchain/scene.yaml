@@ -4,24 +4,29 @@ summary: Servlet FilterChain이 Spring Security의 FilterChainProxy와 SecurityF
 nodes:
   servlet-filter-chain:
     label: Servlet FilterChain
-    row: 3
+    row: 2
     col: 1
+    contentRef: servletfilterchain.ko.md
   servlet-filter:
     label: servlet Filter
     row: 2
     col: 2
+    contentRef: servletfilter.ko.md
   delegating-filter-proxy:
     label: DelegatingFilterProxy
     row: 3
     col: 2
+    contentRef: delegatingfilterproxy.ko.md
   servlet-filter-2:
     label: servlet Filter
     row: 4
     col: 2
+    contentRef: servletfilter2.ko.md
   filter-chain-proxy:
     label: FilterChainProxy
     row: 3
     col: 3
+    contentRef: filterchainproxy.ko.md
   security-filter-chain:
     label: SecurityFilterChain
     row: 3
@@ -29,9 +34,14 @@ nodes:
     childSceneId: google-com-server-spring-filterchain-securityfilterchain
   dispatcher-servlet:
     label: DispatcherServlet
-    row: 5
+    row: 4
     col: 5
     navigateToSceneId: google-com-server-spring-mvc
+
+  spring-security:
+    label: Spring Security
+    row: 2
+    col: 3
 
 edges:
   - from: servlet-filter-chain
@@ -56,3 +66,7 @@ edges:
   - from: servlet-filter-2
     to: dispatcher-servlet
     label: 호출
+  - from: spring-security
+    to: filter-chain-proxy
+    variant: supporting
+    label: 주입
