@@ -6,30 +6,37 @@ nodes:
     label: 설정 정보
     row: 3
     col: 1
+    contentRef: configurationmetadata.ko.md
   bean-definition:
     label: BeanDefinition 등록
     row: 3
     col: 2
+    contentRef: beandefinition.ko.md
   application-context:
     label: ApplicationContext 초기화
     row: 3
     col: 3
+    contentRef: applicationcontext.ko.md
   bean-creation:
     label: Bean 생성
     row: 1
     col: 4
+    contentRef: beancreation.ko.md
   dependency-injection:
     label: 의존성 주입
     row: 3
     col: 4
+    contentRef: dependencyinjection.ko.md
   initialization-callback:
     label: 초기화 Callback
     row: 5
     col: 4
+    contentRef: initializationcallback.ko.md
   ready-beans:
     label: 사용 가능한 Bean
     row: 3
     col: 5
+    contentRef: readybeans.ko.md
 edges:
   - from: configuration-metadata
     to: bean-definition
