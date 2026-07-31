@@ -1,4 +1,4 @@
-id: google-com-server-spring-mvc
+id: google-com-server-spring-webservlet-mvc
 title: DispatcherServlet과 Spring MVC
 summary: DispatcherServlet이 HandlerMapping과 HandlerAdapter를 조정하고 ViewResolver를 통해 서버 측 View를 렌더링하는 흐름입니다.
 nodes:
@@ -6,30 +6,37 @@ nodes:
     label: DispatcherServlet
     row: 2
     col: 1
+    contentRef: dispatcherservlet.ko.md
   rendered-view:
     label: View / HTML 렌더링
     row: 4
     col: 1
+    contentRef: renderedview.ko.md
   handler-mapping:
     label: HandlerMapping
     row: 1
     col: 3
+    contentRef: handlermapping.ko.md
   handler-adapter:
     label: HandlerAdapter
     row: 2
     col: 3
+    contentRef: handleradapter.ko.md
   view-resolver:
     label: ViewResolver
     row: 3
     col: 3
+    contentRef: viewresolver.ko.md
   controller:
     label: Controller
     row: 2
     col: 5
+    contentRef: controller.ko.md
   model:
     label: Model
     row: 4
     col: 5
+    contentRef: model.ko.md
 edges:
   - from: dispatcher-servlet
     to: handler-mapping

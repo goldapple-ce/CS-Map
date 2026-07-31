@@ -1,11 +1,12 @@
-id: google-com-server-spring-filterchain-securityfilterchain
+id: google-com-server-spring-webservlet-filterchain-securityfilterchain
 title: SecurityFilterChain
-summary: Spring Security의 Filter를 엮어 인증 / 인가를 처리합니다.
+summary: FilterChainProxy가 선택한 SecurityFilterChain의 Filter들이 SecurityContext 복원, 인증, 예외 처리와 인가를 순서대로 수행하는 흐름입니다.
 nodes:
   filter-chain-proxy:
     label: FilterChainProxy
     row: 1
     col: 1
+    contentRef: filterchainproxy.ko.md
   security-context-holder-filter:
     label: SecurityContext\nHolderFilter
     row: 1
@@ -15,18 +16,18 @@ nodes:
     label: OAuth2Authorization\nRequestRedirectFilter
     row: 2
     col: 3
-    childSceneId: google-com-server-spring-filterchain-securityfilterchain-oauth2login
+    childSceneId: google-com-server-spring-webservlet-filterchain-securityfilterchain-oauth2login
   oauth2-login-authentication-filter:
     label: OAuth2Login\nAuthenticationFilter
     row: 3
     col: 3
-    navigateToSceneId: google-com-server-spring-filterchain-securityfilterchain-oauth2login
+    navigateToSceneId: google-com-server-spring-webservlet-filterchain-securityfilterchain-oauth2login
   username-password-authentication-filter:
     label: UsernamePassword\nAuthenticationFilter
     row: 4
     col: 3
-    childSceneId: google-com-server-spring-filterchain-securityfilterchain-usernamepasswordauthenticationfilter
-  ananymous-authentication-filter:
+    childSceneId: google-com-server-spring-webservlet-filterchain-securityfilterchain-usernamepasswordauthenticationfilter
+  anonymous-authentication-filter:
     label: Anonymous\nAuthenticationFilter
     row: 5
     col: 3
@@ -42,7 +43,7 @@ nodes:
     col: 4
     contentRef: securitycontextholder.ko.md
   exception-translation-filter:
-    label: ExcpetionTranslation\nFilter
+    label: ExceptionTranslation\nFilter
     row: 5
     col: 4
     contentRef: exceptiontranslationfilter.ko.md
@@ -66,9 +67,9 @@ edges:
     to: username-password-authentication-filter
     label: doFilter
   - from: username-password-authentication-filter
-    to: ananymous-authentication-filter
+    to: anonymous-authentication-filter
     label: doFilter
-  - from: ananymous-authentication-filter
+  - from: anonymous-authentication-filter
     to: exception-translation-filter
     label: doFilter
     labelSide: bottom
@@ -87,7 +88,7 @@ edges:
   - from: username-password-authentication-filter
     to: security-context-holder
     toSide: left
-  - from: ananymous-authentication-filter
+  - from: anonymous-authentication-filter
     to: security-context-holder
     toSide: left
   - from: security-context-holder

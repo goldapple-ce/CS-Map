@@ -1,4 +1,4 @@
-id: google-com-server-spring-filterchain-securityfilterchain-oauth2login
+id: google-com-server-spring-webservlet-filterchain-securityfilterchain-oauth2login
 title: OAuth 2.0 Login
 summary: OAuth2AuthorizationRequestRedirectFilter가 로그인을 시작하고 OAuth2LoginAuthenticationFilter가 콜백을 인증하는 Authorization Code 흐름입니다.
 nodes:
@@ -16,7 +16,7 @@ nodes:
     label: OAuth2Login\nAuthenticationFilter
     row: 3
     col: 3
-    childSceneId: google-com-server-spring-filterchain-securityfilterchain-oauth2login-oauth2loginauthenticationfilter
+    childSceneId: google-com-server-spring-webservlet-filterchain-securityfilterchain-oauth2login-oauth2loginauthenticationfilter
   authorization-request-repository:
     label: AuthorizationRequest\nRepository
     row: 2
@@ -48,54 +48,54 @@ edges:
     # labelSide: bottom
   - from: oauth2-authorization-request-redirect-filter
     to: authorization-request-repository
-    label: 2. 요청자 저장
+    label: 2. 인증 요청 저장
   - from: oauth2-authorization-request-redirect-filter
     fromSide: left
     to: client
     toSide: right
-    label: 3. 인증서버 리다이렉트
+    label: 3. 리다이렉트 응답
     labelSide: bottom
   - from: client
     fromSide: bottom
     to: authorization-server
     toSide: left
-    label: 4. 로그인 요청
+    label: 4. Authorization 요청
     labelSide: bottom
   - from: authorization-server
     # fromSide: left
     to: client
     toSide: bottom
-    label: 5. 인가 코드 발급
+    label: 5. 인가 코드 Callback
     labelSide: top
 
   - from: client
     fromSide: bottom
     to: oauth2-login-authentication-filter
     toSide: left
-    label: 6. 인가 코드 전가
+    label: 6. Callback 요청
     labelSide: bottom
   - from: oauth2-login-authentication-filter
     to: authorization-request-repository
-    label: 7. 요청자 조회
+    label: 7. 인증 요청 조회
   - from: oauth2-login-authentication-filter
     fromSide: bottom
     to: authorization-server
     toSide: top
-    label: 8. 인가 코드 전달
+    label: 8. 토큰 요청
     labelSide: left
   - from: authorization-server
     fromSide: top
     to: oauth2-login-authentication-filter
     toSide: bottom
-    label: 9. Access 토큰 발급
+    label: 9. Access Token
   - from: oauth2-login-authentication-filter
     fromSide: right
     to: resource-server
     toSide: top
-    label: 10. 사용자정보 요청
+    label: 10. 사용자 정보 요청
   - from: resource-server
     to: oauth2-login-authentication-filter
-    label: 11.userInfo
+    label: 11. UserInfo
     labelSide: left
   - from: oauth2-login-authentication-filter
     # fromSide: left

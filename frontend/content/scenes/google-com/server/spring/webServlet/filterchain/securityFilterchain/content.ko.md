@@ -1,6 +1,6 @@
 # 개요
 
-Spring Security은 여러 Security Filter가 연결된 SecurityFilterChain을 기반으로 동작합니다.  
+Spring Security는 여러 Security Filter가 연결된 SecurityFilterChain을 기반으로 동작합니다.  
 현재 요청에 적용할 조건과 `Filter들을 보관`하며, 실제 선택과 실행은 `FilterChainProxy`가 담당합니다.
 
 ---
@@ -44,10 +44,10 @@ Spring Security은 여러 Security Filter가 연결된 SecurityFilterChain을 �
 ## 기타 필터
 
 - OAuth2AuthorizationRequestRedirectFilter :
-  - OAuth2 로그인을 시작하는 요청을 처리하고, 구글 등의 `인증 서버로 리다이렉트`합니다.
+  - OAuth2 로그인을 시작하는 요청을 처리하고, 브라우저가 Authorization Server로 이동할 URL을 `Location` 헤더에 담아 리다이렉트 응답을 반환합니다.
 - ExceptionTranslationFilter :
   - 뒤쪽에서 발생한 `AuthenticationException과 AccessDeniedException을 처리`합니다.
-  - 인증을 시작하거나 로그인 화면으로 리다이렉트하고, 접근 거부 응답 등을 생성하도록 관련 Handler에 위임합니다
+  - 인증을 시작하거나 로그인 화면으로 리다이렉트하고, 접근 거부 응답 등을 생성하도록 관련 Handler에 위임합니다.
 
 ---
 

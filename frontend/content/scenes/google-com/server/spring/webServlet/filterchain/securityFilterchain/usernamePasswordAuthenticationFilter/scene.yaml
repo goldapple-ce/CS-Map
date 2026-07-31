@@ -1,6 +1,6 @@
-id: google-com-server-spring-filterchain-securityfilterchain-usernamepasswordauthenticationfilter
+id: google-com-server-spring-webservlet-filterchain-securityfilterchain-usernamepasswordauthenticationfilter
 title: UsernamePasswordAuthenticationFilter
-summary: UsernamePasswordAuthenticationFilter의 인증 흐름을 알아봅니다.
+summary: UsernamePasswordAuthenticationFilter가 username과 password를 AuthenticationManager에 전달하고, 인증 결과를 SecurityContext에 저장하는 흐름입니다.
 nodes:
   filter-chain-proxy:
     label: FilterChainProxy
@@ -80,7 +80,7 @@ edges:
 
   - from: user-detail-service
     to: dao-authentication-provider
-    label: 5. UserDetail
+    label: 5. UserDetails
   - from: authentication-provider
     to: authentication-manager
     label: 6. Authentication
@@ -89,11 +89,12 @@ edges:
     label: 7. Authentication
   - from: username-password-authentication-filter
     to: security-context-holder
-    label: 8. AuthenticationContext 저장
+    label: 8. SecurityContext 저장
     labelSide: left
   - from: username-password-authentication-filter
     fromSide: bottom
     to: security-context-repository
+    label: SecurityContext 저장
     labelSide: left
 
   - from: provider-manager

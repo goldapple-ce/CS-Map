@@ -60,7 +60,7 @@ export function MarkdownContent({ markdown, idPrefix }: MarkdownContentProps) {
     h6: ({ children }) => heading(children),
     p: ({ children }) => <p className="text-sm leading-6">{children}</p>,
     blockquote: ({ children }) => (
-      <blockquote className="border-l-2 border-border pl-4 text-sm leading-6">
+      <blockquote className="border-l-2 border-border pl-4 text-sm leading-6 text-muted-foreground">
         {children}
       </blockquote>
     ),

@@ -1,4 +1,4 @@
-id: google-com-server-spring-filterchain-securityfilterchain-oauth2login-oauth2loginauthenticationfilter
+id: google-com-server-spring-webservlet-filterchain-securityfilterchain-oauth2login-oauth2loginauthenticationfilter
 title: OAuth2LoginAuthenticationFilter
 summary: OAuth2LoginAuthenticationFilter가 콜백을 인증 요청으로 바꾸고 Code 교환과 사용자 조회를 거쳐 로그인 상태를 저장하는 흐름입니다.
 nodes:
@@ -136,11 +136,12 @@ edges:
     label: 14. Auth..
   - from: oauth2-login-authentication-filter
     to: security-context-holder
-    label: 15. AuthenticationContext 저장
+    label: 15. SecurityContext 저장
     labelSide: left
   - from: oauth2-login-authentication-filter
     fromSide: bottom
     to: security-context-repository
+    label: SecurityContext 저장
     labelSide: left
 
   - from: provider-manager

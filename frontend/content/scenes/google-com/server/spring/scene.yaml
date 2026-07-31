@@ -1,45 +1,64 @@
 id: google-com-server-spring
 title: Spring
-summary: Tomcat이 Servlet FilterChain을 호출하고 최종 Servlet인 DispatcherServlet로 요청을 전달하는 Spring 웹 애플리케이션 흐름입니다.
+summary: Spring Container가 웹과 데이터 접근 구성 요소를 Bean으로 관리하고, 필요한 Bean에 Spring AOP Proxy가 적용되는 구조입니다.
 nodes:
-  tomcat:
-    label: Tomcat
-    row: 3
-    col: 1
-    childSceneId: google-com-server-spring-tomcat
-  container:
+  echo-system:
+    label: Spring 생태계
+    row: 1
+    col: 3
+    contentRef: springecosystem.ko.md
+  web-servlet:
+    label: Web Servlet
+    row: 1
+    col: 2
+    childSceneId: google-com-server-spring-webservlet
+
+  data-access:
+    label: Data Access
+    row: 1
+    col: 4
+    contentRef: dataaccess.ko.md
+  spring-container:
     label: Spring Container
     row: 2
-    col: 4
-    childSceneId: google-com-server-spring-container
-  security:
-    label: Servlet FilterChain
-    row: 3
     col: 3
-    childSceneId: google-com-server-spring-filterchain
-  mvc:
-    label: DispatcherServlet
-    row: 3
-    col: 5
-    childSceneId: google-com-server-spring-mvc
+    childSceneId: google-com-server-spring-container
+
+  spring-aop:
+    label: Spring AOP
+    row: 5
+    col: 3
+    contentRef: springaop.ko.md
+  bean:
+    label: Bean
+    row: 4
+    col: 3
+    contentRef: bean.ko.md
 
 edges:
-  - from: tomcat
-    to: security
-    label: FilterChain 호출
+  - from: web-servlet
+    to: spring-container
+    toSide: top
+    label: 등록
+  - from: echo-system
+    to: spring-container
+  - from: data-access
+    to: spring-container
+    toSide: top
+    label: 등록
+  - from: spring-container
+    to: bean
+    label: 빈 생성
+  - from: spring-aop
+    to: bean
+    label: Proxy 적용
 
-  - from: container
-    to: security
-    label: Security Bean 제공
-    variant: supporting
-    fromSide: left
-    toSide: top
-  - from: container
-    fromSide: right
-    to: mvc
-    toSide: top
-    label: MVC Bean 제공
-    variant: supporting
-  - from: security
-    to: mvc
-    label: DispatcherServlet 호출
+  # - from: bean
+  #   fromSide: top
+  #   to: web-servlet
+  # - from: bean
+  #   fromSide: top
+  #   to: data-access
+  # - from: bean
+  #   fromSide: top
+  #   to: echo-system
