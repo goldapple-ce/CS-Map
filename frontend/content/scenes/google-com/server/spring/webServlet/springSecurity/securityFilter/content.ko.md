@@ -1,7 +1,6 @@
 # 개요
 
-Spring Security는 여러 Security Filter가 연결된 SecurityFilterChain을 기반으로 동작합니다.  
-현재 요청에 적용할 조건과 `Filter들을 보관`하며, 실제 선택과 실행은 `FilterChainProxy`가 담당합니다.
+이 Scene은 `SecurityFilterChain`에 포함된 여러 Security Filter가 실행되는 대표적인 순서를 보여줍니다. 현재 요청에 맞는 SecurityFilterChain을 선택하는 일은 앞 단계의 `FilterChainProxy`가 담당합니다.
 
 ---
 

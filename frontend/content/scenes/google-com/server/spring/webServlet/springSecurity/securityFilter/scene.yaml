@@ -1,6 +1,6 @@
-id: google-com-server-spring-webservlet-filterchain-securityfilterchain
-title: SecurityFilterChain
-summary: FilterChainProxy가 선택한 SecurityFilterChain의 Filter들이 SecurityContext 복원, 인증, 예외 처리와 인가를 순서대로 수행하는 흐름입니다.
+id: google-com-server-spring-webservlet-springsecurity-securityfilter
+title: Security Filter 실행 흐름
+summary: SecurityFilterChain에 포함된 Security Filter들이 SecurityContext 복원, 인증, 예외 처리와 인가를 순서대로 수행하는 흐름입니다.
 nodes:
   filter-chain-proxy:
     label: FilterChainProxy
@@ -16,17 +16,17 @@ nodes:
     label: OAuth2Authorization\nRequestRedirectFilter
     row: 2
     col: 3
-    childSceneId: google-com-server-spring-webservlet-filterchain-securityfilterchain-oauth2login
+    childSceneId: google-com-server-spring-webservlet-springsecurity-securityfilter-oauth2login
   oauth2-login-authentication-filter:
     label: OAuth2Login\nAuthenticationFilter
     row: 3
     col: 3
-    navigateToSceneId: google-com-server-spring-webservlet-filterchain-securityfilterchain-oauth2login
+    navigateToSceneId: google-com-server-spring-webservlet-springsecurity-securityfilter-oauth2login
   username-password-authentication-filter:
     label: UsernamePassword\nAuthenticationFilter
     row: 4
     col: 3
-    childSceneId: google-com-server-spring-webservlet-filterchain-securityfilterchain-usernamepasswordauthenticationfilter
+    childSceneId: google-com-server-spring-webservlet-springsecurity-securityfilter-usernamepasswordauthenticationfilter
   anonymous-authentication-filter:
     label: Anonymous\nAuthenticationFilter
     row: 5

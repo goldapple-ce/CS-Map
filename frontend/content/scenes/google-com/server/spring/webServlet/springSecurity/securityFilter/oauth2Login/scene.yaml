@@ -1,4 +1,4 @@
-id: google-com-server-spring-webservlet-filterchain-securityfilterchain-oauth2login
+id: google-com-server-spring-webservlet-springsecurity-securityfilter-oauth2login
 title: OAuth 2.0 Login
 summary: OAuth2AuthorizationRequestRedirectFilter가 로그인을 시작하고 OAuth2LoginAuthenticationFilter가 콜백을 인증하는 Authorization Code 흐름입니다.
 nodes:
@@ -16,7 +16,7 @@ nodes:
     label: OAuth2Login\nAuthenticationFilter
     row: 3
     col: 3
-    childSceneId: google-com-server-spring-webservlet-filterchain-securityfilterchain-oauth2login-oauth2loginauthenticationfilter
+    childSceneId: google-com-server-spring-webservlet-springsecurity-securityfilter-oauth2login-oauth2loginauthenticationfilter
   authorization-request-repository:
     label: AuthorizationRequest\nRepository
     row: 2

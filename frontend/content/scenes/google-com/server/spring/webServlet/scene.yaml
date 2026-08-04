@@ -22,7 +22,7 @@ nodes:
     label: Spring Security
     row: 4
     col: 4
-    contentRef: springsecurity.ko.md
+    childSceneId: google-com-server-spring-webservlet-springsecurity
 
   web-socket:
     label: Web Socket

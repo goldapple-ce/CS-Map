@@ -1,0 +1,52 @@
+id: google-com-server-spring-webservlet-springsecurity
+title: Spring Security
+summary: FilterChainProxy가 요청에 맞는 SecurityFilterChain을 선택하고, SecurityFilter들이 SecurityContext를 사용하며 요청을 처리하는 구조입니다.
+nodes:
+  delegating-filter-proxy:
+    label: DelegatingFilterProxy
+    row: 3
+    col: 1
+    contentRef: delegatingfilterproxy.ko.md
+  filter-chain-proxy:
+    label: FilterChainProxy
+    row: 3
+    col: 2
+    contentRef: filterchainproxy.ko.md
+  security-filter-chain:
+    label: Security\nFilterChain(s)
+    row: 3
+    col: 3
+    contentRef: securityfilterchain.ko.md
+  security-filter:
+    label: SecurityFilter(s)
+    row: 3
+    col: 4
+    childSceneId: google-com-server-spring-webservlet-springsecurity-securityfilter
+  security-context-holder:
+    label: SecurityContextHolder
+    row: 3
+    col: 5
+    contentRef: securitycontextholder.ko.md
+  security-context-repository:
+    label: SecurityContext\nRepository
+    row: 4
+    col: 5
+    contentRef: securitycontextrepository.ko.md
+edges:
+  - from: delegating-filter-proxy
+    to: filter-chain-proxy
+    label: 위임
+  - from: filter-chain-proxy
+    to: security-filter-chain
+    label: Chain 선택
+  - from: security-filter
+    to: security-filter-chain
+    label: Filter 등록
+  - from: security-context-holder
+    to: security-filter
+    variant: supporting
+    label: Context 등록
+  - from: security-context-repository
+    to: security-filter
+    variant: supporting
+    label: Context 유지
