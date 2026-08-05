@@ -1,6 +1,6 @@
 id: google-com-server-spring-webservlet-mvc
 title: DispatcherServlet과 Spring MVC
-summary: DispatcherServlet이 HandlerMapping과 HandlerAdapter를 조정하고 ViewResolver를 통해 서버 측 View를 렌더링하는 흐름입니다.
+summary: DispatcherServlet이 Controller와 Interceptor를 찾고 HandlerAdapter로 실행한 뒤 ViewResolver를 통해 서버 측 View를 렌더링하는 흐름입니다.
 nodes:
   dispatcher-servlet:
     label: DispatcherServlet
@@ -17,6 +17,11 @@ nodes:
     row: 1
     col: 3
     contentRef: handlermapping.ko.md
+  handler-interceptor:
+    label: HandlerInterceptor(s)
+    row: 1
+    col: 5
+    contentRef: handlerinterceptor.ko.md
   handler-adapter:
     label: HandlerAdapter
     row: 2
@@ -40,33 +45,39 @@ nodes:
 edges:
   - from: dispatcher-servlet
     to: handler-mapping
-    label: ① Handler 조회
+    label: 1. Handler 조회
+    labelSide: bottom
   - from: handler-mapping
+    fromSide: right
     to: controller
-    label: ② 선택된 Handler
-    variant: return
+    toSide: top
+    label: 2. controller 조회
+    variant: supporting
+  - from: handler-mapping
+    to: handler-interceptor
+    label: 2. Interceptor 조회
+    variant: supporting
+  - from: handler-mapping
+    to: dispatcher-servlet
+    label: 3. HandlerExecutionChain 반환
   - from: dispatcher-servlet
     to: handler-adapter
-    label: ③ 실행 Adapter 선택
+    label: 4. 실행 Adapter 선택
   - from: handler-adapter
     to: controller
-    label: ④ Controller 호출
+    label: 5. Controller 호출
   - from: controller
     to: view-resolver
-    label: ⑤ View 이름 반환
-    variant: return
+    label: 6. View 이름 반환
   - from: controller
     to: model
-    label: ⑤ Model 구성
-    variant: return
+    label: 6. Model 구성
   - from: dispatcher-servlet
     to: view-resolver
-    label: ⑥ View 해석 요청
+    label: 6. View 해석 요청
   - from: view-resolver
     to: rendered-view
-    label: ⑦ 실제 View 선택
-    variant: supporting
+    label: 7. 실제 View 선택
   - from: model
     to: rendered-view
     label: Model 적용
-    variant: supporting
