@@ -1,6 +1,6 @@
 id: google-com-server-spring-webservlet
 title: Spring Web Servlet
-summary: Tomcat이 Servlet FilterChain을 호출하고 최종 Servlet인 DispatcherServlet로 요청을 전달하는 Spring 웹 애플리케이션 흐름입니다.
+summary: Tomcat이 HTTP 요청을 받아 Servlet FilterChain을 거쳐 Spring MVC의 DispatcherServlet로 전달하는 Servlet 기반 웹 요청 흐름입니다.
 nodes:
   tomcat:
     label: Tomcat
@@ -25,7 +25,7 @@ nodes:
     childSceneId: google-com-server-spring-webservlet-springsecurity
 
   web-socket:
-    label: Web Socket
+    label: WebSocket
     row: 2
     col: 4
     contentRef: websocket.ko.md
