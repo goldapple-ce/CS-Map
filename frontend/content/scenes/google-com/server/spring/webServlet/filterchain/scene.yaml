@@ -1,6 +1,6 @@
 id: google-com-server-spring-webservlet-filterchain
 title: Servlet FilterChain
-summary: Servlet FilterChain이 Spring Security의 FilterChainProxy와 SecurityFilterChain으로 처리를 위임한 뒤 원래 FilterChain을 계속 진행하는 흐름입니다.
+summary: Servlet Container의 FilterChain이 일반 Filter와 DelegatingFilterProxy를 순서대로 호출한 뒤 DispatcherServlet에 요청을 전달하는 흐름입니다.
 nodes:
   servlet-filter-chain:
     label: Servlet FilterChain

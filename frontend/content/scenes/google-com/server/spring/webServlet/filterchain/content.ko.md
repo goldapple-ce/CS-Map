@@ -1,79 +1,60 @@
-## 개요
+# 한눈에 보기
 
-Spring Security의 Servlet 지원은 Servlet Filter를 기반으로 합니다. `FilterChainProxy`가 현재 요청에 적용할 `SecurityFilterChain`을 선택하고, 그 안의 Security Filter들이 정해진 순서로 요청을 검사합니다.
+Servlet FilterChain은 요청이 Controller에 도착하기 전에 거치는 여러 처리 단계를 순서대로 연결한 구조입니다.  
+각 Filter는 요청을 검사하거나 수정한 뒤 다음 Filter로 넘길 수 있습니다. 문제가 있으면 요청을 더 진행하지 않고 그 자리에서 응답을 끝낼 수도 있습니다.  
+모든 Filter를 통과한 요청은 Spring MVC의 `DispatcherServlet`에 도착합니다.
 
-이 흐름에는 이름이 비슷하지만 서로 다른 세 계층이 있습니다.
+---
 
-```text
-Servlet FilterChain
-└─ DelegatingFilterProxy
-   └─ FilterChainProxy
-      └─ SecurityFilterChain
-         └─ Security Filter들
-```
+# 구성 요소
 
-- `Servlet FilterChain`: Servlet 컨테이너가 관리하는 전체 Filter 실행 체인
-- `FilterChainProxy`: Spring Security의 단일 Servlet Filter 진입점
-- `SecurityFilterChain`: 특정 요청에 적용할 Spring Security Filter 목록
+- `Servlet FilterChain`: 현재 요청에 적용할 Filter들을 정해진 순서대로 호출합니다.
+- `Servlet Filter`: 요청과 응답에 공통 처리를 적용합니다. 로깅, 문자 인코딩과 요청 검사 등에 사용할 수 있습니다.
+- `DelegatingFilterProxy`: Servlet 요청을 Spring Container가 관리하는 Filter Bean에 전달합니다.
+- `Spring Security`: DelegatingFilterProxy를 통해 FilterChain 중간에 인증과 인가 처리를 추가합니다.
+- `DispatcherServlet`: Filter를 모두 통과한 요청을 받아 알맞은 Spring MVC Controller로 연결합니다.
 
-## 필요한 이유
+화면에 두 개의 `Servlet Filter`가 있지만 서로 다른 종류는 아닙니다. Spring Security 처리 앞뒤에 일반 Filter가 존재할 수 있다는 것을 보여주기 위해 두 번 표시했습니다.
 
-보안 검사를 Controller마다 반복하지 않고 요청이 Spring MVC에 도달하기 전 공통 FilterChain에서 적용할 수 있습니다. 인증은 요청 주체가 누구인지 확인하는 과정이고, 인가는 그 주체가 해당 요청을 수행할 수 있는지 판단하는 과정입니다.
+---
 
-## 동작 과정
+# 전체 흐름
 
-1. Tomcat의 Servlet FilterChain이 `DelegatingFilterProxy`를 호출합니다.
-2. `DelegatingFilterProxy`가 Spring Container에 등록된 `FilterChainProxy` Bean으로 처리를 위임합니다.
-3. `FilterChainProxy`가 요청 조건과 일치하는 첫 번째 `SecurityFilterChain`을 선택합니다.
-4. 선택된 filter들이 인증 정보와 보안 상태를 처리합니다.
-5. 인가 규칙이 요청을 허용하는지 판단합니다.
-6. 허용된 요청은 원래 Servlet FilterChain을 계속 진행하고, 남은 Filter를 거쳐 대상 Servlet인 `DispatcherServlet`에 도달할 수 있습니다.
+1. Tomcat 같은 Servlet Container가 현재 요청에 적용할 FilterChain을 실행합니다.
+2. 첫 번째 Servlet Filter가 요청을 처리합니다.
+3. Filter가 `chain.doFilter()`를 호출하면 다음 Filter로 요청이 넘어갑니다.
+4. `DelegatingFilterProxy`가 호출되면 Spring Security의 Filter Bean에 보안 처리를 위임합니다.
+5. Spring Security 처리가 요청을 허용하면 원래 Servlet FilterChain으로 돌아와 다음 Servlet Filter를 실행합니다.
+6. 남은 Filter도 다음 체인을 호출하면 마지막에 `DispatcherServlet`이 실행됩니다.
 
-각 Filter는 반드시 다음 체인을 호출해야 하는 것은 아닙니다. 보안 필터가 인증 또는 인가 실패 응답을 완성하고 다음 체인을 호출하지 않으면 뒤쪽 일반 Filter와 `DispatcherServlet`에는 요청이 도달하지 않습니다.
+Spring Security가 FilterChain 전체를 교체하는 것은 아닙니다. 원래 Servlet FilterChain의 DelegatingFilterProxy 위치에서 Spring Security 내부 Filter들이 잠시 중첩되어 실행된 뒤, 처리가 끝나면 원래 체인으로 돌아옵니다.
 
-## 요청과 응답 방향
+---
 
-요청은 Filter 등록 순서대로 안쪽으로 진행하지만 응답은 호출 스택을 따라 반대 방향으로 돌아옵니다.
+# 개발자가 개입하는 지점
 
-```text
-요청
-Servlet Filter
-→ DelegatingFilterProxy
-→ FilterChainProxy
-→ Security Filter들
-→ 남은 Servlet Filter
-→ DispatcherServlet
+개발자가 Servlet FilterChain 객체를 직접 만드는 경우는 드뭅니다. 보통 Filter를 구현하고 적용 범위와 순서를 설정하면 Servlet Container가 실행 체인을 구성합니다.
 
-응답
-Servlet Filter
-← DelegatingFilterProxy
-← FilterChainProxy
-← Security Filter들
-← 남은 Servlet Filter
-← DispatcherServlet
-```
+- 일반 공통 처리: `Filter` 또는 Spring의 `OncePerRequestFilter` 구현
+- Spring Security 내부에 Filter 추가: `SecurityFilterChain` 설정에서 기존 Filter의 앞이나 뒤에 배치
+- 보안 규칙 변경: Spring Security Scene의 `SecurityFilterChain` Bean 구성
 
-따라서 Filter는 `chain.doFilter()` 호출 전에 요청을 전처리하고, 호출이 반환된 뒤 응답을 후처리할 수 있습니다.
+---
 
-## 내부 구조
+# 꼭 알아둘 점
 
-모든 요청이 화면과 똑같은 인증 방식을 거치는 것은 아닙니다. 이미 인증된 요청, 공개 경로와 사용하는 인증 방식에 따라 실행되는 Filter가 달라질 수 있습니다. 화면은 인증이 필요한 일반적인 요청의 핵심 순서를 단순화합니다.
+## Filter는 요청을 중단할 수 있습니다
 
-## 실패 상황
+Filter가 반드시 다음 Filter를 호출해야 하는 것은 아닙니다. 인증이나 권한 검사에 실패했거나 잘못된 요청이라고 판단하면 직접 응답을 만들고 `chain.doFilter()`를 호출하지 않을 수 있습니다. 이 경우 뒤쪽 Filter와 DispatcherServlet은 실행되지 않습니다.
 
-- 요청에 맞는 SecurityFilterChain이 예상과 다를 수 있습니다.
-- 인증 정보가 없거나 유효하지 않을 수 있습니다.
-- 인증됐어도 필요한 권한이 없어 요청이 거부될 수 있습니다.
-- Filter 순서나 RequestMatcher 설정이 의도와 다를 수 있습니다.
+## Spring Security 지원선은 호출 순서가 아닙니다
 
-## 범위
+화면의 `Spring Security → DelegatingFilterProxy` 점선은 Spring Security가 DelegatingFilterProxy를 통해 Servlet FilterChain에 연결된다는 관계를 나타냅니다. 요청이 Spring Security Topic에서 DelegatingFilterProxy로 이동한다는 뜻은 아닙니다.
 
-개별 Security Filter의 상세 인증·인가 로직은 자식 `SecurityFilterChain` Scene에서 다룹니다. `DispatcherServlet` 이후의 Spring MVC 처리는 연결된 Spring MVC Scene에서 이어집니다.
+---
 
-## 출처
+# 참고 자료
 
-- Spring Security, _Servlet Architecture_
-
-## 참고 자료
-
+- [Jakarta Servlet — FilterChain API](https://jakarta.ee/specifications/servlet/6.1/apidocs/jakarta.servlet/jakarta/servlet/filterchain)
 - [Spring Security — Servlet Architecture](https://docs.spring.io/spring-security/reference/servlet/architecture.html)
+- [Spring Framework — DelegatingFilterProxy API](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/filter/DelegatingFilterProxy.html)
