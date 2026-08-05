@@ -1,4 +1,4 @@
-# 개요
+# 한눈에 보기
 
 HTML 로그인 폼으로 제출된 사용자 이름과 비밀번호를 읽어 인증을 시작하는 필터입니다. 기본 설정에서는 `POST /login` 요청을 처리하고, 요청 파라미터 이름은 `username`과 `password`입니다.
 
@@ -32,6 +32,22 @@ URL, HTTP 메서드, 파라미터 이름은 보안 설정으로 바꿀 수 있�
 - 요청에서 자격 증명을 읽고 인증 흐름을 시작합니다.
 - 실제 사용자 조회와 비밀번호 비교는 보통 `DaoAuthenticationProvider`가 담당합니다.
 - 어떤 `AuthenticationProvider`를 사용할지는 `AuthenticationManager`의 대표 구현인 `ProviderManager`가 결정합니다.
+
+---
+
+# 개발자가 개입하는 지점
+
+개발자는 `formLogin()` 설정에서 로그인 처리 URL, parameter 이름과 성공·실패 Handler를 변경할 수 있습니다.
+
+```java
+http.formLogin(form -> form
+    .loginProcessingUrl("/login")
+    .usernameParameter("email")
+    .passwordParameter("password")
+);
+```
+
+Filter를 직접 생성하기보다 SecurityFilterChain 설정을 통해 구성하는 것이 일반적입니다. JSON body처럼 기본 Form Login과 다른 입력 형식이 필요하면 custom Filter나 별도의 인증 방식을 검토할 수 있습니다.
 
 ---
 

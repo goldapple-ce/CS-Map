@@ -1,10 +1,6 @@
-# 개요
+# 한눈에 보기
 
 Spring Security 필터가 인증을 요청할 때 사용하는 핵심 인터페이스입니다. 인증 전 `Authentication`을 받아 인증 결과를 반환하는 하나의 진입점을 제공합니다.
-
-```java
-Authentication authenticate(Authentication authentication)
-```
 
 ---
 
@@ -18,9 +14,9 @@ Authentication authenticate(Authentication authentication)
 
 ---
 
-# 이 흐름에서의 위치
+# 개발자가 개입하는 지점
 
-`UsernamePasswordAuthenticationFilter`는 자신이 만든 인증 전 토큰을 `AuthenticationManager`에 넘깁니다. 일반적인 Servlet 애플리케이션에서는 `ProviderManager`가 이 인터페이스를 구현하며, 적합한 `AuthenticationProvider`에 실제 검증을 위임합니다.
+custom Authentication Filter나 특별한 인증 흐름을 만들 때는 AuthenticationManager를 주입받아 인증을 요청하거나 별도의 Manager를 구성할 수 있습니다.
 
 ---
 

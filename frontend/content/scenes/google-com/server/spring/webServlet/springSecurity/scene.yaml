@@ -42,11 +42,9 @@ edges:
   - from: security-filter
     to: security-filter-chain
     label: Filter 등록
-  - from: security-context-holder
-    to: security-filter
-    variant: supporting
+  - from: security-filter
+    to: security-context-holder
     label: Context 등록
-  - from: security-context-repository
-    to: security-filter
-    variant: supporting
+  - from: security-filter
+    to: security-context-repository
     label: Context 유지

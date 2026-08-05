@@ -1,59 +1,41 @@
-현재 요청을 보낸 사용자의 인증 정보(Authentication)를 저장하고 꺼내 쓰는 저장소입니다.  
-쉽게 말하면 `지금 이 요청을 보낸 사람이 누구인지 기억해두는 공간`입니다.
+# 한눈에 보기
 
----
+`SecurityContextHolder`는 현재 요청을 처리하는 동안 사용자의 인증 정보를 꺼내거나 설정할 수 있게 하는 공간입니다.
 
-# 구조
-
-```
+```text
 SecurityContextHolder -> SecurityContext -> Authentication
 ```
 
-- SecurityContextHolder : 저장소에 접근하는 역할
-- SecurityContext : 인증 정보를 담는 객체
-- Authentication : 실제 사용자 정보
-  - authenticated : 인증 여부
-  - principal: 사용자 식별자(ID)
-  - credential : 비밀번호
-  - authorities: 권한(ex:ROLE_USER)
-
-여기서 중요하게 볼것은 authenticated 필드는 인증 여부라는 점입니다.
-AnonymousAuthenticationFilter를 보면 더 자세히 알 수 있지만, 간단하게 말씀드리면 `로그인 하지 않은 사용자 또한 authenticated는 true`입니다.  
-해당 Authentication 객체가 Spring Security 내부에서 정상적인 Authentication 상태라는 의미입니다.
+- `SecurityContext`: 현재 실행 흐름의 보안 정보를 담습니다.
+- `Authentication`: 사용자 정보, 인증 여부와 권한을 나타냅니다.
 
 ---
 
-# 각 컴포넌트들과의 관계
+# 동작 방식
 
-- `SecurityContextHolderFilter` : SecurityContext를 설정합니다.
-- Authentication Filter : 인증을 성공한다면 Authentication을 등록합니다.
-  - `Oatuh2LoginAuthenticationFilter`
-  - `UsernamePasswordAuthenticationFilter`
-  - `AnonymousAuthenticationFilter`
-- `AuthorizationFilter` : AuthorizationFilter의 AuthorizationManager가 인가를 확인할 때 사용합니다.
-- `ExceptionTranslationFilter` : 인증 Exception인지, 인가 Exception인지 확인할 때 사용합니다.
+로그인에 성공한 Authentication Filter는 인증된 Authentication을 담은 SecurityContext를 Holder에 설정합니다. 이후 `AuthorizationFilter`는 이 Authentication을 이용해 현재 요청을 허용할지 판단합니다.
 
 ---
 
-# ThreadLocal과 관계
+# 개발자가 개입하는 지점
 
-기본적으로 `ThreadLocal 기반`입니다. 각 요청마다 다른 인증 정보를 가집니다
-
-```
-요청 1Thread -> SecurityContextHolder1 -> 사용자 A 정보
-요청 2Thread -> SecurityContextHolder2 -> 사용자 B 정보
-```
+custom Authentication Filter를 만들거나 현재 로그인 사용자를 코드에서 조회할 때는 SecurityContextHolder를 사용할 수 있습니다.
 
 ---
 
-# 이를 왜 알아야 하는가?
+# 헷갈리기 쉬운 점
 
-만약 Security를 사용하고, `인증/인가 방식을 커스텀`(ex : JWT Filter)해야 할 상황에 알아야합니다.  
-필터를 통과한다고 해도, 결국 SecurityContextHolder에 SecurityContext를 넣지 않으면 해당 사용자는 인증된 상태가 아니게 됩니다.  
-이런 일을 방지하기 위해서라도 이를 알아야 합니다.
+## 다음 요청까지 저장하는 저장소가 아닙니다
+
+SecurityContextHolder는 현재 실행 흐름에서 Context에 접근하게 합니다. 다음 요청에서도 로그인 상태를 유지하는 역할은 `SecurityContextRepository`가 담당합니다.
+
+## authenticated가 항상 실제 로그인을 뜻하지는 않습니다
+
+`AnonymousAuthenticationFilter`가 만든 익명 Authentication도 인증된 객체로 표시될 수 있습니다. `isAuthenticated()` 값 하나만으로 실제 로그인 사용자인지 판단하면 안 됩니다.
 
 ---
 
-# 참고자료
+# 참고 자료
 
-- [SpringSecurity - Authentication](https://docs.spring.io/spring-security/reference/servlet/authentication/architecture.html)
+- [Spring Security — SecurityContextHolder](https://docs.spring.io/spring-security/reference/servlet/authentication/architecture.html#servlet-authentication-securitycontextholder)
+- [Spring Security — Anonymous Authentication](https://docs.spring.io/spring-security/reference/servlet/authentication/anonymous.html)

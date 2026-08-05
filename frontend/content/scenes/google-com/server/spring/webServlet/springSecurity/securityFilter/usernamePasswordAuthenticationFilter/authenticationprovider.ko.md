@@ -1,4 +1,4 @@
-# 개요
+# 한눈에 보기
 
 특정 종류의 인증을 실제로 처리하는 전략 인터페이스입니다. `ProviderManager`는 등록된 여러 `AuthenticationProvider` 중 전달받은 `Authentication` 타입을 지원하는 구현체를 찾아 인증을 맡깁니다.
 
@@ -21,6 +21,16 @@ Authentication authenticate(Authentication authentication)
 # 구현체가 나뉘는 이유
 
 인증 방식마다 필요한 검증이 다르기 때문입니다. 예를 들어 `DaoAuthenticationProvider`는 사용자 이름과 비밀번호를 처리하고, JWT·LDAP·SAML 같은 방식은 각각 다른 Provider가 담당할 수 있습니다. 상위 필터는 이 차이를 몰라도 `AuthenticationManager`라는 하나의 진입점으로 인증을 요청할 수 있습니다.
+
+---
+
+# 개발자가 개입하는 지점
+
+기본 username/password 인증에서는 Spring Security의 DaoAuthenticationProvider를 사용하므로 AuthenticationProvider interface를 직접 구현할 필요가 없습니다.
+
+기본 Provider로 표현하기 어려운 사내 인증, 외부 시스템 인증이나 custom Token 검증이 필요하면 `supports()`와 `authenticate()`를 구현한 custom AuthenticationProvider를 등록할 수 있습니다.
+
+다만 custom Provider를 만들기 전에 기존 Provider와 설정으로 해결할 수 있는지 먼저 확인하는 것이 좋습니다.
 
 ---
 

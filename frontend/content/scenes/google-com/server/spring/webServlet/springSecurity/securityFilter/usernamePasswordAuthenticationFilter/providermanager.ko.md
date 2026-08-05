@@ -1,4 +1,4 @@
-# 개요
+# 한눈에 보기
 
 `AuthenticationManager`의 가장 일반적인 구현체입니다. 등록된 `AuthenticationProvider` 목록을 사용해 전달받은 인증 요청을 처리할 Provider를 찾고, 인증 결과를 호출자에게 돌려줍니다.
 
@@ -28,6 +28,16 @@
 - `ProviderManager`: 여러 `AuthenticationProvider`로 위임하는 대표 구현체입니다.
 
 이 분리 덕분에 상위 필터는 실제로 어떤 Provider가 인증하는지 알 필요가 없습니다.
+
+---
+
+# 개발자가 개입하는 지점
+
+일반적인 Form Login에서는 Spring Security가 ProviderManager를 구성하므로 개발자가 직접 생성하거나 호출할 지점은 많지 않습니다.
+
+여러 인증 방식을 함께 사용하거나 custom AuthenticationProvider를 추가하면 ProviderManager가 확인할 Provider 목록에 영향을 줄 수 있습니다.
+
+다만 이 구조를 알면 올바른 Provider가 선택되지 않거나 `ProviderNotFoundException`이 발생하는 문제를 추적하는 데 도움이 됩니다.
 
 ---
 

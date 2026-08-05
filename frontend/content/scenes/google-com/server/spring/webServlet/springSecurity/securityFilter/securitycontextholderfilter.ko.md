@@ -1,36 +1,38 @@
-# 개요
+# 한눈에 보기
 
-요청이 시작될 때 `저장되어 있던 SecurityContext`를 불러와 SecurityContextHolder에 설정하는 필터입니다.  
-저장된 SecurityContext를 사용하는 세션 기반의 `Stateful 서버`에서 특히 중요합니다.
+`SecurityContextHolderFilter`는 요청이 시작될 때 저장되어 있던 SecurityContext를 불러와 현재 요청에서 사용할 수 있게 준비하는 Filter입니다.
 
----
-
-# 구조
-
-```
-요청 -> SecurityContextRepository ->  SecurityContextHolderStrategy
-```
-
-- `SecurityContextRepository`: 요청 간에 SecurityContext를 저장하고 불러오는 저장소
-- `SecurityContextHolderStrategy`: 현재 요청의 SecurityContext를 저장하고 조회하는 방식을 담당
+세션 기반 로그인에서는 이전 요청에서 저장한 로그인 정보를 다음 요청에서 복원할 때 중요한 역할을 합니다.
 
 ---
 
-# 흐름
+# 동작 방식
 
-1. 요청이 들어옵니다.
-2. SecurityContextRepository에서 저장된 SecurityContext를 조회합니다.
-3. 조회한 SecurityContext를 SecurityContextHolderStrategy를 통해 SecurityContextHolder에 설정합니다.
-4. 이후 Security Filter들이 해당 SecurityContext를 사용합니다.
-5. 요청 처리가 끝나면 SecurityContextHolder를 비웁니다.
+1. `SecurityContextRepository`에서 현재 요청과 연결된 SecurityContext를 찾습니다.
+2. 찾은 Context를 `SecurityContextHolder`에서 사용할 수 있게 설정합니다.
+3. 뒤쪽 Security Filter들이 Context 안의 Authentication을 사용합니다.
+4. 요청 처리가 끝나면 현재 실행 흐름의 Context를 정리합니다.
 
-중요한 점은 SecurityContextHolderFilter는 `SecurityContext를 불러오기만 한다`는 점입니다.  
-Spring Security 6에서는 변경된 SecurityContext를 `다음 요청에서도 유지하려면 SecurityContextRepository.saveContext()를 명시적으로 호출`해야 합니다.  
-따라서 커스텀 인증 필터를 만들고 세션 기반으로 인증 상태를 유지한다면, 인증 성공 후 SecurityContextRepository에도 저장해야 합니다.  
-저장하지 않으면 다음 요청에서 SecurityContextHolderFilter가 해당 인증 정보를 불러올 수 없습니다.
+SecurityContextHolderFilter는 Context를 불러오지만 변경된 Context를 자동으로 저장하지는 않습니다. 인증 결과를 다음 요청에서도 유지해야 한다면 인증 성공 처리에서 SecurityContextRepository에 저장해야 합니다.
+
+---
+
+# 개발자가 개입하는 지점
+
+보통 개발자가 SecurityContextHolderFilter를 직접 생성하거나 호출할 지점은 없습니다.  
+다만, 이 구조를 알면 현재 요청에서는 인증됐지만 다음 요청에서 다시 익명 사용자로 보이는 문제를 추적하는 데 도움이 됩니다.
+
+---
+
+# 헷갈리기 쉬운 점
+
+## 불러오기와 저장은 다릅니다
+
+SecurityContextHolderFilter의 중심 역할은 저장된 Context를 불러와 현재 요청에 연결하는 것입니다. 다음 요청을 위한 저장은 별도 성공 처리와 Repository가 담당합니다.
 
 ---
 
 # 참고 자료
 
-- [Spring Security - Authentication Architecture](https://docs.spring.io/spring-security/reference/servlet/authentication/architecture.html)
+- [Spring Security — SecurityContextHolderFilter API](https://docs.spring.io/spring-security/reference/api/java/org/springframework/security/web/context/SecurityContextHolderFilter.html)
+- [Spring Security — Authentication Persistence](https://docs.spring.io/spring-security/reference/servlet/authentication/persistence.html)

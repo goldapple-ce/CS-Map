@@ -1,58 +1,63 @@
-# 개요
+# 한눈에 보기
 
-이 Scene은 `SecurityFilterChain`에 포함된 여러 Security Filter가 실행되는 대표적인 순서를 보여줍니다. 현재 요청에 맞는 SecurityFilterChain을 선택하는 일은 앞 단계의 `FilterChainProxy`가 담당합니다.
+Security Filter는 Spring Security가 요청에 인증, 인가와 여러 보안 처리를 적용할 때 사용하는 Servlet Filter입니다.
 
----
-
-# 인증과 인가
-
-- 인증(Authentication) : 본인이 누구인지 확인 (로그인)
-- 인가(Authorization) : 특정 리소스에 권한이 있는지 확인 (등급 권한)
+하나의 Filter가 모든 보안 처리를 하는 것은 아닙니다. 역할이 다른 Filter들이 `SecurityFilterChain`에 등록되고, 현재 요청과 관련 있는 Filter가 정해진 순서대로 실행됩니다.
 
 ---
 
-# 주요 Filter 흐름
+# 구성 요소
 
-> 이해를 위해 약간의 단순화가 있습니다.
+- `SecurityContextHolderFilter`: 저장된 SecurityContext를 현재 요청에서 사용할 수 있게 준비합니다.
+- `OAuth2AuthorizationRequestRedirectFilter`: OAuth2 로그인을 시작하고 브라우저에 Authorization Server로 이동할 주소를 전달합니다.
+- `OAuth2LoginAuthenticationFilter`: Authorization Server에서 돌아온 Callback을 처리합니다.
+- `UsernamePasswordAuthenticationFilter`: Form Login의 username과 password를 처리합니다.
+- `AnonymousAuthenticationFilter`: 앞선 Filter에서 인증되지 않았다면 익명 Authentication을 설정합니다.
+- `ExceptionTranslationFilter`: 뒤에서 발생한 인증·인가 예외를 로그인 시작이나 접근 거부 응답으로 바꿉니다.
+- `AuthorizationFilter`: 현재 사용자가 요청을 수행할 수 있는지 확인합니다.
 
-설정에 따라 실제 Filter 구성은 달라집니다. 각 인증 Filter는 자신이 처리할 요청이 아니면 인증을 시도하지 않고 다음 Filter로 요청을 전달합니다.
+`SecurityContextHolder`와 `SecurityContextRepository`는 Filter가 아니며, Filter들이 인증 정보를 사용하고 유지할 때 이용하는 구성 요소입니다.
 
-## SecurityContext 관리
+---
 
-- SecurityContextHolderFilter:
-  - `이미 로그인한 사용자인지 확인`하고, 현재 요청의 SecurityContextHolder에 설정합니다.
-  - 세션 기반 인증에서는 SecurityContext가 주로 HTTP 세션에 저장됩니다.
+# 전체 흐름
 
-## 인증 필터(Authentication Filter)
+1. FilterChainProxy가 선택한 SecurityFilterChain의 Filter 실행을 시작합니다.
+2. SecurityContextHolderFilter가 이전 요청에서 저장된 SecurityContext를 불러옵니다.
+3. 로그인 요청과 일치하는 Authentication Filter가 있으면 인증을 시도합니다.
+4. 아무 Filter도 사용자를 인증하지 않았다면 AnonymousAuthenticationFilter가 익명 Authentication을 설정합니다.
+5. AuthorizationFilter가 현재 Authentication과 접근 규칙을 이용해 요청을 허용할지 판단합니다.
+6. 인증·인가 예외가 발생하면 ExceptionTranslationFilter가 적절한 후속 처리를 시작합니다.
+7. 요청이 허용되면 원래 Servlet FilterChain으로 돌아가 DispatcherServlet까지 진행할 수 있습니다.
 
-인증에 성공하면 인증된 Authentication이 들어 있는 SecurityContext를 SecurityContextHolder에 설정합니다.
+모든 요청이 화면의 인증 Filter를 전부 실행하는 것은 아닙니다. 각 Filter는 자신이 담당하는 요청이 아니면 인증을 시도하지 않고 다음 Filter로 넘깁니다.
 
-- OAuth2LoginAuthenticationFilter :
-  - 구글 등의 인증 서버가 Callback URL로 전달한 `인가 코드를 처리`하고 사용자를 인증합니다.
-- UsernamePasswordAuthenticationFilter :
-  - `기본 Form Login` 요청의 아이디와 비밀번호를 처리합니다.
-- AnonymousAuthenticationFilter :
-  - 앞선 Filter가 `인증하지 않았다면 익명 Authentication`을 설정합니다.
+---
 
-## 인가 필터(Authorization Filter)
+# 개발자가 개입하는 지점
 
-- AuthorizationFilter :
-  - 현재 요청에 적용되는 AuthorizationManager에게 `인가 판단`을 위임합니다.
-  - 필요하면 SecurityContextHolder에서 Authentication을 가져와 인증 여부나 권한을 검사합니다.
+개발자는 `SecurityFilterChain` 설정에서 어떤 Security Filter와 보안 기능을 사용할지 결정할 수 있습니다.
 
-## 기타 필터
+- Form Login, OAuth2 Login과 Bearer Token 인증 활성화
+- URL별 인가 규칙 설정
+- CSRF, CORS, session과 logout 정책 설정
+- custom Security Filter 구현 및 기존 Filter 앞뒤에 추가
+- 인증 성공/실패 Handler와 접근 거부 Handler 변경
 
-- OAuth2AuthorizationRequestRedirectFilter :
-  - OAuth2 로그인을 시작하는 요청을 처리하고, 브라우저가 Authorization Server로 이동할 URL을 `Location` 헤더에 담아 리다이렉트 응답을 반환합니다.
-- ExceptionTranslationFilter :
-  - 뒤쪽에서 발생한 `AuthenticationException과 AccessDeniedException을 처리`합니다.
-  - 인증을 시작하거나 로그인 화면으로 리다이렉트하고, 접근 거부 응답 등을 생성하도록 관련 Handler에 위임합니다.
+Spring Security 기본 Filter의 순서는 보안 동작이 서로 연결되도록 정해져 있습니다. 특별한 이유 없이 순서를 바꾸기보다 custom Filter가 어느 기존 Filter 앞이나 뒤에서 동작해야 하는지 명확히 정하는 것이 좋습니다.
+
+---
+
+# 꼭 알아둘 점
+
+## 인증과 인가는 다릅니다
+
+Authentication Filter는 사용자가 누구인지 확인하고, AuthorizationFilter는 확인된 사용자가 현재 요청을 수행할 수 있는지 판단합니다.
 
 ---
 
 # 참고 자료
 
-- [Spring Security — Servlet Architecture](https://docs.spring.io/spring-security/reference/servlet/architecture.html)
-- [Spring Security — Authentication Persistence](https://docs.spring.io/spring-security/reference/servlet/authentication/persistence.html)
+- [Spring Security — Security Filters](https://docs.spring.io/spring-security/reference/servlet/architecture.html#servlet-security-filters)
+- [Spring Security — Authentication Architecture](https://docs.spring.io/spring-security/reference/servlet/authentication/architecture.html)
 - [Spring Security — Authorize HttpServletRequests](https://docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html)
-- [Inpa Dev - Authentication vs Authorization](https://inpa.tistory.com/entry/CS-👨‍💻-Authentication-vs-Authorization-차이-엄청-쉽게-설명)

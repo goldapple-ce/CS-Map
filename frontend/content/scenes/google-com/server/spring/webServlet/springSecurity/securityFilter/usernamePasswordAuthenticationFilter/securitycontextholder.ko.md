@@ -1,4 +1,4 @@
-# 개요
+# 한눈에 보기
 
 현재 실행 흐름에서 인증된 사용자의 `SecurityContext`를 조회하고 설정하는 접근점입니다. `SecurityContext` 안에는 현재 사용자를 나타내는 `Authentication`이 들어 있습니다.
 
@@ -24,6 +24,16 @@ SecurityContextHolder
 - `SecurityContextRepository`: 인증 정보를 다음 요청에서 다시 불러올 수 있도록 요청 사이에 저장합니다.
 
 `SecurityContextHolder`에만 설정하면 현재 요청에서는 인증된 상태로 보이지만, 저장 정책에 따라 다음 요청에서는 인증이 복원되지 않을 수 있습니다.
+
+---
+
+# 개발자가 개입하는 지점
+
+기본 Form Login에서는 Filter가 인증 결과를 Holder에 설정하므로 개발자가 직접 조작할 지점은 없습니다.
+
+custom Authentication Filter를 만들 때는 인증된 Authentication을 새 SecurityContext에 담아 설정할 수 있습니다.
+
+다만 이 구조를 알면 로그인 성공 후에도 현재 사용자가 익명으로 보이는 문제를 추적하는 데 도움이 됩니다.
 
 ---
 
