@@ -1,6 +1,6 @@
 id: google-com-server-spring
 title: Spring
-summary: Spring Container가 웹과 데이터 접근 구성 요소를 Bean으로 관리하고, 필요한 Bean에 Spring AOP Proxy가 적용되는 구조입니다.
+summary: Spring Container가 설정을 읽어 Bean을 생성하고 연결하며, 웹·데이터 접근과 AOP 기능이 Bean을 중심으로 결합되는 구조입니다.
 nodes:
   echo-system:
     label: Spring 생태계
@@ -22,7 +22,12 @@ nodes:
     label: Spring Container
     row: 2
     col: 3
-    childSceneId: google-com-server-spring-container
+    contentRef: springcontainer.ko.md
+  application-context:
+    label: ApplicationContext
+    row: 2
+    col: 4
+    contentRef: applicationcontext.ko.md
 
   spring-aop:
     label: Spring AOP
@@ -52,7 +57,10 @@ edges:
   - from: spring-aop
     to: bean
     label: Proxy 적용
-
+  - from: spring-container
+    to: application-context
+    label: 대표 인터페이스
+    variant: supporting
   # - from: bean
   #   fromSide: top
   #   to: web-servlet
