@@ -6,7 +6,7 @@ nodes:
     label: Tomcat
     row: 3
     col: 1
-    childSceneId: google-com-server-spring-webservlet-tomcat
+    contentRef: tomcat.ko.md
   filter-chain:
     label: FilterChain
     row: 3
