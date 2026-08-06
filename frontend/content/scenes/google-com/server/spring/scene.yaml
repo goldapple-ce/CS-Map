@@ -17,7 +17,7 @@ nodes:
     label: Data Access
     row: 1
     col: 4
-    contentRef: dataaccess.ko.md
+    childSceneId: google-com-server-spring-dataaccess
   spring-container:
     label: Spring Container
     row: 2
