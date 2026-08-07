@@ -52,9 +52,11 @@ DataSource는 JDBC 표준 interface이고, HikariCP는 Connection Pool 기능을
 
 DataSource가 Connection을 공급하고 재사용을 관리한다면, JDBC Driver는 Database 제품의 protocol에 맞춰 실제 연결과 통신을 구현합니다.
 
-## Connection Pool은 Database 안에 있지 않습니다
+## Connection Pool과 Database의 최대 Connection 수는 다릅니다
 
-일반적인 Spring Boot 구성에서 Pool은 애플리케이션 process 안에서 동작합니다. Database는 Pool에 보관된 각각의 물리 Connection을 server session으로 받아들입니다.
+일반적인 Spring Boot 구성에서 Pool은 애플리케이션 process 안에서 동작합니다. Database는 Pool에 보관된 각각의 물리 Connection을 server session으로 받아들이며, 동시에 허용할 수 있는 Connection 수에는 별도의 한도가 있습니다.
+
+애플리케이션 서버가 여러 대라면 각 서버의 Pool 크기가 합산됩니다. 예를 들어 서버 3대가 각각 최대 10개의 Connection을 사용하면 Database에는 최대 30개의 Connection이 연결될 수 있습니다. 따라서 Pool 크기는 Database의 최대 Connection 수와 다른 애플리케이션이 사용할 여유까지 함께 고려해야 합니다.
 
 ## TransactionManager가 Pool을 소유하는 것은 아닙니다
 

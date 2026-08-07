@@ -1,23 +1,27 @@
 id: google-com-server-nosql
 title: NoSQL 문서형 Database 예시
-summary: MongoDB를 예로 들어 field와 value로 구성된 document를 collection에 저장하고 index와 query로 찾는 흐름입니다.
+summary: MongoDB를 예로 들어 filter를 해석하고 collection과 index에서 BSON document를 찾아 결과를 반환하는 흐름입니다.
 nodes:
   document-query:
     label: Document Query
     row: 3
     col: 1
+    contentRef: documentquery.ko.md
   collection-index:
     label: Collection / Index
     row: 3
     col: 2
+    contentRef: collectionindex.ko.md
   bson-document:
     label: BSON Document
     row: 3
     col: 4
+    contentRef: bsondocument.ko.md
   document-result:
     label: Document 결과
     row: 3
     col: 5
+    contentRef: documentresult.ko.md
 edges:
   - from: document-query
     to: collection-index
