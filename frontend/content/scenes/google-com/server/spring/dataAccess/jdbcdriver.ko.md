@@ -14,7 +14,7 @@ PostgreSQL JDBC Driver, MySQL Connector/J처럼 Database 제품마다 알맞은 
 4. 응답을 JDBC의 `ResultSet`이나 update 결과로 변환합니다.
 
 ```text
-JDBC API → JDBC Driver → Database 전용 Protocol → Relational Database
+JDBC API → JDBC Driver → Database 전용 Protocol → RDB
 ```
 
 ---

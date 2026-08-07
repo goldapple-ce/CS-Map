@@ -17,7 +17,7 @@ nodes:
     label: JPA
     row: 1
     col: 3
-    contentRef: jpa.ko.md
+    childSceneId: google-com-server-spring-dataaccess-jpa
   hibernate:
     label: Hibernate
     row: 1

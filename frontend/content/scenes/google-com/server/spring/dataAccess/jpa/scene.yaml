@@ -1,0 +1,74 @@
+id: google-com-server-spring-dataaccess-jpa
+title: JPA 내부 동작
+summary: EntityManager가 Persistence Context를 통해 Entity를 관리하고, 변경 내용을 감지해 flush하는 JPA의 핵심 흐름입니다.
+nodes:
+  entity-manager-factory:
+    label: EntityManagerFactory
+    row: 3
+    col: 1
+    contentRef: entitymanagerfactory.ko.md
+  entity-manager:
+    label: EntityManager
+    row: 3
+    col: 2
+    contentRef: entitymanager.ko.md
+  persistence-context:
+    label: Persistence Context
+    row: 3
+    col: 3
+    contentRef: persistencecontext.ko.md
+  entity:
+    label: Entity
+    row: 3
+    col: 5
+    contentRef: entity.ko.md
+  mapping:
+    label: Mapping Metadata
+    row: 1
+    col: 5
+    contentRef: mapping.ko.md
+  jpql:
+    label: JPQL
+    row: 5
+    col: 2
+    contentRef: jpql.ko.md
+  dirty-checking:
+    label: Dirty Checking
+    row: 4
+    col: 4
+    contentRef: dirtychecking.ko.md
+  flush:
+    label: Flush
+    row: 5
+    col: 5
+    contentRef: flush.ko.md
+
+edges:
+  - from: entity-manager-factory
+    to: entity-manager
+    label: 생성
+  - from: entity-manager
+    to: persistence-context
+    label: 접근·관리
+  - from: persistence-context
+    to: entity
+    label: 동일성·상태 관리
+  - from: mapping
+    to: entity
+    variant: supporting
+    label: 객체-table mapping
+  - from: entity-manager
+    to: jpql
+    label: Query 생성·실행
+  - from: persistence-context
+    to: dirty-checking
+    label: 변경 확인
+  - from: entity
+    to: dirty-checking
+    label: 관리 Entity 변경
+  - from: dirty-checking
+    to: flush
+    label: 변경 SQL 준비
+  - from: entity
+    to: flush
+    label: persist/remove 반영
