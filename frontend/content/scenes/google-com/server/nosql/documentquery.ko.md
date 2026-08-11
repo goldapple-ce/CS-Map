@@ -2,7 +2,7 @@
 
 Document Query는 document의 field와 value를 기준으로 조회하거나 변경할 대상을 지정하는 요청입니다.
 
-MongoDB에서는 BSON 형태의 filter document로 조건을 표현합니다.
+MongoDB에서는 BSON 형태의 filter document로 조건을 표현합니다. 이 Scene에서는 Document Query를 MongoDB 내부 조회 흐름의 시작점으로 봅니다.
 
 ---
 
@@ -18,6 +18,16 @@ db.members.find({
 이 query는 `members` collection에서 `status`가 `ACTIVE`이고 `age`가 20 이상인 document를 찾습니다.
 
 중첩 field는 dot notation으로 접근할 수 있고 비교, 논리, array와 element 연산자를 조합할 수 있습니다.
+
+`projection`으로 반환할 field를 줄이고 `sort`와 `limit`으로 정렬과 최대 결과 수를 지정할 수 있습니다.
+
+---
+
+# 결과 받기
+
+MongoDB Driver는 BSON 결과를 Java의 `Document`나 Domain 객체로 변환합니다. 결과가 많으면 Cursor와 Batch를 이용해 나누어 가져옵니다.
+
+Query 실행 자체가 빨라도 큰 Document를 많이 반환하면 Network 전송과 BSON 변환에 시간이 걸릴 수 있습니다. 필요한 field와 결과 수만 요청하는 것이 중요합니다.
 
 ---
 
@@ -45,3 +55,4 @@ MongoDB Driver는 BSON type을 보존하는 query document를 protocol에 맞게
 
 - [MongoDB — Query Documents](https://www.mongodb.com/docs/manual/tutorial/query-documents/)
 - [MongoDB — Query Selectors](https://www.mongodb.com/docs/manual/reference/mql/query-predicates/)
+- [MongoDB Java Driver — Find Operations](https://www.mongodb.com/docs/drivers/java/sync/current/crud/query-documents/find/)

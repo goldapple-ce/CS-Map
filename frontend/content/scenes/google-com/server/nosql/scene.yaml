@@ -1,34 +1,47 @@
-id: google-com-server-nosql
+id: google-com-server-mongodb
 title: MongoDB
-summary: MongoDB가 filter를 적용하고 Collection과 Index에서 BSON Document를 찾아 결과를 반환하는 흐름입니다.
+summary: Document Query가 Replica Set의 Member에 전달되고, Collection Scan 또는 Index Scan으로 BSON Document를 찾는 흐름입니다.
 nodes:
   document-query:
     label: Document Query
     row: 3
     col: 1
     contentRef: documentquery.ko.md
-  collection-index:
-    label: Collection / Index
+  replica-set:
+    label: Replica Set
     row: 3
     col: 2
-    contentRef: collectionindex.ko.md
-  bson-document:
-    label: BSON Document
+    contentRef: replicaset.ko.md
+  collection:
+    label: Collection
+    row: 3
+    col: 3
+    contentRef: collection.ko.md
+  index:
+    label: Index
     row: 3
     col: 4
-    contentRef: bsondocument.ko.md
-  document-result:
-    label: Document 결과
+    contentRef: index.ko.md
+  bson-document:
+    label: BSON\nDocument
     row: 3
     col: 5
-    contentRef: documentresult.ko.md
+    contentRef: bsondocument.ko.md
 edges:
   - from: document-query
-    to: collection-index
-    label: filter 적용
-  - from: collection-index
+    to: replica-set
+    label: Query 전송
+  - from: replica-set
+    to: collection
+    label: 처리
+  - from: collection
     to: bson-document
-    label: document 탐색
-  - from: bson-document
-    to: document-result
-    label: 결과 반환
+    label: Collection Scan
+  - from: collection
+    to: index
+    variant: supporting
+    label: Index 사용
+  - from: index
+    to: bson-document
+    variant: supporting
+    label: Index Scan

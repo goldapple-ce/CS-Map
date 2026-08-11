@@ -22,11 +22,11 @@ nodes:
     row: 2
     col: 5
     childSceneId: google-com-server-sql
-  nosql:
+  mongodb:
     label: MongoDB
     row: 4
     col: 5
-    childSceneId: google-com-server-nosql
+    childSceneId: google-com-server-mongodb
   redis:
     label: Redis
     row: 3
@@ -40,7 +40,7 @@ edges:
     to: sql
     label: 관계형 데이터 요청
   - from: spring
-    to: nosql
+    to: mongodb
     label: Document 데이터 요청
   - from: spring
     to: cache
