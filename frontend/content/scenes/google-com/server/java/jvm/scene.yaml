@@ -1,0 +1,82 @@
+id: google-com-server-java-jvm
+title: JVM
+summary: JVM이 Class를 불러오고 memory에 실행 상태를 관리하며 Bytecode를 실행하고 사용하지 않는 객체를 정리하는 구조입니다.
+nodes:
+  class-loading:
+    label: Class Loading
+    row: 1
+    col: 3
+    contentRef: classloading.ko.md
+  pc-register:
+    label: PC Register
+    row: 3
+    col: 1
+    contentRef: pcregister.ko.md
+  jvm-stack:
+    label: JVM Stack
+    row: 3
+    col: 2
+    contentRef: jvmstack.ko.md
+  method-area:
+    label: Method Area
+    row: 3
+    col: 3
+    contentRef: methodarea.ko.md
+  heap:
+    label: Heap
+    row: 3
+    col: 4
+    contentRef: heap.ko.md
+  native-method-stack:
+    label: Native Method Stack
+    row: 3
+    col: 5
+    contentRef: nativemethodstack.ko.md
+  interpreter:
+    label: Interpreter
+    row: 5
+    col: 3
+    contentRef: interpreter.ko.md
+  jit-compiler:
+    label: JIT Compiler
+    row: 5
+    col: 2
+    contentRef: jitcompiler.ko.md
+  garbage-collector:
+    label: Garbage Collector
+    row: 5
+    col: 4
+    contentRef: garbagecollector.ko.md
+edges:
+  - from: class-loading
+    to: method-area
+    label: Class 정보 적재
+  - from: method-area
+    to: interpreter
+    label: Bytecode 제공
+  - from: jvm-stack
+    fromSide: bottom
+    to: interpreter
+    label: 실행 상태 제공
+    # labelSide: left
+  - from: interpreter
+    to: jit-compiler
+    label: Code 최적화
+    variant: supporting
+  - from: garbage-collector
+    to: heap
+    label: 미사용 객체 정리
+    variant: supporting
+areas:
+  runtime-data-area:
+    label: Runtime Data Area
+    row: 3
+    col: 1
+    rowSpan: 1
+    colSpan: 5
+  execution-engine:
+    label: Execution Engine
+    row: 5
+    col: 2
+    rowSpan: 1
+    colSpan: 3

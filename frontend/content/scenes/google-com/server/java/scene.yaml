@@ -21,7 +21,7 @@ nodes:
     label: JVM
     row: 4
     col: 3
-    contentRef: jvm.ko.md
+    childSceneId: google-com-server-java-jvm
   os:
     label: OS
     row: 5
