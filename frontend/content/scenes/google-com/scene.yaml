@@ -7,16 +7,21 @@ nodes:
     row: 3
     col: 1
     childSceneId: google-com-user-browser
+  osi-model:
+    label: OSI 7계층
+    row: 3
+    col: 2
+    childSceneId: google-com-osi-model
   dns:
     label: DNS
     row: 3
-    col: 2
+    col: 3
     childSceneId: google-search-dns
   router:
     label: Router
     row: 3
     col: 4
-    childSceneId: google-search-network
+    contentRef: router.ko.md
   server:
     label: Server
     row: 3
@@ -24,11 +29,22 @@ nodes:
     childSceneId: google-com-server
 edges:
   - from: user-browser
+    fromSide: right
+    to: osi-model
+    toSide: left
+    label: 통신 계층 이해
+  - from: osi-model
+    fromSide: right
     to: dns
+    toSide: left
     label: 이름 확인
   - from: dns
+    fromSide: right
     to: router
+    toSide: left
     label: 목적지 주소 확인
   - from: router
+    fromSide: right
     to: server
+    toSide: left
     label: 서버로 전송

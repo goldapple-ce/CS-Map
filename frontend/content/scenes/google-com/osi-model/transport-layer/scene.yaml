@@ -1,0 +1,49 @@
+id: google-com-osi-transport-layer
+title: Transport Layer
+summary: Port를 이용해 Application Process를 구분하고 TCP 또는 UDP로 데이터를 전달하는 계층입니다.
+nodes:
+  session-layer:
+    label: "5. Session Layer"
+    row: 1
+    col: 3
+    contentRef: session-layer.ko.md
+  tcp:
+    label: TCP
+    row: 3
+    col: 2
+    contentRef: tcp.ko.md
+  udp:
+    label: UDP
+    row: 3
+    col: 4
+    contentRef: udp.ko.md
+  network-layer:
+    label: "3. Network Layer"
+    row: 5
+    col: 3
+    contentRef: network-layer.ko.md
+edges:
+  - from: session-layer
+    fromSide: bottom
+    to: tcp
+    toSide: top
+    label: Data
+    labelSide: left
+  - from: session-layer
+    fromSide: bottom
+    to: udp
+    toSide: top
+    label: Data
+    labelSide: right
+  - from: tcp
+    fromSide: bottom
+    to: network-layer
+    toSide: top
+    label: Segment
+    labelSide: left
+  - from: udp
+    fromSide: bottom
+    to: network-layer
+    toSide: top
+    label: Datagram
+    labelSide: right
