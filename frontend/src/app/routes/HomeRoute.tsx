@@ -31,9 +31,10 @@ const usageSteps = [
 
 export function HomeRoute() {
   const navigate = useNavigate()
+  const rootSceneId = contentRepository.getRootSceneId()
   const rootRoute = contentRepository
     .listRoutes()
-    .find(({ parentId }) => !parentId)
+    .find(({ id }) => id === rootSceneId)
   const rootPath = rootRoute?.path ?? "/explore/google-com"
 
   const enterScene = ({ sceneId }: SceneNavigationRequest) => {

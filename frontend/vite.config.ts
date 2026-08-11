@@ -26,7 +26,13 @@ function contentHotReload(): Plugin {
       const contentDirectory = path.resolve(__dirname, "content")
       const isContentFile =
         file.startsWith(`${contentDirectory}${path.sep}`) &&
-        ["scene.yaml", "concept.yaml", "content.ko.md", "quiz.ko.yaml"].includes(
+        [
+          "scenario.yaml",
+          "scene.yaml",
+          "concept.yaml",
+          "content.ko.md",
+          "quiz.ko.yaml",
+        ].includes(
           path.basename(file)
         )
       if (!isContentFile && !layoutSources.includes(file)) return

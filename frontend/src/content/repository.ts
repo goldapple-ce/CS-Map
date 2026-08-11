@@ -5,6 +5,11 @@ import type {
   Scene,
 } from "@/domain/content-types"
 
+export type ContentManifest = {
+  scenarioId: ContentId
+  rootSceneId: ContentId
+}
+
 export type SceneIndexEntry = {
   id: ContentId
   title: string
@@ -43,6 +48,7 @@ export type LoadedConcept = {
 }
 
 export interface ContentRepository {
+  getRootSceneId(): ContentId
   listRoutes(): readonly RouteIndexEntry[]
   findRoute(path: string): RouteIndexEntry | undefined
   loadSceneMap(id: ContentId): Promise<Scene>

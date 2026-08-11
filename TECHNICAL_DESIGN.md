@@ -200,6 +200,7 @@ project/
 
 ### 5.1 작성 관계
 
+- `content/scenarios/<scenario>/scenario.yaml`의 `rootSceneId`가 해당 시나리오의 명시적 루트다. MVP 빌드는 정확히 하나의 시나리오 설정을 요구하며 파일 순서나 무부모 Scene 순서로 루트를 추론하지 않는다.
 - node의 `childSceneId`가 부모·자식 중첩과 Semantic Zoom 진입의 단일 원본이다.
 - node의 `navigateToSceneId`는 월드의 다른 위치로 이동하는 교차 탐색만 표현한다.
 - `edges`가 보이는 연결선과 Scene 내부 흐름 의미의 단일 원본이다.
@@ -210,6 +211,11 @@ project/
 
 ```ts
 type ContentId = string;
+
+type ScenarioDocument = {
+  id: ContentId;
+  rootSceneId: ContentId;
+};
 
 type SceneDocument = {
   id: ContentId;
@@ -290,6 +296,13 @@ content/scenes/google-com/network/dns/
 
 루트 콘텐츠 디렉터리 이름은 canonical URL과 같은 `google-com`을 사용한다. 기존 `google-search-*` 영구 ID는 내부 참조를 깨뜨리지 않기 위해 유지한다. 새 하위 Scene은 의미에 맞는 ID를 사용하며, 기존 ID를 일괄 변경해야 할 필요가 생기면 별도의 migration으로 처리한다.
 
+```text
+content/scenarios/google-com/
+└─ scenario.yaml  # id, rootSceneId
+```
+
+Scene 작성 데이터에는 루트 여부를 중복 저장하지 않는다. 콘텐츠 빌드는 시나리오의 `rootSceneId`에서 시작해 node의 `childSceneId`만 결정적으로 순회하며 도달 가능한 Scene 집합을 계산한다. `navigateToSceneId`는 교차 이동 관계이므로 공간 중첩과 게시 도달 가능성 계산에는 사용하지 않는다. 도달 불가능한 Scene은 원본 파일과 일반 스키마 검증 대상에는 남지만 생성 Scene index, route index 및 layout index에서는 제외한다. 이후 `childSceneId`로 다시 연결하면 다음 콘텐츠 빌드에서 자동으로 게시 집합에 복귀한다.
+
 ### 6.2 공통 개념 디렉터리
 
 ```text
@@ -305,7 +318,7 @@ content/concepts/tcp/
 ### 6.3 Vite 콘텐츠 로딩
 
 - `predev`와 `prebuild` 단계에서 콘텐츠 검증과 route index 생성을 실행한다.
-- route index에는 파생된 장면 ID, 제목, URL path, 부모, 순서와 lazy module key만 포함하고 긴 본문은 포함하지 않는다.
+- 생성 content manifest에는 시나리오 ID와 명시적 `rootSceneId`를 포함한다. route index에는 루트에서 도달 가능한 장면의 파생 ID, 제목, URL path, 부모, 순서와 lazy module key만 포함하고 긴 본문은 포함하지 않는다.
 - Vite의 정적인 `import.meta.glob` 패턴으로 장면 YAML과 Markdown loader map을 만든다.
 - loader map은 eager import가 아니라 장면별 lazy import를 기본으로 한다.
 - `ContentRepository`가 route index와 loader map을 결합하며 UI는 Vite API를 직접 사용하지 않는다.
@@ -405,7 +418,7 @@ type HistoryEntry = {
 
 - Vite는 단일 SPA entry와 분할된 정적 자산을 `dist`에 생성한다.
 - React Router의 `/` route는 `HomeRoute`를, `/explore/*` route는 임의 깊이의 장면 path를 해석하는 `ExploreRoute`를 사용한다.
-- 게시된 모든 장면 경로를 콘텐츠 route index에 포함한다.
+- 명시적 루트에서 `childSceneId`로 도달 가능한 게시 장면 경로만 콘텐츠 route index에 포함한다.
 - route index는 전체 Topic 목차가 Scene 파일을 모두 선로드하지 않고 계층을 구성할 수 있도록 `title`, `parentId`, `order`, `status`, `path`를 함께 제공한다.
 - `order`는 부모 Scene에서 해당 자식 Scene을 가리키는 node의 작성 순서로 결정하며, 같은 콘텐츠에는 같은 목차 순서가 생성된다.
 - 정적 호스팅은 `/explore/*` 직접 요청을 `/index.html`로 되돌리는 SPA fallback을 제공해야 한다.
@@ -418,7 +431,7 @@ type HistoryEntry = {
 
 ### 9.1 렌더링 전략
 
-- 루트부터 모든 하위 장면을 하나의 재귀적 논리 좌표계에 배치한다.
+- content manifest의 명시적 루트부터 모든 하위 장면을 하나의 재귀적 논리 좌표계에 배치한다. 런타임 World 배치와 루트 복귀는 무부모 Scene 검색 대신 같은 `rootSceneId`를 사용한다.
 - 각 하위 장면은 부모의 확대 대상 노드 영역 안에 로컬 좌표계로 중첩된다.
 - SVG는 연결선과 도형을 담당한다.
 - 클릭 가능한 텍스트·버튼은 SVG 접근 가능 요소 또는 위치가 동기화된 HTML overlay로 표현한다.
@@ -535,6 +548,8 @@ read files
 → unique ID/slug validation
 → reference validation
 → parent-child cycle detection
+→ configured root validation
+→ childSceneId reachability calculation
 → published dependency validation
 → route manifest generation
 → content index generation

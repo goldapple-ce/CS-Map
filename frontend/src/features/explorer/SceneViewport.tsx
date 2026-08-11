@@ -59,7 +59,8 @@ type IdleWindow = Window & {
 
 function scenePathIds(
   sceneId: string,
-  routes: readonly RouteIndexEntry[]
+  routes: readonly RouteIndexEntry[],
+  rootSceneId: string
 ) {
   const routesById = new Map(routes.map((route) => [route.id, route]))
   const path: string[] = []
@@ -82,6 +83,12 @@ function scenePathIds(
       )
     }
     current = parent
+  }
+
+  if (path[0] !== rootSceneId) {
+    throw new Error(
+      `Scene route ${sceneId} is not reachable from configured root: ${rootSceneId}`
+    )
   }
 
   return path
@@ -125,8 +132,9 @@ export function SceneViewport({
   onAnimationChange,
 }: SceneViewportProps) {
   const navigate = useNavigate()
+  const rootSceneId = contentRepository.getRootSceneId()
   const rootPath =
-    contentRepository.listRoutes().find(({ parentId }) => !parentId)?.path ??
+    contentRepository.listRoutes().find(({ id }) => id === rootSceneId)?.path ??
     "/explore/google-com"
   const embedded = presentation === "embedded"
   const viewportRef = useRef<HTMLDivElement>(null)
@@ -153,7 +161,7 @@ export function SceneViewport({
     const startedAt = performance.now()
     let pathIds: string[]
     try {
-      pathIds = scenePathIds(sceneId, routes)
+      pathIds = scenePathIds(sceneId, routes, rootSceneId)
     } catch (error: unknown) {
       setWorldState({
         status: "error",
@@ -172,7 +180,7 @@ export function SceneViewport({
         setWorldState({
           status: "loaded",
           focusedSceneId: sceneId,
-          layout: createWorldLayout(loaded),
+          layout: createWorldLayout(loaded, rootSceneId),
         })
         setLoadingSceneId(undefined)
       })
@@ -190,7 +198,7 @@ export function SceneViewport({
     return () => {
       active = false
     }
-  }, [routeNotFound, sceneId])
+  }, [rootSceneId, routeNotFound, sceneId])
 
   const prefetchScene = useCallback((targetSceneId: string) => {
     void contentRepository.prefetchScene(targetSceneId)

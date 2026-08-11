@@ -146,6 +146,8 @@ MVP의 루트 장면은 다음 질문에서 시작한다.
 - 사용자/브라우저 Scene은 브라우저가 `ClientHello`를 보내고 서버가 인증서 체인을 반환하며 브라우저가 체인·도메인·유효기간을 검증하는 역할을 구분해야 한다.
 - DNS Scene은 브라우저/OS 캐시, 재귀 Resolver, Root DNS, TLD DNS, 권한 DNS와 주소 응답을 구분해야 하며 Root DNS가 최종 주소를 직접 반환하는 것처럼 표현하지 않아야 한다.
 - Router Scene은 기본 게이트웨이, ARP/NDP, 공유기·NAT, ISP와 인터넷 라우팅을 구분하고 NAT가 모든 환경에 필수라고 표현하지 않아야 한다.
+- 시나리오는 탐색을 시작할 루트 Scene을 `rootSceneId`로 명시해야 한다. 파일 정렬이나 부모가 없는 첫 Scene을 루트로 추론하지 않는다.
+- 서비스에 게시되는 Scene은 명시된 루트에서 `childSceneId`를 따라 도달 가능한 Scene으로 제한한다. 도달할 수 없는 유효한 Scene 파일은 삭제하지 않고 보관할 수 있지만 URL, 전체 Topic 목차 및 World에는 노출하지 않는다.
 
 ### 7.2 콘텐츠 깊이
 
@@ -391,7 +393,8 @@ type SelfCheckQuestion = {
 - 부모와 자식 관계의 불일치
 - 필수 필드 누락
 - Scene 제목과 Markdown 설명 파일 누락
-- 접근 불가능한 고립 장면
+- 시나리오의 명시적 루트 누락 또는 존재하지 않는 `rootSceneId`
+- 명시적 루트의 자식 지정과 루트에서 도달 가능한 게시 Scene 집합
 - 같은 node의 `description`·`contentRef` 동시 사용과 이동 가능한 node의 Topic 설명 필드
 - Scene 디렉터리를 벗어나거나 Markdown 파일명이 아닌 Topic `contentRef`
 

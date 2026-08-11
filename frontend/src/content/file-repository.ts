@@ -7,7 +7,11 @@ import {
   recordContentPrefetch,
   recordContentRequest,
 } from "@/content/content-performance"
-import { conceptIndex, sceneIndex } from "@/content/generated/content-index"
+import {
+  conceptIndex,
+  contentManifest,
+  sceneIndex,
+} from "@/content/generated/content-index"
 import { routeIndex } from "@/content/generated/route-index"
 import type {
   ContentRepository,
@@ -68,6 +72,10 @@ export class FileContentRepository implements ContentRepository {
   >()
   private readonly scenePrefetches = new Map<ContentId, Promise<void>>()
   private readonly conceptCache = new Map<ContentId, Promise<LoadedConcept>>()
+
+  getRootSceneId() {
+    return contentManifest.rootSceneId
+  }
 
   listRoutes() {
     return routeIndex

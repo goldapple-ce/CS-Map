@@ -23,10 +23,15 @@ export type WorldLayout = {
   scenes: ReadonlyMap<string, PositionedScene>
 }
 
-export function createWorldLayout(scenes: readonly Scene[]): WorldLayout {
+export function createWorldLayout(
+  scenes: readonly Scene[],
+  rootSceneId: string
+): WorldLayout {
   const scenesById = new Map(scenes.map((scene) => [scene.id, scene]))
-  const root = scenes.find((scene) => !scene.parentId)
-  if (!root) throw new Error("World layout requires a root scene")
+  const root = scenesById.get(rootSceneId)
+  if (!root) {
+    throw new Error(`World layout requires configured root Scene: ${rootSceneId}`)
+  }
 
   const positioned = new Map<string, PositionedScene>()
   const visiting = new Set<string>()
