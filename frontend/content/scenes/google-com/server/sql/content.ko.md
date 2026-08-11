@@ -12,18 +12,25 @@ SQL은 관계형 Database에서 데이터를 정의하고 조회·변경하기 �
 SQL Query
    ↓
 Query Optimizer
-   ↓
-Table / Index
-   ↓
-Buffer Pool
-   └─ Cache Miss → 저장장치
+   ├─ Table Scan → Table
+   └─ Index Scan → Index → 필요한 경우 Table Row 조회
+                         ↓
+                 Table / Index Data
+                         ↓
+                    Buffer Pool
+                         ↓ Cache Miss
+                      저장장치
 ```
 
 Query Optimizer는 가능한 실행 방법을 비교하고 비용이 낮을 것으로 예상되는 Query Execution Plan을 선택합니다.
 
-선택된 Plan은 어떤 table과 index를 어떤 방식으로 접근할지 정합니다. 실행 과정에서 필요한 데이터를 Buffer Pool에서 먼저 찾고, 없을 때만 저장장치에서 읽어 Buffer Pool에 보관합니다.
+Table Scan을 선택하면 Table 데이터를 읽습니다. Index Scan을 선택하면 Index에서 row의 식별자를 찾고, 필요한 값이 Index에 모두 있지 않다면 Table row를 추가로 조회합니다.
 
-Transaction과 constraint는 마지막에 한 번만 거치는 단계가 아니라 query 실행 전체의 작업 범위와 데이터 무결성을 보호합니다. Scene에서는 이 관계를 보조 연결로 나타냅니다.
+Table과 Index 데이터는 Buffer Pool에서 먼저 찾고, 없을 때만 저장장치에서 읽습니다.
+
+Transaction은 마지막에 한 번만 거치는 단계가 아니라 여러 query를 하나의 작업 범위로 묶어 commit과 rollback을 관리합니다. Constraint는 Table에 저장될 데이터의 무결성을 보호합니다.
+
+Lock은 여러 Transaction이 같은 데이터에 동시에 접근할 때 충돌하는 작업을 기다리게 하거나 실패시켜 데이터 변경 순서를 제어합니다.
 
 ---
 

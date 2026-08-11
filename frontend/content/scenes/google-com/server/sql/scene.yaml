@@ -1,6 +1,6 @@
 id: google-com-server-sql
-title: SQL과 관계형 데이터 처리
-summary: Query Optimizer가 table과 index 접근 계획을 선택하고, Buffer Pool에 데이터가 없을 때 저장장치에서 읽는 흐름입니다.
+title: SQL
+summary: Query Optimizer가 Table과 Index 접근을 선택하고, Buffer Pool과 Transaction·Lock이 조회와 변경을 지원하는 흐름입니다.
 nodes:
   sql-query:
     label: SQL Query
@@ -12,41 +12,67 @@ nodes:
     row: 3
     col: 2
     contentRef: queryoptimizer.ko.md
-  table-index:
-    label: Table / Index
+  table:
+    label: Table
+    row: 3
+    col: 4
+    contentRef: table.ko.md
+  index:
+    label: Index
     row: 3
     col: 3
-    contentRef: tableindex.ko.md
+    contentRef: index.ko.md
   buffer-pool:
     label: Buffer Pool
-    row: 3
+    row: 4
     col: 4
     contentRef: bufferpool.ko.md
   storage:
     label: 저장장치
-    row: 3
+    row: 4
     col: 5
     contentRef: storage.ko.md
   transaction-constraint:
-    label: Transaction / Constraint
-    row: 5
-    col: 3
+    label: Transaction
+    row: 2
+    col: 4
     contentRef: transactionconstraint.ko.md
+  lock:
+    label: Lock
+    row: 2
+    col: 5
+    contentRef: lock.ko.md
 edges:
   - from: sql-query
     to: query-optimizer
     label: 실행 방법 비교
   - from: query-optimizer
-    to: table-index
-    label: 접근 대상·방식 선택
-  - from: table-index
+    to: table
+    label: Table Scan
+  - from: query-optimizer
+    to: index
+    label: Index Scan
+  - from: table
     to: buffer-pool
-    label: Page 요청
+    label: Data 요청
+  - from: index
+    to: buffer-pool
+    variant: supporting
+    label: Index Page 요청
+  - from: index
+    to: table
+    label: 조회
   - from: buffer-pool
     to: storage
     variant: supporting
-    label: Cache Miss → 데이터 읽기
+    label: 데이터 읽기
   - from: transaction-constraint
-    to: table-index
+    # fromSide: right
+    to: table
+    # toSide: top
     variant: supporting
-    label: 작업 범위·무결성 보호
+    label: 작업 범위 보호
+  - from: lock
+    to: table
+    variant: supporting
+    label: 동시 접근 제어
