@@ -1,4 +1,5 @@
 import { SceneEdge } from "@/components/scene/SceneEdge"
+import { SceneArea } from "@/components/scene/SceneArea"
 import {
   SceneNode,
   type SceneNodeDensity,
@@ -134,6 +135,16 @@ export function WorldRenderer({
               data-world-scene-id={scene.id}
               transform={`translate(${screenX} ${screenY}) scale(${renderScale})`}
             >
+              {scene.areas.map((area) => (
+                <SceneArea
+                  key={area.id}
+                  area={area}
+                  sceneWidth={localLayout.width}
+                  sceneHeight={localLayout.height}
+                  columns={scene.layout?.columns ?? 5}
+                  rows={scene.layout?.rows ?? 5}
+                />
+              ))}
               {edges.map((element) => {
                 const points = localLayout.edges.get(element.id)
                 return points ? (

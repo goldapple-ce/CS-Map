@@ -21,6 +21,7 @@ const topicContentRefSchema = z
 
 const statusSchema = z.enum(["draft", "review", "published"])
 const gridCoordinateSchema = z.number().int().min(1).max(5)
+const gridSpanSchema = z.number().int().min(1).max(5)
 const portSideSchema = z.enum(["top", "right", "bottom", "left"])
 
 export const scenarioDocumentSchema = z
@@ -92,16 +93,43 @@ const sceneEdgeSchema = z
   })
   .strict()
 
+const sceneAreaSchema = z
+  .object({
+    label: z.string().min(1),
+    row: gridCoordinateSchema,
+    col: gridCoordinateSchema,
+    rowSpan: gridSpanSchema,
+    colSpan: gridSpanSchema,
+  })
+  .strict()
+
 export const sceneDocumentSchema = z
   .object({
     id: contentIdSchema,
     title: z.string().min(1),
     summary: z.string().min(1),
+    areas: z.record(contentIdSchema, sceneAreaSchema).default({}),
     nodes: z.record(contentIdSchema, sceneNodeSchema),
     edges: z.array(sceneEdgeSchema).default([]),
   })
   .strict()
   .superRefine((scene, context) => {
+    for (const [areaId, area] of Object.entries(scene.areas)) {
+      if (area.row + area.rowSpan - 1 > 5) {
+        context.addIssue({
+          code: "custom",
+          path: ["areas", areaId, "rowSpan"],
+          message: `Area exceeds row 5: starts at ${area.row} with span ${area.rowSpan}`,
+        })
+      }
+      if (area.col + area.colSpan - 1 > 5) {
+        context.addIssue({
+          code: "custom",
+          path: ["areas", areaId, "colSpan"],
+          message: `Area exceeds column 5: starts at ${area.col} with span ${area.colSpan}`,
+        })
+      }
+    }
     const occupiedCells = new Map<string, string>()
     for (const [nodeId, node] of Object.entries(scene.nodes)) {
       const cell = `${node.row},${node.col}`
@@ -174,6 +202,13 @@ export function normalizeSceneDocument(
     summary: document.summary,
     ariaLabel: document.summary,
     layout: { type: "grid", columns: 5, rows: 5 },
+    areas: Object.entries(document.areas).map(([id, area]) => ({
+      id,
+      label: area.label,
+      grid: { row: area.row, col: area.col },
+      rowSpan: area.rowSpan,
+      colSpan: area.colSpan,
+    })),
     elements: [
       ...Object.entries(document.nodes).map(([id, node]) => ({
         id,

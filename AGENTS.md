@@ -87,9 +87,9 @@
 - If `CONTENT_GUIDE.md` is present, follow it for every new scene or concept.
 - Distinguish verified facts, general architecture examples, and product-specific assumptions.
 - Never imply knowledge of private Google internals without a public source.
-- Keep Scene YAML limited to `id`, `summary`, `nodes`, and `edges`; derive display and navigation data during the content build.
+- Keep Scene YAML limited to `id`, `title`, `summary`, optional `areas`, `nodes`, and `edges`; derive display and navigation data during the content build.
 - Do not require author, review status, updated date, or structured sources in Scene YAML. Put useful references in the Scene Markdown when needed.
-- Do not add Annotation, Group, or a separate Relationship collection to Scene authoring data. Express containment on nodes and visible flow with edges.
+- Do not add Annotation, unrestricted Group, or a separate Relationship collection to Scene authoring data. A grid-bounded, non-interactive `areas` collection is allowed only to show visual membership inside the current Scene; express navigable containment on nodes and visible flow with edges.
 
 ## Interaction discipline
 

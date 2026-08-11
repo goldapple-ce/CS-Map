@@ -204,7 +204,8 @@ project/
 - node의 `childSceneId`가 부모·자식 중첩과 Semantic Zoom 진입의 단일 원본이다.
 - node의 `navigateToSceneId`는 월드의 다른 위치로 이동하는 교차 탐색만 표현한다.
 - `edges`가 보이는 연결선과 Scene 내부 흐름 의미의 단일 원본이다.
-- 별도 Annotation, Group 또는 Relationship collection은 두지 않는다.
+- 현재 Scene 안의 시각적 소속 범위는 선택적 `areas`로 표현한다. Area는 격자에 제한된 비상호작용 배경이며 탐색 계층이나 관계를 만들지 않는다.
+- 별도 Annotation, 임의 Group 또는 Relationship collection은 두지 않는다.
 - 부모·자식 확대 그래프는 비순환이어야 하며 edge는 Scene 내부에서 순환할 수 있다.
 
 ### 5.2 핵심 타입
@@ -221,8 +222,17 @@ type SceneDocument = {
   id: ContentId;
   title: string;
   summary: string;
+  areas?: Record<ContentId, SceneArea>;
   nodes: Record<ContentId, SceneNode>;
   edges: SceneEdge[];
+};
+
+type SceneArea = {
+  label: string;
+  row: 1 | 2 | 3 | 4 | 5;
+  col: 1 | 2 | 3 | 4 | 5;
+  rowSpan: 1 | 2 | 3 | 4 | 5;
+  colSpan: 1 | 2 | 3 | 4 | 5;
 };
 
 type SceneNode = {
@@ -251,7 +261,7 @@ type SelfCheckQuestion = {
 };
 ```
 
-런타임 `Scene`에는 작성 YAML에서 읽은 `title`, 디렉터리와 node 참조에서 파생한
+런타임 `Scene`에는 작성 YAML에서 읽은 `title`과 Area, 디렉터리와 node 참조에서 파생한
 `slug`, `parentId`, `scenarioId`, URL 순서, 그리고 renderer용 node·edge 배열이
 추가된다. 파생 필드는 작성 YAML에 다시 저장하지 않는다. `childSceneId`는 런타임의
 중첩 대상 참조로, `navigateToSceneId`는 교차 탐색 참조로 정규화한다.
@@ -290,7 +300,9 @@ content/scenes/google-com/network/dns/
    └─ dns-query.svg
 ```
 
-`scene.yaml`은 `id`, `title`, `summary`, `nodes`, `edges`를 가진다. `title`은 Scene 표시 제목의 단일 원본이며 `content.ko.md`는 이를 H1으로 반복하지 않고 긴 설명만 가진다. 퀴즈가 있으면 같은 디렉터리에 질문·답변 배열인 `quiz.ko.yaml`을 둔다.
+`scene.yaml`은 `id`, `title`, `summary`, 선택적 `areas`, `nodes`, `edges`를 가진다. `title`은 Scene 표시 제목의 단일 원본이며 `content.ko.md`는 이를 H1으로 반복하지 않고 긴 설명만 가진다. 퀴즈가 있으면 같은 디렉터리에 질문·답변 배열인 `quiz.ko.yaml`을 둔다.
+
+Area는 `label`, `row`, `col`, `rowSpan`, `colSpan`만 작성한다. 시작 셀과 span이 5×5 격자를 벗어나면 검증 오류다. Area는 현재 Scene의 배경에만 표시하며 Topic, Scene Element, edge routing 장애물 또는 Semantic Zoom 대상으로 정규화하지 않는다.
 
 하위 Scene과 교차 이동 대상이 없는 말단 node는 짧은 Markdown 문자열인 `description` 또는 같은 Scene 디렉터리의 `.md` 파일명인 `contentRef` 중 하나를 가질 수 있다. 두 필드는 상호 배타적이며 이동 가능한 node에는 작성하지 않는다. Topic `contentRef`는 `/`와 `..`를 허용하지 않아 현재 Scene 디렉터리를 벗어날 수 없다.
 
@@ -439,6 +451,7 @@ type HistoryEntry = {
 - 논리 격자 스키마는 모든 node의 셀 지정, 좌표 범위와 셀 중복을 검증한다. 모든 5×5 Scene의 논리적 bounds는 `1000×500`, 각 셀은 `200×100`, 각 Topic은 `130×80`으로 고정한다. Topic은 지정된 셀 중앙에 배치되어 가로 70, 세로 20의 셀 내부 여유를 화살표 경로에 제공한다.
 - Topic 제목은 YAML `label`에 포함된 실제 개행 문자와 문자 형태의 `\n`을 명시적 줄바꿈으로 해석하며 자동 줄바꿈하지 않는다. 따라서 큰따옴표 문자열과 따옴표 없는 문자열 모두 `\n` 표기를 사용할 수 있다. 각 줄의 최대 LOD 예상 너비는 `scene-node-metrics.ts`에서 한글·영문·공백별로 계산한다. `SceneNode`는 가장 긴 줄의 예상 너비와 전체 줄의 예상 높이를 Topic의 가용 영역과 비교해 하나의 공통 축소 비율을 계산하고, 모든 줄을 같은 글자 크기로 중앙 정렬한다.
 - 논리 격자 node는 `grid: { row, col }`을 사용한다. `row`는 세로 셀, `col`은 가로 셀이며 둘 다 1~5 범위다.
+- 논리 격자 Area는 `grid: { row, col }`, `rowSpan`, `colSpan`을 사용한다. renderer는 현재 Scene bounds를 행·열 수로 나눠 Area의 실제 사각형을 계산하고 Area → edge → Topic 순서로 그린다. Area는 pointer event와 포커스를 받지 않으며 카메라, URL, Explanation Panel과 edge router 입력에 포함하지 않는다.
 - 콘텐츠 빌드 단계의 Scene layout adapter가 논리 격자를 로컬 Topic 좌표로 투영하고 직교 edge 경로를 계산해 `scene-layout-index.ts`를 생성한다.
 - 기존 ELK layered adapter는 격자가 없는 이전 콘텐츠를 위한 fallback으로만 남기며 Scene·Relationship 도메인 모델을 ELK 타입에 결합하지 않는다. 런타임 renderer는 생성 인덱스를 읽고, 인덱스가 없는 개발·복구 상황에서만 기존 결정적 배치를 fallback으로 사용한다.
 - 생성된 로컬 Scene 배치를 기존 재귀 월드 배치가 조합해 월드 bounds와 자식 Scene 중첩 영역을 계산하므로 카메라, URL과 Semantic Zoom 상태 모델은 바뀌지 않는다.

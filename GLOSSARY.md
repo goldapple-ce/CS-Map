@@ -70,6 +70,13 @@ Scene의 부모·자식 관계와 각 Scene 내부 레이아웃을 이용해 모
 
 한 Scene 안의 node와 edge를 배치한 결과다. MVP의 모든 Scene은 5×5 Logical Grid로 node 위치를 지정하고 실제 크기와 연결선 경로는 빌드 단계에서 계산한다.
 
+### Scene Area — Scene 영역
+
+하나의 Scene 안에서 여러 Topic이 같은 시스템 또는 구성 범위에 속한다는 것을 보여주는 격자 기반 배경 영역이다. Area는 제목과 테두리를 표시하지만 Topic이 아니므로 클릭, 포커스, 카메라 이동, URL 변경 또는 하위 Scene 진입 대상이 아니다. Area 안의 Topic과 edge는 기존처럼 각각 상호작용하고 흐름을 표현한다.
+
+- 권장 표현: `Scene Area`, `Scene 영역`, 문맥이 분명할 때 `Area`
+- 구분: 하위 Scene의 미리보기가 아니며 탐색 가능한 Group도 아니다.
+
 ### Logical Grid — 논리 격자
 
 Scene 안의 Topic 위치를 콘텐츠 작성자가 예측 가능하게 지정하기 위한 5×5 셀 체계다. `row`는 위에서 아래, `col`은 왼쪽에서 오른쪽으로 세는 1~5의 셀 번호이며 픽셀 좌표가 아니다. 실제 좌표, Topic 크기, 간격과 연결선 경로는 빌드 단계에서 계산한다.

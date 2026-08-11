@@ -326,6 +326,9 @@ Scene YAML은 최소한 다음 정보만 작성한다.
 - 순서나 데이터의 의미를 가진 화살표 라벨은 선 위에 보이게 표시하고 동일한 의미를 보조 기술에도 제공한다.
 - 클릭 가능한 요소와 설명 전용 요소를 구분한다.
 - 모든 Topic은 배경과 경계가 있는 box로 표시해 연결선·라벨과 시각적으로 구분한다.
+- 하나의 Scene 안에서 여러 Topic의 소속 범위를 함께 보여줄 필요가 있으면 5×5 논리 격자 범위의 Scene Area를 배경에 표시할 수 있다.
+- Scene Area는 현재 Scene의 시각적 소속만 표현하며 클릭, 포커스, URL 변경, 카메라 이동 또는 하위 Scene 진입 대상이 되지 않아야 한다.
+- Scene Area 안의 Topic과 edge는 Area가 없는 경우와 동일하게 각각의 상호작용과 흐름 의미를 유지해야 한다.
 - `선택됨` 상태를 색상만으로 구분하지 않는다.
 - 그림만으로 이해하기 어려운 장면은 동등한 텍스트 설명을 제공한다.
 
@@ -352,9 +355,19 @@ Scene 작성 모델은 다음 최소 형식을 사용한다. 파생 데이터와
 ```ts
 type Scene = {
   id: string;
+  title: string;
   summary: string;
+  areas?: Record<string, SceneArea>;
   nodes: Record<string, SceneNode>;
   edges: SceneEdge[];
+};
+
+type SceneArea = {
+  label: string;
+  row: 1 | 2 | 3 | 4 | 5;
+  col: 1 | 2 | 3 | 4 | 5;
+  rowSpan: 1 | 2 | 3 | 4 | 5;
+  colSpan: 1 | 2 | 3 | 4 | 5;
 };
 
 type SceneNode = {
@@ -397,6 +410,7 @@ type SelfCheckQuestion = {
 - 명시적 루트의 자식 지정과 루트에서 도달 가능한 게시 Scene 집합
 - 같은 node의 `description`·`contentRef` 동시 사용과 이동 가능한 node의 Topic 설명 필드
 - Scene 디렉터리를 벗어나거나 Markdown 파일명이 아닌 Topic `contentRef`
+- Scene Area의 `row`, `col`, `rowSpan`, `colSpan`과 5×5 격자 경계 초과
 
 ## 11. 기술 요구사항 및 MVP 기술 기준
 
@@ -441,6 +455,7 @@ MVP의 기본 기술 기준은 다음과 같다. 정확한 라이브러리와 �
 - MVP는 SVG·HTML을 사용해 텍스트 선택, 접근성, 클릭 영역 및 반응형 배치를 지원한다.
 - 장면 콘텐츠는 픽셀 좌표·크기·연결선 경로를 저장하지 않는다. MVP의 모든 Scene은 5×5 논리 격자의 `row`, `col` 셀로 node 위치를 지정한다.
 - 논리 격자의 `row`, `col`은 각각 1~5의 정수이며 실제 픽셀 좌표가 아니다. `row`는 위에서 아래, `col`은 왼쪽에서 오른쪽 순서다. 한 셀에는 하나의 node만 배치하며 실제 좌표, Topic 크기, 셀 간격과 Scene 크기는 렌더러가 계산한다.
+- 선택적 Scene Area는 `row`, `col`에서 시작해 `rowSpan`, `colSpan`만큼의 격자 셀을 차지한다. Area는 Topic과 edge 뒤에 렌더링하며 edge routing 장애물로 사용하지 않는다.
 - Topic 박스는 가장 큰 LOD 라벨 크기를 기준으로 너비를 계산하고 좌우에 각각 32px의 내부 여백을 확보하여 한 줄 라벨이 박스 밖으로 넘치지 않아야 한다.
 - 5열을 넘는 순차 흐름은 의미가 가까운 단계를 같은 열의 서로 다른 행에 배치한다. 동시에 진행되거나 분기되는 Topic도 같은 `col`의 서로 다른 `row`에 배치할 수 있으며, 실제 진행 방향은 edge로 표현한다.
 - 연결선 라벨의 위치는 계산된 경로에서 자동으로 정한다. 콘텐츠 작성자는 라벨 좌표를 입력하지 않으며, 필요한 경우 `labelSide`로 경로의 어느 방향에 라벨을 둘지만 지정할 수 있다.

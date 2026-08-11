@@ -1,4 +1,5 @@
 import { SceneEdge } from "@/components/scene/SceneEdge"
+import { SceneArea } from "@/components/scene/SceneArea"
 import { SceneNode, type SceneNodeState } from "@/components/scene/SceneNode"
 import { createSceneLayout } from "@/components/scene/scene-layout"
 import type {
@@ -63,6 +64,16 @@ export function SceneRenderer({
           </marker>
         </defs>
 
+        {scene.areas.map((area) => (
+          <SceneArea
+            key={area.id}
+            area={area}
+            sceneWidth={layout.width}
+            sceneHeight={layout.height}
+            columns={scene.layout?.columns ?? 5}
+            rows={scene.layout?.rows ?? 5}
+          />
+        ))}
         {edges.map((element) => {
           const points = layout.edges.get(element.id)
           return points ? (

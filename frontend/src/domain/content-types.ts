@@ -26,6 +26,14 @@ export type SceneGridLayout = {
   rows: 5
 }
 
+export type SceneArea = {
+  id: ContentId
+  label: string
+  grid: SceneGridPlacement
+  rowSpan: number
+  colSpan: number
+}
+
 type SceneElementBase = {
   id: ContentId
   label?: string
@@ -88,6 +96,7 @@ export type Scene = {
   ariaLabel: string
   layoutHint?: LayoutHint
   layout?: SceneGridLayout
+  areas: SceneArea[]
   elements: SceneElement[]
   contentRef: string
   contexts: Context[]
