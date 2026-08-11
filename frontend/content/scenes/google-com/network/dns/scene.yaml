@@ -1,52 +1,74 @@
 id: google-search-dns
-title: DNS 이름 확인
-summary: 캐시와 재귀 Resolver를 거쳐 Root, .com TLD, 권한 DNS의 안내를 따라 google.com의 주소를 얻는 흐름입니다.
+title: DNS
+summary: Client의 요청을 받은 Recursive Resolver가 Root, TLD와 Authoritative DNS의 위임을 따라 IP 주소를 찾아 반환합니다.
 nodes:
-  browser-os-cache:
-    label: 브라우저 / OS 캐시
+  client:
+    label: Client
     row: 3
     col: 1
+    contentRef: client.ko.md
   recursive-resolver:
-    label: 로컬 / 재귀 DNS
-    row: 3
-    col: 2
-  udp-query:
-    label: DNS 질의 전송
+    label: Recursive Resolver
     row: 3
     col: 3
-    childSceneId: google-search-dns-udp-query
+    contentRef: recursiveresolver.ko.md
   root-dns:
     label: Root DNS
     row: 1
-    col: 4
-  com-tld-dns:
+    col: 5
+    contentRef: rootdns.ko.md
+  tld-dns:
     label: .com TLD DNS
     row: 3
-    col: 4
-  authoritative-dns:
-    label: 권한 DNS
-    row: 5
-    col: 4
-  ip-response:
-    label: IP 주소 응답
-    row: 3
     col: 5
+    contentRef: tlddns.ko.md
+  authoritative-dns:
+    label: Authoritative DNS
+    row: 5
+    col: 5
+    contentRef: authoritativedns.ko.md
 edges:
-  - from: browser-os-cache
+  - from: client
+    fromSide: right
     to: recursive-resolver
-    label: 캐시 miss 시 요청
+    toSide: left
+    label: 1. DNS Query
   - from: recursive-resolver
-    to: udp-query
-    label: 질의 생성
-  - from: udp-query
+    fromSide: top
     to: root-dns
-    label: root부터 탐색
+    toSide: left
+    label: 2. Root 질의
   - from: root-dns
-    to: com-tld-dns
-    label: .com DNS 안내
-  - from: com-tld-dns
+    fromSide: left
+    to: recursive-resolver
+    toSide: top
+    label: 3. .com TLD DNS 위치
+    labelSide: bottom
+  - from: recursive-resolver
+    fromSide: right
+    to: tld-dns
+    toSide: left
+    label: 4. TLD 질의
+  - from: tld-dns
+    fromSide: left
+    to: recursive-resolver
+    toSide: right
+    label: 5. 권한 DNS 위치
+    labelSide: bottom
+  - from: recursive-resolver
+    fromSide: bottom
     to: authoritative-dns
-    label: 권한 DNS 안내
+    # toSide: left
+    label: 6. 권한 DNS 질의
+    labelSide: bottom
   - from: authoritative-dns
-    to: ip-response
-    label: 주소 record 반환
+    fromSide: left
+    to: recursive-resolver
+    toSide: bottom
+    label: 7. A / AAAA Record
+  - from: recursive-resolver
+    fromSide: left
+    to: client
+    toSide: right
+    label: 8. IP 주소 응답
+    labelSide: bottom

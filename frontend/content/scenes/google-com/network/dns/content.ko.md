@@ -1,50 +1,47 @@
-## 개요
+# 한눈에 보기
 
-브라우저가 `google.com`에 접속하려면 먼저 목적지로 사용할 주소 정보를 얻어야 합니다. 브라우저와 운영체제의 캐시만으로 해결되지 않으면 보통 로컬 설정에 지정된 재귀 DNS Resolver가 여러 이름 서버의 응답과 referral을 따라 결과를 찾습니다.
+Browser가 `google.com`의 Server에 요청을 보내려면 먼저 Server의 IP 주소를 알아야 합니다. DNS는 사람이 사용하는 Domain Name을 통신에 필요한 IP 주소로 확인할 수 있게 해주는 시스템입니다.
 
-## 필요한 이유
+이 그림은 Client가 `google.com`만 알고 있는 상태에서 시작해, **어떻게 IP 주소를 얻는지** 보여줍니다.
 
-사람이 사용하는 도메인 이름과 IP 네트워크가 전달에 사용하는 주소는 역할이 다릅니다. DNS는 계층적인 이름 공간과 resource record를 여러 권한 영역에 나누어 관리하고, Resolver가 필요한 정보를 찾아 애플리케이션에 돌려줄 수 있게 합니다.
+---
 
-## 동작 과정
+# 왜 여러 DNS Server가 등장하나요?
 
-1. 브라우저와 운영체제가 유효한 DNS 캐시를 확인합니다.
-2. 캐시로 해결되지 않으면 로컬 설정의 재귀 Resolver에 `google.com`의 주소 정보를 요청합니다.
-3. Resolver에 답이 없으면 DNS 질의를 전송합니다. 이 지도에서는 일반적인 UDP 질의 경로를 확대할 수 있습니다.
-4. Root DNS는 Google의 IP를 직접 반환하는 대신 `.com` TLD DNS를 찾을 수 있는 referral을 제공합니다.
-5. `.com` TLD DNS는 `google.com`을 담당하는 권한 DNS를 찾을 수 있는 referral을 제공합니다.
-6. 권한 DNS의 답을 바탕으로 Resolver가 주소 결과를 클라이언트에 반환하고 캐시할 수 있습니다.
+하나의 DNS Server가 세상의 모든 Domain과 IP 주소를 가지고 있지는 않습니다. 정보가 여러 DNS Server에 나뉘어 있으므로, Recursive Resolver는 안내를 따라 최종 답을 가진 Server까지 찾아갑니다.
 
-## 내부 구조
+- **Client**는 `google.com`의 IP 주소를 요청합니다.
+- **Recursive Resolver**는 Client 대신 답을 찾습니다.
+- **Root DNS**는 `.com`을 담당하는 TLD DNS의 위치를 알려줍니다.
+- **TLD DNS**는 `google.com`을 담당하는 Authoritative DNS의 위치를 알려줍니다.
+- **Authoritative DNS**는 `google.com`의 A 또는 AAAA Record를 반환합니다.
+- **Recursive Resolver**는 찾은 IP 주소를 Client에게 돌려줍니다.
 
-사용자 프로그램이 Root, TLD와 권한 DNS를 직접 차례대로 호출하는 구조로 이해하면 안 됩니다. 일반적으로 클라이언트는 재귀 Resolver에 최종 답을 요청하고, Resolver가 캐시와 여러 이름 서버의 referral을 처리합니다. 실제 응답에는 CNAME 같은 별칭이 포함되어 추가 확인이 필요할 수도 있습니다.
+따라서 이 그림에서 중요한 것은 DNS Server의 이름을 외우는 것이 아니라, **Resolver가 다음 위치를 안내받으며 최종 IP 주소를 찾아간다**는 흐름입니다.
 
-## 실패 상황
+---
 
-- 캐시된 결과가 만료되었거나 이름이 존재하지 않을 수 있습니다.
-- Resolver 또는 이름 서버의 응답이 시간 안에 도착하지 않을 수 있습니다.
-- referral이나 권한 DNS 설정이 잘못되어 최종 답을 얻지 못할 수 있습니다.
-- UDP 응답이 잘리거나 전송 조건이 달라 TCP 등 다른 방식이 필요할 수 있습니다.
+# 그림을 읽을 때 주의할 점
 
-## 실무 맥락
+Root DNS가 TLD DNS로 요청을 전달하고, TLD DNS가 Authoritative DNS로 다시 전달하는 것은 아닙니다.
 
-장애를 조사할 때는 브라우저/OS 캐시, 사용 중인 재귀 Resolver, referral과 권한 응답을 구분해야 합니다. Root DNS에서 최종 IP가 보이지 않는 것은 정상적인 위임 과정일 수 있습니다.
+Root와 TLD DNS는 다음으로 확인할 DNS Server의 위치를 알려 줍니다. Scene의 세 질의 화살표가 모두 Recursive Resolver에서 출발하는 이유는 Resolver가 Referral을 받을 때마다 다음 DNS Server에 새로운 Query를 보내기 때문입니다.
 
-## 관련 개념
+Resolver의 Cache에 아직 유효한 답이 있다면 Root DNS부터 다시 찾아가지 않고 바로 IP 주소를 반환할 수도 있습니다. 그림은 Cache에 답이 없어서 전체 탐색이 필요한 경우를 보여줍니다.
 
-`DNS 질의 전송` Topic을 클릭하면 DNS 메시지가 UDP datagram과 IP packet이 되어 Socket/Kernel 경로를 지나는 과정을 이어서 볼 수 있습니다. DNS가 항상 UDP만 사용하는 것은 아닙니다.
+A, AAAA와 CNAME 같은 DNS Record는 별도 처리 단계가 아니라 Authoritative DNS 응답의 내용이므로 별도 Topic으로 두지 않습니다.
 
-## 출처
+---
 
-- RFC 1034, _Domain Names — Concepts and Facilities_
-- RFC 1035, _Domain Names — Implementation and Specification_
-- RFC 8499, _DNS Terminology_
+# 개발자가 개입하는 지점
 
-## 지도 참고
+Application 개발자가 Recursive Resolver의 내부 탐색을 직접 구현할 일은 거의 없습니다. 운영체제나 Runtime의 이름 확인 기능을 사용합니다.
 
-- Root와 .com TLD DNS는 보통 최종 IP가 아니라 다음으로 질의할 권한 DNS의 위치를 안내합니다.
+Domain을 운영한다면 Authoritative DNS에 A, AAAA와 CNAME 같은 Record와 TTL을 설정합니다. 장애를 확인할 때는 사용 중인 Recursive Resolver의 응답과 Authoritative DNS의 원본 설정을 구분해서 봐야 합니다.
 
-## 참고 자료
+---
+
+# 참고 자료
 
 - [RFC 1034 — Domain Names, Concepts and Facilities](https://www.rfc-editor.org/rfc/rfc1034.html)
 - [RFC 1035 — Domain Names, Implementation and Specification](https://www.rfc-editor.org/rfc/rfc1035.html)
