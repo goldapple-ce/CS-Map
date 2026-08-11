@@ -1,59 +1,30 @@
 id: google-com-user-browser
-title: 사용자, 브라우저와 Server
-summary: CA의 인증서 서명·발급과 브라우저의 신뢰 기준을 바탕으로 Server 인증 후 HTTP 요청과 응답을 주고받는 흐름입니다.
+title: 사용자 / 브라우저
+summary: 사용자가 Browser에서 Web 접속을 시작한 뒤 HTTPS와 OSI 7계층으로 통신을 확장해 살펴보는 흐름입니다.
 nodes:
-  certificate-authority:
-    label: CA (인증기관)
-    row: 1
-    col: 4
-  user:
-    label: 사용자
+  user-browser:
+    label: 사용자 / 브라우저
     row: 3
     col: 1
-  browser:
-    label: 브라우저
+    contentRef: user-browser.ko.md
+  https:
+    label: HTTPS
     row: 3
     col: 3
-  server:
-    label: Server
+    childSceneId: google-com-https
+  osi-model:
+    label: OSI 7계층
     row: 3
     col: 5
-    navigateToSceneId: google-com-server
+    childSceneId: google-com-osi-model
 edges:
-  - from: certificate-authority
-    to: browser
-    label: 사전 신뢰 기준
-    variant: supporting
-    fromSide: bottom
-    toSide: top
-  - from: certificate-authority
-    to: server
-    label: 인증서 서명·발급
-    variant: supporting
-    fromSide: bottom
-    toSide: top
-  - from: user
-    to: browser
-    label: google.com 입력
+  - from: user-browser
     fromSide: right
+    to: https
     toSide: left
-  - from: browser
-    to: server
-    label: ClientHello
+    label: 보안 Web 통신
+  - from: https
     fromSide: right
+    to: osi-model
     toSide: left
-  - from: server
-    to: browser
-    label: 인증서 체인 제공
-    fromSide: left
-    toSide: right
-  - from: browser
-    to: server
-    label: HTTP 요청
-    fromSide: right
-    toSide: left
-  - from: server
-    to: browser
-    label: HTTP 응답
-    fromSide: left
-    toSide: right
+    label: 계층별 통신 구조

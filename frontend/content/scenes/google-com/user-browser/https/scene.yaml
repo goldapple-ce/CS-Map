@@ -1,0 +1,66 @@
+id: google-com-https
+title: HTTPS
+summary: TCP 연결을 수립한 Browser와 Server가 CA의 신뢰 기준으로 상대를 확인하고 같은 Session Key를 만드는 HTTPS 흐름입니다.
+nodes:
+  browser:
+    label: Browser
+    row: 4
+    col: 2
+    contentRef: browser.ko.md
+  certificate-authority:
+    label: CA
+    row: 2
+    col: 3
+    contentRef: certificate-authority.ko.md
+  server:
+    label: Server
+    row: 4
+    col: 4
+    navigateToSceneId: google-com-server
+edges:
+  - from: certificate-authority
+    # fromSide: bottom
+    to: browser
+    toSide: top
+    label: Root CA 신뢰 기준
+    labelSide: left
+    # variant: supporting
+  - from: certificate-authority
+    # fromSide: bottom
+    to: server
+    toSide: top
+    label: Certificate 서명 발급
+    # variant: supporting
+  - from: browser
+    fromSide: right
+    to: server
+    toSide: left
+    label: 1. TCP Handshake
+    labelSide: top
+  - from: server
+    fromSide: left
+    to: browser
+    toSide: right
+    label: 2. TCP 연결 수립
+    # variant: return
+    labelSide: top
+  - from: browser
+    fromSide: right
+    to: server
+    toSide: left
+    label: 3. ClientHello + Group / Key Share
+    labelSide: bottom
+  - from: server
+    fromSide: left
+    to: browser
+    toSide: right
+    label: 4. ServerHello + Group / Key Share
+    # variant: return
+    labelSide: bottom
+  - from: server
+    fromSide: left
+    to: browser
+    toSide: right
+    label: 5. Certificate + CertificateVerify
+    # variant: return
+    labelSide: bottom
