@@ -17,6 +17,11 @@ nodes:
     row: 3
     col: 3
     childSceneId: google-com-server-spring
+  java-jvm:
+    label: Java / JVM
+    row: 5
+    col: 3
+    childSceneId: google-com-server-java
   cache:
     label: Cache
     row: 3
@@ -45,6 +50,12 @@ edges:
   - from: nginx
     to: spring
     label: API 요청 전달
+  - from: java-jvm
+    fromSide: top
+    to: spring
+    toSide: bottom
+    label: 실행 환경 제공
+    variant: supporting
   - from: spring
     to: sql
     label: 관계형 데이터 요청

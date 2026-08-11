@@ -1,0 +1,42 @@
+id: google-com-server-java
+title: Java / JVM
+summary: Java Source가 Bytecode로 컴파일되고, OS에 맞는 JVM이 이를 실행하는 흐름입니다.
+nodes:
+  java-source:
+    label: Java Source
+    row: 1
+    col: 3
+    contentRef: javasource.ko.md
+  java-compiler:
+    label: Java Compiler
+    row: 2
+    col: 3
+    contentRef: javacompiler.ko.md
+  bytecode:
+    label: Bytecode
+    row: 3
+    col: 3
+    contentRef: bytecode.ko.md
+  jvm:
+    label: JVM
+    row: 4
+    col: 3
+    contentRef: jvm.ko.md
+  os:
+    label: OS
+    row: 5
+    col: 3
+    contentRef: os.ko.md
+edges:
+  - from: java-source
+    to: java-compiler
+    label: 컴파일 입력
+  - from: java-compiler
+    to: bytecode
+    label: 생성
+  - from: bytecode
+    to: jvm
+    label: Load 및 실행
+  - from: jvm
+    to: os
+    label: OS 차이 추상화

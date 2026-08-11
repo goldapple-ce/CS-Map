@@ -4,6 +4,8 @@
 
 Spring Application은 관계형 Database에 SQL을 실행하거나 MongoDB에 Document 데이터를 요청할 수 있습니다. 반복 조회 비용을 줄여야 한다면 Cache를 사용하고, 그 Cache 저장소로 Redis를 선택할 수도 있습니다.
 
+Spring Application은 Java로 작성되어 JVM 위에서 실행됩니다. Java / JVM은 API 요청이 거쳐 가는 별도 단계가 아니라 Spring Application을 실행하는 기반입니다.
+
 > 이 구성은 Google의 비공개 Server 구조를 설명하는 것이 아닙니다. 공개 문서로 확인할 수 있는 기술의 일반적인 역할을 하나의 학습 흐름으로 연결한 예시입니다.
 
 ---
@@ -31,6 +33,7 @@ SQL 경로는 table, row, column, 관계와 constraint를 중심으로 데이터
 - `NGINX`: React 정적 파일을 제공하고 API 요청을 Spring Application으로 전달합니다.
 - `React`: Browser에서 실행되어 화면을 구성하고 필요한 데이터를 API로 요청합니다.
 - `Spring`: 요청 처리와 비즈니스 로직을 실행합니다.
+- `Java / JVM`: Java 코드를 Bytecode로 컴파일하고, JVM이 그 Bytecode를 실행하는 구조를 설명합니다.
 - `Cache`: 반복해서 조회하는 데이터의 복사본을 가까운 곳에 두고 재사용하는 방법과 전략을 설명합니다.
 - `SQL`: 관계형 Database에 구조화된 query를 전달합니다.
 - `MongoDB`: BSON Document를 Collection에 저장하는 문서형 Database입니다.
@@ -43,6 +46,8 @@ MongoDB도 애플리케이션이 기대하는 Document 구조와 validation 규�
 # 개발자가 개입하는 지점
 
 개발자는 요청의 성격과 데이터 접근 패턴에 맞춰 저장소를 선택하고 연결 설정, query, transaction과 오류 처리를 구성합니다.
+
+Java Application을 배포할 때는 사용할 Java version, JVM option, memory 크기와 Garbage Collection 설정도 실행 환경에 맞게 구성합니다.
 
 여러 저장소를 함께 사용한다면 어떤 데이터가 최종 기준인지, 저장소 사이의 변경 실패를 어떻게 복구할지 명확하게 설계해야 합니다. 서로 다른 저장소에 보낸 작업이 하나의 transaction으로 자동 결합되지는 않습니다.
 
