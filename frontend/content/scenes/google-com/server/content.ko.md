@@ -1,6 +1,6 @@
 # 한눈에 보기
 
-이 Scene은 외부 요청이 `Proxy Server → Spring Application → 데이터 저장소`로 이어지는 일반적인 Server 구성을 보여줍니다.
+이 Scene은 NGINX가 React 정적 파일을 제공하고 API 요청은 Spring Application으로 전달하는 일반적인 Server 구성을 보여줍니다.
 
 Spring Application은 관계형 Database에 SQL을 실행하거나 MongoDB에 Document 데이터를 요청할 수 있습니다. 반복 조회 비용을 줄여야 한다면 Cache를 사용하고, 그 Cache 저장소로 Redis를 선택할 수도 있습니다.
 
@@ -10,13 +10,17 @@ Spring Application은 관계형 Database에 SQL을 실행하거나 MongoDB에 Do
 
 # 요청 흐름
 
-1. Proxy Server가 외부 HTTP 요청을 받습니다.
-2. 요청을 처리할 Spring Application으로 전달합니다.
-3. Spring이 요청을 해석하고 비즈니스 로직을 실행합니다.
-4. 데이터가 필요하면 SQL 또는 MongoDB에 조회나 변경을 요청합니다.
-5. 반복해서 사용하는 데이터는 Cache에서 빠르게 조회할 수 있습니다.
-6. Redis는 Cache 데이터를 저장하는 구현으로 사용할 수 있습니다.
-7. 처리 결과가 반대 방향으로 돌아가 HTTP 응답이 됩니다.
+1. NGINX가 외부 HTTP 요청을 받습니다.
+2. 화면 요청에는 Build된 React 정적 파일을 응답합니다.
+3. Browser가 JavaScript를 실행하고 React 화면을 구성합니다.
+4. React에서 보낸 API 요청은 NGINX를 거쳐 Spring Application으로 전달됩니다.
+5. Spring이 요청을 해석하고 비즈니스 로직을 실행합니다.
+6. 데이터가 필요하면 SQL 또는 MongoDB에 조회나 변경을 요청합니다.
+7. 반복해서 사용하는 데이터는 Cache에서 빠르게 조회할 수 있습니다.
+8. Redis는 Cache 데이터를 저장하는 구현으로 사용할 수 있습니다.
+9. 처리 결과가 반대 방향으로 돌아가 HTTP 응답이 됩니다.
+
+Scene의 `React → NGINX → Spring` 화살표는 Browser에서 React가 실행된 이후의 API 요청 방향을 나타냅니다. 처음 화면을 열 때 React 정적 파일은 반대 방향으로 `NGINX → Browser`에 전달됩니다.
 
 SQL 경로는 table, row, column, 관계와 constraint를 중심으로 데이터를 다룹니다. MongoDB 경로는 collection과 BSON document를 중심으로 데이터를 다룹니다. Cache 경로는 Cache 사용 전략을 설명하고, Redis 경로는 memory 기반 Key-Value 구조, Data Type, TTL과 Eviction을 보여줍니다.
 
@@ -24,7 +28,8 @@ SQL 경로는 table, row, column, 관계와 constraint를 중심으로 데이터
 
 # 구성요소
 
-- `Proxy Server`: 외부 요청을 받고 실제 Application Server로 전달합니다.
+- `NGINX`: React 정적 파일을 제공하고 API 요청을 Spring Application으로 전달합니다.
+- `React`: Browser에서 실행되어 화면을 구성하고 필요한 데이터를 API로 요청합니다.
 - `Spring`: 요청 처리와 비즈니스 로직을 실행합니다.
 - `Cache`: 반복해서 조회하는 데이터의 복사본을 가까운 곳에 두고 재사용하는 방법과 전략을 설명합니다.
 - `SQL`: 관계형 Database에 구조화된 query를 전달합니다.
