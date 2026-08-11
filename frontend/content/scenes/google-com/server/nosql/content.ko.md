@@ -1,12 +1,12 @@
 # 한눈에 보기
 
-NoSQL은 관계형 table 모델 이외의 여러 데이터 모델을 묶어 부르는 넓은 표현입니다. 문서형, key-value, wide-column과 graph Database는 구조와 query 방식이 서로 다릅니다.
+MongoDB는 데이터를 BSON Document로 표현하여 Collection에 저장하는 문서형 Database입니다.
 
-이 Scene은 NoSQL 전체의 공통 내부 구조가 아니라 MongoDB 같은 문서형 Database의 구체적인 예시를 보여줍니다.
+이 Scene은 NoSQL 전체를 일반화하지 않고 MongoDB가 Document를 조회하는 구체적인 흐름만 보여줍니다.
 
 ---
 
-# 문서형 처리 흐름
+# MongoDB 처리 흐름
 
 ```text
 Document Query
@@ -34,17 +34,17 @@ Document 결과
 
 # 헷갈리기 쉬운 점
 
-## NoSQL은 schema가 없다는 뜻이 아닙니다
+## MongoDB는 schema가 없다는 뜻이 아닙니다
 
 문서마다 field 구성이 달라질 수 있지만 애플리케이션이 기대하는 구조와 validation 규칙은 여전히 필요합니다.
 
-## NoSQL은 SQL보다 항상 빠른 선택이 아닙니다
+## MongoDB는 관계형 Database보다 항상 빠른 선택이 아닙니다
 
 성능은 데이터 모델, query, index, 데이터 분포, consistency 요구와 운영 방식에 따라 달라집니다.
 
-## 문서형 Database가 NoSQL 전체를 대표하지는 않습니다
+## MongoDB가 모든 NoSQL 저장소를 대표하지는 않습니다
 
-Redis 같은 key-value 저장소와 Neo4j 같은 graph Database는 이 Scene의 collection과 BSON 흐름을 사용하지 않습니다.
+Redis 같은 key-value 저장소와 Neo4j 같은 graph Database는 MongoDB의 Collection과 BSON 흐름을 사용하지 않습니다.
 
 ---
 

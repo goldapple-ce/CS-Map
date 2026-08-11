@@ -1,0 +1,70 @@
+id: google-com-server-redis
+title: Redis Cache
+summary: Redis를 Cache로 사용할 때 알아야 할 I/O Multiplexing, Single Thread, In-Memory 저장, Key와 Data Type, TTL과 Eviction을 보여줍니다.
+nodes:
+  io-multiplexing:
+    label: I/O Multiplexing
+    row: 3
+    col: 1
+    contentRef: iomultiplexing.ko.md
+  command-processing:
+    label: Command
+    row: 3
+    col: 3
+    contentRef: commandprocessing.ko.md
+  single-thread:
+    label: Single Thread
+    row: 2
+    col: 3
+    contentRef: singlethread.ko.md
+  key-value:
+    label: Key / Value
+    row: 3
+    col: 4
+    contentRef: keyvalue.ko.md
+  data-types:
+    label: Data Type
+    row: 4
+    col: 4
+    contentRef: datatypes.ko.md
+  in-memory:
+    label: In-Memory
+    row: 3
+    col: 5
+    contentRef: inmemory.ko.md
+  ttl:
+    label: TTL
+    row: 2
+    col: 4
+    contentRef: ttl.ko.md
+  eviction:
+    label: Eviction
+    row: 2
+    col: 5
+    contentRef: eviction.ko.md
+edges:
+  - from: io-multiplexing
+    to: command-processing
+    label: 준비된 Connection
+  - from: single-thread
+    to: command-processing
+    variant: supporting
+    label: 순차 실행
+  - from: command-processing
+    to: key-value
+    label: Key로 접근
+  - from: data-types
+    to: key-value
+    variant: supporting
+    label: Value 구조
+  - from: key-value
+    to: in-memory
+    label: 처리
+  - from: ttl
+    to: key-value
+    variant: supporting
+    label: Key 만료
+  - from: eviction
+    to: in-memory
+    variant: supporting
+    label: Memory 한도 관리

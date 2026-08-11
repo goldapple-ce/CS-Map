@@ -1,6 +1,6 @@
 id: google-com-server
 title: 일반적인 Server 요청 처리
-summary: Proxy Server가 요청을 Spring Application으로 전달하고, Application이 SQL 또는 NoSQL 저장소에 데이터를 요청하는 학습용 흐름입니다.
+summary: Proxy Server가 요청을 Spring Application으로 전달하고, Application이 SQL·MongoDB 또는 Redis로 구현한 Cache를 사용하는 학습용 흐름입니다.
 nodes:
   nginx:
     label: Proxy Server
@@ -12,16 +12,26 @@ nodes:
     row: 3
     col: 3
     childSceneId: google-com-server-spring
+  cache:
+    label: Cache
+    row: 3
+    col: 4
+    contentRef: cache.ko.md
   sql:
     label: SQL
     row: 2
     col: 5
     childSceneId: google-com-server-sql
   nosql:
-    label: NoSQL
+    label: MongoDB
     row: 4
     col: 5
     childSceneId: google-com-server-nosql
+  redis:
+    label: Redis
+    row: 3
+    col: 5
+    childSceneId: google-com-server-redis
 edges:
   - from: nginx
     to: spring
@@ -31,4 +41,12 @@ edges:
     label: 관계형 데이터 요청
   - from: spring
     to: nosql
-    label: 비관계형 데이터 요청
+    label: Document 데이터 요청
+  - from: spring
+    to: cache
+    variant: supporting
+    label: Cache 사용
+  - from: cache
+    to: redis
+    variant: supporting
+    label: 저장소 구현
