@@ -1,16 +1,31 @@
 id: google-search-root
 title: google.com에 접속하는 전체 흐름
-summary: 브라우저 주소창에 google.com을 입력한 뒤 이름 확인과 네트워크 경로를 거쳐 서버에 도달하는 주요 학습 흐름입니다.
+summary: Browser가 목적지 주소를 확인하고 Network를 통해 Server와 HTTPS 통신을 시작하는 전체 구조입니다.
 nodes:
-  user-browser:
-    label: 사용자 / 브라우저
+  user-device:
+    label: 사용자 기기
+    row: 3
+    col: 2
+    contentRef: user-device.ko.md
+  browser:
+    label: Browser
     row: 3
     col: 1
-    childSceneId: google-com-user-browser
+    contentRef: browser.ko.md
+  https:
+    label: HTTPS
+    row: 2
+    col: 2
+    childSceneId: google-com-https
+  osi-model:
+    label: OSI 7계층
+    row: 2
+    col: 4
+    childSceneId: google-com-osi-model
   dns:
     label: DNS
     row: 3
-    col: 2
+    col: 3
     childSceneId: google-search-dns
   router:
     label: Router
@@ -23,18 +38,46 @@ nodes:
     col: 5
     childSceneId: google-com-server
 edges:
-  - from: user-browser
+  - from: browser
+    fromSide: right
+    to: user-device
+    toSide: left
+    label: 캐시 확인
+    variant: supporting
+  - from: user-device
     fromSide: right
     to: dns
     toSide: left
-    label: 이름 확인
+    label: DNS 질의
   - from: dns
     fromSide: right
     to: router
     toSide: left
-    label: 목적지 주소 확인
+    label: IP 확인
   - from: router
     fromSide: right
     to: server
     toSide: left
-    label: 서버로 전송
+    label: 패킷 전달
+  - from: browser
+    fromSide: top
+    to: https
+    toSide: left
+    label: 보안 연결
+  - from: https
+    fromSide: right
+    to: osi-model
+    toSide: left
+    label: 계층 처리
+  - from: osi-model
+    fromSide: right
+    to: server
+    toSide: top
+    label: 서버 전송
+areas:
+  user-device:
+    label: 사용자 기기
+    row: 3
+    col: 1
+    rowSpan: 1
+    colSpan: 2

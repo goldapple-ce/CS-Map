@@ -1,0 +1,49 @@
+id: google-com-user-device
+title: 사용자 기기
+summary: OS가 CPU, Memory, Storage와 Network Interface를 관리하며 Application이 동작할 실행 환경을 제공하는 구조입니다.
+nodes:
+  os:
+    label: OS
+    row: 1
+    col: 3
+    contentRef: os.ko.md
+  cpu:
+    label: CPU
+    row: 3
+    col: 1
+    contentRef: cpu.ko.md
+  memory:
+    label: Memory
+    row: 3
+    col: 2
+    contentRef: memory.ko.md
+  storage:
+    label: Storage
+    row: 3
+    col: 4
+    contentRef: storage.ko.md
+  network-interface:
+    label: Network Interface
+    row: 3
+    col: 5
+    contentRef: networkinterface.ko.md
+edges:
+  - from: os
+    to: cpu
+    label: 실행 시간 배분
+  - from: os
+    to: memory
+    label: Memory 관리
+  - from: os
+    to: storage
+    label: File과 I/O 관리
+  - from: os
+    to: network-interface
+    label: Network I/O 관리
+areas:
+  hardware:
+    label: Hardware
+    row: 2
+    col: 1
+    rowSpan: 3
+    colSpan: 5
