@@ -10,7 +10,6 @@ type SceneAreaProps = {
 
 const AREA_INSET = 8
 const AREA_LABEL_GAP = 8
-const FIRST_ROW_LABEL_SPACE = 20
 
 export function SceneArea({
   area,
@@ -21,12 +20,10 @@ export function SceneArea({
 }: SceneAreaProps) {
   const cellWidth = sceneWidth / columns
   const cellHeight = sceneHeight / rows
-  const labelSpace = area.grid.row === 1 ? FIRST_ROW_LABEL_SPACE : 0
   const x = (area.grid.col - 1) * cellWidth + AREA_INSET
-  const y =
-    (area.grid.row - 1) * cellHeight + AREA_INSET + labelSpace
+  const y = (area.grid.row - 1) * cellHeight + AREA_INSET
   const width = area.colSpan * cellWidth - AREA_INSET * 2
-  const height = area.rowSpan * cellHeight - AREA_INSET * 2 - labelSpace
+  const height = area.rowSpan * cellHeight - AREA_INSET * 2
 
   return (
     <g
