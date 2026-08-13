@@ -1,36 +1,28 @@
-# Content authoring
+# CS Map 콘텐츠
 
-Content lives outside rendering and navigation code. Add scenes under
-`content/scenes/<scenario>/<path>/` and concepts under
-`content/concepts/<concept>/`.
+`frontend/content`에는 CS Map의 Scene, Topic 설명, 공통 Concept와 퀴즈가 들어 있습니다. 화면 코드와 분리되어 있어 YAML과 Markdown만으로 콘텐츠를 추가하거나 수정할 수 있습니다.
 
-Each scene directory contains `scene.yaml`, `content.ko.md`, and an optional
-`quiz.ko.yaml`. The Scene title belongs only in `scene.yaml`; the Markdown file
-contains the long-form explanation and does not repeat the title as an H1.
+## 처음 작성할 때
 
-```yaml
-id: google-search-root
-title: google.com에 접속하는 전체 흐름
-summary: 브라우저에서 목적지 서버까지 이어지는 흐름입니다.
-nodes: {}
-edges: []
+1. 비슷한 기존 Scene과 Topic을 먼저 확인합니다.
+2. [CONTENT_FORMAT.md](./CONTENT_FORMAT.md)의 파일 구조와 형식에 맞춰 YAML과 Markdown을 작성합니다.
+3. 제품과 용어 기준이 필요하면 저장소 루트의 `REQUIREMENTS.md`, `TECHNICAL_DESIGN.md`, `GLOSSARY.md`를 확인합니다.
+4. 콘텐츠 검증 명령으로 파일 구조와 참조를 확인합니다.
+
+## 콘텐츠 확인
+
+`frontend` 디렉터리에서 실행합니다.
+
+```bash
+npm run content:validate
 ```
 
-Each concept directory follows its own `concept.yaml` and Markdown structure.
-IDs use lowercase kebab-case.
+개발 서버와 빌드는 실행 전에 콘텐츠 인덱스를 자동으로 생성합니다.
 
-`Scene`, `Concept`, `Context`, and `Occurrence` are separate records. A scene
-uses `conceptRefs` to join a shared concept to one occurrence and one context.
-Navigation depth is represented only through `parentId`; there is no numeric
-level field.
+## 문서 안내
 
-A scene may include an optional `quiz.ko.yaml`:
-
-```yaml
-- question: 요청이 다음으로 이동하는 곳은 어디인가요?
-  answer: 브라우저가 준비한 요청은 네트워크를 통해 전송됩니다.
-```
-
-Quizzes are static self-check content; scores, progress, and answer history are
-not stored. During development, saving Scene content regenerates the content
-and route indexes and refreshes the browser.
+- [CONTENT_FORMAT.md](./CONTENT_FORMAT.md): 사람과 에이전트가 함께 따르는 파일 및 작성 형식
+- [AGENTS.md](./AGENTS.md): AI 에이전트가 콘텐츠를 판단하고 작성할 때 따르는 규칙
+- `REQUIREMENTS.md`: 제품과 콘텐츠 요구사항
+- `TECHNICAL_DESIGN.md`: 콘텐츠 구조와 빌드 방식
+- `GLOSSARY.md`: 프로젝트 권장 용어
