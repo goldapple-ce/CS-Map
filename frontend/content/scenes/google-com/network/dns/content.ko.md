@@ -4,6 +4,8 @@ Browser가 `google.com`의 Server에 요청을 보내려면 먼저 Server의 IP 
 
 이 그림은 Client가 `google.com`만 알고 있는 상태에서 시작해, **어떻게 IP 주소를 얻는지** 보여줍니다.
 
+일반적인 DNS Query는 HTTPS 요청이 아니라 DNS를 위한 별도의 통신입니다. 다만 Browser나 운영체제 설정에 따라 DNS Query를 HTTPS에 담는 `DoH(DNS over HTTPS)`를 사용할 수도 있습니다.
+
 ---
 
 # 왜 여러 DNS Server가 등장하나요?
@@ -45,4 +47,5 @@ Domain을 운영한다면 Authoritative DNS에 A, AAAA와 CNAME 같은 Record와
 
 - [RFC 1034 — Domain Names, Concepts and Facilities](https://www.rfc-editor.org/rfc/rfc1034.html)
 - [RFC 1035 — Domain Names, Implementation and Specification](https://www.rfc-editor.org/rfc/rfc1035.html)
+- [RFC 8484 — DNS Queries over HTTPS](https://www.rfc-editor.org/rfc/rfc8484.html)
 - [RFC 8499 — DNS Terminology](https://www.rfc-editor.org/rfc/rfc8499.html)

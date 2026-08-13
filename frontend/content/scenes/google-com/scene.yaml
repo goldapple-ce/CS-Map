@@ -20,21 +20,26 @@ nodes:
   osi-model:
     label: OSI 7계층
     row: 2
-    col: 4
-    childSceneId: google-com-osi-model
-  dns:
-    label: DNS
-    row: 3
     col: 3
-    childSceneId: google-search-dns
+    childSceneId: google-com-osi-model
   router:
     label: Router
     row: 3
+    col: 3
+    contentRef: router.ko.md
+  dns:
+    label: DNS
+    row: 3
+    col: 4
+    childSceneId: google-search-dns
+  router2:
+    label: Router
+    row: 2
     col: 4
     contentRef: router.ko.md
   server:
     label: Server
-    row: 3
+    row: 2
     col: 5
     childSceneId: google-com-server
 edges:
@@ -46,19 +51,14 @@ edges:
     variant: supporting
   - from: user-device
     fromSide: right
-    to: dns
-    toSide: left
-    label: DNS 질의
-  - from: dns
-    fromSide: right
     to: router
     toSide: left
-    label: IP 확인
+    label: DNS 질의
   - from: router
     fromSide: right
-    to: server
+    to: dns
     toSide: left
-    label: 패킷 전달
+    label: IP 확인
   - from: browser
     fromSide: top
     to: https
@@ -70,9 +70,10 @@ edges:
     toSide: left
     label: 계층 처리
   - from: osi-model
-    fromSide: right
+    to: router2
+    label: 서버 요청
+  - from: router2
     to: server
-    toSide: top
     label: 서버 전송
 areas:
   user-device:
