@@ -374,6 +374,8 @@ type SceneNode = {
   label: string;
   row: 1 | 2 | 3 | 4 | 5;
   col: 1 | 2 | 3 | 4 | 5;
+  rowSpan?: 1 | 2 | 3 | 4 | 5;
+  colSpan?: 1 | 2 | 3 | 4 | 5;
   childSceneId?: string;
   navigateToSceneId?: string;
   description?: string;
@@ -410,7 +412,7 @@ type SelfCheckQuestion = {
 - 명시적 루트의 자식 지정과 루트에서 도달 가능한 게시 Scene 집합
 - 같은 node의 `description`·`contentRef` 동시 사용과 이동 가능한 node의 Topic 설명 필드
 - Scene 디렉터리를 벗어나거나 Markdown 파일명이 아닌 Topic `contentRef`
-- Scene Area의 `row`, `col`, `rowSpan`, `colSpan`과 5×5 격자 경계 초과
+- Topic과 Scene Area의 `row`, `col`, `rowSpan`, `colSpan` 및 5×5 격자 경계 초과
 
 ## 11. 기술 요구사항 및 MVP 기술 기준
 
@@ -456,6 +458,7 @@ MVP의 기본 기술 기준은 다음과 같다. 정확한 라이브러리와 �
 - 장면 콘텐츠는 픽셀 좌표·크기·연결선 경로를 저장하지 않는다. MVP의 모든 Scene은 5×5 논리 격자의 `row`, `col` 셀로 node 위치를 지정한다.
 - 논리 격자의 `row`, `col`은 각각 1~5의 정수이며 실제 픽셀 좌표가 아니다. `row`는 위에서 아래, `col`은 왼쪽에서 오른쪽 순서다. 한 셀에는 하나의 node만 배치하며 실제 좌표, Topic 크기, 셀 간격과 Scene 크기는 렌더러가 계산한다.
 - 선택적 Scene Area는 `row`, `col`에서 시작해 `rowSpan`, `colSpan`만큼의 격자 셀을 차지한다. Area는 Topic과 edge 뒤에 렌더링하며 edge routing 장애물로 사용하지 않는다.
+- Topic도 선택적으로 `rowSpan`, `colSpan`을 지정할 수 있으며 생략하면 `1×1`이다. 확장된 Topic은 차지하는 모든 셀을 점유하고 edge routing 장애물과 클릭 영역에는 전체 크기를 사용한다. 하위 Scene 중첩과 집중 배율은 확장된 Topic 중앙의 기존 기본 Topic 크기를 기준으로 유지한다.
 - Topic 박스는 가장 큰 LOD 라벨 크기를 기준으로 너비를 계산하고 좌우에 각각 32px의 내부 여백을 확보하여 한 줄 라벨이 박스 밖으로 넘치지 않아야 한다.
 - 5열을 넘는 순차 흐름은 의미가 가까운 단계를 같은 열의 서로 다른 행에 배치한다. 동시에 진행되거나 분기되는 Topic도 같은 `col`의 서로 다른 `row`에 배치할 수 있으며, 실제 진행 방향은 edge로 표현한다.
 - 연결선 라벨의 위치는 계산된 경로에서 자동으로 정한다. 콘텐츠 작성자는 라벨 좌표를 입력하지 않으며, 필요한 경우 `labelSide`로 경로의 어느 방향에 라벨을 둘지만 지정할 수 있다.

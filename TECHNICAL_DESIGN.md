@@ -239,6 +239,8 @@ type SceneNode = {
   label: string;
   row: 1 | 2 | 3 | 4 | 5;
   col: 1 | 2 | 3 | 4 | 5;
+  rowSpan?: 1 | 2 | 3 | 4 | 5;
+  colSpan?: 1 | 2 | 3 | 4 | 5;
   childSceneId?: ContentId;
   navigateToSceneId?: ContentId;
   description?: string;
@@ -304,7 +306,7 @@ content/scenes/google-com/network/dns/
 
 Area는 `label`, `row`, `col`, `rowSpan`, `colSpan`만 작성한다. 시작 셀과 span이 5×5 격자를 벗어나면 검증 오류다. Area는 현재 Scene의 배경에만 표시하며 Topic, Scene Element, edge routing 장애물 또는 Semantic Zoom 대상으로 정규화하지 않는다.
 
-하위 Scene과 교차 이동 대상이 없는 말단 node는 짧은 Markdown 문자열인 `description` 또는 같은 Scene 디렉터리의 `.md` 파일명인 `contentRef` 중 하나를 가질 수 있다. 두 필드는 상호 배타적이며 이동 가능한 node에는 작성하지 않는다. Topic `contentRef`는 `/`와 `..`를 허용하지 않아 현재 Scene 디렉터리를 벗어날 수 없다.
+node는 선택적으로 `rowSpan`, `colSpan`을 지정해 시작 셀부터 여러 격자 셀을 차지할 수 있으며 생략값은 각각 `1`이다. 확장된 node는 점유한 모든 셀의 중복과 격자 경계를 검증한다. 하위 Scene과 교차 이동 대상이 없는 말단 node는 짧은 Markdown 문자열인 `description` 또는 같은 Scene 디렉터리의 `.md` 파일명인 `contentRef` 중 하나를 가질 수 있다. 두 필드는 상호 배타적이며 이동 가능한 node에는 작성하지 않는다. Topic `contentRef`는 `/`와 `..`를 허용하지 않아 현재 Scene 디렉터리를 벗어날 수 없다.
 
 루트 콘텐츠 디렉터리 이름은 canonical URL과 같은 `google-com`을 사용한다. 기존 `google-search-*` 영구 ID는 내부 참조를 깨뜨리지 않기 위해 유지한다. 새 하위 Scene은 의미에 맞는 ID를 사용하며, 기존 ID를 일괄 변경해야 할 필요가 생기면 별도의 migration으로 처리한다.
 
@@ -451,6 +453,7 @@ type HistoryEntry = {
 - 논리 격자 스키마는 모든 node의 셀 지정, 좌표 범위와 셀 중복을 검증한다. 모든 5×5 Scene의 논리적 bounds는 `1000×500`, 각 셀은 `200×100`, 각 Topic은 `130×80`으로 고정한다. Topic은 지정된 셀 중앙에 배치되어 가로 70, 세로 20의 셀 내부 여유를 화살표 경로에 제공한다.
 - Topic 제목은 YAML `label`에 포함된 실제 개행 문자와 문자 형태의 `\n`을 명시적 줄바꿈으로 해석하며 자동 줄바꿈하지 않는다. 따라서 큰따옴표 문자열과 따옴표 없는 문자열 모두 `\n` 표기를 사용할 수 있다. 각 줄의 최대 LOD 예상 너비는 `scene-node-metrics.ts`에서 한글·영문·공백별로 계산한다. `SceneNode`는 가장 긴 줄의 예상 너비와 전체 줄의 예상 높이를 Topic의 가용 영역과 비교해 하나의 공통 축소 비율을 계산하고, 모든 줄을 같은 글자 크기로 중앙 정렬한다.
 - 논리 격자 node는 `grid: { row, col }`을 사용한다. `row`는 세로 셀, `col`은 가로 셀이며 둘 다 1~5 범위다.
+- node의 선택적 `rowSpan`, `colSpan`은 기본 Topic의 위·아래 및 좌·우 기준을 유지한 채 여러 셀 중심 사이의 거리를 더해 보이는 bounds를 확장한다. layout router와 클릭 영역은 확장 bounds를 사용한다. 자식 Scene 중첩은 확장 bounds 중앙에 놓인 기존 `130×80` portal bounds를 사용해 월드 배율과 단계별 집중 배율을 유지한다.
 - 논리 격자 Area는 `grid: { row, col }`, `rowSpan`, `colSpan`을 사용한다. renderer는 현재 Scene bounds를 행·열 수로 나눠 Area의 실제 사각형을 계산하고 Area → edge → Topic 순서로 그린다. Area는 pointer event와 포커스를 받지 않으며 카메라, URL, Explanation Panel과 edge router 입력에 포함하지 않는다.
 - 콘텐츠 빌드 단계의 Scene layout adapter가 논리 격자를 로컬 Topic 좌표로 투영하고 직교 edge 경로를 계산해 `scene-layout-index.ts`를 생성한다.
 - 기존 ELK layered adapter는 격자가 없는 이전 콘텐츠를 위한 fallback으로만 남기며 Scene·Relationship 도메인 모델을 ELK 타입에 결합하지 않는다. 런타임 renderer는 생성 인덱스를 읽고, 인덱스가 없는 개발·복구 상황에서만 기존 결정적 배치를 fallback으로 사용한다.

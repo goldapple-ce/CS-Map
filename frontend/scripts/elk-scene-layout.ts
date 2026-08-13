@@ -213,6 +213,8 @@ async function buildGridSceneLayout(
           `Grid scene ${scene.id} is missing coordinates for node ${node.id}`
         )
       }
+      const rowSpan = node.grid.rowSpan ?? 1
+      const colSpan = node.grid.colSpan ?? 1
       return [
         node.id,
         {
@@ -222,8 +224,8 @@ async function buildGridSceneLayout(
           y:
             (node.grid.row - 1) * cellHeight +
             (cellHeight - SCENE_NODE_HEIGHT) / 2,
-          width: SCENE_NODE_WIDTH,
-          height: SCENE_NODE_HEIGHT,
+          width: (colSpan - 1) * cellWidth + SCENE_NODE_WIDTH,
+          height: (rowSpan - 1) * cellHeight + SCENE_NODE_HEIGHT,
         },
       ]
     })

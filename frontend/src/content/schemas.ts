@@ -48,6 +48,8 @@ const sceneNodeSchema = z
     label: z.string().min(1),
     row: gridCoordinateSchema,
     col: gridCoordinateSchema,
+    rowSpan: gridSpanSchema.default(1),
+    colSpan: gridSpanSchema.default(1),
     childSceneId: contentIdSchema.optional(),
     navigateToSceneId: contentIdSchema.optional(),
     description: z.string().min(1).optional(),
@@ -132,16 +134,34 @@ export const sceneDocumentSchema = z
     }
     const occupiedCells = new Map<string, string>()
     for (const [nodeId, node] of Object.entries(scene.nodes)) {
-      const cell = `${node.row},${node.col}`
-      const occupant = occupiedCells.get(cell)
-      if (occupant) {
+      if (node.row + node.rowSpan - 1 > 5) {
         context.addIssue({
           code: "custom",
-          path: ["nodes", nodeId],
-          message: `Grid cell ${cell} is already occupied by ${occupant}`,
+          path: ["nodes", nodeId, "rowSpan"],
+          message: `Topic exceeds row 5: starts at ${node.row} with span ${node.rowSpan}`,
         })
       }
-      occupiedCells.set(cell, nodeId)
+      if (node.col + node.colSpan - 1 > 5) {
+        context.addIssue({
+          code: "custom",
+          path: ["nodes", nodeId, "colSpan"],
+          message: `Topic exceeds column 5: starts at ${node.col} with span ${node.colSpan}`,
+        })
+      }
+      for (let row = node.row; row < node.row + node.rowSpan; row += 1) {
+        for (let col = node.col; col < node.col + node.colSpan; col += 1) {
+          const cell = `${row},${col}`
+          const occupant = occupiedCells.get(cell)
+          if (occupant) {
+            context.addIssue({
+              code: "custom",
+              path: ["nodes", nodeId],
+              message: `Grid cell ${cell} is already occupied by ${occupant}`,
+            })
+          }
+          occupiedCells.set(cell, nodeId)
+        }
+      }
     }
     scene.edges.forEach((edge, index) => {
       if (!scene.nodes[edge.from]) {
@@ -214,7 +234,12 @@ export function normalizeSceneDocument(
         id,
         kind: "node" as const,
         label: node.label,
-        grid: { row: node.row, col: node.col },
+        grid: {
+          row: node.row,
+          col: node.col,
+          rowSpan: node.rowSpan,
+          colSpan: node.colSpan,
+        },
         ...(node.childSceneId ? { targetSceneId: node.childSceneId } : {}),
         ...(node.navigateToSceneId
           ? { navigateToSceneId: node.navigateToSceneId }

@@ -3,6 +3,10 @@ import {
   type LayoutBox,
   type SceneLayout,
 } from "@/components/scene/scene-layout"
+import {
+  SCENE_NODE_HEIGHT,
+  SCENE_NODE_WIDTH,
+} from "@/components/scene/scene-node-metrics"
 import type { Scene } from "@/domain/content-types"
 
 export type WorldBounds = LayoutBox
@@ -78,17 +82,21 @@ export function createWorldLayout(
       const nodeBounds = localLayout.nodes.get(element.id)
       if (!child || !nodeBounds) continue
       const childLayout = layoutFor(child)
+      const targetWidth = Math.min(SCENE_NODE_WIDTH, nodeBounds.width)
+      const targetHeight = Math.min(SCENE_NODE_HEIGHT, nodeBounds.height)
+      const targetX = nodeBounds.x + (nodeBounds.width - targetWidth) / 2
+      const targetY = nodeBounds.y + (nodeBounds.height - targetHeight) / 2
       const childScaleWithinNode = Math.min(
-        nodeBounds.width / childLayout.width,
-        nodeBounds.height / childLayout.height
+        targetWidth / childLayout.width,
+        targetHeight / childLayout.height
       )
       const childScale = scale * childScaleWithinNode
       const childLocalWidth = childLayout.width * childScaleWithinNode
       const childLocalHeight = childLayout.height * childScaleWithinNode
       place(
         child,
-        x + (nodeBounds.x + (nodeBounds.width - childLocalWidth) / 2) * scale,
-        y + (nodeBounds.y + (nodeBounds.height - childLocalHeight) / 2) * scale,
+        x + (targetX + (targetWidth - childLocalWidth) / 2) * scale,
+        y + (targetY + (targetHeight - childLocalHeight) / 2) * scale,
         childScale,
         scene.id,
         element.id
