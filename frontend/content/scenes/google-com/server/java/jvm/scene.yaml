@@ -26,7 +26,7 @@ nodes:
     label: Heap
     row: 3
     col: 4
-    contentRef: heap.ko.md
+    childSceneId: google-com-server-java-jvm-heap
   native-method-stack:
     label: Native Method Stack
     row: 3

@@ -1,0 +1,91 @@
+id: google-com-server-java-jvm-heap
+title: Heap
+summary: 새 객체가 Young Generation에 생성되고 Garbage Collection에서 살아남은 객체가 Old Generation으로 이동하는 전형적인 세대별 Heap 구조입니다.
+nodes:
+  eden:
+    label: Eden
+    row: 1
+    col: 3
+    contentRef: eden.ko.md
+  survivor-0:
+    label: S0
+    row: 3
+    col: 3
+    contentRef: survivor.ko.md
+  survivor-1:
+    label: S1
+    row: 3
+    col: 4
+    contentRef: survivor.ko.md
+  old-objects:
+    label: Old Objects
+    row: 5
+    col: 3
+    contentRef: oldobjects.ko.md
+  garbage-collector:
+    label: Garbage Collector
+    row: 3
+    col: 1
+    contentRef: heapgc.ko.md
+edges:
+  - from: eden
+    to: survivor-0
+    label: 생존 객체 이동 예시
+  - from: survivor-0
+    fromSide: right
+    to: survivor-1
+    toSide: left
+    label: 역할 교대
+    labelSide: bottom
+  - from: survivor-1
+    fromSide: left
+    to: survivor-0
+    toSide: right
+    # variant: return
+  - from: survivor-1
+    to: old-objects
+    label: Promotion
+
+  - from: garbage-collector
+    # fromSide: top
+    to: eden
+    # toSide: bottom
+    label: Eden 수집
+    variant: supporting
+  - from: garbage-collector
+    # fromSide: top
+    to: survivor-0
+    # toSide: bottom
+    label: 생존 객체 이동
+    variant: supporting
+  # - from: garbage-collector
+  #   # fromSide: top
+  #   to: survivor-1
+  #   toSide: bottom
+  #   label: 생존 객체 이동
+  #   variant: supporting
+  - from: garbage-collector
+    # fromSide: top
+    to: old-objects
+    # toSide: bottom
+    label: Old 영역 수집
+    variant: supporting
+areas:
+  young-generation:
+    label: Young Generation
+    row: 1
+    col: 3
+    rowSpan: 3
+    colSpan: 2
+  survivor:
+    label: Survivor
+    row: 3
+    col: 3
+    rowSpan: 1
+    colSpan: 2
+  old-generation:
+    label: Old Generation
+    row: 5
+    col: 3
+    rowSpan: 1
+    colSpan: 2
