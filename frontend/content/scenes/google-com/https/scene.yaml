@@ -4,8 +4,9 @@ summary: TCP 연결을 수립한 Browser와 Server가 CA의 신뢰 기준으로 
 nodes:
   browser:
     label: Browser
-    row: 4
+    row: 3
     col: 2
+    rowSpan: 2
     contentRef: browser.ko.md
   certificate-authority:
     label: CA
@@ -14,8 +15,9 @@ nodes:
     contentRef: certificate-authority.ko.md
   server:
     label: Server
-    row: 4
+    row: 3
     col: 4
+    rowSpan: 2
     navigateToSceneId: google-com-server
 edges:
   - from: certificate-authority
@@ -23,7 +25,7 @@ edges:
     to: browser
     toSide: top
     label: Root CA 신뢰 기준
-    labelSide: left
+    # labelSide: left
     # variant: supporting
   - from: certificate-authority
     # fromSide: bottom
@@ -31,6 +33,7 @@ edges:
     toSide: top
     label: Certificate 서명 발급
     # variant: supporting
+
   - from: browser
     fromSide: right
     to: server

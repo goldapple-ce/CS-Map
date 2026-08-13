@@ -1,0 +1,20 @@
+- question: HTTPS는 HTTP와 무엇이 다른가요?
+  answer: TLS를 이용해 HTTP 요청과 응답을 암호화합니다.
+
+- question: 브라우저와 서버는 Session Key를 네트워크로 직접 주고받나요?
+  answer: 아니요. 서로의 Key Share와 각자 보관한 비공개키를 이용해 같은 Session Key를 각각 만듭니다.
+
+- question: Key Share는 Session Key 자체인가요?
+  answer: 아니요. Session Key를 만들기 위해 서로 공개하는 재료입니다.
+
+- question: 누군가 Key Share인 A와 B를 모두 알아내면 비공개키도 바로 알 수 있나요?
+  answer: 아니요. A, B와 공개된 G를 알아도 비공개키 a, b를 역산하는 데는 현실적으로 매우 오랜 시간이 걸립니다.
+
+- question: 서버는 왜 Certificate를 보내나요?
+  answer: 브라우저가 접속한 서버가 해당 도메인의 진짜 서버인지 확인할 수 있게 하기 위해서입니다.
+
+- question: 브라우저는 Certificate를 확인할 때마다 CA 서버에 요청하나요?
+  answer: 아니요. 브라우저나 운영체제가 가진 Root CA의 공개키를 이용해 Certificate의 서명을 직접 검증합니다.
+
+- question: 실제 HTTP 데이터를 암호화할 때 대칭키를 사용하는 이유는 무엇인가요?
+  answer: 많은 데이터를 암호화하고 복호화할 때 비대칭키 방식보다 빠르기 때문입니다.
