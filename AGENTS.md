@@ -1,101 +1,34 @@
-# Project rules
+# 루트 에이전트
 
-## Source of truth
+루트 에이전트는 사용자의 요청을 가장 먼저 받는 에이전트다. 요청의 성격을 판단해 직접 처리하거나 알맞은 하위 에이전트에게 맡긴다.
 
-- `REQUIREMENTS.md` is the product source of truth.
-- `TECHNICAL_DESIGN.md` is the architecture source of truth.
-- `GLOSSARY.md` defines the preferred project terminology for user communication and documentation.
-- If documents conflict, stop and report the conflict before implementation.
+## 담당 작업
 
-## Terminology discipline
+- 요청이 계획, Frontend, Content 또는 저장소 공통 작업 중 어디에 속하는지 판단한다.
+- 하위 에이전트에게 작업을 맡기고 결과가 원래 요청을 충족하는지 확인한다.
+- 루트 문서와 저장소 공통 구조처럼 특정 하위 에이전트에 속하지 않는 작업은 직접 처리한다.
+- Frontend 구현, 콘텐츠 작성과 PLAN 관리는 각각의 하위 에이전트 지침에 맡긴다.
 
-- Use the preferred Korean and English terms from `GLOSSARY.md` when communicating with the user or updating project documents.
-- Do not use page, slide, depth screen, or free-form canvas language for the persistent spatial navigation model unless describing an actual page, slide, or HTML canvas.
-- When terminology conflicts with product behavior or architecture, follow `REQUIREMENTS.md` and `TECHNICAL_DESIGN.md` and update the glossary instead of redefining the product through terminology.
+## 공통 지침
 
-## Product invariants
+- 요청과 관련된 [제품 요구사항](./docs/REQUIREMENTS.md), [기술 설계](./docs/TECHNICAL_DESIGN.md)와 [프로젝트 용어](./docs/WORDS.md)를 따른다.
+- 기준 문서끼리 충돌하면 작업을 멈추고 사용자에게 알린다.
+- 사용자가 요청하거나 승인한 범위만 작업하고 관련 없는 사용자 변경을 보존한다.
+- 작업을 마치면 변경 파일과 충족하지 못한 항목을 보고한다.
 
-- Do not add fixed CS category navigation.
-- Do not turn the product into a free-form node graph or unrestricted infinite canvas.
-- Primary navigation is click-based semantic zoom inside one persistent viewport.
-- The map and long-form explanation panel must coexist on desktop.
-- Scene depth must not have a hard-coded maximum.
-- Reuse common concepts; do not duplicate their core explanations per context.
-- Context-specific implementations belong under their occurrence, such as server cache → distributed cache → Redis.
-- Every Topic node must be clickable. A node without a child or navigation target opens an explicit no-description state in the Explanation Panel without changing the URL or camera.
+## 하위 에이전트
 
-## Implementation discipline
+- [Planning Agent](./agents/PLANNING_AGENTS.md): INBOX를 검토하고 PLAN을 작성·관리한다.
+- [Frontend Agent](./agents/FRONTEND_AGENTS.md): 승인된 PLAN에 포함된 Frontend 코드를 구현한다.
+- [Content Agent](./agents/CONTENT_AGENTS.md): Scene, Topic, Concept, 퀴즈와 설명 문서를 작성한다.
 
-- If an unfinished `PLAN.md` exists, work only on that plan until its implementation and user-owned verification are complete.
-- Do not interrupt or replace the current plan because of a new INBOX request unless the user explicitly asks to stop the current plan and prioritize that request.
-- Do not implement future plan items or requests that are not included in the current plan.
-- Keep content data separate from rendering and navigation code.
-- Do not bind the domain model to a graph-rendering library.
-- Do not introduce a backend for the MVP without a demonstrated requirement.
-- Preserve unrelated user changes.
-- Do not run automated or manual tests; the user owns all test execution.
-- Report changed files, note that tests were not run, and list unmet acceptance criteria after each task.
-- Never run `git commit`, `git push`, create tags, or rewrite Git history. The user owns all Git operations.
-- Update implementation checkboxes only after the implementation is complete. Do not update test-only checkboxes without the user's confirmation.
+## 분기 지침
 
-## Work management
+1. 계획 작성, INBOX 정리 또는 PLAN 관리를 요청하면 Planning Agent에게 맡긴다.
+2. 콘텐츠 작업이면 Content Agent에게 바로 맡긴다. 사용자가 계획도 요청했다면 Planning Agent가 먼저 PLAN을 작성한다.
+3. Frontend 코드 작업이면 Planning Agent가 먼저 PLAN을 작성하거나 진행 중인 PLAN을 확인한다.
+4. 진행 중인 PLAN에 현재 요청이 없다면 사용자에게 기존 PLAN에 반영할지 먼저 확인한다. 요청이 반영된 PLAN을 사용자가 승인하기 전에는 구현을 시작하지 않는다.
+5. 루트 문서 정리나 저장소 관리처럼 위 범위에 속하지 않는 작업은 루트 에이전트가 직접 처리한다.
+6. 하나의 요청이 여러 범위에 걸치면 Planning Agent가 작업 범위와 순서를 먼저 정한다.
 
-- Keep at most one `PLAN.md` in the repository.
-- `INBOX.md` must keep exactly two request areas: `## 다음 PLAN 후보` and `## 메모`.
-- The user may edit either INBOX area while a plan is running. Preserve concurrent additions and unrelated wording exactly.
-
-### Current plan lifecycle
-
-- Continue an existing unfinished `PLAN.md` before reviewing any INBOX request.
-- New INBOX entries do not expand the active plan.
-- When the active plan is implemented and the user-owned verification is complete, report the result and delete `PLAN.md`. Do not archive or copy completed plan contents elsewhere.
-- Git history is the work history; the user owns commits and pushes.
-
-### Next PLAN candidates
-
-- Only `## 다음 PLAN 후보` may be reviewed when no unfinished `PLAN.md` exists.
-- Analyze candidate priority and relatedness, then select only the requests appropriate for one coherent plan.
-- A new plan must include its goal, selected INBOX requests, request-level completion criteria, implementation order, required requirement/design updates, verification methods, and current status.
-- Show the new `PLAN.md` to the user and wait for approval before implementation.
-- Remove only the exact candidate entries selected for that plan. Re-read `INBOX.md` immediately before editing it so later additions are preserved.
-- Leave unselected candidates unchanged. Do not rewrite or delete them.
-- If similar candidates are combined, explain the reason in the plan before removing them from INBOX.
-- Ask the user before planning ambiguous or conflicting candidates.
-
-### Notes
-
-- Never automatically include `## 메모` entries in a plan.
-- Do not implement, prioritize, promote, rewrite, delete, or combine notes.
-- Do not use notes as justification to expand implementation scope.
-- Treat a note as a work request only after the user moves it to `## 다음 PLAN 후보` or explicitly asks to implement it.
-
-## Styling discipline
-
-- Use Tailwind CSS and shadcn/ui for application UI.
-- Do not add MUI, CSS Modules, Sass, styled-components, Emotion, or another styling system.
-- Add only the shadcn/ui components required by the current commit.
-- Treat `src/components/ui` as generated UI primitives; do not modify them without a concrete need.
-- Put project-specific components outside `src/components/ui`.
-- Use semantic theme utilities such as `bg-background`, `text-foreground`, `border-border`, and `text-muted-foreground`.
-- Do not scatter raw palette utilities such as `bg-blue-500` through feature components.
-- Use `cva` for repeated component states and variants.
-- Use inline style only for runtime-calculated coordinates, dimensions, transform origins, and transforms.
-- Keep global CSS limited to Tailwind/shadcn initialization, theme variables, and unavoidable document-level defaults.
-
-## Content discipline
-
-- If `CONTENT_GUIDE.md` is present, follow it for every new scene or concept.
-- Distinguish verified facts, general architecture examples, and product-specific assumptions.
-- Never imply knowledge of private Google internals without a public source.
-- Keep Scene YAML limited to `id`, `title`, `summary`, optional `areas`, `nodes`, and `edges`; derive display and navigation data during the content build.
-- Do not require author, review status, updated date, or structured sources in Scene YAML. Put useful references in the Scene Markdown when needed.
-- Do not add Annotation, unrestricted Group, or a separate Relationship collection to Scene authoring data. A grid-bounded, non-interactive `areas` collection is allowed only to show visual membership inside the current Scene; express navigable containment on nodes and visible flow with edges.
-
-## Interaction discipline
-
-- Node body click moves and zooms the persistent world camera to its nested child scene; it must not replace the canvas.
-- Hover or keyboard focus may show a short preview; essential content cannot exist only there.
-- Long-form content belongs in the explanation panel.
-- Back navigation restores scene, focus, panel state, and reading position.
-- Honor `prefers-reduced-motion`.
-- Keep all interactive nodes keyboard accessible.
+하위 에이전트를 추가하거나 역할을 바꾸면 이 문서의 역할과 분기도 함께 갱신한다.
