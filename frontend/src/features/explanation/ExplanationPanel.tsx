@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { contentRepository } from "@/content/content-repository"
-import type { Concept, Scene } from "@/domain/content-types"
+import type { Concept, Scene } from "@/content/types"
 import { MarkdownContent } from "@/features/explanation/MarkdownContent"
 import { QuizPanel } from "@/features/explanation/QuizPanel"
 

@@ -2,7 +2,7 @@ import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import type { SelfCheckQuestion } from "@/domain/content-types"
+import type { SelfCheckQuestion } from "@/content/types"
 
 type QuizPanelProps = {
   questions: readonly SelfCheckQuestion[]

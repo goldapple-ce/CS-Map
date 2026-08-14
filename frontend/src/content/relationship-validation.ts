@@ -1,4 +1,4 @@
-import type { Concept, ContentId, Scene } from "@/domain/content-types"
+import type { Concept, ContentId, Scene } from "@/content/types"
 
 export type ContentValidationIssue = {
   contentId?: ContentId

@@ -2,7 +2,7 @@ import type {
   Scene,
   SceneEdgeElement,
   SceneNodeElement,
-} from "@/domain/content-types"
+} from "@/content/types"
 import { sceneLayoutIndex } from "@/content/generated/scene-layout-index"
 import {
   estimatedSceneNodeWidth,
@@ -10,7 +10,7 @@ import {
   SCENE_GRID_WIDTH,
   SCENE_NODE_HEIGHT,
   SCENE_NODE_WIDTH,
-} from "@/components/scene/scene-node-metrics"
+} from "@/features/explorer/layout/scene-node-metrics"
 
 export type LayoutBox = {
   x: number

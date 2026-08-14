@@ -13,7 +13,7 @@ function contentHotReload(): Plugin {
     path.resolve(__dirname, "scripts/elk-scene-layout.ts"),
     path.resolve(
       __dirname,
-      "src/components/scene/scene-node-metrics.ts"
+      "src/features/explorer/layout/scene-node-metrics.ts"
     ),
   ]
 

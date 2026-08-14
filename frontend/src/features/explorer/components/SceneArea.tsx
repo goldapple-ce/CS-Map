@@ -1,4 +1,4 @@
-import type { SceneArea as SceneAreaModel } from "@/domain/content-types"
+import type { SceneArea as SceneAreaModel } from "@/content/types"
 
 type SceneAreaProps = {
   area: SceneAreaModel

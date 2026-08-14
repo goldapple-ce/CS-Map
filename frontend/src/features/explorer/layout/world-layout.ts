@@ -2,12 +2,12 @@ import {
   createSceneLayout,
   type LayoutBox,
   type SceneLayout,
-} from "@/components/scene/scene-layout"
+} from "@/features/explorer/layout/scene-layout"
 import {
   SCENE_NODE_HEIGHT,
   SCENE_NODE_WIDTH,
-} from "@/components/scene/scene-node-metrics"
-import type { Scene } from "@/domain/content-types"
+} from "@/features/explorer/layout/scene-node-metrics"
+import type { Scene } from "@/content/types"
 
 export type WorldBounds = LayoutBox
 

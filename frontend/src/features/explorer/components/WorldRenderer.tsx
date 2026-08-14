@@ -1,19 +1,21 @@
-import { SceneEdge } from "@/components/scene/SceneEdge"
-import { SceneArea } from "@/components/scene/SceneArea"
+import type { SceneEdgeElement, SceneNodeElement } from "@/content/types"
+import { SceneArea } from "@/features/explorer/components/SceneArea"
+import { SceneEdge } from "@/features/explorer/components/SceneEdge"
 import {
   SceneNode,
   type SceneNodeDensity,
   type SceneNodeState,
-} from "@/components/scene/SceneNode"
-import type { WorldLayout } from "@/components/scene/world-layout"
-import { getSceneAncestors } from "@/components/scene/world-layout"
-import type { SceneEdgeElement, SceneNodeElement } from "@/domain/content-types"
+} from "@/features/explorer/components/SceneNode"
 import {
   boundsIntersect,
   visibleWorldBounds,
   type CameraState,
   type ViewportSize,
 } from "@/features/explorer/camera"
+import {
+  getSceneAncestors,
+  type WorldLayout,
+} from "@/features/explorer/layout/world-layout"
 
 type WorldRendererProps = {
   layout: WorldLayout

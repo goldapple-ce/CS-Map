@@ -1,5 +1,5 @@
-import type { LayoutPoint } from "@/components/scene/scene-layout"
-import type { SceneEdgeElement } from "@/domain/content-types"
+import type { SceneEdgeElement } from "@/content/types"
+import type { LayoutPoint } from "@/features/explorer/layout/scene-layout"
 
 type SceneEdgeProps = {
   element: SceneEdgeElement

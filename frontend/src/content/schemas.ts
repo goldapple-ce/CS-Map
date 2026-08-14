@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import type { Concept, Scene, SelfCheckQuestion } from "@/domain/content-types"
+import type { Concept, Scene, SelfCheckQuestion } from "@/content/types"
 
 const contentIdSchema = z
   .string()

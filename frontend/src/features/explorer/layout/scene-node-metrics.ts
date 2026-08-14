@@ -1,4 +1,4 @@
-import type { SceneNodeElement } from "@/domain/content-types"
+import type { SceneNodeElement } from "@/content/types"
 
 export const SCENE_NODE_WIDTH = 130
 export const SCENE_NODE_HEIGHT = 80

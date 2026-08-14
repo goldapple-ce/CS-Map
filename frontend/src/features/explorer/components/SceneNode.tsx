@@ -1,8 +1,8 @@
 import { cva } from "class-variance-authority"
 
-import type { LayoutBox } from "@/components/scene/scene-layout"
-import { estimatedSceneNodeLabelWidth } from "@/components/scene/scene-node-metrics"
-import type { SceneNodeElement } from "@/domain/content-types"
+import type { SceneNodeElement } from "@/content/types"
+import type { LayoutBox } from "@/features/explorer/layout/scene-layout"
+import { estimatedSceneNodeLabelWidth } from "@/features/explorer/layout/scene-node-metrics"
 import { cn } from "@/lib/utils"
 
 export type SceneNodeState = "interactive" | "selected"

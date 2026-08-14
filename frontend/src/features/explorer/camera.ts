@@ -1,8 +1,8 @@
-import type { WorldBounds } from "@/components/scene/world-layout"
+import type { WorldBounds } from "@/features/explorer/layout/world-layout"
 import {
   SCENE_GRID_HEIGHT,
   SCENE_GRID_WIDTH,
-} from "@/components/scene/scene-node-metrics"
+} from "@/features/explorer/layout/scene-node-metrics"
 
 export type CameraState = {
   centerX: number

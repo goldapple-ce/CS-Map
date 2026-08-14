@@ -3,7 +3,7 @@ import type {
   ContentId,
   ContentStatus,
   Scene,
-} from "@/domain/content-types"
+} from "@/content/types"
 
 export type ContentManifest = {
   scenarioId: ContentId

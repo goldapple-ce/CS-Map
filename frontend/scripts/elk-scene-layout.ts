@@ -7,19 +7,19 @@ import type {
   ElkPort,
 } from "elkjs/lib/elk-api.js"
 
-import type { SerializedSceneLayout } from "../src/components/scene/scene-layout.ts"
+import type { SerializedSceneLayout } from "../src/features/explorer/layout/scene-layout.ts"
 import {
   estimatedSceneNodeWidth,
   SCENE_GRID_HEIGHT,
   SCENE_GRID_WIDTH,
   SCENE_NODE_HEIGHT,
   SCENE_NODE_WIDTH,
-} from "../src/components/scene/scene-node-metrics.ts"
+} from "../src/features/explorer/layout/scene-node-metrics.ts"
 import type {
   Scene,
   SceneEdgeElement,
   SceneNodeElement,
-} from "../src/domain/content-types.ts"
+} from "../src/content/types.ts"
 
 const MIN_SCENE_WIDTH = 1280
 const MIN_SCENE_HEIGHT = 720

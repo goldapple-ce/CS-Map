@@ -24,7 +24,7 @@ import {
   parseSceneDocument,
   parseSceneQuiz,
 } from "@/content/schemas"
-import type { ContentId, Scene } from "@/domain/content-types"
+import type { ContentId, Scene } from "@/content/types"
 
 type RawLoader = () => Promise<unknown>
 

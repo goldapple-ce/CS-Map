@@ -8,11 +8,11 @@ import {
 import { ListTree } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
-import { WorldRenderer } from "@/components/scene/WorldRenderer"
+import { WorldRenderer } from "@/features/explorer/components/WorldRenderer"
 import {
   createWorldLayout,
   type WorldLayout,
-} from "@/components/scene/world-layout"
+} from "@/features/explorer/layout/world-layout"
 import { Button } from "@/components/ui/button"
 import { contentRepository } from "@/content/content-repository"
 import type { RouteIndexEntry } from "@/content/repository"
