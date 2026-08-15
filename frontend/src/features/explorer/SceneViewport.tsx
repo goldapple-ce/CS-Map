@@ -15,7 +15,7 @@ import {
 } from "@/features/explorer/layout/world-layout"
 import { Button } from "@/components/ui/button"
 import { contentRepository } from "@/content/content-repository"
-import type { RouteIndexEntry } from "@/content/repository"
+import type { RouteIndexEntry } from "@shared/content/generated-contract"
 import {
   cameraForBounds,
   cameraForGridScene,
@@ -31,7 +31,7 @@ import {
 type WorldLoadState =
   | { status: "loading" }
   | { status: "loaded"; focusedSceneId: string; layout: WorldLayout }
-  | { status: "error"; message: string }
+  | { status: "error"; focusedSceneId: string; message: string }
 
 type SceneViewportProps = {
   sceneId?: string
@@ -57,6 +57,7 @@ type IdleWindow = Window & {
   cancelIdleCallback?: (handle: number) => void
 }
 
+/** Root부터 대상 Scene까지 검증된 Route ID 경로를 만든다. */
 function scenePathIds(
   sceneId: string,
   routes: readonly RouteIndexEntry[],
@@ -94,27 +95,7 @@ function scenePathIds(
   return path
 }
 
-function recordScenePathReady(
-  sceneId: string,
-  requestedSceneCount: number,
-  totalSceneCount: number,
-  startedAt: number
-) {
-  if (!import.meta.env.DEV) return
-  const finishedAt = performance.now()
-  performance.measure("cs-map:scene-path-ready", {
-    start: startedAt,
-    end: finishedAt,
-  })
-  console.info("[CS Map performance]", {
-    metric: "scene-path-ready",
-    sceneId,
-    durationMs: Math.round((finishedAt - startedAt) * 100) / 100,
-    requestedSceneCount,
-    totalSceneCount,
-  })
-}
-
+/** Scene 경로를 불러오고 Camera·선택·전환 상태를 조립한다. */
 export function SceneViewport({
   sceneId,
   selectedSceneId,
@@ -141,7 +122,7 @@ export function SceneViewport({
   const animationFrameRef = useRef<number | undefined>(undefined)
   const cameraRef = useRef(DEFAULT_CAMERA)
   const initializedRef = useRef(false)
-  const pendingAnnouncementRef = useRef<string>()
+  const pendingAnnouncementRef = useRef<string | undefined>(undefined)
   const [viewport, setViewport] = useState<ViewportSize>({
     width: 1,
     height: 1,
@@ -150,7 +131,6 @@ export function SceneViewport({
   const [worldState, setWorldState] = useState<WorldLoadState>({
     status: "loading",
   })
-  const [loadingSceneId, setLoadingSceneId] = useState<string>()
   const [animating, setAnimating] = useState(false)
   const [announcement, setAnnouncement] = useState("")
 
@@ -158,48 +138,36 @@ export function SceneViewport({
     if (routeNotFound || !sceneId) return
     let active = true
     const routes = contentRepository.listRoutes()
-    const startedAt = performance.now()
-    let pathIds: string[]
-    try {
-      pathIds = scenePathIds(sceneId, routes, rootSceneId)
-    } catch (error: unknown) {
-      setWorldState({
-        status: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : "현재 Scene 경로를 찾지 못했습니다.",
-      })
-      return
-    }
-    setLoadingSceneId(sceneId)
-    Promise.all(pathIds.map((id) => contentRepository.loadSceneMap(id)))
+    Promise.resolve()
+      .then(() => scenePathIds(sceneId, routes, rootSceneId))
+      .then((pathIds) =>
+        Promise.all(pathIds.map((id) => contentRepository.loadSceneMap(id)))
+      )
       .then((loaded) => {
         if (!active) return
-        recordScenePathReady(sceneId, pathIds.length, routes.length, startedAt)
         setWorldState({
           status: "loaded",
           focusedSceneId: sceneId,
           layout: createWorldLayout(loaded, rootSceneId),
         })
-        setLoadingSceneId(undefined)
       })
       .catch((error: unknown) => {
         if (!active) return
         setWorldState({
           status: "error",
+          focusedSceneId: sceneId,
           message:
             error instanceof Error
               ? error.message
               : "지식 공간을 불러오지 못했습니다.",
         })
-        setLoadingSceneId(undefined)
       })
     return () => {
       active = false
     }
   }, [rootSceneId, routeNotFound, sceneId])
 
+  /** 인접 Scene 콘텐츠를 현재 탐색 상태 변경 없이 준비한다. */
   const prefetchScene = useCallback((targetSceneId: string) => {
     void contentRepository.prefetchScene(targetSceneId)
   }, [])
@@ -222,6 +190,7 @@ export function SceneViewport({
     if (targets.size === 0) return
 
     const idleWindow = window as IdleWindow
+    /** 브라우저가 유휴할 때 인접 Scene을 차례로 미리 불러온다. */
     const run = () => {
       for (const targetSceneId of targets) prefetchScene(targetSceneId)
     }
@@ -247,6 +216,7 @@ export function SceneViewport({
     return () => observer.disconnect()
   }, [])
 
+  /** Camera ref와 렌더링 상태를 함께 갱신해 외부에 알린다. */
   const updateCamera = useCallback(
     (next: CameraState) => {
       cameraRef.current = next
@@ -256,6 +226,7 @@ export function SceneViewport({
     [onCameraChange]
   )
 
+  /** 동작 설정에 따라 Camera를 즉시 적용하거나 보간해 이동한다. */
   const animateCamera = useCallback(
     (target: CameraState, immediate: boolean) => {
       if (animationFrameRef.current)
@@ -283,6 +254,7 @@ export function SceneViewport({
       setAnimating(true)
       onAnimationChange(true)
 
+      /** 한 animation frame의 Camera 위치를 계산하고 다음 frame을 예약한다. */
       const frame = (now: number) => {
         const progress = Math.min((now - startedAt) / duration, 1)
         const eased = 1 - Math.pow(1 - progress, 3)
@@ -355,6 +327,7 @@ export function SceneViewport({
     []
   )
 
+  /** 현재 Camera를 포함한 Child Scene 진입 요청을 전달한다. */
   const enterScene = (targetSceneId: string, elementId: string) => {
     if (animating) return
     onEnterScene({
@@ -364,13 +337,20 @@ export function SceneViewport({
     })
   }
 
+  const currentWorldState: WorldLoadState =
+    sceneId &&
+    worldState.status !== "loading" &&
+    worldState.focusedSceneId === sceneId
+      ? worldState
+      : { status: "loading" }
   const focusedScene =
-    worldState.status === "loaded"
-      ? worldState.layout.scenes.get(worldState.focusedSceneId)?.scene
+    currentWorldState.status === "loaded"
+      ? currentWorldState.layout.scenes.get(currentWorldState.focusedSceneId)
+          ?.scene
       : undefined
   const rootPositioned =
-    worldState.status === "loaded"
-      ? worldState.layout.scenes.get(worldState.layout.rootSceneId)
+    currentWorldState.status === "loaded"
+      ? currentWorldState.layout.scenes.get(currentWorldState.layout.rootSceneId)
       : undefined
   const rootCamera = rootPositioned
     ? rootPositioned.scene.layout?.type === "grid"
@@ -391,9 +371,7 @@ export function SceneViewport({
   return (
     <section
       aria-labelledby="scene-title"
-      aria-busy={
-        worldState.status === "loading" || Boolean(loadingSceneId) || animating
-      }
+      aria-busy={currentWorldState.status === "loading" || animating}
       className={
         embedded
           ? "flex size-full min-h-0 flex-col"
@@ -463,22 +441,22 @@ export function SceneViewport({
             </div>
           </div>
         ) : null}
-        {worldState.status === "loading" ? (
+        {currentWorldState.status === "loading" ? (
           <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
             논리적 지식 공간을 구성하는 중입니다.
           </div>
         ) : null}
-        {worldState.status === "error" ? (
+        {currentWorldState.status === "error" ? (
           <div className="flex size-full items-center justify-center p-8 text-sm text-destructive">
-            {worldState.message}
+            {currentWorldState.message}
           </div>
         ) : null}
-        {worldState.status === "loaded" && sceneId && !routeNotFound ? (
+        {currentWorldState.status === "loaded" && sceneId && !routeNotFound ? (
           <WorldRenderer
-            layout={worldState.layout}
+            layout={currentWorldState.layout}
             camera={camera}
             viewport={viewport}
-            focusedSceneId={worldState.focusedSceneId}
+            focusedSceneId={currentWorldState.focusedSceneId}
             selectedSceneId={selectedSceneId}
             selectedElementId={selectedElementId}
             navigationDisabled={navigationDisabled || animating}

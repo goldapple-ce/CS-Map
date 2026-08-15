@@ -1,4 +1,4 @@
-import type { SceneArea as SceneAreaModel } from "@/content/types"
+import type { SceneArea as SceneAreaModel } from "@shared/content/types"
 
 type SceneAreaProps = {
   area: SceneAreaModel
@@ -11,6 +11,7 @@ type SceneAreaProps = {
 const AREA_INSET = 8
 const AREA_LABEL_GAP = 8
 
+/** Grid 범위를 Scene 내부의 비상호작용 SVG Area로 표시한다. */
 export function SceneArea({
   area,
   sceneWidth,

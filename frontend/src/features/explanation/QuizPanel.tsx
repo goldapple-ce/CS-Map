@@ -2,12 +2,13 @@ import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import type { SelfCheckQuestion } from "@/content/types"
+import type { SelfCheckQuestion } from "@shared/content/types"
 
 type QuizPanelProps = {
   questions: readonly SelfCheckQuestion[]
 }
 
+/** Topic 퀴즈와 사용자가 개별 답변을 여닫는 상태를 표시한다. */
 export function QuizPanel({ questions }: QuizPanelProps) {
   const [revealed, setRevealed] = useState<ReadonlySet<number>>(new Set())
 

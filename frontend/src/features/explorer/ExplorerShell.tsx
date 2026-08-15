@@ -31,12 +31,14 @@ type ExplorerShellProps = {
 
 const DEFAULT_CAMERA: CameraState = { centerX: 640, centerY: 360, scale: 1 }
 
+/** Scene Route의 URL segment 수로 탐색 깊이를 계산한다. */
 function routeDepth(sceneId?: string) {
   if (!sceneId) return 0
   const route = contentRepository.listRoutes().find(({ id }) => id === sceneId)
   return route?.path.split("/").filter(Boolean).length ?? 0
 }
 
+/** Route와 World Viewport, Explanation Panel의 탐색 상태를 조립한다. */
 export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
   const navigate = useNavigate()
   const mapPanelRef = usePanelRef()
@@ -61,12 +63,14 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
+    /** 운영체제의 동작 감소 설정을 현재 화면 상태에 반영한다. */
     const updatePreference = () => setReducedMotion(mediaQuery.matches)
     updatePreference()
     mediaQuery.addEventListener("change", updatePreference)
     return () => mediaQuery.removeEventListener("change", updatePreference)
   }, [])
 
+  /** 떠나는 Scene의 Camera와 Panel 상태를 탐색 스냅샷에 저장한다. */
   const captureScene = useCallback(
     (
       targetSceneId: string | undefined,
@@ -86,6 +90,7 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
     []
   )
 
+  /** 진입한 Scene의 저장된 Panel 상태와 크기를 복원한다. */
   const restorePanel = useCallback(
     (targetSceneId: string) => {
       const snapshot = getSceneSnapshot(targetSceneId)
@@ -123,21 +128,27 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
         returningRef.current = routeDepth(sceneId) < routeDepth(previousSceneId)
       }
     }
-    if (sceneId) restorePanel(sceneId)
-    setTopicSelection(undefined)
+    const restoreFrame = requestAnimationFrame(() => {
+      if (sceneId) restorePanel(sceneId)
+      setTopicSelection(undefined)
+    })
     previousSceneIdRef.current = sceneId
+    return () => cancelAnimationFrame(restoreFrame)
   }, [captureScene, restorePanel, sceneId])
 
+  /** Explanation Panel을 접고 현재 접힘 상태를 기록한다. */
   const collapseExplanation = () => {
     panelCollapsedRef.current = true
     explanationPanelRef.current?.collapse()
   }
 
+  /** 접힌 Explanation Panel을 다시 연다. */
   const openExplanation = () => {
     panelCollapsedRef.current = false
     explanationPanelRef.current?.expand()
   }
 
+  /** 분할 화면과 Explanation 읽기 모드를 전환한다. */
   const toggleReadingMode = () => {
     if (panelModeRef.current === "reading") {
       panelModeRef.current = "split"
@@ -152,6 +163,7 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
     requestAnimationFrame(() => mapPanelRef.current?.collapse())
   }
 
+  /** 선택한 Topic의 Child Scene Route로 진입한다. */
   const enterScene = (request: SceneNavigationRequest) => {
     if (navigationLockedRef.current) return
     const targetRoute = contentRepository
@@ -165,6 +177,7 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
     navigate(targetRoute.path)
   }
 
+  /** Outline에서 고른 Scene Route로 직접 이동한다. */
   const selectOutlineScene = (targetSceneId: string) => {
     setOutlineOpen(false)
     if (navigationLockedRef.current || targetSceneId === sceneId) return
@@ -179,6 +192,7 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
     navigate(targetRoute.path)
   }
 
+  /** 현재 탐색 스냅샷을 저장하고 이전 Route로 돌아간다. */
   const goBack = () => {
     if (navigationLockedRef.current) return
     navigationLockedRef.current = true
@@ -189,14 +203,17 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
     else navigate(-1)
   }
 
+  /** 준비된 Scene 제목을 Explanation Panel 제목에 반영한다. */
   const handleSceneReady = useCallback((_: string, title: string) => {
     setExplanationTitle(title)
   }, [])
 
+  /** 최신 Camera를 다음 탐색 스냅샷 저장용 ref에 보관한다. */
   const handleCameraChange = useCallback((camera: CameraState) => {
     currentCameraRef.current = camera
   }, [])
 
+  /** Scene 전환 잠금을 갱신하고 이동 완료 뒤 적절한 요소에 초점을 둔다. */
   const handleAnimationChange = useCallback(
     (animating: boolean) => {
       setNavigationDisabled(animating)
@@ -219,10 +236,12 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
     [sceneId]
   )
 
+  /** Explanation Panel의 최신 스크롤 위치를 저장용 ref에 보관한다. */
   const handleExplanationScroll = useCallback((scrollTop: number) => {
     explanationScrollTopRef.current = scrollTop
   }, [])
 
+  /** 선택한 Topic 설명을 열고 접혀 있던 Panel을 펼친다. */
   const selectTopic = useCallback(
     (ownerSceneId: string, elementId: string, label: string) => {
       setTopicSelection({ sceneId: ownerSceneId, elementId, label })

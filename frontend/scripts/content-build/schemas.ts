@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import type { Concept, Scene, SelfCheckQuestion } from "@/content/types"
+import type { Concept, Scene, SelfCheckQuestion } from "@shared/content/types"
 
 const contentIdSchema = z
   .string()
@@ -201,6 +201,7 @@ export type SceneDerivedMetadata = {
   parentId?: string
 }
 
+/** Scene 문서의 Node 순서를 보존해 Child Scene 참조를 추출한다. */
 export function sceneDocumentChildren(document: SceneDocument) {
   return Object.entries(document.nodes).flatMap(([nodeId, node], order) =>
     node.childSceneId
@@ -209,6 +210,7 @@ export function sceneDocumentChildren(document: SceneDocument) {
   )
 }
 
+/** 검증된 작성 문서와 파생 메타데이터를 런타임 Scene 모델로 변환한다. */
 export function normalizeSceneDocument(
   document: SceneDocument,
   metadata: SceneDerivedMetadata,
@@ -282,14 +284,17 @@ export const conceptSchema = z
   })
   .strict()
 
+/** 알 수 없는 입력을 검증된 Scene 작성 문서로 파싱한다. */
 export function parseSceneDocument(input: unknown): SceneDocument {
   return sceneDocumentSchema.parse(input)
 }
 
+/** 알 수 없는 입력을 Scene 퀴즈 목록으로 검증한다. */
 export function parseSceneQuiz(input: unknown): SelfCheckQuestion[] {
   return sceneQuizSchema.parse(input)
 }
 
+/** 알 수 없는 입력을 검증된 Concept 모델로 파싱한다. */
 export function parseConcept(input: unknown): Concept {
   return conceptSchema.parse(input) as Concept
 }

@@ -21,6 +21,7 @@ type ExplorerHeaderProps = {
   onOpenPanel: () => void
 }
 
+/** Explorer의 뒤로 가기, 홈 이동, 현재 경로와 패널 열기 동작을 표시한다. */
 export function ExplorerHeader({
   panelCollapsed,
   navigationDisabled,

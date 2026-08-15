@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
 
+/** 알 수 없는 URL에 404 안내와 시작 화면 복귀 동작을 제공한다. */
 export function NotFoundRoute() {
   const navigate = useNavigate()
 

@@ -29,6 +29,7 @@ const usageSteps = [
   },
 ]
 
+/** Root Scene 미리보기와 Explorer 진입 안내를 시작 화면에 표시한다. */
 export function HomeRoute() {
   const navigate = useNavigate()
   const rootSceneId = contentRepository.getRootSceneId()
@@ -37,6 +38,7 @@ export function HomeRoute() {
     .find(({ id }) => id === rootSceneId)
   const rootPath = rootRoute?.path ?? "/explore/google-com"
 
+  /** 미리보기에서 선택한 Scene의 전체 Explorer 경로로 이동한다. */
   const enterScene = ({ sceneId }: SceneNavigationRequest) => {
     const targetRoute = contentRepository
       .listRoutes()

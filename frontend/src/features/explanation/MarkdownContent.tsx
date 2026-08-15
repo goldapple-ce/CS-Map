@@ -5,6 +5,7 @@ import ReactMarkdown, {
 } from "react-markdown"
 import remarkGfm from "remark-gfm"
 
+/** React Node에서 제목 ID 생성에 사용할 평문 문자열을 재귀적으로 추출한다. */
 function textContent(node: ReactNode): string {
   if (typeof node === "string" || typeof node === "number") {
     return String(node)
@@ -16,6 +17,7 @@ function textContent(node: ReactNode): string {
   return ""
 }
 
+/** 중복 제목을 구분하면서 패널 내부에서 고유한 heading ID를 만든다. */
 function headingId(text: string, used: Map<string, number>, idPrefix: string) {
   const base =
     text
@@ -28,6 +30,7 @@ function headingId(text: string, used: Map<string, number>, idPrefix: string) {
   return `${idPrefix}-${count === 0 ? base : `${base}-${count + 1}`}`
 }
 
+/** HTTP(S) 외 URL을 제거해 Markdown 링크 대상을 제한한다. */
 function externalUrl(url: string) {
   return /^https?:\/\//u.test(url) ? defaultUrlTransform(url) : ""
 }
@@ -37,8 +40,10 @@ type MarkdownContentProps = {
   idPrefix: string
 }
 
+/** 허용된 Markdown 요소를 안전한 Explanation 스타일로 렌더링한다. */
 export function MarkdownContent({ markdown, idPrefix }: MarkdownContentProps) {
   const usedHeadingIds = new Map<string, number>()
+  /** 제목 깊이를 패널용 heading으로 통일하고 고유 ID를 부여한다. */
   const heading = (children: ReactNode, prominent = false) => (
     <h3
       id={headingId(textContent(children), usedHeadingIds, idPrefix)}

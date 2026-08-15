@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useRef, useState, type RefObject } from "react"
+import { useMemo, useRef, useState, type RefObject } from "react"
 import { Dialog } from "@base-ui/react/dialog"
 import { ChevronDown, ChevronRight, Search, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import type { RouteIndexEntry } from "@/content/repository"
+import type { RouteIndexEntry } from "@shared/content/generated-contract"
 import { cn } from "@/lib/utils"
 
 type OutlineNode = {
@@ -23,10 +23,12 @@ type TopicOutlineProps = {
   onSelectScene: (sceneId: string) => void
 }
 
+/** 작성 순서와 제목을 기준으로 목차 항목의 안정된 순서를 정한다. */
 function compareRoutes(left: RouteIndexEntry, right: RouteIndexEntry) {
   return left.order - right.order || left.title.localeCompare(right.title, "ko")
 }
 
+/** 평탄한 Route 목록을 부모-자식 목차 트리로 변환한다. */
 function createOutline(routes: readonly RouteIndexEntry[]): OutlineNode[] {
   const nodes = new Map<string, OutlineNode>(
     routes.map((route) => [route.id, { route, children: [] }])
@@ -41,6 +43,7 @@ function createOutline(routes: readonly RouteIndexEntry[]): OutlineNode[] {
     else roots.push(node)
   }
 
+  /** 현재 가지와 모든 하위 가지를 같은 기준으로 정렬한다. */
   const sortBranch = (nodesToSort: OutlineNode[]) => {
     nodesToSort.sort((left, right) => compareRoutes(left.route, right.route))
     for (const node of nodesToSort) sortBranch(node.children)
@@ -49,6 +52,7 @@ function createOutline(routes: readonly RouteIndexEntry[]): OutlineNode[] {
   return roots
 }
 
+/** 현재 Scene을 드러내기 위해 펼쳐야 하는 모든 조상 ID를 구한다. */
 function ancestorIds(
   sceneId: string | undefined,
   routesById: ReadonlyMap<string, RouteIndexEntry>
@@ -62,10 +66,12 @@ function ancestorIds(
   return ids
 }
 
+/** Topic 검색에 사용할 공백·유니코드·대소문자를 정규화한다. */
 function normalizeSearchText(value: string) {
   return value.trim().normalize("NFKC").toLocaleLowerCase("ko-KR")
 }
 
+/** 목차 트리를 화면 순서의 Route 목록으로 평탄화한다. */
 function flattenOutline(nodes: readonly OutlineNode[]): RouteIndexEntry[] {
   return nodes.flatMap((node) => [
     node.route,
@@ -73,6 +79,7 @@ function flattenOutline(nodes: readonly OutlineNode[]): RouteIndexEntry[] {
   ])
 }
 
+/** 검색 결과에 표시할 Root부터 현재 Scene까지의 경로를 구한다. */
 function topicPath(
   sceneId: string,
   routesById: ReadonlyMap<string, RouteIndexEntry>
@@ -99,6 +106,7 @@ type OutlineBranchProps = {
   onSelectScene: (sceneId: string) => void
 }
 
+/** 한 목차 가지와 재귀적인 하위 가지를 렌더링한다. */
 function OutlineBranch({
   nodes,
   currentSceneId,
@@ -185,6 +193,7 @@ function OutlineBranch({
   )
 }
 
+/** 전체 Topic 트리와 제목 검색을 제공하는 탐색 Dialog를 렌더링한다. */
 export function TopicOutline({
   open,
   routes,
@@ -217,11 +226,12 @@ export function TopicOutline({
     [normalizedQuery, orderedRoutes]
   )
 
-  useEffect(() => {
-    const ancestors = ancestorIds(currentSceneId, routesById)
-    setExpanded((current) => new Set([...current, ...ancestors]))
-  }, [currentSceneId, routesById])
+  const visibleExpanded = useMemo(
+    () => new Set([...expanded, ...ancestorIds(currentSceneId, routesById)]),
+    [currentSceneId, expanded, routesById]
+  )
 
+  /** 사용자가 선택한 목차 가지의 펼침 상태를 전환한다. */
   const toggle = (sceneId: string) => {
     setExpanded((current) => {
       const next = new Set(current)
@@ -231,11 +241,13 @@ export function TopicOutline({
     })
   }
 
+  /** Dialog가 닫힐 때 검색 상태를 함께 초기화한다. */
   const changeOpen = (nextOpen: boolean) => {
     if (!nextOpen) setQuery("")
     onOpenChange(nextOpen)
   }
 
+  /** 검색 상태를 비우고 선택한 Scene으로 이동한다. */
   const selectScene = (sceneId: string) => {
     setQuery("")
     onSelectScene(sceneId)
@@ -371,7 +383,7 @@ export function TopicOutline({
                   <OutlineBranch
                     nodes={outline}
                     currentSceneId={currentSceneId}
-                    expanded={expanded}
+                    expanded={visibleExpanded}
                     navigationDisabled={navigationDisabled}
                     currentItemRef={currentItemRef}
                     onToggle={toggle}

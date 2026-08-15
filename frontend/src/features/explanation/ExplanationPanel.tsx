@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { contentRepository } from "@/content/content-repository"
-import type { Concept, Scene } from "@/content/types"
+import type { Concept, Scene } from "@shared/content/types"
 import { MarkdownContent } from "@/features/explanation/MarkdownContent"
 import { QuizPanel } from "@/features/explanation/QuizPanel"
 
@@ -29,19 +29,20 @@ type ConceptExplanation = {
 }
 
 type ExplanationState =
-  | { status: "idle" | "loading" }
+  | { status: "idle" }
   | {
       status: "loaded"
+      sceneId: string
       scene: Scene
       markdown: string
       concepts: ConceptExplanation[]
     }
-  | { status: "error"; message: string }
+  | { status: "error"; sceneId: string; message: string }
 
 type TopicExplanationState =
-  | { status: "idle" | "loading" }
-  | { status: "loaded"; markdown?: string }
-  | { status: "error"; message: string }
+  | { status: "idle" }
+  | { status: "loaded"; selectionKey: string; markdown?: string }
+  | { status: "error"; selectionKey: string; message: string }
 
 type ExplanationPanelProps = {
   sceneId?: string
@@ -55,6 +56,7 @@ type ExplanationPanelProps = {
   onToggleReadingMode: () => void
 }
 
+/** 선택된 Scene 또는 Topic의 설명과 퀴즈를 패널에 표시한다. */
 export function ExplanationPanel({
   sceneId,
   title,
@@ -66,22 +68,24 @@ export function ExplanationPanel({
   onCollapse,
   onToggleReadingMode,
 }: ExplanationPanelProps) {
+  const selectionKey = topicSelection
+    ? `${topicSelection.sceneId}:${topicSelection.elementId}`
+    : undefined
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const explanationScrollTopRef = useRef(restoreScrollTop)
   const [state, setState] = useState<ExplanationState>({ status: "idle" })
   const [topicExplanation, setTopicExplanation] =
     useState<TopicExplanationState>({ status: "idle" })
-  const [activeTab, setActiveTab] = useState<"explanation" | "quiz">(
-    "explanation"
-  )
+  const [tabState, setTabState] = useState<{
+    value: "explanation" | "quiz"
+    selectionKey?: string
+  }>({ value: "explanation" })
+  const activeTab =
+    tabState.selectionKey === selectionKey ? tabState.value : "explanation"
 
   useEffect(() => {
-    if (!sceneId) {
-      setState({ status: "idle" })
-      return
-    }
+    if (!sceneId) return
     let active = true
-    setState({ status: "loading" })
     contentRepository
       .loadScene(sceneId)
       .then(async ({ scene, markdown }) => {
@@ -109,12 +113,14 @@ export function ExplanationPanel({
             }
           })
         )
-        if (active) setState({ status: "loaded", scene, markdown, concepts })
+        if (active)
+          setState({ status: "loaded", sceneId, scene, markdown, concepts })
       })
       .catch((error: unknown) => {
         if (!active) return
         setState({
           status: "error",
+          sceneId,
           message:
             error instanceof Error
               ? error.message
@@ -131,28 +137,24 @@ export function ExplanationPanel({
   }, [restoreScrollTop, sceneId])
 
   useEffect(() => {
-    if (topicSelection) setActiveTab("explanation")
-  }, [topicSelection])
-
-  useEffect(() => {
-    if (!topicSelection) {
-      setTopicExplanation({ status: "idle" })
-      return
-    }
+    if (!topicSelection) return
     let active = true
-    setTopicExplanation({ status: "loading" })
+    const selectionKey = `${topicSelection.sceneId}:${topicSelection.elementId}`
     contentRepository
       .loadTopicExplanation(topicSelection.sceneId, topicSelection.elementId)
       .then((markdown) => {
         if (!active) return
         setTopicExplanation(
-          markdown ? { status: "loaded", markdown } : { status: "loaded" }
+          markdown
+            ? { status: "loaded", selectionKey, markdown }
+            : { status: "loaded", selectionKey }
         )
       })
       .catch((error: unknown) => {
         if (!active) return
         setTopicExplanation({
           status: "error",
+          selectionKey,
           message:
             error instanceof Error
               ? error.message
@@ -174,6 +176,7 @@ export function ExplanationPanel({
       topicSelection || activeTab === "quiz"
         ? 0
         : explanationScrollTopRef.current
+    /** Scene 설명 탭의 스크롤 위치만 탐색 스냅샷에 반영한다. */
     const handleScroll = () => {
       if (topicSelection || activeTab !== "explanation") return
       explanationScrollTopRef.current = viewport.scrollTop
@@ -184,6 +187,16 @@ export function ExplanationPanel({
   }, [activeTab, onScrollTopChange, topicSelection, sceneId])
 
   const panelTitle = topicSelection?.label ?? title
+  const currentState: ExplanationState =
+    sceneId && state.status !== "idle" && state.sceneId === sceneId
+      ? state
+      : { status: "idle" }
+  const currentTopicExplanation: TopicExplanationState =
+    selectionKey &&
+    topicExplanation.status !== "idle" &&
+    topicExplanation.selectionKey === selectionKey
+      ? topicExplanation
+      : { status: "idle" }
 
   return (
     <aside
@@ -233,7 +246,7 @@ export function ExplanationPanel({
         value={topicSelection ? "explanation" : activeTab}
         onValueChange={(value) => {
           if (value === "explanation" || value === "quiz") {
-            setActiveTab(value)
+            setTabState({ value, selectionKey })
           }
         }}
         className="min-h-0 flex-1"
@@ -263,18 +276,17 @@ export function ExplanationPanel({
               <article className="mx-auto max-w-3xl space-y-10 px-6 py-7">
                 {topicSelection ? (
                   <section className="space-y-5">
-                    {topicExplanation.status === "loading" ||
-                    topicExplanation.status === "idle" ? (
+                    {currentTopicExplanation.status === "idle" ? (
                       <p className="text-sm text-muted-foreground">
                         Topic 설명을 불러오는 중입니다.
                       </p>
-                    ) : topicExplanation.status === "error" ? (
+                    ) : currentTopicExplanation.status === "error" ? (
                       <p className="text-sm text-destructive">
-                        {topicExplanation.message}
+                        {currentTopicExplanation.message}
                       </p>
-                    ) : topicExplanation.markdown ? (
+                    ) : currentTopicExplanation.markdown ? (
                       <MarkdownContent
-                        markdown={topicExplanation.markdown}
+                        markdown={currentTopicExplanation.markdown}
                         idPrefix={`topic-${topicSelection.sceneId}-${topicSelection.elementId}`}
                       />
                     ) : (
@@ -287,25 +299,30 @@ export function ExplanationPanel({
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={onClearTopic}
+                      onClick={() => {
+                        setTabState({ value: "explanation" })
+                        onClearTopic()
+                      }}
                     >
                       현재 Scene 설명으로 돌아가기
                     </Button>
                   </section>
-                ) : state.status === "loading" || state.status === "idle" ? (
+                ) : currentState.status === "idle" ? (
                   <p className="text-sm text-muted-foreground">
                     설명을 불러오는 중입니다.
                   </p>
-                ) : state.status === "error" ? (
-                  <p className="text-sm text-destructive">{state.message}</p>
+                ) : currentState.status === "error" ? (
+                  <p className="text-sm text-destructive">
+                    {currentState.message}
+                  </p>
                 ) : (
                   <>
                     <MarkdownContent
-                      markdown={state.markdown}
-                      idPrefix={`scene-${state.scene.id}`}
+                      markdown={currentState.markdown}
+                      idPrefix={`scene-${currentState.scene.id}`}
                     />
 
-                    {state.concepts.map(
+                    {currentState.concepts.map(
                       ({ concept, markdown, contextSummary, occurrenceId }) => (
                         <section
                           key={occurrenceId}
@@ -348,16 +365,18 @@ export function ExplanationPanel({
               className="data-hidden:hidden"
             >
               <article className="mx-auto max-w-3xl px-6 py-7">
-                {state.status === "loading" || state.status === "idle" ? (
+                {currentState.status === "idle" ? (
                   <p className="text-sm text-muted-foreground">
                     퀴즈를 불러오는 중입니다.
                   </p>
-                ) : state.status === "error" ? (
-                  <p className="text-sm text-destructive">{state.message}</p>
+                ) : currentState.status === "error" ? (
+                  <p className="text-sm text-destructive">
+                    {currentState.message}
+                  </p>
                 ) : (
                   <QuizPanel
-                    key={state.scene.id}
-                    questions={state.scene.selfCheckQuiz ?? []}
+                    key={currentState.scene.id}
+                    questions={currentState.scene.selfCheckQuiz ?? []}
                   />
                 )}
               </article>

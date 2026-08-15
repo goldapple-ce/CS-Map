@@ -1,4 +1,4 @@
-import type { Concept, ContentId, Scene } from "@/content/types"
+import type { Concept, ContentId, Scene } from "@shared/content/types"
 
 export type ContentValidationIssue = {
   contentId?: ContentId
@@ -6,12 +6,14 @@ export type ContentValidationIssue = {
   message: string
 }
 
+/** 콘텐츠 검증 오류를 일관된 경로 정보와 함께 만든다. */
 const makeIssue = (
   contentId: ContentId | undefined,
   path: string,
   message: string
 ): ContentValidationIssue => ({ contentId, path, message })
 
+/** 문자열 목록에서 두 번 이상 등장한 값을 최초 중복 순서로 반환한다. */
 function findDuplicates(values: readonly string[]) {
   const seen = new Set<string>()
   const duplicates = new Set<string>()
@@ -22,6 +24,7 @@ function findDuplicates(values: readonly string[]) {
   return [...duplicates]
 }
 
+/** Scene·Concept 사이의 ID, 참조, 소유 관계와 순환을 검증한다. */
 export function validateContentGraph(
   scenes: readonly Scene[],
   concepts: readonly Concept[]
@@ -88,6 +91,7 @@ export function validateContentGraph(
   )
   const visiting = new Set<string>()
   const visited = new Set<string>()
+  /** Child Scene 경로를 깊이 우선으로 방문하며 순환을 기록한다. */
   const visit = (sceneId: string) => {
     if (visiting.has(sceneId)) {
       issues.push(makeIssue(sceneId, "nodes.childSceneId", "Child Scene cycle detected"))

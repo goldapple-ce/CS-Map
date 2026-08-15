@@ -1,3 +1,4 @@
+/** 생성 콘텐츠 전반에서 사용하는 안정된 문자열 식별자다. */
 export type ContentId = string
 
 export type ContentStatus = "draft" | "review" | "published"

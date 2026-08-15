@@ -2,7 +2,7 @@ import type { WorldBounds } from "@/features/explorer/layout/world-layout"
 import {
   SCENE_GRID_HEIGHT,
   SCENE_GRID_WIDTH,
-} from "@/features/explorer/layout/scene-node-metrics"
+} from "@shared/layout/scene-node-metrics"
 
 export type CameraState = {
   centerX: number
@@ -15,6 +15,7 @@ export type ViewportSize = {
   height: number
 }
 
+/** 여백을 포함한 Bounds 전체가 Viewport에 들어오는 Camera를 계산한다. */
 export function cameraForBounds(
   bounds: WorldBounds,
   viewport: ViewportSize,
@@ -32,6 +33,7 @@ export function cameraForBounds(
   }
 }
 
+/** Grid Scene의 기준 크기를 Viewport에 맞추는 Camera를 계산한다. */
 export function cameraForGridScene(
   bounds: WorldBounds,
   worldScale: number,
@@ -49,6 +51,7 @@ export function cameraForGridScene(
   }
 }
 
+/** Bounds 너비가 Viewport 너비에 맞도록 Camera를 계산한다. */
 export function cameraForWidth(
   bounds: WorldBounds,
   viewport: ViewportSize
@@ -60,6 +63,7 @@ export function cameraForWidth(
   }
 }
 
+/** Camera와 overscan으로 현재 렌더링할 World Bounds를 계산한다. */
 export function visibleWorldBounds(
   camera: CameraState,
   viewport: ViewportSize,
@@ -75,6 +79,7 @@ export function visibleWorldBounds(
   }
 }
 
+/** 두 World Bounds가 맞닿거나 겹치는지 확인한다. */
 export function boundsIntersect(left: WorldBounds, right: WorldBounds) {
   return !(
     left.x + left.width < right.x ||

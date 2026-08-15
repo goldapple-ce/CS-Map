@@ -16,8 +16,8 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@shared/*": ["./shared/*"]
     }
   },
-  "include": ["scripts/**/*.ts"]
+  "include": ["scripts/**/*.ts", "shared/**/*.ts"]
 }

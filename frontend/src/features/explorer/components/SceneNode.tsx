@@ -1,8 +1,8 @@
 import { cva } from "class-variance-authority"
 
-import type { SceneNodeElement } from "@/content/types"
-import type { LayoutBox } from "@/features/explorer/layout/scene-layout"
-import { estimatedSceneNodeLabelWidth } from "@/features/explorer/layout/scene-node-metrics"
+import type { SceneNodeElement } from "@shared/content/types"
+import type { LayoutBox } from "@shared/layout/scene-layout-contract"
+import { estimatedSceneNodeLabelWidth } from "@shared/layout/scene-node-metrics"
 import { cn } from "@/lib/utils"
 
 export type SceneNodeState = "interactive" | "selected"
@@ -57,6 +57,7 @@ type SceneNodeProps = {
   onSelectTopic?: (elementId: string, label: string) => void
 }
 
+/** Scene Node를 탐색 또는 설명 선택이 가능한 HTML 요소로 표시한다. */
 export function SceneNode({
   element,
   layout,

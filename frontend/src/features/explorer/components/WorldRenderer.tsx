@@ -1,4 +1,4 @@
-import type { SceneEdgeElement, SceneNodeElement } from "@/content/types"
+import type { SceneEdgeElement, SceneNodeElement } from "@shared/content/types"
 import { SceneArea } from "@/features/explorer/components/SceneArea"
 import { SceneEdge } from "@/features/explorer/components/SceneEdge"
 import {
@@ -32,6 +32,7 @@ type WorldRendererProps = {
 
 const MAX_CONTEXT_RENDER_SCALE = 128
 
+/** 현재 Topic 선택과 일치하는 Node의 시각 상태를 결정한다. */
 function nodeState(
   element: SceneNodeElement,
   sceneId: string,
@@ -43,12 +44,14 @@ function nodeState(
     : "interactive"
 }
 
+/** 화면에 투영된 배율을 Node 정보 밀도 단계로 변환한다. */
 function nodeDensity(renderScale: number): SceneNodeDensity {
   if (renderScale < 0.45) return "far"
   if (renderScale < 0.65) return "medium"
   return "near"
 }
 
+/** Camera에 보이는 Scene만 World 좌표에서 화면 좌표로 투영해 렌더링한다. */
 export function WorldRenderer({
   layout,
   camera,

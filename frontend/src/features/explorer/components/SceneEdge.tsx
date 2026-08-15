@@ -1,5 +1,5 @@
-import type { SceneEdgeElement } from "@/content/types"
-import type { LayoutPoint } from "@/features/explorer/layout/scene-layout"
+import type { SceneEdgeElement } from "@shared/content/types"
+import type { LayoutPoint } from "@shared/layout/scene-layout-contract"
 
 type SceneEdgeProps = {
   element: SceneEdgeElement
@@ -12,6 +12,7 @@ const LABEL_OUTLINE_WIDTH = 4
 
 type LabelSide = NonNullable<SceneEdgeElement["labelSide"]>
 
+/** Edge의 적합한 선분을 골라 요청된 방향에 Label 좌표를 배치한다. */
 function labelPosition(
   points: readonly LayoutPoint[],
   clearance: number,
@@ -52,6 +53,7 @@ function labelPosition(
   return { x: centerX + clearance, y: centerY, textAnchor: "start" as const }
 }
 
+/** 직교 경로와 선택적 Label을 의미에 맞는 SVG Edge로 표시한다. */
 export function SceneEdge({
   element,
   points,

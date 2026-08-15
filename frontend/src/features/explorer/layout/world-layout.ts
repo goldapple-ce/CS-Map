@@ -1,13 +1,15 @@
 import {
   createSceneLayout,
-  type LayoutBox,
-  type SceneLayout,
 } from "@/features/explorer/layout/scene-layout"
+import type {
+  LayoutBox,
+  SceneLayout,
+} from "@shared/layout/scene-layout-contract"
 import {
   SCENE_NODE_HEIGHT,
   SCENE_NODE_WIDTH,
-} from "@/features/explorer/layout/scene-node-metrics"
-import type { Scene } from "@/content/types"
+} from "@shared/layout/scene-node-metrics"
+import type { Scene } from "@shared/content/types"
 
 export type WorldBounds = LayoutBox
 
@@ -27,6 +29,7 @@ export type WorldLayout = {
   scenes: ReadonlyMap<string, PositionedScene>
 }
 
+/** Root와 Child Scene의 로컬 Layout을 하나의 재귀적인 World 공간에 배치한다. */
 export function createWorldLayout(
   scenes: readonly Scene[],
   rootSceneId: string
@@ -40,6 +43,7 @@ export function createWorldLayout(
   const positioned = new Map<string, PositionedScene>()
   const visiting = new Set<string>()
   const layouts = new Map<string, SceneLayout>()
+  /** Scene별 로컬 Layout을 한 번 생성하고 같은 World 계산에서 재사용한다. */
   const layoutFor = (scene: Scene) => {
     const cached = layouts.get(scene.id)
     if (cached) return cached
@@ -48,6 +52,7 @@ export function createWorldLayout(
     return layout
   }
 
+  /** Scene을 World 좌표에 놓고 Node 내부의 Child Scene을 재귀 배치한다. */
   const place = (
     scene: Scene,
     x: number,
@@ -109,6 +114,7 @@ export function createWorldLayout(
   return { rootSceneId: root.id, scenes: positioned }
 }
 
+/** 대상 Scene 자신부터 Root까지의 Scene ID 집합을 반환한다. */
 export function getSceneAncestors(layout: WorldLayout, sceneId: string) {
   const ids = new Set<string>()
   let current = layout.scenes.get(sceneId)

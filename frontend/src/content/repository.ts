@@ -1,41 +1,9 @@
 import type {
   Concept,
   ContentId,
-  ContentStatus,
   Scene,
-} from "@/content/types"
-
-export type ContentManifest = {
-  scenarioId: ContentId
-  rootSceneId: ContentId
-}
-
-export type SceneIndexEntry = {
-  id: ContentId
-  title: string
-  slug: string
-  scenarioId: ContentId
-  parentId?: ContentId
-  status: ContentStatus
-  moduleKey: string
-}
-
-export type ConceptIndexEntry = {
-  id: ContentId
-  slug: string
-  status: ContentStatus
-  moduleKey: string
-}
-
-export type RouteIndexEntry = {
-  id: ContentId
-  title: string
-  path: string
-  parentId?: ContentId
-  order: number
-  status: "published"
-  moduleKey: string
-}
+} from "@shared/content/types"
+import type { RouteIndexEntry } from "@shared/content/generated-contract"
 
 export type LoadedScene = {
   scene: Scene
