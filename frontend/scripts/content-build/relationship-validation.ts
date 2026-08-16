@@ -44,7 +44,9 @@ export function validateContentGraph(
   for (const pathKey of findDuplicates(
     scenes.map(({ parentId, slug }) => `${parentId ?? "root"}/${slug}`)
   )) {
-    issues.push(makeIssue(undefined, "slug", `Duplicate scene path segment: ${pathKey}`))
+    issues.push(
+      makeIssue(undefined, "slug", `Duplicate scene path segment: ${pathKey}`)
+    )
   }
 
   for (const scene of scenes) {
@@ -57,26 +59,62 @@ export function validateContentGraph(
     }
     for (const edge of edges) {
       if (!nodesById.has(edge.fromElementId)) {
-        issues.push(makeIssue(scene.id, `elements.${edge.id}.fromElementId`, `Unknown node: ${edge.fromElementId}`))
+        issues.push(
+          makeIssue(
+            scene.id,
+            `elements.${edge.id}.fromElementId`,
+            `Unknown node: ${edge.fromElementId}`
+          )
+        )
       }
       if (!nodesById.has(edge.toElementId)) {
-        issues.push(makeIssue(scene.id, `elements.${edge.id}.toElementId`, `Unknown node: ${edge.toElementId}`))
+        issues.push(
+          makeIssue(
+            scene.id,
+            `elements.${edge.id}.toElementId`,
+            `Unknown node: ${edge.toElementId}`
+          )
+        )
       }
     }
     for (const node of nodes) {
       if (node.targetSceneId && node.navigateToSceneId) {
-        issues.push(makeIssue(scene.id, `elements.${node.id}`, "Node must use either childSceneId or navigateToSceneId, not both"))
+        issues.push(
+          makeIssue(
+            scene.id,
+            `elements.${node.id}`,
+            "Node must use either childSceneId or navigateToSceneId, not both"
+          )
+        )
       }
       if (node.targetSceneId) {
         const target = scenesById.get(node.targetSceneId)
         if (!target) {
-          issues.push(makeIssue(scene.id, `elements.${node.id}.childSceneId`, `Unknown child Scene: ${node.targetSceneId}`))
+          issues.push(
+            makeIssue(
+              scene.id,
+              `elements.${node.id}.childSceneId`,
+              `Unknown child Scene: ${node.targetSceneId}`
+            )
+          )
         } else if (target.parentId !== scene.id) {
-          issues.push(makeIssue(scene.id, `elements.${node.id}.childSceneId`, `Child ${target.id} must derive parent ${scene.id}`))
+          issues.push(
+            makeIssue(
+              scene.id,
+              `elements.${node.id}.childSceneId`,
+              `Child ${target.id} must derive parent ${scene.id}`
+            )
+          )
         }
       }
       if (node.navigateToSceneId && !scenesById.has(node.navigateToSceneId)) {
-        issues.push(makeIssue(scene.id, `elements.${node.id}.navigateToSceneId`, `Unknown navigation target Scene: ${node.navigateToSceneId}`))
+        issues.push(
+          makeIssue(
+            scene.id,
+            `elements.${node.id}.navigateToSceneId`,
+            `Unknown navigation target Scene: ${node.navigateToSceneId}`
+          )
+        )
       }
     }
   }
@@ -85,7 +123,9 @@ export function validateContentGraph(
     scenes.map((scene) => [
       scene.id,
       scene.elements.flatMap((element) =>
-        element.kind === "node" && element.targetSceneId ? [element.targetSceneId] : []
+        element.kind === "node" && element.targetSceneId
+          ? [element.targetSceneId]
+          : []
       ),
     ])
   )
@@ -94,7 +134,9 @@ export function validateContentGraph(
   /** Child Scene 경로를 깊이 우선으로 방문하며 순환을 기록한다. */
   const visit = (sceneId: string) => {
     if (visiting.has(sceneId)) {
-      issues.push(makeIssue(sceneId, "nodes.childSceneId", "Child Scene cycle detected"))
+      issues.push(
+        makeIssue(sceneId, "nodes.childSceneId", "Child Scene cycle detected")
+      )
       return
     }
     if (visited.has(sceneId)) return

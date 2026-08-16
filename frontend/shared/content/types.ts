@@ -91,7 +91,6 @@ export type SelfCheckQuestion = {
 export type Scene = {
   id: ContentId
   slug: string
-  scenarioId: ContentId
   parentId?: ContentId
   title: string
   summary: string

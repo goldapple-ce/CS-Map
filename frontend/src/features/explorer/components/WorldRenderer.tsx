@@ -37,7 +37,7 @@ function nodeState(
   element: SceneNodeElement,
   sceneId: string,
   selectedSceneId: string | undefined,
-  selectedElementId: string | undefined,
+  selectedElementId: string | undefined
 ): SceneNodeState {
   return sceneId === selectedSceneId && element.id === selectedElementId
     ? "selected"
@@ -120,11 +120,9 @@ export function WorldRenderer({
           const { scene, localLayout } = positioned
           const renderScale = positioned.scale * camera.scale
           const screenX =
-            viewport.width / 2 +
-            (positioned.x - camera.centerX) * camera.scale
+            viewport.width / 2 + (positioned.x - camera.centerX) * camera.scale
           const screenY =
-            viewport.height / 2 +
-            (positioned.y - camera.centerY) * camera.scale
+            viewport.height / 2 + (positioned.y - camera.centerY) * camera.scale
           const density = nodeDensity(renderScale)
           const isFocused = scene.id === focusedSceneId
           const edges = scene.elements.filter(

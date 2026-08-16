@@ -120,8 +120,10 @@ flowchart TD
 - `scripts/content-build/scene-graph.ts`: Child 소유권, 파생 metadata와 Root 도달 가능성 계산
 - `scripts/content-build/relationship-validation.ts`: Scene·Concept 참조와 순환 검증
 - `scripts/elk-scene-layout.ts`: Grid Node box와 직교 Edge 경로 계산
-- `scripts/content-build/indexes.ts`: Route 계산과 생성 TypeScript 직렬화
-- `scripts/build-content-index.ts`: 파일 I/O, 단계 조율, 오류 집계와 생성물 동기화
+- `scripts/content-build/source-content.ts`: 작성 파일 탐색·검증과 Scene·Concept 준비
+- `scripts/content-build/generated-content.ts`: Route 계산과 생성 TypeScript 직렬화
+- `scripts/content-build/generated-file.ts`: 생성물 byte 검증·동기화와 이전 파일 정리
+- `scripts/build-content-index.ts`: 검증·Layout·data 조립 단계 조율과 오류 집계
 
 `content:validate`는 `--check` 모드로 같은 결과를 다시 계산한다. 생성 파일이 없거나 오래됐거나 이전 generated 파일이 남아 있으면 파일을 수정하지 않고 실패한다.
 

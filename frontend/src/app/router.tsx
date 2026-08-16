@@ -1,7 +1,4 @@
-import {
-  createBrowserRouter,
-  type RouteObject,
-} from "react-router-dom"
+import { createBrowserRouter, type RouteObject } from "react-router-dom"
 
 import { ExploreRoute } from "@/app/routes/ExploreRoute"
 import { HomeRoute } from "@/app/routes/HomeRoute"

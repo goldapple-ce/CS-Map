@@ -24,13 +24,6 @@ const gridCoordinateSchema = z.number().int().min(1).max(5)
 const gridSpanSchema = z.number().int().min(1).max(5)
 const portSideSchema = z.enum(["top", "right", "bottom", "left"])
 
-export const scenarioDocumentSchema = z
-  .object({
-    id: contentIdSchema,
-    rootSceneId: contentIdSchema,
-  })
-  .strict()
-
 const contributorSchema = z
   .object({ id: contentIdSchema, displayName: z.string().min(1) })
   .strict()
@@ -193,11 +186,9 @@ export const sceneQuizSchema = z
   .min(1)
 
 export type SceneDocument = z.infer<typeof sceneDocumentSchema>
-export type ScenarioDocument = z.infer<typeof scenarioDocumentSchema>
 
 export type SceneDerivedMetadata = {
   slug: string
-  scenarioId: string
   parentId?: string
 }
 

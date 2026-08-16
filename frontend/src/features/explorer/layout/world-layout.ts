@@ -1,6 +1,4 @@
-import {
-  createSceneLayout,
-} from "@/features/explorer/layout/scene-layout"
+import { createSceneLayout } from "@/features/explorer/layout/scene-layout"
 import type {
   LayoutBox,
   SceneLayout,
@@ -37,7 +35,7 @@ export function createWorldLayout(
   const scenesById = new Map(scenes.map((scene) => [scene.id, scene]))
   const root = scenesById.get(rootSceneId)
   if (!root) {
-    throw new Error(`World layout requires configured root Scene: ${rootSceneId}`)
+    throw new Error(`World layout requires Root Scene: ${rootSceneId}`)
   }
 
   const positioned = new Map<string, PositionedScene>()

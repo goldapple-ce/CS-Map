@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type RefObject,
-} from "react"
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react"
 import { ListTree } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
@@ -88,7 +82,7 @@ function scenePathIds(
 
   if (path[0] !== rootSceneId) {
     throw new Error(
-      `Scene route ${sceneId} is not reachable from configured root: ${rootSceneId}`
+      `Scene route ${sceneId} is not reachable from Root Scene: ${rootSceneId}`
     )
   }
 
@@ -350,7 +344,9 @@ export function SceneViewport({
       : undefined
   const rootPositioned =
     currentWorldState.status === "loaded"
-      ? currentWorldState.layout.scenes.get(currentWorldState.layout.rootSceneId)
+      ? currentWorldState.layout.scenes.get(
+          currentWorldState.layout.rootSceneId
+        )
       : undefined
   const rootCamera = rootPositioned
     ? rootPositioned.scene.layout?.type === "grid"
@@ -435,9 +431,7 @@ export function SceneViewport({
               <h2 className="text-xl font-semibold">
                 게시된 Topic이 없습니다.
               </h2>
-              <Button onClick={() => navigate(rootPath)}>
-                루트로
-              </Button>
+              <Button onClick={() => navigate(rootPath)}>루트로</Button>
             </div>
           </div>
         ) : null}

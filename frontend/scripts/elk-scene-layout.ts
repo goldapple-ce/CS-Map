@@ -128,9 +128,7 @@ export async function buildSceneLayout(
       }),
       edges: edges.map((edge) => ({
         id: edge.id,
-        sources: [
-          edge.fromSide ? `${edge.id}::source` : edge.fromElementId,
-        ],
+        sources: [edge.fromSide ? `${edge.id}::source` : edge.fromElementId],
         targets: [edge.toSide ? `${edge.id}::target` : edge.toElementId],
       })),
     },

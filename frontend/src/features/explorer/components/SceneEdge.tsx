@@ -60,8 +60,7 @@ export function SceneEdge({
   contextual = false,
 }: SceneEdgeProps) {
   if (points.length < 2) return null
-  const labelClearance =
-    LABEL_FONT_SIZE / 2 + LABEL_OUTLINE_WIDTH / 2 + 6
+  const labelClearance = LABEL_FONT_SIZE / 2 + LABEL_OUTLINE_WIDTH / 2 + 6
   const label = element.label
     ? labelPosition(points, labelClearance, element.labelSide)
     : undefined
@@ -101,7 +100,7 @@ export function SceneEdge({
           paintOrder="stroke"
           opacity={contextual ? "0.35" : secondary ? "0.72" : "0.82"}
           aria-hidden="true"
-          className="pointer-events-none select-none text-xs"
+          className="pointer-events-none text-xs select-none"
         >
           {element.label}
         </text>

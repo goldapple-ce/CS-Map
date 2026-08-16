@@ -28,7 +28,9 @@ export function buildRouteIndex(
     if (cached) return cached
     const item = scenesById.get(sceneId)
     if (!item) {
-      throw new Error(`Published route references unavailable Scene: ${sceneId}`)
+      throw new Error(
+        `Published route references unavailable Scene: ${sceneId}`
+      )
     }
     const route = item.value.parentId
       ? `${resolveRoute(item.value.parentId)}/${item.value.slug}`

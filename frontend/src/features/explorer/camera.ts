@@ -43,10 +43,8 @@ export function cameraForGridScene(
     centerX: bounds.x + bounds.width / 2,
     centerY: bounds.y + bounds.height / 2,
     scale: Math.min(
-      viewport.width /
-        Math.max(SCENE_GRID_WIDTH * worldScale, 0.0001),
-      viewport.height /
-        Math.max(SCENE_GRID_HEIGHT * worldScale, 0.0001)
+      viewport.width / Math.max(SCENE_GRID_WIDTH * worldScale, 0.0001),
+      viewport.height / Math.max(SCENE_GRID_HEIGHT * worldScale, 0.0001)
     ),
   }
 }

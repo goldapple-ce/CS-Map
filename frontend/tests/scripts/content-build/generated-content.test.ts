@@ -6,9 +6,9 @@ import type { Scene } from "@shared/content/types"
 import {
   buildRouteIndex,
   renderContentData,
-} from "../../../scripts/content-build/indexes.ts"
+} from "../../../scripts/content-build/generated-content.ts"
 
-/** Route와 Index 테스트에 필요한 최소 준비 Scene을 만든다. */
+/** Route 계산과 생성 데이터 직렬화 테스트에 필요한 Scene을 만든다. */
 function preparedScene(
   id: string,
   slug: string,
@@ -44,10 +44,10 @@ function preparedScene(
     occurrences: [],
     conceptRefs: [],
   } satisfies Scene
-  return { document, value, moduleKey: `/content/${id}/scene.yaml` }
+  return { document, value }
 }
 
-describe("Content indexes", () => {
+describe("Generated content", () => {
   it("부모 Route와 Child order를 계산하고 draft Scene은 제외한다", () => {
     const files = [
       preparedScene("root", "root", undefined, ["second", "first"]),

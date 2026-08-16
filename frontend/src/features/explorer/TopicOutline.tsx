@@ -73,10 +73,7 @@ function normalizeSearchText(value: string) {
 
 /** 목차 트리를 화면 순서의 Route 목록으로 평탄화한다. */
 function flattenOutline(nodes: readonly OutlineNode[]): RouteIndexEntry[] {
-  return nodes.flatMap((node) => [
-    node.route,
-    ...flattenOutline(node.children),
-  ])
+  return nodes.flatMap((node) => [node.route, ...flattenOutline(node.children)])
 }
 
 /** 검색 결과에 표시할 Root부터 현재 Scene까지의 경로를 구한다. */
@@ -157,7 +154,7 @@ function OutlineBranch({
                 aria-current={isCurrent ? "location" : undefined}
                 disabled={navigationDisabled}
                 className={cn(
-                  "min-w-0 flex-1 rounded-md px-2 py-2 text-left text-sm outline-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50",
+                  "min-w-0 flex-1 rounded-md px-2 py-2 text-left text-sm transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50",
                   isCurrent
                     ? "font-semibold text-foreground"
                     : "text-muted-foreground hover:text-foreground"
@@ -274,7 +271,7 @@ export function TopicOutline({
               </div>
               <Dialog.Close
                 aria-label="목차 닫기"
-                className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg outline-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
+                className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
               >
                 <X aria-hidden="true" className="size-4" />
               </Dialog.Close>
@@ -340,12 +337,10 @@ export function TopicOutline({
                           <li key={route.id}>
                             <button
                               type="button"
-                              aria-current={
-                                isCurrent ? "location" : undefined
-                              }
+                              aria-current={isCurrent ? "location" : undefined}
                               disabled={navigationDisabled}
                               className={cn(
-                                "w-full rounded-lg border border-border px-3 py-2.5 text-left outline-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50",
+                                "w-full rounded-lg border border-border px-3 py-2.5 text-left transition-colors outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50",
                                 isCurrent && "bg-muted"
                               )}
                               onClick={() => selectScene(route.id)}

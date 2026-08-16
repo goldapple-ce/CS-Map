@@ -4,7 +4,6 @@ import {
   sceneDocumentChildren,
   type SceneDocument,
   type SceneDerivedMetadata,
-  type ScenarioDocument,
 } from "./schemas.ts"
 
 type SceneDocumentFile = { filePath: string; value: SceneDocument }
@@ -33,21 +32,21 @@ export function collectSceneOwners(files: readonly SceneDocumentFile[]) {
   return { owners, errors }
 }
 
-/** 설정된 Root Scene이 Child로 소유된 경우 기존 형식의 오류를 반환한다. */
+/** 고정 Root Scene이 Child로 소유된 경우 오류를 반환한다. */
 export function rootOwnershipError(
   rootSceneId: string,
   owners: ReadonlyMap<string, SceneOwner>
 ) {
   const owner = owners.get(rootSceneId)
   return owner
-    ? `${rootSceneId}: configured root Scene cannot be a child of ${owner.parentId}`
+    ? `${rootSceneId}: Root Scene cannot be a child of ${owner.parentId}`
     : undefined
 }
 
 /** 소유 관계를 캡처해 상위 Scene부터 파생 메타데이터를 해석하는 함수를 만든다. */
 export function createSceneMetadataResolver(
   files: readonly SceneDocumentFile[],
-  scenario: ScenarioDocument,
+  rootSceneId: string,
   owners: ReadonlyMap<string, SceneOwner>
 ) {
   const documentsById = new Map(files.map((file) => [file.value.id, file]))
@@ -66,10 +65,9 @@ export function createSceneMetadataResolver(
     }
     resolving.add(document.id)
 
-    if (document.id === scenario.rootSceneId) {
+    if (document.id === rootSceneId) {
       const metadata: SceneDerivedMetadata = {
-        slug: path.basename(path.dirname(filePath)),
-        scenarioId: scenario.id,
+        slug: document.id,
       }
       metadataCache.set(document.id, metadata)
       resolving.delete(document.id)
@@ -78,12 +76,9 @@ export function createSceneMetadataResolver(
 
     const owner = owners.get(document.id)
     const parentFile = owner ? documentsById.get(owner.parentId) : undefined
-    const parentMetadata = parentFile
-      ? resolveMetadata(parentFile.value, parentFile.filePath)
-      : undefined
+    if (parentFile) resolveMetadata(parentFile.value, parentFile.filePath)
     const metadata: SceneDerivedMetadata = {
       slug: owner?.nodeId ?? path.basename(path.dirname(filePath)),
-      scenarioId: parentMetadata?.scenarioId ?? document.id,
       ...(owner ? { parentId: owner.parentId } : {}),
     }
     metadataCache.set(document.id, metadata)
@@ -105,7 +100,7 @@ export function collectReachableSceneIds(
 
   if (!scenesById.has(rootSceneId)) {
     errors.push(
-      `content/scenarios: configured rootSceneId references unknown Scene: ${rootSceneId}`
+      `content/scenes/scene.yaml: Root Scene is unavailable: ${rootSceneId}`
     )
     return { reachable, errors }
   }
