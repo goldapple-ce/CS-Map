@@ -14,7 +14,7 @@
 Frontend를 실행하거나 코드를 수정할 때는 다음 순서로 이어서 읽는다.
 
 1. [Frontend 실행과 구조](./frontend/README.md)
-2. [기술 설계](./docs/TECHNICAL_DESIGN.md)
+2. [아키텍처](./docs/ARCHITECTURE.md)
 3. [코드 작성 가이드](./docs/CODE_GUIDE.md)
 
 콘텐츠를 작성할 때는 공통 문서 다음에 [콘텐츠 작성 가이드](./docs/CONTENT_GUIDE.md)를 읽는다.

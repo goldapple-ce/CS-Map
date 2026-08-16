@@ -11,7 +11,7 @@
 
 ## 공통 지침
 
-- 요청과 관련된 [제품 요구사항](./docs/REQUIREMENTS.md), [기술 설계](./docs/TECHNICAL_DESIGN.md)와 [프로젝트 용어](./docs/WORDS.md)를 따른다.
+- 요청과 관련된 [제품 요구사항](./docs/REQUIREMENTS.md), [아키텍처](./docs/ARCHITECTURE.md)와 [프로젝트 용어](./docs/WORDS.md)를 따른다.
 - 기준 문서끼리 충돌하면 작업을 멈추고 사용자에게 알린다.
 - 사용자가 요청하거나 승인한 범위만 작업하고 관련 없는 사용자 변경을 보존한다.
 - 작업을 마치면 변경 파일과 충족하지 못한 항목을 보고한다.

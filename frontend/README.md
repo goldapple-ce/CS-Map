@@ -45,6 +45,6 @@ src ───────────> shared
 ## 관련 문서
 
 - [제품 요구사항](../docs/REQUIREMENTS.md)
-- [기술 설계](../docs/TECHNICAL_DESIGN.md)
+- [아키텍처](../docs/ARCHITECTURE.md)
 - [코드 작성 가이드](../docs/CODE_GUIDE.md)
 - [콘텐츠 작성 가이드](../docs/CONTENT_GUIDE.md)
