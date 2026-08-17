@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react"
 import { ListTree } from "lucide-react"
-import { useNavigate } from "react-router-dom"
 
 import { WorldRenderer } from "@/features/explorer/components/WorldRenderer"
 import {
@@ -28,10 +27,9 @@ type WorldLoadState =
   | { status: "error"; focusedSceneId: string; message: string }
 
 type SceneViewportProps = {
-  sceneId?: string
+  sceneId: string
   selectedSceneId?: string
   selectedElementId?: string
-  routeNotFound: boolean
   navigationDisabled: boolean
   reducedMotion: boolean
   outlineTriggerRef?: RefObject<HTMLButtonElement | null>
@@ -45,11 +43,6 @@ type SceneViewportProps = {
 }
 
 const DEFAULT_CAMERA: CameraState = { centerX: 640, centerY: 360, scale: 1 }
-
-type IdleWindow = Window & {
-  requestIdleCallback?: (callback: () => void) => number
-  cancelIdleCallback?: (handle: number) => void
-}
 
 /** Root부터 대상 Scene까지 검증된 Route ID 경로를 만든다. */
 function scenePathIds(
@@ -94,7 +87,6 @@ export function SceneViewport({
   sceneId,
   selectedSceneId,
   selectedElementId,
-  routeNotFound,
   navigationDisabled,
   reducedMotion,
   outlineTriggerRef,
@@ -106,11 +98,7 @@ export function SceneViewport({
   onCameraChange,
   onAnimationChange,
 }: SceneViewportProps) {
-  const navigate = useNavigate()
   const rootSceneId = contentRepository.getRootSceneId()
-  const rootPath =
-    contentRepository.listRoutes().find(({ id }) => id === rootSceneId)?.path ??
-    "/explore/google-com"
   const embedded = presentation === "embedded"
   const viewportRef = useRef<HTMLDivElement>(null)
   const animationFrameRef = useRef<number | undefined>(undefined)
@@ -129,7 +117,6 @@ export function SceneViewport({
   const [announcement, setAnnouncement] = useState("")
 
   useEffect(() => {
-    if (routeNotFound || !sceneId) return
     let active = true
     const routes = contentRepository.listRoutes()
     Promise.resolve()
@@ -159,42 +146,7 @@ export function SceneViewport({
     return () => {
       active = false
     }
-  }, [rootSceneId, routeNotFound, sceneId])
-
-  /** 인접 Scene 콘텐츠를 현재 탐색 상태 변경 없이 준비한다. */
-  const prefetchScene = useCallback((targetSceneId: string) => {
-    void contentRepository.prefetchScene(targetSceneId)
-  }, [])
-
-  useEffect(() => {
-    if (worldState.status !== "loaded") return
-    const focusedScene = worldState.layout.scenes.get(
-      worldState.focusedSceneId
-    )?.scene
-    if (!focusedScene) return
-    const targets = new Set(
-      focusedScene.elements.flatMap((element) =>
-        element.kind === "node"
-          ? [element.targetSceneId, element.navigateToSceneId].filter(
-              (id): id is string => Boolean(id)
-            )
-          : []
-      )
-    )
-    if (targets.size === 0) return
-
-    const idleWindow = window as IdleWindow
-    /** 브라우저가 유휴할 때 인접 Scene을 차례로 미리 불러온다. */
-    const run = () => {
-      for (const targetSceneId of targets) prefetchScene(targetSceneId)
-    }
-    if (idleWindow.requestIdleCallback) {
-      const handle = idleWindow.requestIdleCallback(run)
-      return () => idleWindow.cancelIdleCallback?.(handle)
-    }
-    const handle = window.setTimeout(run, 200)
-    return () => window.clearTimeout(handle)
-  }, [prefetchScene, worldState])
+  }, [rootSceneId, sceneId])
 
   useEffect(() => {
     const element = viewportRef.current
@@ -281,8 +233,6 @@ export function SceneViewport({
 
   useEffect(() => {
     if (
-      routeNotFound ||
-      !sceneId ||
       worldState.status !== "loaded" ||
       worldState.focusedSceneId !== sceneId ||
       viewport.width <= 1 ||
@@ -303,15 +253,7 @@ export function SceneViewport({
     onSceneReady(sceneId, positioned.scene.title)
     animateCamera(target, !initializedRef.current)
     initializedRef.current = true
-  }, [
-    animateCamera,
-    embedded,
-    onSceneReady,
-    routeNotFound,
-    sceneId,
-    viewport,
-    worldState,
-  ])
+  }, [animateCamera, embedded, onSceneReady, sceneId, viewport, worldState])
 
   useEffect(
     () => () => {
@@ -332,9 +274,7 @@ export function SceneViewport({
   }
 
   const currentWorldState: WorldLoadState =
-    sceneId &&
-    worldState.status !== "loading" &&
-    worldState.focusedSceneId === sceneId
+    worldState.status !== "loading" && worldState.focusedSceneId === sceneId
       ? worldState
       : { status: "loading" }
   const focusedScene =
@@ -360,9 +300,7 @@ export function SceneViewport({
   const relativeZoom = rootCamera
     ? Math.round((camera.scale / rootCamera.scale) * 100)
     : 100
-  const sceneTitle = routeNotFound
-    ? "Topic을 찾을 수 없음"
-    : (focusedScene?.title ?? "지식 공간 로딩")
+  const sceneTitle = focusedScene?.title ?? "지식 공간 로딩"
 
   return (
     <section
@@ -425,16 +363,6 @@ export function SceneViewport({
             목차
           </Button>
         ) : null}
-        {routeNotFound ? (
-          <div className="flex size-full items-center justify-center p-8">
-            <div className="flex max-w-md flex-col items-start gap-4 rounded-xl border border-border bg-background p-6">
-              <h2 className="text-xl font-semibold">
-                게시된 Topic이 없습니다.
-              </h2>
-              <Button onClick={() => navigate(rootPath)}>루트로</Button>
-            </div>
-          </div>
-        ) : null}
         {currentWorldState.status === "loading" ? (
           <div className="flex size-full items-center justify-center text-sm text-muted-foreground">
             논리적 지식 공간을 구성하는 중입니다.
@@ -445,7 +373,7 @@ export function SceneViewport({
             {currentWorldState.message}
           </div>
         ) : null}
-        {currentWorldState.status === "loaded" && sceneId && !routeNotFound ? (
+        {currentWorldState.status === "loaded" ? (
           <WorldRenderer
             layout={currentWorldState.layout}
             camera={camera}
@@ -455,7 +383,6 @@ export function SceneViewport({
             selectedElementId={selectedElementId}
             navigationDisabled={navigationDisabled || animating}
             onEnterScene={enterScene}
-            onPrefetchScene={prefetchScene}
             onSelectTopic={onSelectTopic}
           />
         ) : null}

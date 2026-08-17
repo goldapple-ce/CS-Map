@@ -18,12 +18,11 @@ import { useExplanationPanel } from "./hooks/use-explanation-panel"
 import { useReducedMotion } from "./hooks/use-reduced-motion"
 
 type ExplorerShellProps = {
-  sceneId?: string
-  routeNotFound: boolean
+  sceneId: string
 }
 
 /** Route와 World Viewport, Explanation Panel의 탐색 상태를 조립한다. */
-export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
+export function ExplorerShell({ sceneId }: ExplorerShellProps) {
   const panel = useExplanationPanel()
   const navigation = useSceneNavigation({ sceneId })
   const reducedMotion = useReducedMotion()
@@ -84,6 +83,7 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
             panelRef={panel.viewPortPanelRef}
             defaultSize="62%"
             minSize="36%"
+
             collapsible={panel.mode === "reading"}
             collapsedSize="0%"
           >
@@ -91,7 +91,6 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
               sceneId={sceneId}
               selectedSceneId={topicSelection?.sceneId}
               selectedElementId={topicSelection?.elementId}
-              routeNotFound={routeNotFound}
               navigationDisabled={navigation.navigationDisabled}
               reducedMotion={reducedMotion}
               outlineTriggerRef={outlineTriggerRef}

@@ -45,7 +45,7 @@ type TopicExplanationState =
   | { status: "error"; selectionKey: string; message: string }
 
 type ExplanationPanelProps = {
-  sceneId?: string
+  sceneId: string
   title: string
   topicSelection?: TopicSelection
   readingMode: boolean

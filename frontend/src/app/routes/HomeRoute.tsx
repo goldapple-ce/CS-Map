@@ -29,13 +29,23 @@ const usageSteps = [
   },
 ]
 
+function requireRootRoute() {
+  const rootSceneId = contentRepository.getRootSceneId()
+  const route = contentRepository
+    .listRoutes()
+    .find(({ id }) => id === rootSceneId)
+
+  if (!route) {
+    throw new Error(`Root Scene Route is missing: ${rootSceneId}`)
+  }
+
+  return route
+}
+
 /** Root Scene 미리보기와 Explorer 진입 안내를 시작 화면에 표시한다. */
 export function HomeRoute() {
   const navigate = useNavigate()
-  const rootSceneId = contentRepository.getRootSceneId()
-  const rootRoute = contentRepository
-    .listRoutes()
-    .find(({ id }) => id === rootSceneId)
+  const rootRoute = requireRootRoute()
   const rootPath = rootRoute?.path ?? "/explore/google-com"
 
   /** 미리보기에서 선택한 Scene의 전체 Explorer 경로로 이동한다. */
@@ -95,7 +105,7 @@ export function HomeRoute() {
 
           <div className="mt-5 h-40 w-full overflow-hidden">
             <SceneViewport
-              sceneId={rootRoute?.id}
+              sceneId={rootRoute.id}
               routeNotFound={!rootRoute}
               navigationDisabled={false}
               reducedMotion

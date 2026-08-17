@@ -9,7 +9,7 @@ import { contentRepository } from "@/content/content-repository"
 import { useNavigate } from "react-router-dom"
 
 type UseSceneNavigationOptions = {
-  sceneId?: string
+  sceneId: string
 }
 
 const DEFAULT_CAMERA: CameraState = { centerX: 640, centerY: 360, scale: 1 }

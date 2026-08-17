@@ -19,20 +19,14 @@ describe("contentRepository", () => {
     await expect(
       contentRepository.loadTopicExplanation(contentData.rootSceneId, "https")
     ).resolves.toBeUndefined()
-    await expect(contentRepository.loadSceneMap("missing-scene")).rejects.toThrow(
-      "Unknown scene: missing-scene"
-    )
-    await expect(contentRepository.loadConcept("missing-concept")).rejects.toThrow(
-      "Unknown concept: missing-concept"
-    )
+    await expect(
+      contentRepository.loadSceneMap("missing-scene")
+    ).rejects.toThrow("Unknown scene: missing-scene")
+    await expect(
+      contentRepository.loadConcept("missing-concept")
+    ).rejects.toThrow("Unknown concept: missing-concept")
     await expect(
       contentRepository.loadTopicExplanation(contentData.rootSceneId, "missing")
-    ).rejects.toThrow(
-      "Unknown Topic missing in Scene google-search-root"
-    )
-  })
-
-  it("prefetch 호환 API는 eager data에서 아무 작업 없이 완료된다", async () => {
-    await expect(contentRepository.prefetchScene("missing-scene")).resolves.toBeUndefined()
+    ).rejects.toThrow("Unknown Topic missing in Scene google-search-root")
   })
 })

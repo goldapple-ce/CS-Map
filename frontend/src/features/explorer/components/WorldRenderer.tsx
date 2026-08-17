@@ -26,7 +26,7 @@ type WorldRendererProps = {
   selectedElementId?: string
   navigationDisabled: boolean
   onEnterScene: (sceneId: string, elementId: string) => void
-  onPrefetchScene: (sceneId: string) => void
+  // onPrefetchScene: (sceneId: string) => void
   onSelectTopic: (sceneId: string, elementId: string, label: string) => void
 }
 
@@ -61,7 +61,6 @@ export function WorldRenderer({
   selectedElementId,
   navigationDisabled,
   onEnterScene,
-  onPrefetchScene,
   onSelectTopic,
 }: WorldRendererProps) {
   const visibleBounds = visibleWorldBounds(camera, viewport)
@@ -181,7 +180,6 @@ export function WorldRenderer({
                     density={density}
                     navigationDisabled={navigationDisabled}
                     onEnterScene={onEnterScene}
-                    onPrefetchScene={onPrefetchScene}
                     onSelectTopic={(elementId, label) =>
                       onSelectTopic(scene.id, elementId, label)
                     }
