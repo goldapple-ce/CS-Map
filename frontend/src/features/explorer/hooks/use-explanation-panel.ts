@@ -5,7 +5,7 @@ export type PanelMode = "split" | "reading"
 
 /** Explorer의 분할 패널 상태와 사용자 명령을 관리한다. */
 export function useExplanationPanel() {
-  const mapPanelRef = usePanelRef()
+  const viewPortPanelRef = usePanelRef()
   const explanationPanelRef = usePanelRef()
 
   const lastExpandedSizeRef = useRef(38)
@@ -29,14 +29,14 @@ export function useExplanationPanel() {
   const toggleReadingMode = useCallback(() => {
     if (mode === "reading") {
       setMode("split")
-      mapPanelRef.current?.expand()
+      viewPortPanelRef.current?.expand()
       explanationPanelRef.current?.resize(`${lastExpandedSizeRef.current}%`)
       return
     }
     setMode("reading")
     explanationPanelRef.current?.expand()
-    requestAnimationFrame(() => mapPanelRef.current?.collapse())
-  }, [explanationPanelRef, mapPanelRef, mode])
+    requestAnimationFrame(() => viewPortPanelRef.current?.collapse())
+  }, [explanationPanelRef, viewPortPanelRef, mode])
 
   /** 패널 크기와 접힘 상태를 최신 값으로 유지한다. */
   const handleResize = useCallback(
@@ -52,7 +52,7 @@ export function useExplanationPanel() {
   )
 
   return {
-    mapPanelRef,
+    viewPortPanelRef,
     explanationPanelRef,
     collapsed,
     mode,

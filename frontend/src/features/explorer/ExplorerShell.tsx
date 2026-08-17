@@ -81,7 +81,7 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
         <ResizablePanelGroup orientation="horizontal">
           <ResizablePanel
             id="scene-viewport"
-            panelRef={panel.mapPanelRef}
+            panelRef={panel.viewPortPanelRef}
             defaultSize="62%"
             minSize="36%"
             collapsible={panel.mode === "reading"}
