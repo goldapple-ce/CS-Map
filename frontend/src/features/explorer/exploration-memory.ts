@@ -9,10 +9,6 @@ export type SceneNavigationRequest = {
 export type SceneSnapshot = {
   focusedElementId?: string
   camera: CameraState
-  // panelCollapsed: boolean
-  // panelMode: "split" | "reading"
-  // panelSize: number
-  explanationScrollTop: number
 }
 
 const snapshots = new Map<string, SceneSnapshot>()

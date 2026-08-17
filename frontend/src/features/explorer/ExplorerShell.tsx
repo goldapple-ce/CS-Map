@@ -15,7 +15,7 @@ import { SceneViewport } from "@/features/explorer/SceneViewport"
 import { TopicOutline } from "@/features/explorer/TopicOutline"
 import { useSceneNavigation } from "./hooks/use-scene-navigation"
 import { useExplanationPanel } from "./hooks/use-explanation-panel"
-import { useReducedMotion } from "./hooks/use-redue-motion"
+import { useReducedMotion } from "./hooks/use-reduced-motion"
 
 type ExplorerShellProps = {
   sceneId?: string
@@ -24,11 +24,8 @@ type ExplorerShellProps = {
 
 /** Route와 World Viewport, Explanation Panel의 탐색 상태를 조립한다. */
 export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
-  const panel = useExplanationPanel(sceneId)
-  const navigation = useSceneNavigation({
-    sceneId,
-    getExplanationScrollTop: panel.getScrollTop,
-  })
+  const panel = useExplanationPanel()
+  const navigation = useSceneNavigation({ sceneId })
   const reducedMotion = useReducedMotion()
 
   const outlineTriggerRef = useRef<HTMLButtonElement>(null)
@@ -133,8 +130,6 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
               title={explanationTitle}
               topicSelection={topicSelection}
               readingMode={panel.mode === "reading"}
-              restoreScrollTop={panel.restoreScrollTop}
-              onScrollTopChange={panel.handleScroll}
               onClearTopic={() => setTopicSelection(undefined)}
               onCollapse={panel.collapse}
               onToggleReadingMode={panel.toggleReadingMode}

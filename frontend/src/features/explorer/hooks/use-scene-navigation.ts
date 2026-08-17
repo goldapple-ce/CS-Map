@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom"
 
 type UseSceneNavigationOptions = {
   sceneId?: string
-  getExplanationScrollTop: () => number
 }
 
 const DEFAULT_CAMERA: CameraState = { centerX: 640, centerY: 360, scale: 1 }
@@ -22,10 +21,8 @@ function routeDepth(sceneId?: string) {
   return route?.path.split("/").filter(Boolean).length ?? 0
 }
 
-export function useSceneNavigation({
-  sceneId,
-  getExplanationScrollTop,
-}: UseSceneNavigationOptions) {
+/** Scene 이동과 Camera 스냅샷 및 복귀 포커스를 관리한다. */
+export function useSceneNavigation({ sceneId }: UseSceneNavigationOptions) {
   const navigate = useNavigate()
   const previousSceneIdRef = useRef(sceneId)
   const navigationLockedRef = useRef(false)
@@ -34,7 +31,7 @@ export function useSceneNavigation({
   const currentCameraRef = useRef(DEFAULT_CAMERA)
   const [navigationDisabled, setNavigationDisabled] = useState(false)
 
-  /** 떠나는 Scene의 Camera와 Panel 상태를 탐색 스냅샷에 저장한다. */
+  /** 떠나는 Scene의 Camera와 선택 Topic을 탐색 스냅샷에 저장한다. */
   const captureScene = useCallback(
     (
       targetSceneId: string | undefined,
@@ -45,10 +42,9 @@ export function useSceneNavigation({
       saveSceneSnapshot(targetSceneId, {
         focusedElementId,
         camera,
-        explanationScrollTop: getExplanationScrollTop(),
       })
     },
-    [getExplanationScrollTop]
+    []
   )
 
   useEffect(() => {

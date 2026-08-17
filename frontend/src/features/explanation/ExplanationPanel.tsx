@@ -49,8 +49,6 @@ type ExplanationPanelProps = {
   title: string
   topicSelection?: TopicSelection
   readingMode: boolean
-  restoreScrollTop: number
-  onScrollTopChange: (scrollTop: number) => void
   onClearTopic: () => void
   onCollapse: () => void
   onToggleReadingMode: () => void
@@ -62,8 +60,6 @@ export function ExplanationPanel({
   title,
   topicSelection,
   readingMode,
-  restoreScrollTop,
-  onScrollTopChange,
   onClearTopic,
   onCollapse,
   onToggleReadingMode,
@@ -72,7 +68,6 @@ export function ExplanationPanel({
     ? `${topicSelection.sceneId}:${topicSelection.elementId}`
     : undefined
   const scrollAreaRef = useRef<HTMLDivElement>(null)
-  const explanationScrollTopRef = useRef(restoreScrollTop)
   const [state, setState] = useState<ExplanationState>({ status: "idle" })
   const [topicExplanation, setTopicExplanation] =
     useState<TopicExplanationState>({ status: "idle" })
@@ -133,10 +128,6 @@ export function ExplanationPanel({
   }, [sceneId])
 
   useEffect(() => {
-    explanationScrollTopRef.current = restoreScrollTop
-  }, [restoreScrollTop, sceneId])
-
-  useEffect(() => {
     if (!topicSelection) return
     let active = true
     const selectionKey = `${topicSelection.sceneId}:${topicSelection.elementId}`
@@ -172,19 +163,8 @@ export function ExplanationPanel({
     )
     if (!viewport) return
 
-    viewport.scrollTop =
-      topicSelection || activeTab === "quiz"
-        ? 0
-        : explanationScrollTopRef.current
-    /** Scene 설명 탭의 스크롤 위치만 탐색 스냅샷에 반영한다. */
-    const handleScroll = () => {
-      if (topicSelection || activeTab !== "explanation") return
-      explanationScrollTopRef.current = viewport.scrollTop
-      onScrollTopChange(viewport.scrollTop)
-    }
-    viewport.addEventListener("scroll", handleScroll, { passive: true })
-    return () => viewport.removeEventListener("scroll", handleScroll)
-  }, [activeTab, onScrollTopChange, topicSelection, sceneId])
+    viewport.scrollTop = 0
+  }, [topicSelection, sceneId])
 
   const panelTitle = topicSelection?.label ?? title
   const currentState: ExplanationState =
