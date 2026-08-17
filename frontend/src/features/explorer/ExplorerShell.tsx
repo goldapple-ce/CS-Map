@@ -81,9 +81,9 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
       saveSceneSnapshot(targetSceneId, {
         focusedElementId,
         camera,
-        panelCollapsed: panelCollapsedRef.current,
-        panelMode: panelModeRef.current,
-        panelSize: panelSizeRef.current,
+        // panelCollapsed: panelCollapsedRef.current,
+        // panelMode: panelModeRef.current,
+        // panelSize: panelSizeRef.current,
         explanationScrollTop: explanationScrollTopRef.current,
       })
     },
@@ -91,34 +91,12 @@ export function ExplorerShell({ sceneId, routeNotFound }: ExplorerShellProps) {
   )
 
   /** 진입한 Scene의 저장된 Panel 상태와 크기를 복원한다. */
-  const restorePanel = useCallback(
-    (targetSceneId: string) => {
-      const snapshot = getSceneSnapshot(targetSceneId)
-      const restoredMode = snapshot?.panelMode ?? "split"
-      const restoredCollapsed = snapshot?.panelCollapsed ?? false
-      const restoredSize = snapshot?.panelSize ?? 38
-      panelModeRef.current = restoredMode
-      panelCollapsedRef.current = restoredCollapsed
-      panelSizeRef.current = restoredSize
-      explanationScrollTopRef.current = snapshot?.explanationScrollTop ?? 0
-      setPanelMode(restoredMode)
-      setPanelCollapsed(restoredCollapsed)
-      setRestoreScrollTop(snapshot?.explanationScrollTop ?? 0)
+  const restorePanel = useCallback((targetSceneId: string) => {
+    const scrollTop = getSceneSnapshot(targetSceneId)?.explanationScrollTop ?? 0
 
-      if (restoredMode === "reading") {
-        explanationPanelRef.current?.expand()
-        requestAnimationFrame(() => mapPanelRef.current?.collapse())
-      } else {
-        mapPanelRef.current?.expand()
-        if (restoredCollapsed) explanationPanelRef.current?.collapse()
-        else {
-          explanationPanelRef.current?.expand()
-          explanationPanelRef.current?.resize(`${restoredSize}%`)
-        }
-      }
-    },
-    [explanationPanelRef, mapPanelRef]
-  )
+    explanationScrollTopRef.current = scrollTop
+    setRestoreScrollTop(scrollTop)
+  }, [])
 
   useEffect(() => {
     const previousSceneId = previousSceneIdRef.current

@@ -9,9 +9,9 @@ export type SceneNavigationRequest = {
 export type SceneSnapshot = {
   focusedElementId?: string
   camera: CameraState
-  panelCollapsed: boolean
-  panelMode: "split" | "reading"
-  panelSize: number
+  // panelCollapsed: boolean
+  // panelMode: "split" | "reading"
+  // panelSize: number
   explanationScrollTop: number
 }
 
