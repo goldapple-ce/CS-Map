@@ -5,8 +5,8 @@ import { contentData } from "../../../src/content/generated/content-data"
 
 describe("contentRepository", () => {
   it("정적 Scene과 상세 콘텐츠를 기존 Promise API로 반환한다", async () => {
-    const scene = await contentRepository.getSceneMap(contentData.rootSceneId)
-    const detail = await contentRepository.loadScene(contentData.rootSceneId)
+    const scene = contentRepository.getSceneMap(contentData.rootSceneId)
+    const detail = contentRepository.getScene(contentData.rootSceneId)
 
     expect(scene).toBe(contentData.scenes[contentData.rootSceneId].scene)
     expect(detail).toEqual({
@@ -17,16 +17,16 @@ describe("contentRepository", () => {
 
   it("Topic 설명 없음과 unknown 콘텐츠 오류 계약을 유지한다", async () => {
     await expect(
-      contentRepository.loadTopicExplanation(contentData.rootSceneId, "https")
+      contentRepository.getTopicExplanation(contentData.rootSceneId, "https")
     ).resolves.toBeUndefined()
     await expect(
       contentRepository.getSceneMap("missing-scene")
     ).rejects.toThrow("Unknown scene: missing-scene")
     await expect(
-      contentRepository.loadConcept("missing-concept")
+      contentRepository.getConcept("missing-concept")
     ).rejects.toThrow("Unknown concept: missing-concept")
     await expect(
-      contentRepository.loadTopicExplanation(contentData.rootSceneId, "missing")
+      contentRepository.getTopicExplanation(contentData.rootSceneId, "missing")
     ).rejects.toThrow("Unknown Topic missing in Scene google-search-root")
   })
 })

@@ -1,4 +1,4 @@
-import { useEffect, type RefObject } from "react"
+import { type RefObject } from "react"
 import { ListTree } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -23,7 +23,6 @@ type SceneViewportProps = {
   onOpenOutline?: () => void
   onEnterScene: (request: SceneNavigationRequest) => void
   onSelectTopic: (sceneId: string, elementId: string, label: string) => void
-  onSceneReady: (sceneId: string, title: string) => void
   onCameraChange: (camera: CameraState) => void
   onAnimationChange: (animating: boolean) => void
 }
@@ -40,7 +39,6 @@ export function SceneViewport({
   onOpenOutline,
   onEnterScene,
   onSelectTopic,
-  onSceneReady,
   onCameraChange,
   onAnimationChange,
 }: SceneViewportProps) {
@@ -88,12 +86,6 @@ export function SceneViewport({
       camera: cameraState,
     })
   }
-
-  useEffect(() => {
-    if (!focusedScene) return
-
-    onSceneReady(sceneId, focusedScene.title)
-  }, [focusedScene, onSceneReady, sceneId])
 
   return (
     <section

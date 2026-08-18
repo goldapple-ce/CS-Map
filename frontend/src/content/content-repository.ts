@@ -1,5 +1,4 @@
 import { contentData } from "@/content/generated/content-data"
-import type { LoadedConcept, LoadedScene } from "@/content/repository"
 import type { RouteIndexEntry } from "@shared/content/generated-contract"
 import type { ContentId, Scene } from "@shared/content/types"
 
@@ -32,27 +31,25 @@ export const contentRepository = {
     return sceneContent(id).scene
   },
 
-  /** Scene 지도와 Markdown을 기존 Promise 계약으로 반환한다. */
-  async loadScene(id: ContentId): Promise<LoadedScene> {
+  /** Scene 지도와 Markdown을 반환한다. */
+  getScene(id: ContentId) {
     const { scene, markdown } = sceneContent(id)
     return { scene, markdown }
   },
 
-  /** Topic의 최종 설명을 반환하고 알 수 없는 Topic을 거부한다. */
-  async loadTopicExplanation(
-    sceneId: ContentId,
-    elementId: ContentId
-  ): Promise<string | undefined> {
+  /** Topic의 최종 설명을 반환한다. */
+  getTopicExplanation(sceneId: ContentId, elementId: ContentId) {
     const content = sceneContent(sceneId)
     const element = content.scene.elements.find((item) => item.id === elementId)
-    if (!element || element.kind !== "node") {
+
+    if (!element || element.kind !== "node")
       throw new Error(`Unknown Topic ${elementId} in Scene ${sceneId}`)
-    }
+
     return content.topicExplanations[elementId]
   },
 
-  /** Concept와 Markdown을 반환하고 unknown ID를 거부한다. */
-  async loadConcept(id: ContentId): Promise<LoadedConcept> {
+  /** Concept와 Markdown을 반환한다. */
+  getConcept(id: ContentId) {
     const content = contentData.concepts[id]
     if (!content) throw new Error(`Unknown concept: ${id}`)
     return content

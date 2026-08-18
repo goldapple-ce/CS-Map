@@ -15,7 +15,7 @@ import { SceneViewport } from "@/features/explorer/SceneViewport"
 import { TopicOutline } from "@/features/explorer/TopicOutline"
 import { useSceneNavigation } from "./hooks/use-scene-navigation"
 import { useExplanationPanel } from "./hooks/use-explanation-panel"
-import { useReducedMotion } from "./hooks/use-reduced-motion"
+import { useReducedMotion } from "./hooks/use-reduce-motion"
 
 type ExplorerShellProps = {
   sceneId: string
@@ -29,7 +29,6 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
 
   const outlineTriggerRef = useRef<HTMLButtonElement>(null)
 
-  const [explanationTitle, setExplanationTitle] = useState("google.com 접속")
   const [topicSelection, setTopicSelection] = useState<TopicSelection>()
   const [outlineOpen, setOutlineOpen] = useState(false)
 
@@ -43,11 +42,6 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
     setOutlineOpen(false)
     navigation.selectScene(targetSceneId)
   }
-
-  /** 준비된 Scene 제목을 Explanation Panel 제목에 반영한다. */
-  const handleSceneReady = useCallback((_: string, title: string) => {
-    setExplanationTitle(title)
-  }, [])
 
   /** 선택한 Topic 설명을 열고 접혀 있던 Panel을 펼친다. */
   const selectTopic = useCallback(
@@ -97,7 +91,6 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
               onOpenOutline={() => setOutlineOpen(true)}
               onEnterScene={navigation.enterScene}
               onSelectTopic={selectTopic}
-              onSceneReady={handleSceneReady}
               onCameraChange={navigation.handleCameraChange}
               onAnimationChange={navigation.handleAnimationChange}
             />
@@ -126,7 +119,6 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
           >
             <ExplanationPanel
               sceneId={sceneId}
-              title={explanationTitle}
               topicSelection={topicSelection}
               readingMode={panel.mode === "reading"}
               onClearTopic={() => setTopicSelection(undefined)}

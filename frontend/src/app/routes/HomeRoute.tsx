@@ -111,7 +111,6 @@ export function HomeRoute() {
               presentation="embedded"
               onEnterScene={enterScene}
               onSelectTopic={() => navigate(rootPath)}
-              onSceneReady={() => undefined}
               onCameraChange={() => undefined}
               onAnimationChange={() => undefined}
             />
