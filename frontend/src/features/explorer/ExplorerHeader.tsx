@@ -1,4 +1,4 @@
-import { ArrowLeft, House, PanelRightOpen } from "lucide-react"
+import { House, PanelRightOpen } from "lucide-react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
@@ -16,16 +16,12 @@ const knownLabels: Record<string, string> = {
 
 type ExplorerHeaderProps = {
   panelCollapsed: boolean
-  navigationDisabled: boolean
-  onBack: () => void
   onOpenPanel: () => void
 }
 
 /** Explorer의 뒤로 가기, 홈 이동, 현재 경로와 패널 열기 동작을 표시한다. */
 export function ExplorerHeader({
   panelCollapsed,
-  navigationDisabled,
-  onBack,
   onOpenPanel,
 }: ExplorerHeaderProps) {
   const location = useLocation()
@@ -35,16 +31,6 @@ export function ExplorerHeader({
   return (
     <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border bg-background px-4">
       <div className="flex items-center gap-1">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label="이전 장면으로 돌아가기"
-          disabled={navigationDisabled}
-          onClick={onBack}
-        >
-          <ArrowLeft aria-hidden="true" />
-        </Button>
         <Button
           type="button"
           variant="ghost"

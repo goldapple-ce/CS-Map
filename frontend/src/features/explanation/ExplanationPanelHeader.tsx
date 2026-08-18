@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { BookOpen, Columns2, PanelRightClose } from "lucide-react"
+import { Maximize2, Minimize2, PanelRightClose } from "lucide-react"
 
 type ExplanationHeaderProps = {
   title: string
@@ -24,7 +24,7 @@ export function ExplanationHeader({
   }[kind]
 
   return (
-    <div className="flex shrink-0 items-start gap-3 border-b border-border px-5 py-4">
+    <div className="flex shrink-0 items-start gap-3 border-b border-border px-5 py-3">
       <div className="min-w-0 flex-1">
         <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
           {label}
@@ -41,22 +41,20 @@ export function ExplanationHeader({
         onClick={onToggleReadingMode}
       >
         {readingMode ? (
-          <Columns2 aria-hidden="true" />
+          <Minimize2 aria-hidden="true" />
         ) : (
-          <BookOpen aria-hidden="true" />
+          <Maximize2 aria-hidden="true" />
         )}
       </Button>
-      {!readingMode ? (
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label="설명 패널 접기"
-          onClick={onCollapse}
-        >
-          <PanelRightClose aria-hidden="true" />
-        </Button>
-      ) : null}
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label="설명 패널 접기"
+        onClick={onCollapse}
+      >
+        <PanelRightClose aria-hidden="true" />
+      </Button>
     </div>
   )
 }

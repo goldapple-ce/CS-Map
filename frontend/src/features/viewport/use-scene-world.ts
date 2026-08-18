@@ -1,5 +1,5 @@
 import { contentRepository } from "@/content/content-repository"
-import { createWorldLayout } from "../layout/world-layout"
+import { createWorldLayout } from "../explorer/layout/world-layout"
 import { useMemo } from "react"
 import type { RouteIndexEntry } from "@shared/content/generated-contract"
 

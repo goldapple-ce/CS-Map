@@ -5,9 +5,9 @@ import {
   cameraForWidth,
   type CameraState,
   type ViewportSize,
-} from "../camera"
-import type { PositionedScene } from "../layout/world-layout"
-import { getSceneSnapshot } from "../exploration-memory"
+} from "../explorer/camera"
+import type { PositionedScene } from "../explorer/layout/world-layout"
+import { getSceneSnapshot } from "../explorer/exploration-memory"
 
 type UseViewportCameraOptions = {
   sceneId: string

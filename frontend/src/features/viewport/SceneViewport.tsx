@@ -8,9 +8,10 @@ import {
   type CameraState,
 } from "@/features/explorer/camera"
 import { type SceneNavigationRequest } from "@/features/explorer/exploration-memory"
-import { useSceneWorld } from "./hooks/use-scene-world"
-import { useViewportCamera } from "./hooks/use-viewport-camera"
-import { WorldRenderer } from "./components/WorldRenderer"
+import { useSceneWorld } from "./use-scene-world"
+import { useViewportCamera } from "./use-viewport-camera"
+import { WorldRenderer } from "../explorer/components/WorldRenderer"
+import { SceneViewportHeader } from "./SceneViewportHeader"
 
 type SceneViewportProps = {
   sceneId: string
@@ -44,6 +45,7 @@ export function SceneViewport({
 }: SceneViewportProps) {
   const world = useSceneWorld(sceneId)
   const positionedScene = world.layout.scenes.get(world.focusedSceneId)
+  const focusedScene = positionedScene?.scene
   const embedded = presentation === "embedded"
 
   const {
@@ -61,7 +63,6 @@ export function SceneViewport({
     onAnimationChange,
   })
 
-  const focusedScene = positionedScene?.scene
   const rootPositioned = world.layout.scenes.get(world.layout.rootSceneId)
   const rootCamera = rootPositioned
     ? rootPositioned.scene.layout?.type === "grid"
@@ -105,7 +106,7 @@ export function SceneViewport({
       >
         {announcement}
       </p>
-      <SceneViewportHeading
+      <SceneViewportHeader
         embedded={embedded}
         title={sceneTitle}
         relativeZoom={relativeZoom}
@@ -144,47 +145,5 @@ export function SceneViewport({
         />
       </div>
     </section>
-  )
-}
-
-/** 표시 방식에 맞는 Scene 제목과 확대 비율을 렌더링한다. */
-function SceneViewportHeading({
-  embedded,
-  title,
-  relativeZoom,
-  showZoom,
-}: {
-  embedded: boolean
-  title: string
-  relativeZoom: number
-  showZoom: boolean
-}) {
-  if (embedded) {
-    return (
-      <h2 id="scene-title" className="sr-only">
-        {title}
-      </h2>
-    )
-  }
-
-  return (
-    <div className="flex items-center justify-between border-b border-border px-5 py-3">
-      <div>
-        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-          World viewport
-        </p>
-        <h1
-          id="scene-title"
-          tabIndex={-1}
-          className="text-lg font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
-          {title}
-        </h1>
-      </div>
-
-      {showZoom ? (
-        <p className="text-xs text-muted-foreground">{relativeZoom}%</p>
-      ) : null}
-    </div>
   )
 }

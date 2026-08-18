@@ -11,7 +11,7 @@ import {
   type TopicSelection,
 } from "@/features/explanation/ExplanationPanel"
 import { ExplorerHeader } from "@/features/explorer/ExplorerHeader"
-import { SceneViewport } from "@/features/explorer/SceneViewport"
+import { SceneViewport } from "@/features/viewport/SceneViewport"
 import { TopicOutline } from "@/features/explorer/TopicOutline"
 import { useSceneNavigation } from "./hooks/use-scene-navigation"
 import { useExplanationPanel } from "./hooks/use-explanation-panel"
@@ -55,8 +55,6 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
     <div className="flex h-svh min-h-0 flex-col overflow-hidden bg-background text-foreground">
       <ExplorerHeader
         panelCollapsed={panel.collapsed}
-        navigationDisabled={navigation.navigationDisabled}
-        onBack={navigation.goBack}
         onOpenPanel={panel.open}
       />
 

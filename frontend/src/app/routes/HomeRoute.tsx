@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { contentRepository } from "@/content/content-repository"
 import type { SceneNavigationRequest } from "@/features/explorer/exploration-memory"
-import { SceneViewport } from "@/features/explorer/SceneViewport"
+import { SceneViewport } from "@/features/viewport/SceneViewport"
 
 const usageSteps = [
   {
