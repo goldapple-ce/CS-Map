@@ -1,12 +1,7 @@
 import { contentRepository } from "@/content/content-repository"
-import { createWorldLayout, type WorldLayout } from "../layout/world-layout"
-import { useEffect, useState } from "react"
+import { createWorldLayout } from "../layout/world-layout"
+import { useMemo } from "react"
 import type { RouteIndexEntry } from "@shared/content/generated-contract"
-
-type WorldLoadState =
-  | { status: "loading" }
-  | { status: "loaded"; focusedSceneId: string; layout: WorldLayout }
-  | { status: "error"; focusedSceneId: string; message: string }
 
 /** Root부터 대상 Scene까지 검증된 Route ID 경로를 만든다. */
 function scenePathIds(
@@ -48,50 +43,20 @@ function scenePathIds(
 
 /** Root부터 현재 Scene까지의 WorldLayout을 구성한다. */
 export function useSceneWorld(sceneId: string) {
-  const rootSceneId = contentRepository.getRootSceneId()
-  const [state, setState] = useState<WorldLoadState>({
-    status: "loading",
-  })
+  return useMemo(() => {
+    const rootSceneId = contentRepository.getRootSceneId()
 
-  useEffect(() => {
-    let active = true
-    const routes = contentRepository.listRoutes()
-    Promise.resolve()
-      .then(() => scenePathIds(sceneId, routes, rootSceneId))
-      .then((pathIds) =>
-        Promise.all(pathIds.map((id) => contentRepository.loadSceneMap(id)))
-      )
-      .then((loaded) => {
-        if (!active) return
-        setState({
-          status: "loaded",
-          focusedSceneId: sceneId,
-          layout: createWorldLayout(loaded, rootSceneId),
-        })
-      })
-      .catch((error: unknown) => {
-        if (!active) return
-        setState({
-          status: "error",
-          focusedSceneId: sceneId,
-          message:
-            error instanceof Error
-              ? error.message
-              : "지식 공간을 불러오지 못했습니다.",
-        })
-      })
-    return () => {
-      active = false
+    const pathIds = scenePathIds(
+      sceneId,
+      contentRepository.listRoutes(),
+      rootSceneId
+    )
+
+    const scenes = pathIds.map((id) => contentRepository.getSceneMap(id))
+
+    return {
+      focusedSceneId: sceneId,
+      layout: createWorldLayout(scenes, rootSceneId),
     }
-  }, [rootSceneId, sceneId])
-
-  const currentState: WorldLoadState =
-    state.status !== "loading" && state.focusedSceneId === sceneId
-      ? state
-      : { status: "loading" as const }
-
-  return {
-    rootSceneId,
-    state: currentState,
-  }
+  }, [sceneId])
 }

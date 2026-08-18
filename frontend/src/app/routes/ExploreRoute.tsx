@@ -10,5 +10,5 @@ export function ExploreRoute() {
   const route = contentRepository.findRoute(location.pathname)
 
   if (!route) return <NotFoundRoute />
-  return <ExplorerShell sceneId={route.id} routeNotFound={!route} />
+  return <ExplorerShell sceneId={route.id} />
 }

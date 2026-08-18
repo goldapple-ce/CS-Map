@@ -106,7 +106,6 @@ export function HomeRoute() {
           <div className="mt-5 h-40 w-full overflow-hidden">
             <SceneViewport
               sceneId={rootRoute.id}
-              routeNotFound={!rootRoute}
               navigationDisabled={false}
               reducedMotion
               presentation="embedded"

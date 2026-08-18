@@ -5,7 +5,7 @@ import { contentData } from "../../../src/content/generated/content-data"
 
 describe("contentRepository", () => {
   it("정적 Scene과 상세 콘텐츠를 기존 Promise API로 반환한다", async () => {
-    const scene = await contentRepository.loadSceneMap(contentData.rootSceneId)
+    const scene = await contentRepository.getSceneMap(contentData.rootSceneId)
     const detail = await contentRepository.loadScene(contentData.rootSceneId)
 
     expect(scene).toBe(contentData.scenes[contentData.rootSceneId].scene)
@@ -20,7 +20,7 @@ describe("contentRepository", () => {
       contentRepository.loadTopicExplanation(contentData.rootSceneId, "https")
     ).resolves.toBeUndefined()
     await expect(
-      contentRepository.loadSceneMap("missing-scene")
+      contentRepository.getSceneMap("missing-scene")
     ).rejects.toThrow("Unknown scene: missing-scene")
     await expect(
       contentRepository.loadConcept("missing-concept")

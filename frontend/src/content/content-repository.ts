@@ -27,8 +27,8 @@ export const contentRepository = {
     return contentData.routes.find((route) => route.path === path)
   },
 
-  /** Scene 지도 모델을 기존 Promise 계약으로 반환한다. */
-  async loadSceneMap(id: ContentId): Promise<Scene> {
+  /** Scene ID에 대응하는 지도 모델을 반환한다. */
+  getSceneMap(id: ContentId): Scene {
     return sceneContent(id).scene
   },
 
