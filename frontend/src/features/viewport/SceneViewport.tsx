@@ -106,12 +106,7 @@ export function SceneViewport({
       >
         {announcement}
       </p>
-      <SceneViewportHeader
-        embedded={embedded}
-        title={sceneTitle}
-        relativeZoom={relativeZoom}
-        showZoom={Boolean(focusedScene)}
-      />
+      <SceneViewportHeader title={sceneTitle} relativeZoom={relativeZoom} />
 
       <div
         ref={viewportRef}

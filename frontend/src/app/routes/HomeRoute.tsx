@@ -103,7 +103,7 @@ export function HomeRoute() {
             </Button>
           </div>
 
-          <div className="mt-5 h-40 w-full overflow-hidden">
+          <div className="mt-5 w-full overflow-hidden">
             <SceneViewport
               sceneId={rootRoute.id}
               navigationDisabled={false}

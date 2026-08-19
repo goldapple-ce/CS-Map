@@ -16,6 +16,7 @@ import { TopicOutline } from "@/features/explorer/TopicOutline"
 import { useSceneNavigation } from "./hooks/use-scene-navigation"
 import { useExplanationPanel } from "./hooks/use-explanation-panel"
 import { useReducedMotion } from "./hooks/use-reduce-motion"
+import { ExplorerPanelControls } from "./ExplorePanelControls"
 
 type ExplorerShellProps = {
   sceneId: string
@@ -53,10 +54,7 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
 
   return (
     <div className="flex h-svh min-h-0 flex-col overflow-hidden bg-background text-foreground">
-      <ExplorerHeader
-        panelCollapsed={panel.collapsed}
-        onOpenPanel={panel.open}
-      />
+      <ExplorerHeader />
 
       <TopicOutline
         open={outlineOpen}
@@ -69,13 +67,18 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
       />
 
       <main className="min-h-0 flex-1">
+        <ExplorerPanelControls
+          collapsed={panel.collapsed}
+          readingMode={panel.mode === "reading"}
+          onToggleVisibility={panel.toggleVisibility}
+          onToggleReadingMode={panel.toggleReadingMode}
+        />
         <ResizablePanelGroup orientation="horizontal">
           <ResizablePanel
             id="scene-viewport"
-            panelRef={panel.viewPortPanelRef}
+            panelRef={panel.viewportPanelRef}
             defaultSize="62%"
             minSize="36%"
-
             collapsible={panel.mode === "reading"}
             collapsedSize="0%"
           >
@@ -118,10 +121,7 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
             <ExplanationPanel
               sceneId={sceneId}
               topicSelection={topicSelection}
-              readingMode={panel.mode === "reading"}
               onClearTopic={() => setTopicSelection(undefined)}
-              onCollapse={panel.collapse}
-              onToggleReadingMode={panel.toggleReadingMode}
             />
           </ResizablePanel>
         </ResizablePanelGroup>

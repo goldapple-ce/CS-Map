@@ -18,20 +18,14 @@ export type TopicSelection = {
 type ExplanationPanelProps = {
   sceneId: string
   topicSelection?: TopicSelection
-  readingMode: boolean
   onClearTopic: () => void
-  onCollapse: () => void
-  onToggleReadingMode: () => void
 }
 
 /** 선택된 Scene 또는 Topic의 설명과 퀴즈를 패널에 표시한다. */
 export function ExplanationPanel({
   sceneId,
   topicSelection,
-  readingMode,
   onClearTopic,
-  onCollapse,
-  onToggleReadingMode,
 }: ExplanationPanelProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null)
 
@@ -92,9 +86,6 @@ export function ExplanationPanel({
       <ExplanationHeader
         title={panelTitle}
         kind={topicSelection ? "topic" : activeTab}
-        readingMode={readingMode}
-        onCollapse={onCollapse}
-        onToggleReadingMode={onToggleReadingMode}
       />
       <Tabs
         value={topicSelection ? "explanation" : activeTab}
