@@ -16,7 +16,6 @@ type SceneViewportProps = {
   selectedElementId?: string
   navigationDisabled: boolean
   reducedMotion: boolean
-  presentation?: "explorer" | "embedded"
   onEnterScene: (request: SceneNavigationRequest) => void
   onSelectTopic: (sceneId: string, elementId: string, label: string) => void
   onCameraChange: (camera: CameraState) => void
@@ -30,7 +29,6 @@ export function SceneViewport({
   selectedElementId,
   navigationDisabled,
   reducedMotion,
-  presentation = "explorer",
   onEnterScene,
   onSelectTopic,
   onCameraChange,
@@ -39,7 +37,7 @@ export function SceneViewport({
   const world = useSceneWorld(sceneId)
   const positionedScene = world.layout.scenes.get(world.focusedSceneId)
   const focusedScene = positionedScene?.scene
-  const embedded = presentation === "embedded"
+  // const embedded = presentation === "embedded"
 
   const {
     viewportRef,
@@ -49,7 +47,6 @@ export function SceneViewport({
   } = useViewportCamera({
     sceneId,
     positionedScene,
-    embedded,
     reducedMotion,
     onCameraChange,
     onAnimationChange,
@@ -84,11 +81,7 @@ export function SceneViewport({
     <section
       aria-labelledby="scene-title"
       aria-busy={animating}
-      className={
-        embedded
-          ? "flex size-full min-h-0 flex-col"
-          : "flex size-full min-h-0 flex-col bg-muted/20"
-      }
+      className="flex size-full min-h-0 flex-col bg-muted/20"
     >
       <SceneViewportHeader title={sceneTitle} relativeZoom={relativeZoom} />
 

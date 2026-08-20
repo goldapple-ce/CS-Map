@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import {
   cameraForBounds,
   cameraForGridScene,
-  cameraForWidth,
   type CameraState,
   type ViewportSize,
 } from "../explorer/camera"
@@ -12,7 +11,6 @@ import { getSceneSnapshot } from "../explorer/exploration-memory"
 type UseViewportCameraOptions = {
   sceneId: string
   positionedScene?: PositionedScene
-  embedded: boolean
   reducedMotion: boolean
   onCameraChange: (camera: CameraState) => void
   onAnimationChange: (animating: boolean) => void
@@ -24,7 +22,6 @@ const DEFAULT_CAMERA: CameraState = { centerX: 640, centerY: 360, scale: 1 }
 export function useViewportCamera({
   sceneId,
   positionedScene,
-  embedded,
   reducedMotion,
   onCameraChange,
   onAnimationChange,
@@ -126,22 +123,19 @@ export function useViewportCamera({
 
   useEffect(() => {
     if (!positionedScene || viewport.width <= 1 || viewport.height <= 1) return
-    const savedCamera = embedded ? undefined : getSceneSnapshot(sceneId)?.camera
+    const savedCamera = getSceneSnapshot(sceneId)?.camera
     const target =
-      savedCamera ??
-      (embedded
-        ? cameraForWidth(positionedScene.bounds, viewport)
-        : positionedScene.scene.layout?.type === "grid"
-          ? cameraForGridScene(
-              positionedScene.bounds,
-              positionedScene.scale,
-              viewport
-            )
-          : cameraForBounds(positionedScene.bounds, viewport))
+      (savedCamera ?? positionedScene.scene.layout?.type === "grid")
+        ? cameraForGridScene(
+            positionedScene.bounds,
+            positionedScene.scale,
+            viewport
+          )
+        : cameraForBounds(positionedScene.bounds, viewport)
     pendingAnnouncementRef.current = `${positionedScene.scene.title} Topic으로 이동했습니다.`
     animateCamera(target, !initializedRef.current)
     initializedRef.current = true
-  }, [animateCamera, embedded, positionedScene, sceneId, viewport])
+  }, [animateCamera, positionedScene, sceneId, viewport])
 
   /** animation frame cleanup */
   useEffect(

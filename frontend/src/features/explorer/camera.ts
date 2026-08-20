@@ -49,18 +49,6 @@ export function cameraForGridScene(
   }
 }
 
-/** Bounds 너비가 Viewport 너비에 맞도록 Camera를 계산한다. */
-export function cameraForWidth(
-  bounds: WorldBounds,
-  viewport: ViewportSize
-): CameraState {
-  return {
-    centerX: bounds.x + bounds.width / 2,
-    centerY: bounds.y + bounds.height / 2,
-    scale: viewport.width / Math.max(bounds.width, 0.0001),
-  }
-}
-
 /** Camera와 overscan으로 현재 렌더링할 World Bounds를 계산한다. */
 export function visibleWorldBounds(
   camera: CameraState,
