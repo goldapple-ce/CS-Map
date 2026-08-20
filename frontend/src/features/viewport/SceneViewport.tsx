@@ -1,5 +1,3 @@
-import { type RefObject } from "react"
-
 import {
   cameraForBounds,
   cameraForGridScene,
@@ -18,9 +16,7 @@ type SceneViewportProps = {
   selectedElementId?: string
   navigationDisabled: boolean
   reducedMotion: boolean
-  outlineTriggerRef?: RefObject<HTMLButtonElement | null>
   presentation?: "explorer" | "embedded"
-  onOpenOutline?: () => void
   onEnterScene: (request: SceneNavigationRequest) => void
   onSelectTopic: (sceneId: string, elementId: string, label: string) => void
   onCameraChange: (camera: CameraState) => void

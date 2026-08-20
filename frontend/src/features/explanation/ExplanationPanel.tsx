@@ -99,11 +99,11 @@ export function ExplanationPanel({
         {!topicSelection ? (
           <div className="shrink-0 border-b border-border px-5 py-2.5">
             <TabsList aria-label="Topic 콘텐츠">
-              <TabsTrigger value="explanation">
+              <TabsTrigger className="gap-2" value="explanation">
                 <BookOpenText aria-hidden="true" />
                 설명
               </TabsTrigger>
-              <TabsTrigger value="quiz">
+              <TabsTrigger className="gap-2" value="quiz">
                 <ListChecks aria-hidden="true" />
                 퀴즈
               </TabsTrigger>

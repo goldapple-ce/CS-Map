@@ -1,17 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { contentRepository } from "@/content/content-repository"
 import {
   ExplanationPanel,
   type TopicSelection,
 } from "@/features/explanation/ExplanationPanel"
 import { SceneViewport } from "@/features/viewport/SceneViewport"
-import { TopicOutline } from "@/features/explorer/TopicOutline"
 import { useSceneNavigation } from "./hooks/use-scene-navigation"
 import { useExplanationPanel } from "./hooks/use-explanation-panel"
 import { useReducedMotion } from "./hooks/use-reduce-motion"
@@ -27,21 +25,13 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
   const navigation = useSceneNavigation({ sceneId })
   const reducedMotion = useReducedMotion()
 
-  const outlineTriggerRef = useRef<HTMLButtonElement>(null)
-
   const [topicSelection, setTopicSelection] = useState<TopicSelection>()
-  const [outlineOpen, setOutlineOpen] = useState(false)
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setTopicSelection(undefined))
 
     return () => cancelAnimationFrame(frame)
   }, [sceneId])
-
-  const selectOutlineScene = (targetSceneId: string) => {
-    setOutlineOpen(false)
-    navigation.selectScene(targetSceneId)
-  }
 
   /** 선택한 Topic 설명을 열고 접혀 있던 Panel을 펼친다. */
   const selectTopic = useCallback(
@@ -51,17 +41,7 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
     []
   )
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-background text-foreground">
-      <TopicOutline
-        open={outlineOpen}
-        routes={contentRepository.listRoutes()}
-        currentSceneId={sceneId}
-        navigationDisabled={navigation.navigationDisabled}
-        triggerRef={outlineTriggerRef}
-        onOpenChange={setOutlineOpen}
-        onSelectScene={selectOutlineScene}
-      />
-
+    <div className="flex h-full flex-col overflow-hidden">
       <main className="relative min-h-0 flex-1">
         <div className="absolute top-4.5 right-3 z-30 flex items-center gap-1">
           <ExplorerPanelControls
@@ -86,8 +66,6 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
               selectedElementId={topicSelection?.elementId}
               navigationDisabled={navigation.navigationDisabled}
               reducedMotion={reducedMotion}
-              outlineTriggerRef={outlineTriggerRef}
-              onOpenOutline={() => setOutlineOpen(true)}
               onEnterScene={navigation.enterScene}
               onSelectTopic={selectTopic}
               onCameraChange={navigation.handleCameraChange}

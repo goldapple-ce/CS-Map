@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom"
-import { Moon, Search, Sun } from "lucide-react"
+import { Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Search } from "@/features/search/Search"
 
 import {
   ThemeAnimationType,
@@ -31,7 +32,7 @@ export function AppHeader() {
   }
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4">
+    <header className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
       <Button
         className="text-lg"
         variant="ghost"
@@ -41,9 +42,7 @@ export function AppHeader() {
         CS-MAP
       </Button>
 
-      <Button variant="ghost" size="icon" aria-label="검색">
-        <Search />
-      </Button>
+      <Search />
       <Button
         ref={ref}
         variant="ghost"
