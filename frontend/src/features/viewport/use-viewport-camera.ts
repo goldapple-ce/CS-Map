@@ -42,7 +42,6 @@ export function useViewportCamera({
   const [camera, setCamera] = useState(DEFAULT_CAMERA)
 
   const [animating, setAnimating] = useState(false)
-  const [announcement, setAnnouncement] = useState("")
 
   useEffect(() => {
     const element = viewportRef.current
@@ -77,7 +76,6 @@ export function useViewportCamera({
         updateCamera(target)
         setAnimating(false)
         if (pendingAnnouncementRef.current) {
-          setAnnouncement(pendingAnnouncementRef.current)
           pendingAnnouncementRef.current = undefined
         }
         onAnimationChange(false)
@@ -116,7 +114,6 @@ export function useViewportCamera({
           animationFrameRef.current = undefined
           setAnimating(false)
           if (pendingAnnouncementRef.current) {
-            setAnnouncement(pendingAnnouncementRef.current)
             pendingAnnouncementRef.current = undefined
           }
           onAnimationChange(false)
@@ -160,6 +157,5 @@ export function useViewportCamera({
     viewport,
     camera,
     animating,
-    announcement,
   }
 }

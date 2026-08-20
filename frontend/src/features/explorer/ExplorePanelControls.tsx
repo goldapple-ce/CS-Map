@@ -21,7 +21,7 @@ export function ExplorerPanelControls({
   onToggleReadingMode,
 }: ExplorerPanelControlsProps) {
   return (
-    <div className="absolute top-18.5 right-3 z-30 flex items-center gap-1">
+    <div>
       {!collapsed ? (
         <Button
           type="button"

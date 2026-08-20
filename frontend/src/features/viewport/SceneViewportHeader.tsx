@@ -8,7 +8,7 @@ export function SceneViewportHeader({
 }) {
   return (
     <div className="flex items-center justify-between border-b border-border px-5 py-3">
-      <div>
+      <div className="flex min-w-0 flex-col">
         <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
           World viewport
         </p>

@@ -10,7 +10,6 @@ import {
   ExplanationPanel,
   type TopicSelection,
 } from "@/features/explanation/ExplanationPanel"
-import { ExplorerHeader } from "@/features/explorer/ExplorerHeader"
 import { SceneViewport } from "@/features/viewport/SceneViewport"
 import { TopicOutline } from "@/features/explorer/TopicOutline"
 import { useSceneNavigation } from "./hooks/use-scene-navigation"
@@ -51,11 +50,8 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
     },
     []
   )
-
   return (
-    <div className="flex h-svh min-h-0 flex-col overflow-hidden bg-background text-foreground">
-      <ExplorerHeader />
-
+    <div className="flex h-full flex-col overflow-hidden bg-background text-foreground">
       <TopicOutline
         open={outlineOpen}
         routes={contentRepository.listRoutes()}
@@ -66,13 +62,15 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
         onSelectScene={selectOutlineScene}
       />
 
-      <main className="min-h-0 flex-1">
-        <ExplorerPanelControls
-          collapsed={panel.collapsed}
-          readingMode={panel.mode === "reading"}
-          onToggleVisibility={panel.toggleVisibility}
-          onToggleReadingMode={panel.toggleReadingMode}
-        />
+      <main className="relative min-h-0 flex-1">
+        <div className="absolute top-4.5 right-3 z-30 flex items-center gap-1">
+          <ExplorerPanelControls
+            collapsed={panel.collapsed}
+            readingMode={panel.mode === "reading"}
+            onToggleVisibility={panel.toggleVisibility}
+            onToggleReadingMode={panel.toggleReadingMode}
+          />
+        </div>
         <ResizablePanelGroup orientation="horizontal">
           <ResizablePanel
             id="scene-viewport"

@@ -1,7 +1,5 @@
 import { type RefObject } from "react"
-import { ListTree } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
 import {
   cameraForBounds,
   cameraForGridScene,
@@ -12,6 +10,7 @@ import { useSceneWorld } from "./use-scene-world"
 import { useViewportCamera } from "./use-viewport-camera"
 import { WorldRenderer } from "../explorer/components/WorldRenderer"
 import { SceneViewportHeader } from "./SceneViewportHeader"
+import { ViewportBreadcrumb } from "./ViewportBreadcrumb"
 
 type SceneViewportProps = {
   sceneId: string
@@ -35,9 +34,7 @@ export function SceneViewport({
   selectedElementId,
   navigationDisabled,
   reducedMotion,
-  outlineTriggerRef,
   presentation = "explorer",
-  onOpenOutline,
   onEnterScene,
   onSelectTopic,
   onCameraChange,
@@ -53,7 +50,6 @@ export function SceneViewport({
     viewport,
     camera: cameraState,
     animating,
-    announcement,
   } = useViewportCamera({
     sceneId,
     positionedScene,
@@ -98,35 +94,15 @@ export function SceneViewport({
           : "flex size-full min-h-0 flex-col bg-muted/20"
       }
     >
-      <p
-        className="sr-only"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        {announcement}
-      </p>
       <SceneViewportHeader title={sceneTitle} relativeZoom={relativeZoom} />
 
       <div
         ref={viewportRef}
         className="relative min-h-0 flex-1 overflow-hidden"
       >
-        {onOpenOutline ? (
-          <Button
-            ref={outlineTriggerRef}
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={navigationDisabled || animating}
-            aria-haspopup="dialog"
-            className="absolute top-4 left-4 z-10 bg-background/90 shadow-sm backdrop-blur-sm"
-            onClick={onOpenOutline}
-          >
-            <ListTree aria-hidden="true" />
-            목차
-          </Button>
-        ) : null}
+        <div className="absolute top-4 right-4 left-4 z-10">
+          <ViewportBreadcrumb />
+        </div>
         <WorldRenderer
           layout={world.layout}
           camera={cameraState}
