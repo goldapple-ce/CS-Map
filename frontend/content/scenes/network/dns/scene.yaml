@@ -1,4 +1,3 @@
-id: google-search-dns
 title: DNS
 summary: Client의 요청을 받은 Recursive Resolver가 Root, TLD와 Authoritative DNS의 위임을 따라 IP 주소를 찾아 반환합니다.
 nodes:

@@ -1,5 +1,3 @@
-import path from "node:path"
-
 import {
   sceneDocumentChildren,
   type SceneDocument,
@@ -54,10 +52,7 @@ export function createSceneMetadataResolver(
   const resolving = new Set<string>()
 
   /** 진행 중인 ID로 순환과 캐시 적중을 구분하며 Scene 메타데이터를 해석한다. */
-  function resolveMetadata(
-    document: SceneDocument,
-    filePath: string
-  ): SceneDerivedMetadata {
+  function resolveMetadata(document: SceneDocument): SceneDerivedMetadata {
     const cached = metadataCache.get(document.id)
     if (cached) return cached
     if (resolving.has(document.id)) {
@@ -76,9 +71,9 @@ export function createSceneMetadataResolver(
 
     const owner = owners.get(document.id)
     const parentFile = owner ? documentsById.get(owner.parentId) : undefined
-    if (parentFile) resolveMetadata(parentFile.value, parentFile.filePath)
+    if (parentFile) resolveMetadata(parentFile.value)
     const metadata: SceneDerivedMetadata = {
-      slug: owner?.nodeId ?? path.basename(path.dirname(filePath)),
+      slug: owner?.nodeId ?? document.id,
       ...(owner ? { parentId: owner.parentId } : {}),
     }
     metadataCache.set(document.id, metadata)

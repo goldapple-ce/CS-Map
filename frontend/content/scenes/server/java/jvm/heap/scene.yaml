@@ -1,4 +1,3 @@
-id: google-com-server-java-jvm-heap
 title: Heap
 summary: 새 객체가 Young Generation에 생성되고 Garbage Collection에서 살아남은 객체가 Old Generation으로 이동하는 전형적인 세대별 Heap 구조입니다.
 nodes:

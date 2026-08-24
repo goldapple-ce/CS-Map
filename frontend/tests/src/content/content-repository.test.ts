@@ -23,6 +23,8 @@ describe("contentRepository", () => {
     )
     expect(() =>
       contentRepository.getTopicExplanation(contentData.rootSceneId, "missing")
-    ).toThrow("Unknown Topic missing in Scene enter-google")
+    ).toThrow(
+      `Unknown Topic missing in Scene ${contentData.rootSceneId}`
+    )
   })
 })

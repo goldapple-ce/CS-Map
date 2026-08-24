@@ -16,8 +16,7 @@ function sceneDocument(
   id: string,
   children: Readonly<Record<string, string>> = {}
 ): SceneDocument {
-  return sceneDocumentSchema.parse({
-    id,
+  const source = sceneDocumentSchema.parse({
     title: id,
     summary: id,
     nodes: Object.fromEntries(
@@ -27,6 +26,7 @@ function sceneDocument(
       ])
     ),
   })
+  return { ...source, id }
 }
 
 /** Scene 문서를 graph 함수가 받는 파일 형태로 감싼다. */
@@ -47,7 +47,7 @@ describe("Scene graph", () => {
       "parent-b:nodes.second.childSceneId: Scene child is already owned by parent-a",
     ])
     expect(rootOwnershipError("child", ownership.owners)).toBe(
-      "child: configured root Scene cannot be a child of parent-a"
+      "child: Root Scene cannot be a child of parent-a"
     )
   })
 
@@ -59,13 +59,44 @@ describe("Scene graph", () => {
     const ownership = collectSceneOwners(files)
     const resolve = createSceneMetadataResolver(
       files,
-      { id: "scenario", rootSceneId: "missing-root" },
+      "missing-root",
       ownership.owners
     )
 
-    expect(() => resolve(files[0].value, files[0].filePath)).toThrow(
+    expect(() => resolve(files[0].value)).toThrow(
       "Child Scene cycle detected at a"
     )
+  })
+
+  it("계층형 Scene ID와 별개로 소유 Topic ID를 Route slug로 사용한다", () => {
+    const files = [
+      sceneFile(
+        sceneDocument("scenes", { server: "server", dns: "network-dns" })
+      ),
+      sceneFile(sceneDocument("server", { spring: "server-spring" })),
+      sceneFile(sceneDocument("server-spring")),
+      sceneFile(sceneDocument("network-dns")),
+    ]
+    const ownership = collectSceneOwners(files)
+    const resolve = createSceneMetadataResolver(
+      files,
+      "scenes",
+      ownership.owners
+    )
+
+    expect(resolve(files[0].value)).toEqual({ slug: "scenes" })
+    expect(resolve(files[1].value)).toEqual({
+      slug: "server",
+      parentId: "scenes",
+    })
+    expect(resolve(files[2].value)).toEqual({
+      slug: "spring",
+      parentId: "server",
+    })
+    expect(resolve(files[3].value)).toEqual({
+      slug: "dns",
+      parentId: "scenes",
+    })
   })
 
   it("Root에서 도달 가능한 Scene과 unknown Child 오류만 수집한다", () => {

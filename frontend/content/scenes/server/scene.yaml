@@ -1,4 +1,3 @@
-id: google-com-server
 title: 일반적인 Server 요청 처리
 summary: NGINX가 React 정적 파일을 제공하고 API 요청을 Spring Application으로 전달하는 일반적인 Server 구성입니다.
 nodes:
@@ -16,12 +15,12 @@ nodes:
     label: Spring
     row: 3
     col: 3
-    childSceneId: google-com-server-spring
+    childSceneId: server-spring
   java-jvm:
     label: Java / JVM
     row: 5
     col: 3
-    childSceneId: google-com-server-java
+    childSceneId: server-java
   cache:
     label: Cache
     row: 3
@@ -31,17 +30,17 @@ nodes:
     label: SQL
     row: 2
     col: 5
-    childSceneId: google-com-server-sql
+    childSceneId: server-sql
   mongodb:
     label: MongoDB
     row: 4
     col: 5
-    childSceneId: google-com-server-mongodb
+    childSceneId: server-mongodb
   redis:
     label: Redis
     row: 3
     col: 5
-    childSceneId: google-com-server-redis
+    childSceneId: server-redis
 edges:
   - from: react
     to: nginx

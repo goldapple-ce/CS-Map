@@ -1,4 +1,3 @@
-id: google-com-https
 title: HTTPS
 summary: TCP 연결을 수립한 Browser와 Server가 CA의 신뢰 기준으로 상대를 확인하고 같은 Session Key를 만드는 HTTPS 흐름입니다.
 nodes:
@@ -18,7 +17,7 @@ nodes:
     row: 3
     col: 4
     rowSpan: 2
-    navigateToSceneId: google-com-server
+    navigateToSceneId: server
 edges:
   - from: certificate-authority
     # fromSide: bottom

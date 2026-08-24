@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom"
 
 import { contentRepository } from "@/content/content-repository"
+import { contentData } from "@/content/generated/content-data"
 import { EnterGooglePreview } from "@/features/home/EnterGooglePreview"
 import { UsageGuide } from "@/features/home/UsageGuide"
 import { Hero } from "@/features/home/Hero"
@@ -9,7 +10,13 @@ import { MousePointerClick } from "lucide-react"
 /** Root Scene 미리보기와 Explorer 진입 안내를 시작 화면에 표시한다. */
 export function HomeRoute() {
   const navigate = useNavigate()
-  const rootScene = contentRepository.getScene("enter-google").scene
+  const rootScene = contentRepository.getScene(contentData.rootSceneId).scene
+  const rootRoute = contentData.routes.find(
+    ({ id }) => id === contentData.rootSceneId
+  )
+  if (!rootRoute) {
+    throw new Error(`Root Scene route is unavailable: ${contentData.rootSceneId}`)
+  }
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col items-center space-y-6 px-8 py-8">
@@ -38,7 +45,7 @@ export function HomeRoute() {
         </div>
         <EnterGooglePreview
           scene={rootScene}
-          onEnter={() => navigate("explore/enter-google")}
+          onEnter={() => navigate(rootRoute.path)}
         />
       </section>
 

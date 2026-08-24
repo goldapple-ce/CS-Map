@@ -2,6 +2,8 @@ import { Fragment } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { ChevronRight } from "lucide-react"
 
+import { contentData } from "@/content/generated/content-data"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +23,7 @@ export function ViewportBreadcrumb() {
 
   const segments = pathname.split("/").filter(Boolean).slice(1)
 
-  const current = segments.at(-1) ?? "enter-google"
+  const current = segments.at(-1) ?? contentData.rootSceneId
   const parents = segments.slice(0, -1)
 
   const visibleParents =

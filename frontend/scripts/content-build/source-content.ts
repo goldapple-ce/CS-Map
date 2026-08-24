@@ -11,10 +11,12 @@ import {
   rootOwnershipError,
 } from "./scene-graph.ts"
 import {
+  contentIdSchema,
   normalizeSceneDocument,
   sceneDocumentSchema,
   sceneQuizSchema,
   type SceneDocument,
+  type SceneSourceDocument,
 } from "./schemas.ts"
 
 type ContentFile<T> = { filePath: string; value: T }
@@ -23,6 +25,11 @@ type PreparedSceneFile = ContentFile<Scene> & {
   markdown: string
   topicExplanations: Readonly<Record<string, string>>
 }
+
+type SceneSourceFile = ContentFile<SceneSourceDocument>
+
+/** 제품의 고정 시작점인 Root Scene에 부여하는 ID다. */
+export const ROOT_SCENE_ID = "enter-google"
 
 /** 지정한 디렉터리 아래에서 이름이 일치하는 파일을 재귀적으로 찾아 정렬한다. */
 async function findFiles(
@@ -75,6 +82,61 @@ async function parseFiles<T>(
   return { files, errors }
 }
 
+/** content/scenes 기준 폴더 경로를 계층형 ID로 주입하고 잘못되거나 중복된 경로를 보고한다. */
+export function deriveSceneDocuments(
+  appRoot: string,
+  files: readonly SceneSourceFile[]
+): { files: ContentFile<SceneDocument>[]; errors: string[] } {
+  const derived: ContentFile<SceneDocument>[] = []
+  const errors: string[] = []
+  const filesById = new Map<string, string>()
+  const scenesRoot = path.join(appRoot, "content", "scenes")
+
+  for (const file of files) {
+    const sceneDirectory = path.dirname(file.filePath)
+    const relativeDirectory = path.relative(scenesRoot, sceneDirectory)
+    if (
+      relativeDirectory.startsWith(`..${path.sep}`) ||
+      relativeDirectory === ".." ||
+      path.isAbsolute(relativeDirectory)
+    ) {
+      errors.push(
+        `${relativePath(appRoot, file.filePath)}: Scene must be inside content/scenes`
+      )
+      continue
+    }
+
+    const segments = relativeDirectory ? relativeDirectory.split(path.sep) : []
+    const invalidSegment = segments.find(
+      (segment) => !contentIdSchema.safeParse(segment).success
+    )
+    if (invalidSegment) {
+      errors.push(
+        `${relativePath(appRoot, file.filePath)}: Scene path segment must be lowercase kebab-case: ${invalidSegment}`
+      )
+      continue
+    }
+
+    const id = segments.length > 0 ? segments.join("-") : ROOT_SCENE_ID
+
+    const previousPath = filesById.get(id)
+    if (previousPath) {
+      errors.push(
+        `Duplicate derived Scene ID ${id}: ${relativePath(appRoot, previousPath)}, ${relativePath(appRoot, file.filePath)}`
+      )
+      continue
+    }
+
+    filesById.set(id, file.filePath)
+    derived.push({
+      filePath: file.filePath,
+      value: { ...file.value, id },
+    })
+  }
+
+  return { files: derived, errors }
+}
+
 /** 고정 Root Scene과 하위 Scene 작성 파일을 읽어 YAML 검증 결과를 반환한다. */
 export async function readSourceDocuments(appRoot: string) {
   const contentRoot = path.join(appRoot, "content")
@@ -88,7 +150,9 @@ export async function readSourceDocuments(appRoot: string) {
     scenePaths,
     sceneDocumentSchema
   )
-  const rootScene = sceneDocuments.files.find(
+  const derivedScenes = deriveSceneDocuments(appRoot, sceneDocuments.files)
+  sceneDocuments.errors.push(...derivedScenes.errors)
+  const rootScene = derivedScenes.files.find(
     ({ filePath }) => filePath === rootScenePath
   )
   if (!scenePaths.includes(rootScenePath)) {
@@ -98,7 +162,10 @@ export async function readSourceDocuments(appRoot: string) {
   }
   return {
     rootScene,
-    sceneDocuments,
+    sceneDocuments: {
+      files: derivedScenes.files,
+      errors: sceneDocuments.errors,
+    },
   }
 }
 
@@ -172,7 +239,7 @@ export async function prepareScenes(
       }
     }
     try {
-      const metadata = resolveMetadata(file.value, file.filePath)
+      const metadata = resolveMetadata(file.value)
       prepared.push({
         filePath: file.filePath,
         document: file.value,

@@ -1,4 +1,3 @@
-id: google-com-server-spring
 title: Spring
 summary: Spring Container가 설정을 읽어 Bean을 생성하고 연결하며, 웹·데이터 접근과 AOP 기능이 Bean을 중심으로 결합되는 구조입니다.
 nodes:
@@ -11,13 +10,13 @@ nodes:
     label: Web Servlet
     row: 1
     col: 2
-    childSceneId: google-com-server-spring-webservlet
+    childSceneId: server-spring-web-servlet
 
   data-access:
     label: Data Access
     row: 1
     col: 4
-    childSceneId: google-com-server-spring-dataaccess
+    childSceneId: server-spring-data-access
   spring-container:
     label: Spring Container
     row: 2

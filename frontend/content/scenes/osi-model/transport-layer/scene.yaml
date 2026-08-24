@@ -1,4 +1,3 @@
-id: google-com-osi-transport-layer
 title: Transport Layer
 summary: Port를 이용해 Application Process를 구분하고 TCP 또는 UDP로 데이터를 전달하는 계층입니다.
 nodes:

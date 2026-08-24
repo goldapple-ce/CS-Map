@@ -1,4 +1,3 @@
-id: google-com-user-device
 title: 사용자 기기
 summary: OS가 CPU, Memory, Storage와 Network Interface를 관리하며 Application이 동작할 실행 환경을 제공하는 구조입니다.
 nodes:

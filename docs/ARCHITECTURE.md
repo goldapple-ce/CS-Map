@@ -79,7 +79,6 @@ flowchart LR
 
 ## 콘텐츠 모델
 
-- `Scenario`: 전체 탐색의 `rootSceneId`를 지정한다.
 - `Scene`: 제목, 요약, Area, Node, Edge와 선택적 Quiz를 가진 지도 단위다.
 - `Node`: Scene에 배치되는 Topic 표현이다.
 - `Child Scene`: Node의 `childSceneId`로 소유 관계를 만든다.
@@ -87,6 +86,8 @@ flowchart LR
 - `description`, `contentRef`: 말단 Topic의 인라인 또는 Markdown 설명이다.
 
 작성 데이터에는 URL과 화면 좌표를 저장하지 않는다. Parent 관계와 URL은 Scene 참조에서, Node 좌표와 Edge 경로는 Grid 작성값에서 빌드 시 계산한다.
+
+Scene ID는 `scene.yaml`에 작성하지 않는다. `content/scenes` 아래에서 `scene.yaml` 부모까지의 상대 경로 세그먼트를 `-`로 연결해 파생한다. 예를 들어 `content/scenes/server/spring/scene.yaml`은 `server-spring`이다. 각 경로 세그먼트는 소문자 kebab-case여야 하며 서로 다른 경로가 같은 파생 ID를 만들 수 없다. 고정 Root 파일 `content/scenes/scene.yaml`만 제품의 시작점을 나타내는 `enter-google` 상수를 ID로 사용한다.
 
 ## Content Build
 
@@ -119,7 +120,7 @@ flowchart TD
 - `scripts/content-build/scene-graph.ts`: Child 소유권, 파생 metadata와 Root 도달 가능성 계산
 - `scripts/content-build/relationship-validation.ts`: Scene 참조와 순환 검증
 - `scripts/elk-scene-layout.ts`: Grid Node box와 직교 Edge 경로 계산
-- `scripts/content-build/source-content.ts`: 작성 파일 탐색·검증과 Scene 준비
+- `scripts/content-build/source-content.ts`: 작성 파일 탐색, 상대 폴더 경로 기반 Scene ID 검증·주입과 Scene 준비
 - `scripts/content-build/generated-content.ts`: Route 계산과 생성 TypeScript 직렬화
 - `scripts/content-build/generated-file.ts`: 생성물 byte 검증·동기화와 이전 파일 정리
 - `scripts/build-content-index.ts`: 검증·Layout·data 조립 단계 조율과 오류 집계
@@ -238,7 +239,7 @@ Layout은 두 단계로 나뉜다.
 
 ## 오류와 신뢰 경계
 
-- 작성 데이터 오류는 Content Build에서 모아 사람이 수정 가능한 파일 경로와 함께 보고한다.
+- 작성 데이터 오류는 Content Build에서 모아 사람이 수정 가능한 파일 경로와 함께 보고한다. 잘못된 Scene 경로 세그먼트와 중복 파생 ID도 이 단계에서 검사하며, 중복이면 관련된 두 파일 경로를 함께 표시한다.
 - 잘못된 참조, 중복 소유, 순환과 도달 불가능 Scene은 브라우저 실행 전에 처리한다.
 - 생성 Layout 누락과 unknown Route·Scene·Topic은 브라우저에서 명확한 오류가 된다.
 - Markdown은 React Markdown을 통해 허용된 요소로 렌더링하며 임의 HTML과 JavaScript를 실행하지 않는다.

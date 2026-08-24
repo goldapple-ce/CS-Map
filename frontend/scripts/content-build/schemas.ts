@@ -2,7 +2,7 @@ import { z } from "zod"
 
 import type { Scene, SelfCheckQuestion } from "@shared/content/types"
 
-const contentIdSchema = z
+export const contentIdSchema = z
   .string()
   .min(1)
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
@@ -83,7 +83,6 @@ const sceneAreaSchema = z
 
 export const sceneDocumentSchema = z
   .object({
-    id: contentIdSchema,
     title: z.string().min(1),
     summary: z.string().min(1),
     areas: z.record(contentIdSchema, sceneAreaSchema).default({}),
@@ -168,7 +167,11 @@ export const sceneQuizSchema = z
   )
   .min(1)
 
-export type SceneDocument = z.infer<typeof sceneDocumentSchema>
+export type SceneSourceDocument = z.infer<typeof sceneDocumentSchema>
+
+export type SceneDocument = SceneSourceDocument & {
+  id: string
+}
 
 export type SceneDerivedMetadata = {
   slug: string
@@ -233,7 +236,7 @@ export function normalizeSceneDocument(
 }
 
 /** 알 수 없는 입력을 검증된 Scene 작성 문서로 파싱한다. */
-export function parseSceneDocument(input: unknown): SceneDocument {
+export function parseSceneDocument(input: unknown): SceneSourceDocument {
   return sceneDocumentSchema.parse(input)
 }
 

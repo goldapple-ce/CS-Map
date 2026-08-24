@@ -24,29 +24,21 @@
 
 ```text
 frontend/content/
-├─ scenarios/<scenario>/scenario.yaml
-└─ scenes/<scenario>/<scene-path>/
+└─ scenes/
    ├─ scene.yaml
    ├─ content.ko.md
-   ├─ quiz.ko.yaml
-   └─ <topic>.ko.md
+   └─ <child-scene>/
+      ├─ scene.yaml
+      ├─ content.ko.md
+      ├─ quiz.ko.yaml
+      └─ <topic>.ko.md
 ```
 
-`quiz.ko.yaml`과 `<topic>.ko.md`는 필요할 때만 만든다. ID와 디렉터리 이름은 영문 소문자 kebab-case를 사용한다.
-
-## Scenario 형식
-
-Scenario는 처음 보여줄 Root Scene을 지정한다.
-
-```yaml
-id: google-com
-rootSceneId: google-search-root
-```
+`quiz.ko.yaml`과 `<topic>.ko.md`는 필요할 때만 만든다. Scene ID는 `content/scenes` 아래에서 `scene.yaml` 부모까지의 상대 폴더 경로를 `-`로 연결해 자동으로 정하므로 YAML에 따로 작성하지 않는다. 예를 들어 `scenes/server/spring/scene.yaml`의 ID는 `server-spring`이다. 각 폴더명은 영문 소문자 kebab-case여야 하며, 서로 다른 경로가 같은 ID를 만들 수 없다. 고정 시작점인 `scenes/scene.yaml`의 Root Scene ID만 `enter-google`이다.
 
 ## Scene YAML 형식
 
 ```yaml
-id: example-scene
 title: Example 흐름
 summary: 이 Scene이 보여주는 내용을 한 문장으로 설명합니다.
 
@@ -76,7 +68,6 @@ areas:
     colSpan: 2
 ```
 
-- `id`: 중복되지 않는 영구 ID
 - `title`: 화면에 표시할 Scene 제목
 - `summary`: Scene을 설명하는 한 문장
 - `nodes`: 화면에 배치할 Topic

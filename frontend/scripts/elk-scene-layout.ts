@@ -108,7 +108,8 @@ export async function buildSceneLayout(
 
   const routes = await routeEdges(
     {
-      id: scene.id,
+      // Scene과 내부 Topic이 같은 ID를 가질 수 있어 ELK graph ID만 별도 namespace로 둔다.
+      id: `scene:${scene.id}`,
       x: 0,
       y: 0,
       width: sceneWidth,

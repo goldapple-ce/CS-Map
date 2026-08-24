@@ -1,4 +1,3 @@
-id: google-com-server-spring-dataaccess-jpa
 title: JPA 내부 동작
 summary: EntityManager가 Persistence Context를 통해 Entity를 관리하고, 변경 내용을 감지해 flush하는 JPA의 핵심 흐름입니다.
 nodes:
