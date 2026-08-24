@@ -5,7 +5,7 @@ import {
   saveSceneSnapshot,
   type SceneNavigationRequest,
 } from "../exploration-memory"
-import { contentRepository } from "@/content/content-repository"
+import { contentData } from "@/content/generated/content-data"
 import { useNavigate } from "react-router-dom"
 
 type UseSceneNavigationOptions = {
@@ -17,7 +17,7 @@ const DEFAULT_CAMERA: CameraState = { centerX: 640, centerY: 360, scale: 1 }
 /** Scene Route의 URL segment 수로 탐색 깊이를 계산한다. */
 function routeDepth(sceneId?: string) {
   if (!sceneId) return 0
-  const route = contentRepository.listRoutes().find(({ id }) => id === sceneId)
+  const route = contentData.routes.find(({ id }) => id === sceneId)
   return route?.path.split("/").filter(Boolean).length ?? 0
 }
 
@@ -66,9 +66,9 @@ export function useSceneNavigation({ sceneId }: UseSceneNavigationOptions) {
   /** 선택한 Topic의 Child Scene Route로 진입한다. */
   const enterScene = (request: SceneNavigationRequest) => {
     if (navigationLockedRef.current) return
-    const targetRoute = contentRepository
-      .listRoutes()
-      .find(({ id }) => id === request.sceneId)
+    const targetRoute = contentData.routes.find(
+      ({ id }) => id === request.sceneId
+    )
     if (!targetRoute) return
     navigationLockedRef.current = true
     returningRef.current = false
@@ -80,9 +80,9 @@ export function useSceneNavigation({ sceneId }: UseSceneNavigationOptions) {
   /** 고른 Scene Route로 직접 이동한다. */
   const selectScene = (targetSceneId: string) => {
     if (navigationLockedRef.current || targetSceneId === sceneId) return
-    const targetRoute = contentRepository
-      .listRoutes()
-      .find(({ id }) => id === targetSceneId)
+    const targetRoute = contentData.routes.find(
+      ({ id }) => id === targetSceneId
+    )
     if (!targetRoute) return
     navigationLockedRef.current = true
     returningRef.current = false

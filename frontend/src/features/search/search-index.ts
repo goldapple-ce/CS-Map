@@ -1,4 +1,4 @@
-import { contentRepository } from "@/content/content-repository"
+import { contentData } from "@/content/generated/content-data"
 import type { RouteIndexEntry } from "@shared/content/generated-contract"
 
 export type SearchNode = {
@@ -40,7 +40,7 @@ function flattenOutline(nodes: readonly SearchNode[]): RouteIndexEntry[] {
   return nodes.flatMap((node) => [node.route, ...flattenOutline(node.children)])
 }
 
-export const searchRoutes = contentRepository.listRoutes()
+export const searchRoutes = contentData.routes
 export const searchRoutesById = new Map(
   searchRoutes.map((route) => [route.id, route])
 )

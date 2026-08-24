@@ -1,4 +1,5 @@
 import { contentRepository } from "@/content/content-repository"
+import { contentData } from "@/content/generated/content-data"
 import { createWorldLayout } from "../explorer/layout/world-layout"
 import { useMemo } from "react"
 import type { RouteIndexEntry } from "@shared/content/generated-contract"
@@ -44,15 +45,11 @@ function scenePathIds(
 /** Root부터 현재 Scene까지의 WorldLayout을 구성한다. */
 export function useSceneWorld(sceneId: string) {
   return useMemo(() => {
-    const rootSceneId = contentRepository.getRootSceneId()
+    const rootSceneId = contentData.rootSceneId
 
-    const pathIds = scenePathIds(
-      sceneId,
-      contentRepository.listRoutes(),
-      rootSceneId
-    )
+    const pathIds = scenePathIds(sceneId, contentData.routes, rootSceneId)
 
-    const scenes = pathIds.map((id) => contentRepository.getSceneMap(id))
+    const scenes = pathIds.map((id) => contentRepository.getScene(id).scene)
 
     return {
       focusedSceneId: sceneId,

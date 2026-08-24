@@ -74,7 +74,7 @@ flowchart LR
 - `shared`는 `scripts`나 `src`에 의존하지 않는다.
 - YAML 파싱, Zod Schema, 작성 문서 타입과 정규화는 `scripts/content-build`에만 둔다.
 - 브라우저는 `content` 작성 디렉터리와 파일 경로를 알지 않는다.
-- UI는 generated data를 직접 탐색하지 않고 Content Repository를 사용한다.
+- URL·Scene·Topic처럼 검증이 필요한 조회는 Content Repository를 사용한다. Root Scene ID와 Route 목록처럼 생성 단계에서 보장된 index는 generated data에서 직접 읽는다.
 - 생성 파일은 사람이 직접 수정하지 않는다.
 
 ## 콘텐츠 모델
@@ -163,16 +163,14 @@ flowchart LR
 
 ### Content Repository
 
-`src/content/content-repository.ts`는 생성 데이터를 기존 비동기 API로 노출하는 정적 adapter다.
+`src/content/content-repository.ts`는 생성 데이터에서 검증이 필요한 조회만 제공하는 정적 adapter다.
 
-- Root Scene과 Route 목록 조회
 - URL에 대응하는 Route 조회
-- Scene 지도와 Markdown 조회
+- Scene과 Markdown 조회
 - Topic 설명 조회
 - unknown ID에 대한 일관된 오류 반환
-- 기존 호출부 호환을 위한 완료된 Promise와 no-op prefetch 제공
 
-브라우저에는 raw YAML/Markdown loader, Zod, 동적 content module과 요청 cache가 없다. 모든 콘텐츠가 애플리케이션 초기 JavaScript에 포함되므로 Repository의 비동기 형태는 I/O가 아니라 UI 계약 호환을 위한 것이다.
+Root Scene ID와 Route 목록은 generated data가 보장하는 index이므로 별도 Repository 메서드로 다시 감싸지 않는다. 브라우저에는 raw YAML/Markdown loader, Zod, 동적 content module과 요청 cache가 없으며 모든 콘텐츠가 애플리케이션 초기 JavaScript에 포함된다.
 
 ## Explorer 실행 흐름
 
@@ -193,8 +191,8 @@ sequenceDiagram
     Repo-->>Router: Scene ID
     Router->>Shell: sceneId 전달
     Shell->>Viewport: 현재 Scene과 탐색 상태 전달
-    Viewport->>Repo: Root부터 현재 Scene까지 loadSceneMap()
-    Repo-->>Viewport: 생성 Scene Promise
+    Viewport->>Repo: Root부터 현재 Scene까지 getScene()
+    Repo-->>Viewport: 생성 Scene
     Viewport->>Layout: Parent·Child World 배치
     Layout-->>Renderer: World 좌표와 로컬 Layout
     Renderer-->>User: 보이는 Scene·Node·Edge 표시

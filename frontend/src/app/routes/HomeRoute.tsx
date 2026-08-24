@@ -9,7 +9,7 @@ import { MousePointerClick } from "lucide-react"
 /** Root Scene 미리보기와 Explorer 진입 안내를 시작 화면에 표시한다. */
 export function HomeRoute() {
   const navigate = useNavigate()
-  const rootScene = contentRepository.getSceneMap("enter-google")
+  const rootScene = contentRepository.getScene("enter-google").scene
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col items-center space-y-6 px-8 py-8">
