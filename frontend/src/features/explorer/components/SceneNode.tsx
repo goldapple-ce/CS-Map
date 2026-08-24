@@ -52,7 +52,7 @@ type SceneNodeProps = {
   state: SceneNodeState
   density?: SceneNodeDensity
   navigationDisabled?: boolean
-  onEnterScene?: (sceneId: string, elementId: string) => void
+  onEnterScene?: (sceneId: string) => void
   onPrefetchScene?: (sceneId: string) => void
   onSelectTopic?: (elementId: string, label: string) => void
 }
@@ -117,11 +117,10 @@ export function SceneNode({
     nodeContent = (
       <button
         type="button"
-        data-scene-node-id={element.id}
         disabled={navigationDisabled}
         aria-label={`${accessibleLabel} 내부 보기`}
         className={cn(sceneNodeVariants({ state }))}
-        onClick={() => onEnterScene(navigationSceneId, element.id)}
+        onClick={() => onEnterScene(navigationSceneId)}
       >
         {content}
       </button>
@@ -130,7 +129,6 @@ export function SceneNode({
     nodeContent = (
       <button
         type="button"
-        data-scene-node-id={element.id}
         disabled={navigationDisabled}
         aria-label={`${accessibleLabel} 설명 열기`}
         className={cn(sceneNodeVariants({ state }))}
@@ -142,7 +140,6 @@ export function SceneNode({
   } else {
     nodeContent = (
       <div
-        data-scene-node-id={element.id}
         role="group"
         aria-label={`${accessibleLabel}, ${stateLabels[state]}`}
         className={cn(sceneNodeVariants({ state }))}

@@ -25,7 +25,7 @@ type WorldRendererProps = {
   selectedSceneId?: string
   selectedElementId?: string
   navigationDisabled: boolean
-  onEnterScene: (sceneId: string, elementId: string) => void
+  onEnterScene: (sceneId: string) => void
   // onPrefetchScene: (sceneId: string) => void
   onSelectTopic: (sceneId: string, elementId: string, label: string) => void
 }
@@ -134,7 +134,6 @@ export function WorldRenderer({
           return (
             <g
               key={scene.id}
-              data-world-scene-id={scene.id}
               transform={`translate(${screenX} ${screenY}) scale(${renderScale})`}
             >
               {isFocused

@@ -229,13 +229,12 @@ Layout은 두 단계로 나뉜다.
 | --- | --- | --- |
 | URL과 현재 Scene | React Router, `ExploreRoute` | URL을 Scene ID로 해석 |
 | Panel 조립과 탐색 잠금 | `ExplorerShell` | 지도·설명·목차 연결과 Scene 이동 조율 |
-| Camera와 애니메이션 | `SceneViewport` | 확대, 이동, Viewport 크기와 포커스 관리 |
-| Scene 복귀 상태 | `exploration-memory.ts` | Camera, Panel, 선택 Topic과 스크롤 snapshot 보관 |
+| Camera와 애니메이션 | `SceneViewport` | 현재 Scene과 Viewport에 맞는 확대·이동 관리 |
 | World 좌표 | `world-layout.ts` | Parent·Child Scene의 재귀 배치 |
 | 목차 검색과 펼침 | `Search` | Route 목록을 트리로 표현하고 Scene 제목·요약·Topic 이름·키워드를 검색하며 기본 목차와 결과에 필요한 Scene metadata를 표시 |
 | 설명 load와 탭 | `ExplanationPanel` | Scene·Topic·Quiz 표시 |
 
-상태를 다른 모듈에 중복 저장하지 않는다. 화면 전환 중 유지해야 하는 값은 `ExplorerShell`과 탐색 snapshot이 소유하고, 계산 가능한 값은 Route와 generated data에서 파생한다.
+상태를 다른 모듈에 중복 저장하지 않는다. 화면 전환 중 유지해야 하는 Panel 상태는 `ExplorerShell`이 소유하고, Camera처럼 Scene과 Viewport에서 계산 가능한 값은 저장하지 않고 다시 계산한다.
 
 Search는 generated Route와 Scene을 결합한 `SearchEntry`를 검색 결과와 기본 목차에 함께 사용한다. `SearchItemContent`가 Scene 제목, 요약과 현재 위치 표시를 공통으로 담당하며 명시적인 옵션에 따라 검색 키워드와 Topic 이름 tag를 표시한다. `SearchResults`는 tag를 포함한 평탄한 결과 목록과 이동을, `SearchOutline`은 tag를 제외한 기본 목차의 트리 들여쓰기, 가지 펼침·접힘과 Link 이동을 각각 소유한다.
 

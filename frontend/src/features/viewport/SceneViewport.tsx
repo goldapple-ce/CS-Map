@@ -1,8 +1,4 @@
-import {
-  cameraForGridScene,
-  type CameraState,
-} from "@/features/explorer/camera"
-import { type SceneNavigationRequest } from "@/features/explorer/exploration-memory"
+import { cameraForGridScene } from "@/features/explorer/camera"
 import { useSceneWorld } from "./use-scene-world"
 import { useViewportCamera } from "./use-viewport-camera"
 import { WorldRenderer } from "../explorer/components/WorldRenderer"
@@ -15,9 +11,8 @@ type SceneViewportProps = {
   selectedElementId?: string
   navigationDisabled: boolean
   reducedMotion: boolean
-  onEnterScene: (request: SceneNavigationRequest) => void
+  onEnterScene: (sceneId: string) => void
   onSelectTopic: (sceneId: string, elementId: string, label: string) => void
-  onCameraChange: (camera: CameraState) => void
   onAnimationChange: (animating: boolean) => void
 }
 
@@ -30,14 +25,11 @@ export function SceneViewport({
   reducedMotion,
   onEnterScene,
   onSelectTopic,
-  onCameraChange,
   onAnimationChange,
 }: SceneViewportProps) {
   const world = useSceneWorld(sceneId)
   const positionedScene = world.layout.scenes.get(world.focusedSceneId)
   const focusedScene = positionedScene?.scene
-  // const embedded = presentation === "embedded"
-
   const {
     viewportRef,
     viewport,
@@ -47,31 +39,22 @@ export function SceneViewport({
     sceneId,
     positionedScene,
     reducedMotion,
-    onCameraChange,
     onAnimationChange,
   })
 
   const rootPositioned = world.layout.scenes.get(world.layout.rootSceneId)
   const rootCamera = rootPositioned
-    ? cameraForGridScene(
-        rootPositioned.bounds,
-        rootPositioned.scale,
-        viewport
-      )
+    ? cameraForGridScene(rootPositioned.bounds, rootPositioned.scale, viewport)
     : undefined
   const relativeZoom = rootCamera
     ? Math.round((cameraState.scale / rootCamera.scale) * 100)
     : 100
   const sceneTitle = focusedScene?.title ?? "지식 공간 로딩"
 
-  /** 현재 Camera를 포함한 Child Scene 진입 요청을 전달한다. */
-  const enterScene = (targetSceneId: string, elementId: string) => {
+  /** Camera 전환 중이 아닐 때 Child Scene 진입을 전달한다. */
+  const enterScene = (targetSceneId: string) => {
     if (animating) return
-    onEnterScene({
-      sceneId: targetSceneId,
-      elementId,
-      camera: cameraState,
-    })
+    onEnterScene(targetSceneId)
   }
 
   return (

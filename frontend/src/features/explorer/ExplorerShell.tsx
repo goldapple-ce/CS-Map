@@ -68,7 +68,6 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
               reducedMotion={reducedMotion}
               onEnterScene={navigation.enterScene}
               onSelectTopic={selectTopic}
-              onCameraChange={navigation.handleCameraChange}
               onAnimationChange={navigation.handleAnimationChange}
             />
           </ResizablePanel>
