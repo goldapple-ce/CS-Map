@@ -144,8 +144,8 @@ export function WorldRenderer({
                       area={area}
                       sceneWidth={localLayout.width}
                       sceneHeight={localLayout.height}
-                      columns={scene.layout?.columns ?? 5}
-                      rows={scene.layout?.rows ?? 5}
+                      columns={scene.layout.columns}
+                      rows={scene.layout.rows}
                     />
                   ))
                 : null}

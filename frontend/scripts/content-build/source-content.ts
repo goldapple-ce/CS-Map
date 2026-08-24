@@ -4,15 +4,13 @@ import path from "node:path"
 import { parse } from "yaml"
 import type { ZodType } from "zod"
 
-import type { GeneratedConceptContent } from "@shared/content/generated-contract"
-import type { Concept, Scene, SelfCheckQuestion } from "@shared/content/types"
+import type { Scene, SelfCheckQuestion } from "@shared/content/types"
 import {
   collectSceneOwners,
   createSceneMetadataResolver,
   rootOwnershipError,
 } from "./scene-graph.ts"
 import {
-  conceptSchema,
   normalizeSceneDocument,
   sceneDocumentSchema,
   sceneQuizSchema,
@@ -77,18 +75,19 @@ async function parseFiles<T>(
   return { files, errors }
 }
 
-/** 고정 Root Scene과 하위 Scene·Concept 작성 파일을 읽어 YAML 검증 결과를 반환한다. */
+/** 고정 Root Scene과 하위 Scene 작성 파일을 읽어 YAML 검증 결과를 반환한다. */
 export async function readSourceDocuments(appRoot: string) {
   const contentRoot = path.join(appRoot, "content")
   const rootScenePath = path.join(contentRoot, "scenes", "scene.yaml")
-  const [scenePaths, conceptPaths] = await Promise.all([
-    findFiles(path.join(contentRoot, "scenes"), "scene.yaml"),
-    findFiles(path.join(contentRoot, "concepts"), "concept.yaml"),
-  ])
-  const [sceneDocuments, conceptDocuments] = await Promise.all([
-    parseFiles(appRoot, scenePaths, sceneDocumentSchema),
-    parseFiles(appRoot, conceptPaths, conceptSchema),
-  ])
+  const scenePaths = await findFiles(
+    path.join(contentRoot, "scenes"),
+    "scene.yaml"
+  )
+  const sceneDocuments = await parseFiles(
+    appRoot,
+    scenePaths,
+    sceneDocumentSchema
+  )
   const rootScene = sceneDocuments.files.find(
     ({ filePath }) => filePath === rootScenePath
   )
@@ -100,7 +99,6 @@ export async function readSourceDocuments(appRoot: string) {
   return {
     rootScene,
     sceneDocuments,
-    conceptDocuments,
   }
 }
 
@@ -189,27 +187,4 @@ export async function prepareScenes(
     }
   }
   return { files: prepared, errors }
-}
-
-/** Concept와 참조 Markdown을 완성된 생성 record로 준비한다. */
-export async function prepareConcepts(
-  appRoot: string,
-  files: readonly ContentFile<Concept>[]
-) {
-  const errors: string[] = []
-  const concepts: Record<string, GeneratedConceptContent> = {}
-  for (const { filePath, value } of files) {
-    try {
-      const markdown = await readFile(
-        path.resolve(path.dirname(filePath), value.contentRef),
-        "utf8"
-      )
-      concepts[value.id] = { concept: value, markdown }
-    } catch {
-      errors.push(
-        `${relativePath(appRoot, filePath)}: missing Markdown content ${value.contentRef}`
-      )
-    }
-  }
-  return { concepts, errors }
 }

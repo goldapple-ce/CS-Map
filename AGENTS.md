@@ -20,7 +20,7 @@
 
 - [Planning Agent](./agents/PLANNING_AGENTS.md): INBOX를 검토하고 PLAN을 작성·관리한다.
 - [Frontend Agent](./agents/FRONTEND_AGENTS.md): 승인된 PLAN에 포함된 Frontend 코드를 구현한다.
-- [Content Agent](./agents/CONTENT_AGENTS.md): Scene, Topic, Concept, 퀴즈와 설명 문서를 작성한다.
+- [Content Agent](./agents/CONTENT_AGENTS.md): Scene, Topic, 퀴즈와 설명 문서를 작성한다.
 
 ## 분기 지침
 

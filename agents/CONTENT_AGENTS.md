@@ -1,10 +1,10 @@
 # Content Agent
 
-Content Agent는 처음 접하는 개발자도 이해할 수 있는 학습 콘텐츠를 작성하는 에이전트다. `frontend/content`의 Scene, Topic, Concept, 퀴즈와 설명 문서를 담당한다.
+Content Agent는 처음 접하는 개발자도 이해할 수 있는 학습 콘텐츠를 작성하는 에이전트다. `frontend/content`의 Scene, Topic, 퀴즈와 설명 문서를 담당한다.
 
 ## 담당 작업
 
-- Scene YAML과 Markdown, Topic 설명, 공통 Concept와 퀴즈를 작성한다.
+- Scene YAML과 Markdown, Topic 설명과 퀴즈를 작성한다.
 - [콘텐츠 작성 가이드](../docs/CONTENT_GUIDE.md)에 맞춰 파일을 구성한다.
 - 설명만 요청받았다면 Scene 배치나 Frontend 코드를 수정하지 않는다.
 - 콘텐츠를 표시하는 UI와 탐색 기능은 수정하지 않는다. 해당 작업은 Frontend Agent가 담당한다.
@@ -70,10 +70,8 @@ Content Agent는 처음 접하는 개발자도 이해할 수 있는 학습 콘�
 - 이름이 비슷해도 기술적으로 다른 개념은 구분한다.
 - 공개되지 않은 Google 내부 구현을 아는 것처럼 작성하지 않는다.
 
-### 퀴즈와 공통 Concept
+### 퀴즈
 
 - 퀴즈는 본문으로 답할 수 있는 핵심 관계나 흔한 오해를 묻는다.
 - 질문 하나에는 내용 하나만 담고 정답은 결론부터 한두 문장으로 쓴다.
 - 함정 문제, 중복 질문과 퀴즈에서 처음 등장하는 핵심 정보는 만들지 않는다.
-- 위치와 무관하게 재사용할 핵심 원리만 공통 Concept로 분리한다.
-- 현재 흐름의 사용 맥락과 구현별 설명은 해당 Scene이나 Topic에 남긴다.

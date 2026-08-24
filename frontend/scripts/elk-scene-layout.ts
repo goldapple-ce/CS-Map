@@ -88,11 +88,6 @@ export async function buildSceneLayout(
 
   const nodeLayouts = Object.fromEntries(
     nodes.map((node) => {
-      if (!node.grid) {
-        throw new Error(
-          `Grid scene ${scene.id} is missing coordinates for node ${node.id}`
-        )
-      }
       const rowSpan = node.grid.rowSpan ?? 1
       const colSpan = node.grid.colSpan ?? 1
       return [

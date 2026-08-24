@@ -1,4 +1,4 @@
-import type { Concept, ContentId, Scene } from "@shared/content/types"
+import type { ContentId, Scene } from "@shared/content/types"
 
 export type ContentValidationIssue = {
   contentId?: ContentId
@@ -24,22 +24,15 @@ function findDuplicates(values: readonly string[]) {
   return [...duplicates]
 }
 
-/** Scene·Concept 사이의 ID, 참조, 소유 관계와 순환을 검증한다. */
+/** Scene 사이의 ID, 참조, 소유 관계와 순환을 검증한다. */
 export function validateContentGraph(
-  scenes: readonly Scene[],
-  concepts: readonly Concept[]
+  scenes: readonly Scene[]
 ): ContentValidationIssue[] {
   const issues: ContentValidationIssue[] = []
   const scenesById = new Map(scenes.map((scene) => [scene.id, scene]))
 
-  for (const id of findDuplicates([
-    ...scenes.map(({ id }) => id),
-    ...concepts.map(({ id }) => id),
-  ])) {
+  for (const id of findDuplicates(scenes.map(({ id }) => id))) {
     issues.push(makeIssue(id, "id", `Duplicate content ID: ${id}`))
-  }
-  for (const slug of findDuplicates(concepts.map(({ slug }) => slug))) {
-    issues.push(makeIssue(undefined, "slug", `Duplicate concept slug: ${slug}`))
   }
   for (const pathKey of findDuplicates(
     scenes.map(({ parentId, slug }) => `${parentId ?? "root"}/${slug}`)

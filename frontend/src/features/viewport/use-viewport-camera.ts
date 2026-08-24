@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import {
-  cameraForBounds,
   cameraForGridScene,
   type CameraState,
   type ViewportSize,
@@ -125,13 +124,12 @@ export function useViewportCamera({
     if (!positionedScene || viewport.width <= 1 || viewport.height <= 1) return
     const savedCamera = getSceneSnapshot(sceneId)?.camera
     const target =
-      (savedCamera ?? positionedScene.scene.layout?.type === "grid")
-        ? cameraForGridScene(
-            positionedScene.bounds,
-            positionedScene.scale,
-            viewport
-          )
-        : cameraForBounds(positionedScene.bounds, viewport)
+      savedCamera ??
+      cameraForGridScene(
+        positionedScene.bounds,
+        positionedScene.scale,
+        viewport
+      )
     pendingAnnouncementRef.current = `${positionedScene.scene.title} Topic으로 이동했습니다.`
     animateCamera(target, !initializedRef.current)
     initializedRef.current = true

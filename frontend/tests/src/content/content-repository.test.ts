@@ -23,9 +23,6 @@ describe("contentRepository", () => {
       contentRepository.getSceneMap("missing-scene")
     ).rejects.toThrow("Unknown scene: missing-scene")
     await expect(
-      contentRepository.getConcept("missing-concept")
-    ).rejects.toThrow("Unknown concept: missing-concept")
-    await expect(
       contentRepository.getTopicExplanation(contentData.rootSceneId, "missing")
     ).rejects.toThrow("Unknown Topic missing in Scene google-search-root")
   })

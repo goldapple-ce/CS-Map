@@ -13,7 +13,7 @@ CS Map의 화면, 탐색과 콘텐츠 표시 기능을 구현하는 React 애플
 
 ## 주요 디렉터리
 
-- `content`: Scene, Topic, Concept와 퀴즈
+- `content`: Scene, Topic 설명과 퀴즈
 - `scripts`: YAML과 Markdown을 검증하고 실행용 콘텐츠를 생성하는 Node.js 도구
 - `shared`: Content Build와 브라우저가 함께 사용하는 순수 타입과 Layout 계약
 - `src`: 브라우저에서 실행되는 애플리케이션

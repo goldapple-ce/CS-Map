@@ -1,21 +1,6 @@
 /** 생성 콘텐츠 전반에서 사용하는 안정된 문자열 식별자다. */
 export type ContentId = string
 
-export type ContentStatus = "draft" | "review" | "published"
-
-export type Contributor = {
-  id: ContentId
-  displayName: string
-}
-
-export type Source = {
-  title: string
-  url: string
-  type: "official" | "primary" | "secondary"
-}
-
-export type LayoutHint = "horizontal" | "branch"
-
 export type SceneGridPlacement = {
   row: number
   col: number
@@ -24,7 +9,6 @@ export type SceneGridPlacement = {
 }
 
 export type SceneGridLayout = {
-  type: "grid"
   columns: 5
   rows: 5
 }
@@ -39,20 +23,19 @@ export type SceneArea = {
 
 type SceneElementBase = {
   id: ContentId
-  label?: string
 }
 
 export type SceneNodeElement = SceneElementBase & {
   kind: "node"
-  grid?: SceneGridPlacement
+  label: string
+  grid: SceneGridPlacement
   targetSceneId?: ContentId
   navigateToSceneId?: ContentId
-  description?: string
-  contentRef?: string
 }
 
 export type SceneEdgeElement = SceneElementBase & {
   kind: "edge"
+  label?: string
   fromElementId: ContentId
   toElementId: ContentId
   variant?: "flow" | "supporting" | "return"
@@ -62,26 +45,6 @@ export type SceneEdgeElement = SceneElementBase & {
 }
 
 export type SceneElement = SceneNodeElement | SceneEdgeElement
-
-export type Context = {
-  id: ContentId
-  summary: string
-  contentRef?: string
-}
-
-export type Occurrence = {
-  id: ContentId
-  conceptId: ContentId
-  contextId: ContentId
-  elementId?: ContentId
-  implementationSceneIds: ContentId[]
-}
-
-export type ConceptUsage = {
-  conceptId: ContentId
-  occurrenceId: ContentId
-  contextId: ContentId
-}
 
 export type SelfCheckQuestion = {
   question: string
@@ -93,29 +56,8 @@ export type Scene = {
   slug: string
   parentId?: ContentId
   title: string
-  summary: string
-  status: ContentStatus
-  ariaLabel: string
-  layoutHint?: LayoutHint
-  layout?: SceneGridLayout
+  layout: SceneGridLayout
   areas: SceneArea[]
   elements: SceneElement[]
-  contentRef: string
-  contexts: Context[]
-  occurrences: Occurrence[]
-  conceptRefs: ConceptUsage[]
   selfCheckQuiz?: SelfCheckQuestion[]
-}
-
-export type Concept = {
-  id: ContentId
-  slug: string
-  title: string
-  aliases: string[]
-  summary: string
-  status: ContentStatus
-  contentRef: string
-  sources: Source[]
-  author: Contributor
-  updatedAt: string
 }

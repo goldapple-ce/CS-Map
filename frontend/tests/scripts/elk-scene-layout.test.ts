@@ -8,18 +8,10 @@ function gridScene(elements: SceneElement[]): Scene {
   return {
     id: "test-scene",
     slug: "test-scene",
-    scenarioId: "test-scenario",
     title: "Test Scene",
-    summary: "Test Scene",
-    status: "published",
-    ariaLabel: "Test Scene",
-    layout: { type: "grid", columns: 5, rows: 5 },
+    layout: { columns: 5, rows: 5 },
     areas: [],
     elements,
-    contentRef: "content.ko.md",
-    contexts: [],
-    occurrences: [],
-    conceptRefs: [],
   }
 }
 
@@ -30,6 +22,7 @@ describe("buildSceneLayout", () => {
         {
           id: "source",
           kind: "node",
+          label: "Source",
           grid: { row: 1, col: 1, rowSpan: 2, colSpan: 2 },
         },
       ])
@@ -46,8 +39,18 @@ describe("buildSceneLayout", () => {
   it("지정된 port side를 사용해 직교 Edge 경로를 만든다", async () => {
     const layout = await buildSceneLayout(
       gridScene([
-        { id: "source", kind: "node", grid: { row: 1, col: 1 } },
-        { id: "target", kind: "node", grid: { row: 1, col: 3 } },
+        {
+          id: "source",
+          kind: "node",
+          label: "Source",
+          grid: { row: 1, col: 1 },
+        },
+        {
+          id: "target",
+          kind: "node",
+          label: "Target",
+          grid: { row: 1, col: 3 },
+        },
         {
           id: "edge",
           kind: "edge",
@@ -67,10 +70,15 @@ describe("buildSceneLayout", () => {
     }
   })
 
-  it("self-loop을 직렬화하고 좌표 없는 Node는 거부한다", async () => {
+  it("self-loop을 직렬화한다", async () => {
     const loopLayout = await buildSceneLayout(
       gridScene([
-        { id: "source", kind: "node", grid: { row: 1, col: 1 } },
+        {
+          id: "source",
+          kind: "node",
+          label: "Source",
+          grid: { row: 1, col: 1 },
+        },
         {
           id: "loop",
           kind: "edge",
@@ -81,10 +89,5 @@ describe("buildSceneLayout", () => {
     )
 
     expect(loopLayout.edges.loop.length).toBeGreaterThanOrEqual(2)
-    await expect(
-      buildSceneLayout(gridScene([{ id: "missing", kind: "node" }]))
-    ).rejects.toThrow(
-      "Grid scene test-scene is missing coordinates for node missing"
-    )
   })
 })

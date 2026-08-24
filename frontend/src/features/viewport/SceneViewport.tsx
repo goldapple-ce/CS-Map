@@ -1,5 +1,4 @@
 import {
-  cameraForBounds,
   cameraForGridScene,
   type CameraState,
 } from "@/features/explorer/camera"
@@ -54,13 +53,11 @@ export function SceneViewport({
 
   const rootPositioned = world.layout.scenes.get(world.layout.rootSceneId)
   const rootCamera = rootPositioned
-    ? rootPositioned.scene.layout?.type === "grid"
-      ? cameraForGridScene(
-          rootPositioned.bounds,
-          rootPositioned.scale,
-          viewport
-        )
-      : cameraForBounds(rootPositioned.bounds, viewport)
+    ? cameraForGridScene(
+        rootPositioned.bounds,
+        rootPositioned.scale,
+        viewport
+      )
     : undefined
   const relativeZoom = rootCamera
     ? Math.round((cameraState.scale / rootCamera.scale) * 100)

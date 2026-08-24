@@ -84,7 +84,6 @@ flowchart LR
 - `Node`: Scene에 배치되는 Topic 표현이다.
 - `Child Scene`: Node의 `childSceneId`로 소유 관계를 만든다.
 - `navigateToSceneId`: 포함 관계 없이 다른 Scene으로 이동한다.
-- `Concept`: 여러 Scene에서 재사용하는 공통 설명이다.
 - `description`, `contentRef`: 말단 Topic의 인라인 또는 Markdown 설명이다.
 
 작성 데이터에는 URL과 화면 좌표를 저장하지 않는다. Parent 관계와 URL은 Scene 참조에서, Node 좌표와 Edge 경로는 Grid 작성값에서 빌드 시 계산한다.
@@ -95,11 +94,11 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    Files["Scenario · Scene · Concept YAML<br/>Markdown · Quiz"]
+    Files["Scene YAML<br/>Markdown · Quiz"]
     Parse["YAML parse"]
     Schema["Zod schema 검증"]
     Graph["소유 관계 · 참조 · 순환 · 도달 가능성 검증"]
-    Normalize["runtime Scene · Concept 정규화"]
+    Normalize["runtime Scene 정규화"]
     Route["Route 계산"]
     Layout["Grid Node · Edge Layout 계산"]
     Assemble["GeneratedContentData 조립"]
@@ -118,9 +117,9 @@ flowchart TD
 
 - `scripts/content-build/schemas.ts`: 작성 데이터 형식, 기본값과 필드 간 제약 검증
 - `scripts/content-build/scene-graph.ts`: Child 소유권, 파생 metadata와 Root 도달 가능성 계산
-- `scripts/content-build/relationship-validation.ts`: Scene·Concept 참조와 순환 검증
+- `scripts/content-build/relationship-validation.ts`: Scene 참조와 순환 검증
 - `scripts/elk-scene-layout.ts`: Grid Node box와 직교 Edge 경로 계산
-- `scripts/content-build/source-content.ts`: 작성 파일 탐색·검증과 Scene·Concept 준비
+- `scripts/content-build/source-content.ts`: 작성 파일 탐색·검증과 Scene 준비
 - `scripts/content-build/generated-content.ts`: Route 계산과 생성 TypeScript 직렬화
 - `scripts/content-build/generated-file.ts`: 생성물 byte 검증·동기화와 이전 파일 정리
 - `scripts/build-content-index.ts`: 검증·Layout·data 조립 단계 조율과 오류 집계
@@ -136,12 +135,11 @@ type GeneratedContentData = {
   rootSceneId: ContentId
   routes: readonly RouteIndexEntry[]
   scenes: Readonly<Record<ContentId, GeneratedSceneContent>>
-  concepts: Readonly<Record<ContentId, GeneratedConceptContent>>
   layouts: Readonly<Record<ContentId, SerializedSceneLayout>>
 }
 ```
 
-각 Scene record에는 완성된 `Scene`, Scene Markdown, Topic 설명과 선택적 Quiz가 포함된다. Concept record에는 검증된 `Concept`와 Markdown이 포함된다. Root에서 도달할 수 없는 Scene은 Route, Scene과 Layout record에 생성하지 않는다.
+각 Scene record에는 완성된 `Scene`, Scene Markdown, Topic 설명과 선택적 Quiz가 포함된다. Root에서 도달할 수 없는 Scene은 Route, Scene과 Layout record에 생성하지 않는다.
 
 공용 타입은 `shared/content`와 `shared/layout`이 소유한다. 생성 파일은 이 계약을 구현할 뿐 별도 비즈니스 로직을 갖지 않는다.
 
@@ -170,7 +168,7 @@ flowchart LR
 - Root Scene과 Route 목록 조회
 - URL에 대응하는 Route 조회
 - Scene 지도와 Markdown 조회
-- Topic 설명과 Concept 조회
+- Topic 설명 조회
 - unknown ID에 대한 일관된 오류 반환
 - 기존 호출부 호환을 위한 완료된 Promise와 no-op prefetch 제공
 
@@ -213,10 +211,9 @@ sequenceDiagram
 
 Explanation Panel은 현재 `sceneId`와 선택한 Topic을 기준으로 Repository를 호출한다.
 
-- Scene 설명: Scene Markdown과 관련 Concept를 표시한다.
+- Scene 설명: Scene Markdown을 표시한다.
 - Topic 설명: 생성된 Topic 설명을 표시하고 없으면 안내 상태를 표시한다.
 - Quiz: `Scene.selfCheckQuiz`를 질문과 답변으로 표시한다.
-- Concept: 공통 Markdown과 현재 Scene의 Context를 함께 표시한다.
 
 ## Layout과 렌더링
 
@@ -237,7 +234,7 @@ Layout은 두 단계로 나뉜다.
 | Scene 복귀 상태 | `exploration-memory.ts` | Camera, Panel, 선택 Topic과 스크롤 snapshot 보관 |
 | World 좌표 | `world-layout.ts` | Parent·Child Scene의 재귀 배치 |
 | 목차 검색과 펼침 | `TopicOutline` | Route 목록을 트리로 표현 |
-| 설명 load와 탭 | `ExplanationPanel` | Scene·Topic·Concept·Quiz 표시 |
+| 설명 load와 탭 | `ExplanationPanel` | Scene·Topic·Quiz 표시 |
 
 상태를 다른 모듈에 중복 저장하지 않는다. 화면 전환 중 유지해야 하는 값은 `ExplorerShell`과 탐색 snapshot이 소유하고, 계산 가능한 값은 Route와 generated data에서 파생한다.
 
@@ -245,7 +242,7 @@ Layout은 두 단계로 나뉜다.
 
 - 작성 데이터 오류는 Content Build에서 모아 사람이 수정 가능한 파일 경로와 함께 보고한다.
 - 잘못된 참조, 중복 소유, 순환과 도달 불가능 Scene은 브라우저 실행 전에 처리한다.
-- 생성 Layout 누락과 unknown Route·Scene·Topic·Concept는 브라우저에서 명확한 오류가 된다.
+- 생성 Layout 누락과 unknown Route·Scene·Topic은 브라우저에서 명확한 오류가 된다.
 - Markdown은 React Markdown을 통해 허용된 요소로 렌더링하며 임의 HTML과 JavaScript를 실행하지 않는다.
 - 생성 데이터와 작성 파일의 동기화는 `content:validate`가 확인한다.
 
@@ -259,7 +256,7 @@ Layout은 두 단계로 나뉜다.
 - 전체 JavaScript 합계: 1,396,098 → 1,194,547 bytes, 14.44% 감소
 - 생성 `content-data.ts`: 665,681 bytes
 
-실제 초기 로딩 병목이 확인되면 Scene·Concept별 generated module, 동적 import, module Promise cache와 인접 Scene prefetch를 다시 검토한다. 측정 없이 이 복잡성을 미리 추가하지 않는다.
+실제 초기 로딩 병목이 확인되면 Scene별 generated module, 동적 import, module Promise cache와 인접 Scene prefetch를 다시 검토한다. 측정 없이 이 복잡성을 미리 추가하지 않는다.
 
 ## 변경 가이드
 

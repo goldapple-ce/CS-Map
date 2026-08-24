@@ -32,7 +32,6 @@ function contentHotReload(): Plugin {
         [
           "scenario.yaml",
           "scene.yaml",
-          "concept.yaml",
           "content.ko.md",
           "quiz.ko.yaml",
         ].includes(

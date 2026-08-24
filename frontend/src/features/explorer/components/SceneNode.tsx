@@ -68,7 +68,7 @@ export function SceneNode({
   onSelectTopic,
 }: SceneNodeProps) {
   const { x, y, width, height } = layout
-  const label = element.label ?? element.id
+  const label = element.label
   const labelLines = label.split(/\r?\n|\\n/u)
   const accessibleLabel = labelLines
     .map((line) => line.trim())

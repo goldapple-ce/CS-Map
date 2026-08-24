@@ -1,6 +1,6 @@
 # 콘텐츠 작성 가이드
 
-`frontend/content`에 Scene, Topic 설명, Concept와 퀴즈를 작성하는 방법과 파일 형식을 설명한다.
+`frontend/content`에 Scene, Topic 설명과 퀴즈를 작성하는 방법과 파일 형식을 설명한다.
 
 ## 무엇을 수정하면 되나요?
 
@@ -9,7 +9,6 @@
 - Child Scene이 없는 Topic 설명: `<topic>.ko.md`
 - Scene 퀴즈: `quiz.ko.yaml`
 - Topic의 내부 구조: Child Scene 디렉터리와 `childSceneId`
-- 여러 위치에서 공유할 설명: `concepts`의 Concept
 
 ## 작성 순서
 
@@ -26,14 +25,11 @@
 ```text
 frontend/content/
 ├─ scenarios/<scenario>/scenario.yaml
-├─ scenes/<scenario>/<scene-path>/
-│  ├─ scene.yaml
-│  ├─ content.ko.md
-│  ├─ quiz.ko.yaml
-│  └─ <topic>.ko.md
-└─ concepts/<concept>/
-   ├─ concept.yaml
-   └─ content.ko.md
+└─ scenes/<scenario>/<scene-path>/
+   ├─ scene.yaml
+   ├─ content.ko.md
+   ├─ quiz.ko.yaml
+   └─ <topic>.ko.md
 ```
 
 `quiz.ko.yaml`과 `<topic>.ko.md`는 필요할 때만 만든다. ID와 디렉터리 이름은 영문 소문자 kebab-case를 사용한다.
@@ -167,28 +163,6 @@ Scene Area는 `label`, `row`, `col`, `rowSpan`, `colSpan`을 가진다. 같은 �
 - 질문 하나에는 내용 하나만 담는다.
 - 답변은 결론부터 한두 문장으로 작성한다.
 - 본문에 없는 핵심 정보를 퀴즈에서 처음 소개하지 않는다.
-
-## Concept 형식
-
-```yaml
-id: example-concept
-slug: example-concept
-title: Example Concept
-aliases: []
-summary: 이 Concept를 한 문장으로 설명합니다.
-status: draft
-contentRef: content.ko.md
-author:
-  id: author-id
-  displayName: 작성자 이름
-updatedAt: 2026-01-01
-sources:
-  - title: 공식 문서
-    url: https://example.com
-    type: official
-```
-
-`status`는 `draft`, `review`, `published`, `sources.type`은 `official`, `primary`, `secondary` 중 하나다.
 
 ## 검증
 

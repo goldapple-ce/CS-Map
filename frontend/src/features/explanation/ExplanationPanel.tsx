@@ -5,7 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { contentRepository } from "@/content/content-repository"
 import { QuizPanel } from "@/features/explanation/QuizPanel"
-import { SceneExplanationContent } from "./SceneExplanationContent"
+import { MarkdownContent } from "./MarkdownContent"
 import { TopicExplanationContent } from "./TopicExplanationContent"
 import { ExplanationHeader } from "./ExplanationPanelHeader"
 
@@ -45,25 +45,9 @@ export function ExplanationPanel({
   const explanation = useMemo(() => {
     const { scene, markdown } = contentRepository.getScene(sceneId)
 
-    const concepts = scene.conceptRefs.map((usage) => {
-      const { concept, markdown: conceptMarkdown } =
-        contentRepository.getConcept(usage.conceptId)
-
-      const context = scene.contexts.find(({ id }) => id === usage.contextId)
-
-      return {
-        concept,
-        markdown: conceptMarkdown,
-        contextSummary:
-          context?.summary ?? "현재 장면에서 사용되는 공통 개념입니다.",
-        occurrenceId: usage.occurrenceId,
-      }
-    })
-
     return {
       scene,
       markdown,
-      concepts,
     }
   }, [sceneId])
 
@@ -129,7 +113,10 @@ export function ExplanationPanel({
                     }}
                   />
                 ) : (
-                  <SceneExplanationContent explanation={explanation} />
+                  <MarkdownContent
+                    markdown={explanation.markdown}
+                    idPrefix={`scene-${explanation.scene.id}`}
+                  />
                 )}
               </article>
             </TabsContent>

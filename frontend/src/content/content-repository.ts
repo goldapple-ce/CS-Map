@@ -47,11 +47,4 @@ export const contentRepository = {
 
     return content.topicExplanations[elementId]
   },
-
-  /** Concept와 Markdown을 반환한다. */
-  getConcept(id: ContentId) {
-    const content = contentData.concepts[id]
-    if (!content) throw new Error(`Unknown concept: ${id}`)
-    return content
-  },
 }

@@ -38,15 +38,13 @@ function previewBounds(scene: Scene, layout: SceneLayout): LayoutBox {
     }
   }
 
-  if (scene.layout?.type === "grid") {
-    const cellWidth = layout.width / scene.layout.columns
-    const cellHeight = layout.height / scene.layout.rows
-    for (const area of scene.areas) {
-      const x = (area.grid.col - 1) * cellWidth
-      const y = (area.grid.row - 1) * cellHeight
-      xValues.push(x, x + area.colSpan * cellWidth)
-      yValues.push(y - AREA_LABEL_SPACE, y + area.rowSpan * cellHeight)
-    }
+  const cellWidth = layout.width / scene.layout.columns
+  const cellHeight = layout.height / scene.layout.rows
+  for (const area of scene.areas) {
+    const x = (area.grid.col - 1) * cellWidth
+    const y = (area.grid.row - 1) * cellHeight
+    xValues.push(x, x + area.colSpan * cellWidth)
+    yValues.push(y - AREA_LABEL_SPACE, y + area.rowSpan * cellHeight)
   }
 
   if (xValues.length === 0 || yValues.length === 0) {
@@ -104,18 +102,16 @@ export function EnterGooglePreview({
         </marker>
       </defs>
 
-      {scene.layout?.type === "grid"
-        ? scene.areas.map((area) => (
-            <SceneArea
-              key={area.id}
-              area={area}
-              sceneWidth={layout.width}
-              sceneHeight={layout.height}
-              columns={scene.layout?.columns ?? 5}
-              rows={scene.layout?.rows ?? 5}
-            />
-          ))
-        : null}
+      {scene.areas.map((area) => (
+        <SceneArea
+          key={area.id}
+          area={area}
+          sceneWidth={layout.width}
+          sceneHeight={layout.height}
+          columns={scene.layout.columns}
+          rows={scene.layout.rows}
+        />
+      ))}
 
       {edges.map((element) => {
         const points = layout.edges.get(element.id)

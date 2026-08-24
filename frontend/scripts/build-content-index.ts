@@ -10,7 +10,6 @@ import { syncGeneratedContent } from "./content-build/generated-file.ts"
 import { validateContentGraph } from "./content-build/relationship-validation.ts"
 import { collectReachableSceneIds } from "./content-build/scene-graph.ts"
 import {
-  prepareConcepts,
   prepareScenes,
   readSourceDocuments,
 } from "./content-build/source-content.ts"
@@ -38,9 +37,8 @@ function throwContentValidation(errors: readonly string[]): never {
 
 /** Source 검증부터 Layout·data 조립과 생성물 동기화까지 순서대로 조율한다. */
 async function main() {
-  const { rootScene, sceneDocuments, conceptDocuments } =
-    await readSourceDocuments(appRoot)
-  const errors = [...sceneDocuments.errors, ...conceptDocuments.errors]
+  const { rootScene, sceneDocuments } = await readSourceDocuments(appRoot)
+  const errors = [...sceneDocuments.errors]
   if (!rootScene) throwContentValidation(errors)
   const rootSceneId = rootScene.value.id
 
@@ -50,12 +48,6 @@ async function main() {
     rootSceneId
   )
   errors.push(...sceneResult.errors)
-  const preparedConcepts = await prepareConcepts(
-    appRoot,
-    conceptDocuments.files
-  )
-  errors.push(...preparedConcepts.errors)
-
   const reachability = collectReachableSceneIds(
     rootSceneId,
     sceneDocuments.files
@@ -63,13 +55,13 @@ async function main() {
   errors.push(...reachability.errors)
 
   const graphIssues = validateContentGraph(
-    sceneResult.files.map(({ value }) => value),
-    conceptDocuments.files.map(({ value }) => value)
+    sceneResult.files.map(({ value }) => value)
   )
   const contentFiles = new Map(
-    [...sceneResult.files, ...conceptDocuments.files].map(
-      ({ filePath, value }) => [value.id, relativePath(filePath)]
-    )
+    sceneResult.files.map(({ filePath, value }) => [
+      value.id,
+      relativePath(filePath),
+    ])
   )
   for (const issue of graphIssues) {
     errors.push(
@@ -98,7 +90,6 @@ async function main() {
         { scene: value, markdown, topicExplanations },
       ])
     ),
-    concepts: preparedConcepts.concepts,
     layouts,
   }
 

@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest"
 
 import type { GeneratedContentData } from "@shared/content/generated-contract"
-import { sceneDocumentSchema } from "../../../scripts/content-build/schemas.ts"
 import type { Scene } from "@shared/content/types"
 import {
   buildRouteIndex,
@@ -12,65 +11,41 @@ import {
 function preparedScene(
   id: string,
   slug: string,
-  parentId?: string,
-  children: readonly string[] = [],
-  status: Scene["status"] = "published"
+  parentId?: string
 ) {
-  const document = sceneDocumentSchema.parse({
-    id,
-    title: id,
-    summary: id,
-    nodes: Object.fromEntries(
-      children.map((childId, index) => [
-        `child-${index}`,
-        { label: childId, row: 1, col: index + 1, childSceneId: childId },
-      ])
-    ),
-  })
   const value = {
     id,
     slug,
-    scenarioId: "scenario",
     ...(parentId ? { parentId } : {}),
     title: id,
-    summary: id,
-    status,
-    ariaLabel: id,
-    layout: { type: "grid", columns: 5, rows: 5 },
+    layout: { columns: 5, rows: 5 },
     areas: [],
     elements: [],
-    contentRef: "content.ko.md",
-    contexts: [],
-    occurrences: [],
-    conceptRefs: [],
   } satisfies Scene
-  return { document, value }
+  return { value }
 }
 
 describe("Generated content", () => {
-  it("부모 Route와 Child order를 계산하고 draft Scene은 제외한다", () => {
+  it("부모 Route를 계산하고 경로순으로 정렬한다", () => {
     const files = [
-      preparedScene("root", "root", undefined, ["second", "first"]),
+      preparedScene("root", "root"),
       preparedScene("first", "a", "root"),
       preparedScene("second", "b", "root"),
-      preparedScene("draft", "draft", undefined, [], "draft"),
     ]
 
     expect(buildRouteIndex(files)).toEqual([
-      { id: "root", title: "root", path: "/explore/root", order: 0 },
+      { id: "root", title: "root", path: "/explore/root" },
       {
         id: "first",
         title: "first",
         path: "/explore/root/a",
         parentId: "root",
-        order: 1,
       },
       {
         id: "second",
         title: "second",
         path: "/explore/root/b",
         parentId: "root",
-        order: 0,
       },
     ])
   })
@@ -78,7 +53,7 @@ describe("Generated content", () => {
   it("단일 생성 계약에 모든 runtime content 범주를 직렬화한다", () => {
     const content = renderContentData({
       rootSceneId: "root",
-      routes: [{ id: "root", title: "Root", path: "/explore/root", order: 0 }],
+      routes: [{ id: "root", title: "Root", path: "/explore/root" }],
       scenes: {
         root: {
           scene: {
@@ -87,12 +62,6 @@ describe("Generated content", () => {
           },
           markdown: "scene markdown",
           topicExplanations: { topic: "topic markdown" },
-        },
-      },
-      concepts: {
-        concept: {
-          concept: { id: "concept", title: "Concept" },
-          markdown: "concept markdown",
         },
       },
       layouts: {
@@ -105,7 +74,6 @@ describe("Generated content", () => {
       "scene markdown",
       "topic markdown",
       "question",
-      "concept markdown",
       "/explore/root",
       '"width": 10',
     ]) {

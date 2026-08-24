@@ -6,12 +6,11 @@ import type { Scene } from "@shared/content/types"
 
 type PreparedSceneFile = { value: Scene }
 
-/** 게시된 Scene의 부모 경로를 계산해 경로순 Route Index를 만든다. */
+/** Scene의 부모 경로를 계산해 경로순 Route Index를 만든다. */
 export function buildRouteIndex(
   files: readonly PreparedSceneFile[]
 ): RouteIndexEntry[] {
-  const published = files.filter(({ value }) => value.status === "published")
-  const scenesById = new Map(published.map((item) => [item.value.id, item]))
+  const scenesById = new Map(files.map((item) => [item.value.id, item]))
   const paths = new Map<string, string>()
 
   /** 부모 Route를 먼저 해석해 전체 URL을 계산하고 같은 결과를 재사용한다. */
@@ -21,7 +20,7 @@ export function buildRouteIndex(
     const item = scenesById.get(sceneId)
     if (!item) {
       throw new Error(
-        `Published route references unavailable Scene: ${sceneId}`
+        `Route references unavailable Scene: ${sceneId}`
       )
     }
     const route = item.value.parentId
@@ -31,7 +30,7 @@ export function buildRouteIndex(
     return route
   }
 
-  return published
+  return files
     .map(({ value }) => ({
       id: value.id,
       title: value.title,

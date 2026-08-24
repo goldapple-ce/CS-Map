@@ -10,4 +10,4 @@
 
 - 단일 구현만 사용하는 `ContentRepository` interface의 실제 교체·테스트 소비 여부를 확인하고, 불필요하면 concrete API로 축소하거나 제거한다.
 - 기존 Zod 오류 계약과 콘텐츠 신뢰 경계를 유지할 수 있는 범위에서 `parse*` wrapper를 축소한다.
-- 실제 초기 로딩 병목이 측정되면 Scene/Concept별 generated module, dynamic import, module Promise cache와 인접 Scene prefetch를 복구하고 압축된 초기 JavaScript 크기와 실제 로딩 시간을 전후 비교한다.
+- 실제 초기 로딩 병목이 측정되면 Scene별 generated module, dynamic import, module Promise cache와 인접 Scene prefetch를 복구하고 압축된 초기 JavaScript 크기와 실제 로딩 시간을 전후 비교한다.
