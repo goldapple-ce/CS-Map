@@ -26,8 +26,8 @@
 
 1. 계획 작성, INBOX 정리 또는 PLAN 관리를 요청하면 Planning Agent에게 맡긴다.
 2. 콘텐츠 작업이면 Content Agent에게 바로 맡긴다. 사용자가 계획도 요청했다면 Planning Agent가 먼저 PLAN을 작성한다.
-3. Frontend 코드 작업이면 Planning Agent가 먼저 PLAN을 작성하거나 진행 중인 PLAN을 확인한다.
-4. 진행 중인 PLAN에 현재 요청이 없다면 사용자에게 기존 PLAN에 반영할지 먼저 확인한다. 요청이 반영된 PLAN을 사용자가 승인하기 전에는 구현을 시작하지 않는다.
+3. 사용자가 계획을 요청했거나 여러 범위의 작업 순서를 먼저 정해야 하는 Frontend 작업이면 Planning Agent가 PLAN을 작성하거나 진행 중인 PLAN을 확인한다.
+4. 사용자가 바로 구현을 요청하거나 PLAN 생략을 명시한 Frontend 작업은 PLAN 작성·갱신과 별도 승인 없이 Frontend Agent에게 바로 맡긴다.
 5. 루트 문서 정리나 저장소 관리처럼 위 범위에 속하지 않는 작업은 루트 에이전트가 직접 처리한다.
 6. 하나의 요청이 여러 범위에 걸치면 Planning Agent가 작업 범위와 순서를 먼저 정한다.
 
