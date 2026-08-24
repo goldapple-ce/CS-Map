@@ -4,23 +4,15 @@ import type {
 } from "@shared/content/generated-contract"
 import type { Scene } from "@shared/content/types"
 
-import { sceneDocumentChildren, type SceneDocument } from "./schemas.ts"
+type PreparedSceneFile = { value: Scene }
 
-type PreparedSceneFile = { document: SceneDocument; value: Scene }
-
-/** 게시된 Scene의 부모 경로와 Child 순서를 계산해 경로순 Route Index를 만든다. */
+/** 게시된 Scene의 부모 경로를 계산해 경로순 Route Index를 만든다. */
 export function buildRouteIndex(
   files: readonly PreparedSceneFile[]
 ): RouteIndexEntry[] {
   const published = files.filter(({ value }) => value.status === "published")
   const scenesById = new Map(published.map((item) => [item.value.id, item]))
   const paths = new Map<string, string>()
-  const childOrder = new Map<string, number>()
-  for (const { document } of published) {
-    for (const child of sceneDocumentChildren(document)) {
-      childOrder.set(child.childSceneId, child.order)
-    }
-  }
 
   /** 부모 Route를 먼저 해석해 전체 URL을 계산하고 같은 결과를 재사용한다. */
   function resolveRoute(sceneId: string): string {
@@ -45,7 +37,6 @@ export function buildRouteIndex(
       title: value.title,
       path: resolveRoute(value.id),
       ...(value.parentId ? { parentId: value.parentId } : {}),
-      order: childOrder.get(value.id) ?? 0,
     }))
     .sort((left, right) => left.path.localeCompare(right.path))
 }

@@ -6,9 +6,9 @@ export type SearchNode = {
   children: SearchNode[]
 }
 
-/** 작성 순서와 제목을 기준으로 목차 항목의 안정된 순서를 정한다. */
+/** Topic 제목을 기준으로 목차 항목의 안정된 순서를 정한다. */
 function compareRoutes(left: RouteIndexEntry, right: RouteIndexEntry) {
-  return left.order - right.order || left.title.localeCompare(right.title, "ko")
+  return left.title.localeCompare(right.title, "ko")
 }
 
 /** 평탄한 Route 목록을 부모-자식 목차 트리로 변환한다. */

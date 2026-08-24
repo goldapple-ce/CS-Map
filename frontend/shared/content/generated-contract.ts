@@ -6,7 +6,6 @@ export type RouteIndexEntry = {
   title: string
   path: string
   parentId?: ContentId
-  order: number
 }
 
 export type GeneratedSceneContent = {

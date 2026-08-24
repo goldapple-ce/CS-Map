@@ -192,11 +192,11 @@ export type SceneDerivedMetadata = {
   parentId?: string
 }
 
-/** Scene 문서의 Node 순서를 보존해 Child Scene 참조를 추출한다. */
+/** Scene 문서에서 Child Scene 참조를 추출한다. */
 export function sceneDocumentChildren(document: SceneDocument) {
-  return Object.entries(document.nodes).flatMap(([nodeId, node], order) =>
+  return Object.entries(document.nodes).flatMap(([nodeId, node]) =>
     node.childSceneId
-      ? [{ nodeId, childSceneId: node.childSceneId, order }]
+      ? [{ nodeId, childSceneId: node.childSceneId }]
       : []
   )
 }
