@@ -79,7 +79,7 @@ flowchart LR
 
 ## 콘텐츠 모델
 
-- `Scene`: 제목, 요약, Area, Node, Edge와 선택적 Quiz를 가진 지도 단위다.
+- `Scene`: 제목, 요약, 선택적 검색 키워드, Area, Node, Edge와 선택적 Quiz를 가진 지도 단위다.
 - `Node`: Scene에 배치되는 Topic 표현이다.
 - `Child Scene`: Node의 `childSceneId`로 소유 관계를 만든다.
 - `navigateToSceneId`: 포함 관계 없이 다른 Scene으로 이동한다.
@@ -140,7 +140,7 @@ type GeneratedContentData = {
 }
 ```
 
-각 Scene record에는 완성된 `Scene`, Scene Markdown, Topic 설명과 선택적 Quiz가 포함된다. Root에서 도달할 수 없는 Scene은 Route, Scene과 Layout record에 생성하지 않는다.
+각 Scene record에는 검색에 사용하는 요약·키워드를 포함한 완성된 `Scene`, Scene Markdown, Topic 설명과 선택적 Quiz가 포함된다. Root에서 도달할 수 없는 Scene은 Route, Scene과 Layout record에 생성하지 않는다.
 
 공용 타입은 `shared/content`와 `shared/layout`이 소유한다. 생성 파일은 이 계약을 구현할 뿐 별도 비즈니스 로직을 갖지 않는다.
 
@@ -232,10 +232,12 @@ Layout은 두 단계로 나뉜다.
 | Camera와 애니메이션 | `SceneViewport` | 확대, 이동, Viewport 크기와 포커스 관리 |
 | Scene 복귀 상태 | `exploration-memory.ts` | Camera, Panel, 선택 Topic과 스크롤 snapshot 보관 |
 | World 좌표 | `world-layout.ts` | Parent·Child Scene의 재귀 배치 |
-| 목차 검색과 펼침 | `TopicOutline` | Route 목록을 트리로 표현 |
+| 목차 검색과 펼침 | `Search` | Route 목록을 트리로 표현하고 Scene 제목·요약·Topic 이름·키워드를 검색하며 기본 목차와 결과에 필요한 Scene metadata를 표시 |
 | 설명 load와 탭 | `ExplanationPanel` | Scene·Topic·Quiz 표시 |
 
 상태를 다른 모듈에 중복 저장하지 않는다. 화면 전환 중 유지해야 하는 값은 `ExplorerShell`과 탐색 snapshot이 소유하고, 계산 가능한 값은 Route와 generated data에서 파생한다.
+
+Search는 generated Route와 Scene을 결합한 `SearchEntry`를 검색 결과와 기본 목차에 함께 사용한다. `SearchItemContent`가 Scene 제목, 요약과 현재 위치 표시를 공통으로 담당하며 명시적인 옵션에 따라 검색 키워드와 Topic 이름 tag를 표시한다. `SearchResults`는 tag를 포함한 평탄한 결과 목록과 이동을, `SearchOutline`은 tag를 제외한 기본 목차의 트리 들여쓰기, 가지 펼침·접힘과 Link 이동을 각각 소유한다.
 
 ## 오류와 신뢰 경계
 

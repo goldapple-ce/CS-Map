@@ -14,6 +14,7 @@ function preparedScene(id: string, slug: string, parentId?: string) {
     slug,
     ...(parentId ? { parentId } : {}),
     title: id,
+    summary: `${id} summary`,
     layout: { columns: 5, rows: 5 },
     areas: [],
     elements: [],

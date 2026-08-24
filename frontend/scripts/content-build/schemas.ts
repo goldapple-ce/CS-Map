@@ -85,6 +85,7 @@ export const sceneDocumentSchema = z
   .object({
     title: z.string().min(1),
     summary: z.string().min(1),
+    keywords: z.array(z.string().trim().min(1)).min(1).optional(),
     areas: z.record(contentIdSchema, sceneAreaSchema).default({}),
     nodes: z.record(contentIdSchema, sceneNodeSchema),
     edges: z.array(sceneEdgeSchema).default([]),
@@ -194,6 +195,8 @@ export function normalizeSceneDocument(
   return {
     id: document.id,
     title: document.title,
+    summary: document.summary,
+    ...(document.keywords ? { keywords: document.keywords } : {}),
     ...metadata,
     layout: { columns: 5, rows: 5 },
     areas: Object.entries(document.areas).map(([id, area]) => ({

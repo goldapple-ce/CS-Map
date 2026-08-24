@@ -56,6 +56,8 @@ export type Scene = {
   slug: string
   parentId?: ContentId
   title: string
+  summary: string
+  keywords?: string[]
   layout: SceneGridLayout
   areas: SceneArea[]
   elements: SceneElement[]

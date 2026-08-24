@@ -6,7 +6,10 @@ import {
   deriveSceneDocuments,
   ROOT_SCENE_ID,
 } from "../../../scripts/content-build/source-content.ts"
-import { sceneDocumentSchema } from "../../../scripts/content-build/schemas.ts"
+import {
+  normalizeSceneDocument,
+  sceneDocumentSchema,
+} from "../../../scripts/content-build/schemas.ts"
 
 const appRoot = path.join(path.sep, "app")
 
@@ -20,6 +23,40 @@ function sourceScene(title: string) {
 }
 
 describe("Source content", () => {
+  it("Scene 요약과 검색 키워드를 runtime 모델에 보존한다", () => {
+    const document = {
+      ...sourceScene("Searchable Scene"),
+      id: "searchable-scene",
+      keywords: ["별칭", "alias"],
+    }
+
+    expect(
+      normalizeSceneDocument(document, { slug: "searchable-scene" })
+    ).toMatchObject({
+      summary: "Searchable Scene",
+      keywords: ["별칭", "alias"],
+    })
+  })
+
+  it("빈 검색 키워드 배열과 빈 키워드를 거부한다", () => {
+    expect(() =>
+      sceneDocumentSchema.parse({
+        title: "Empty keywords",
+        summary: "Summary",
+        keywords: [],
+        nodes: {},
+      })
+    ).toThrow()
+    expect(() =>
+      sceneDocumentSchema.parse({
+        title: "Blank keyword",
+        summary: "Summary",
+        keywords: ["   "],
+        nodes: {},
+      })
+    ).toThrow()
+  })
+
   it("scenes 기준 상대 폴더 경로 전체를 Scene ID로 주입한다", () => {
     const result = deriveSceneDocuments(appRoot, [
       {

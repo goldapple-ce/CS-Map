@@ -1,18 +1,18 @@
-import type { RouteIndexEntry } from "@shared/content/generated-contract"
-
 import { cn } from "@/lib/utils"
 import { useNavigate } from "react-router-dom"
+import { SearchItemContent } from "./SearchItemContent"
+import type { SearchEntry } from "./search-index"
 
 type SearchResultsProps = {
-  routes: readonly RouteIndexEntry[]
+  entries: readonly SearchEntry[]
   currentSceneId?: string
 }
 
-/** 검색 결과와 각 Topic의 상위 경로를 선택 가능한 목록으로 표시한다. */
-export function SearchResults({ routes, currentSceneId }: SearchResultsProps) {
+/** 검색된 Scene metadata를 이동 가능한 평탄한 목록으로 표시한다. */
+export function SearchResults({ entries, currentSceneId }: SearchResultsProps) {
   const navigate = useNavigate()
 
-  if (routes.length === 0) {
+  if (entries.length === 0) {
     return (
       <div
         role="status"
@@ -20,7 +20,7 @@ export function SearchResults({ routes, currentSceneId }: SearchResultsProps) {
       >
         <p className="text-sm font-medium">일치하는 Topic이 없습니다.</p>
         <p className="mt-1 text-xs text-muted-foreground">
-          다른 제목이나 더 짧은 검색어를 입력해 보세요.
+          다른 제목, 설명, 키워드나 더 짧은 검색어를 입력해 보세요.
         </p>
       </div>
     )
@@ -28,24 +28,27 @@ export function SearchResults({ routes, currentSceneId }: SearchResultsProps) {
 
   return (
     <ul aria-label="Topic 검색 결과" className="space-y-2">
-      {routes.map((route) => {
-        const isCurrent = route.id === currentSceneId
+      {entries.map((entry) => {
+        const isCurrent = entry.id === currentSceneId
 
         return (
-          <li key={route.id}>
+          <li key={entry.id}>
             <button
               className={cn(
                 "w-full rounded-lg border border-border p-3 text-left hover:bg-muted",
                 isCurrent && "bg-muted"
               )}
-              onClick={() => navigate(route.path)}
+              aria-label={
+                isCurrent ? `${entry.title}, 현재 Topic` : entry.title
+              }
+              aria-current={isCurrent ? "page" : undefined}
+              onClick={() => navigate(entry.path)}
             >
-              <p className="block font-medium">
-                {route.title}
-                {isCurrent ? (
-                  <span className="ml-4 text-xs">현재 Topic</span>
-                ) : null}
-              </p>
+              <SearchItemContent
+                entry={entry}
+                current={isCurrent}
+                showKeywords
+              />
             </button>
           </li>
         )

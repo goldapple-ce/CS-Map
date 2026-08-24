@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { ancestorIds, searchOutline, type SearchNode } from "./search-index"
 import { Link } from "react-router-dom"
+import { SearchItemContent } from "./SearchItemContent"
 
 type SearchOutlineProps = {
   currentSceneId?: string
@@ -25,16 +26,16 @@ function OutlineBranch({
 }: OutlineBranchProps) {
   return (
     <ul className="space-y-1">
-      {nodes.map(({ route, children }) => {
+      {nodes.map(({ entry, children }) => {
         const hasChildren = children.length > 0
-        const isExpanded = expanded.has(route.id)
-        const isCurrent = route.id === currentSceneId
+        const isExpanded = expanded.has(entry.id)
+        const isCurrent = entry.id === currentSceneId
 
         return (
-          <li key={route.id}>
+          <li key={entry.id}>
             <div
               className={cn(
-                "flex items-center rounded-lg",
+                "flex items-start rounded-lg",
                 isCurrent && "bg-muted"
               )}
             >
@@ -42,8 +43,10 @@ function OutlineBranch({
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  className="shrink-0"
-                  onClick={() => onToggle(route.id)}
+                  className="mt-1 shrink-0"
+                  aria-label={`${entry.title} 하위 Topic ${isExpanded ? "접기" : "펼치기"}`}
+                  aria-expanded={isExpanded}
+                  onClick={() => onToggle(entry.id)}
                 >
                   {isExpanded ? <ChevronDown /> : <ChevronRight />}
                 </Button>
@@ -56,14 +59,17 @@ function OutlineBranch({
                   "w-full min-w-0 flex-1 rounded-md p-2 text-left hover:bg-muted",
                   isCurrent && "bg-muted"
                 )}
-                to={route.path}
+                to={entry.path}
+                aria-label={
+                  isCurrent ? `${entry.title}, 현재 Topic` : entry.title
+                }
+                aria-current={isCurrent ? "page" : undefined}
               >
-                <p className="block font-medium">
-                  {route.title}
-                  {isCurrent ? (
-                    <span className="ml-4 text-xs">현재 Topic</span>
-                  ) : null}
-                </p>
+                <SearchItemContent
+                  entry={entry}
+                  current={isCurrent}
+                  showKeywords={false}
+                />
               </Link>
             </div>
 

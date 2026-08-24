@@ -9,6 +9,7 @@ function gridScene(elements: SceneElement[]): Scene {
     id: "test-scene",
     slug: "test-scene",
     title: "Test Scene",
+    summary: "Test Scene summary",
     layout: { columns: 5, rows: 5 },
     areas: [],
     elements,

@@ -41,6 +41,7 @@ frontend/content/
 ```yaml
 title: Example 흐름
 summary: 이 Scene이 보여주는 내용을 한 문장으로 설명합니다.
+keywords: [검색 별칭, abbreviation]
 
 nodes:
   leaf-topic:
@@ -70,11 +71,13 @@ areas:
 
 - `title`: 화면에 표시할 Scene 제목
 - `summary`: Scene을 설명하는 한 문장
+- `keywords`: 제목과 요약만으로 찾기 어려운 한글·영문·약어 검색 별칭(선택)
 - `nodes`: 화면에 배치할 Topic
 - `edges`: Topic 사이의 흐름
 - `areas`: 여러 Topic을 배경으로 묶을 때만 사용
 
 Scene 제목은 `title`에만 작성하고 `content.ko.md`에서 반복하지 않는다.
+`keywords`에는 제목이나 요약을 그대로 반복하지 않고, 실제 검색에 도움이 되는 별칭만 넣는다. 검색 결과에 tag로 표시되므로 지나치게 많거나 긴 값은 피한다.
 
 ### Topic
 

@@ -14,7 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { contentRepository } from "@/content/content-repository"
 import { SearchOutline } from "./SearchOutline"
 import { SearchResults } from "./SearchResults"
-import { normalizeSearchText, orderedSearchRoutes } from "./search-index"
+import { normalizeSearchText, orderedSearchEntries } from "./search-index"
 import {
   InputGroup,
   InputGroupAddon,
@@ -32,8 +32,8 @@ export function Search() {
   const searchResults = useMemo(
     () =>
       normalizedQuery
-        ? orderedSearchRoutes.filter((route) =>
-            normalizeSearchText(route.title).includes(normalizedQuery)
+        ? orderedSearchEntries.filter((entry) =>
+            entry.searchText.includes(normalizedQuery)
           )
         : [],
     [normalizedQuery]
@@ -81,7 +81,7 @@ export function Search() {
             <nav aria-label="전체 Topic 목차">
               {normalizedQuery ? (
                 <SearchResults
-                  routes={searchResults}
+                  entries={searchResults}
                   currentSceneId={currentSceneId}
                 />
               ) : (
