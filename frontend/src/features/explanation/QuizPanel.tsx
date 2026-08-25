@@ -28,11 +28,8 @@ export function QuizPanel({ questions }: QuizPanelProps) {
       <div>
         <p className="text-sm font-medium text-muted-foreground">이해 확인</p>
         <h3 className="mt-1 text-2xl font-semibold tracking-tight">
-          현재 Topic 퀴즈
+          현재 Scene 퀴즈
         </h3>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          질문을 생각해 본 뒤 답변을 확인해 보세요. 결과는 저장되지 않습니다.
-        </p>
       </div>
 
       {questions.map((item, index) => {
