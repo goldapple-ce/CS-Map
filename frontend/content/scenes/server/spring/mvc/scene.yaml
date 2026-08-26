@@ -1,4 +1,4 @@
-title: DispatcherServlet과 Spring MVC
+title: Spring MVC
 summary: DispatcherServlet이 Controller와 Interceptor를 찾고 HandlerAdapter로 실행한 뒤 ViewResolver를 통해 서버 측 View를 렌더링하는 흐름입니다.
 nodes:
   dispatcher-servlet:

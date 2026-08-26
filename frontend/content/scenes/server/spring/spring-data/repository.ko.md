@@ -11,7 +11,7 @@ JPA, JDBC, MongoDB와 Redis module은 이 공통 추상화를 이용해 비슷�
 - Repository
   - CrudRepository
     - ListCrudRepository
-      - JPARepostiroy
+      - JpaRepository
       - MongoRepository
 
 Redis Repository와 Spring Data JDBC Repository는 보통 애플리케이션 interface가 `CrudRepository`나 `ListCrudRepository`를 직접 확장하고, module별 설정과 domain mapping을 통해 저장소 종류가 결정됩니다.

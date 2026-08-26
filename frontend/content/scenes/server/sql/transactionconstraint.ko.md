@@ -43,7 +43,7 @@ UPDATE 실행 → 자동 Commit
 
 따라서 여러 SQL을 하나의 작업으로 묶으려면 같은 Connection에서 Transaction을 시작하고 마지막에 commit 또는 rollback해야 합니다.
 
-Spring에서는 보통 `@Transactional`과 `TransactionManager`가 이 작업을 대신합니다. 자세한 Spring Proxy, Propagation과 rollback 규칙은 Spring Data Access의 Transaction Topic에서 다룹니다.
+Spring에서는 보통 `@Transactional`과 `TransactionManager`가 이 작업을 대신합니다. 자세한 Spring Proxy, Propagation과 rollback 규칙은 Spring Framework Scene의 Transaction Topic에서 다룹니다.
 
 ---
 

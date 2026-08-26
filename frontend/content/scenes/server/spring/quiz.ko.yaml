@@ -1,14 +1,17 @@
-- question: Java에서 만든 객체는 모두 Spring Bean인가요?
-  answer: 아니요. Component scan이나 `@Bean` 설정 등을 통해 Spring Container에 등록되어 관리되는 객체가 Bean입니다.
+- question: Spring Framework의 Core에서 Container와 Bean은 어떤 관계인가요?
+  answer: Container가 Bean을 만들고 의존 관계와 생명주기를 관리합니다.
 
-- question: Spring에서 IoC는 무엇을 뜻하나요?
-  answer: 객체의 생성, 연결과 생명주기를 제어하는 주체가 개발자 코드에서 Spring Container로 바뀌는 것을 뜻합니다.
+- question: Spring AOP는 모든 Bean이 반드시 거쳐야 하는 실행 단계인가요?
+  answer: 아니요. 필요한 Bean에 Proxy를 통해 공통 기능을 적용하는 보조 기능입니다.
 
-- question: DI를 사용하면 객체가 필요한 의존성을 직접 생성하나요?
-  answer: 아니요. 객체는 생성자 등을 통해 Spring Container가 찾아 준 의존성을 전달받습니다.
+- question: Spring Transaction이 서로 다른 Data Access 기술에서 제공하는 공통점은 무엇인가요?
+  answer: 작업의 commit과 rollback 경계를 일관된 방식으로 정하도록 돕는 Transaction 추상화입니다.
 
-- question: Spring AOP는 공통 기능을 일반적으로 어떻게 적용하나요?
-  answer: 대상 Bean을 Proxy로 감싸 로깅이나 transaction 같은 공통 기능을 method 호출 전후에 적용합니다.
+- question: Spring JDBC는 Java JDBC API를 대체하는 별도 통신 표준인가요?
+  answer: 아니요. JDBC와 DataSource를 사용하면서 반복 처리, 예외 변환과 Spring Transaction 연동을 제공하는 Spring Framework 지원입니다.
 
-- question: Spring Framework와 Spring Boot는 같은 것인가요?
-  answer: 아니요. Spring Framework는 Container와 AOP 같은 기반 기능을 제공하고, Spring Boot는 이를 빠르게 조합하도록 자동 설정과 starter 등을 제공합니다.
+- question: Spring Data는 Spring Framework Scene의 Data Access Area와 같은 뜻인가요?
+  answer: 아니요. Spring Data는 Repository와 저장소별 Mapping을 제공하는 별도 Spring 프로젝트입니다.
+
+- question: Web Servlet, Data Access와 목적별 Spring 프로젝트는 항상 차례로 실행되나요?
+  answer: 아니요. Application의 필요에 따라 선택하고 Bean과 결합하는 서로 다른 기능 영역입니다.

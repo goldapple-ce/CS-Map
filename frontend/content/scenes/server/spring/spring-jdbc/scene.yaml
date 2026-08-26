@@ -1,0 +1,67 @@
+title: Spring JDBC
+summary: Application Code가 JdbcClient 또는 JdbcTemplate로 SQL을 실행하면 DataSource·JDBC API·Driver를 거쳐 관계형 Database와 통신하는 흐름입니다.
+keywords:
+  [JdbcClient, JdbcTemplate, DataSource, JDBC Driver, DataAccessException]
+
+nodes:
+  spring-jpa:
+    label: Spring JPA
+    row: 3
+    col: 1
+    description: 개발자가 SQL과 Parameter를 작성하고 JdbcClient 또는 JdbcTemplate를 호출합니다.
+  jdbc-client:
+    label: JdbcClient
+    row: 2
+    col: 2
+    contentRef: jdbc-client.ko.md
+  jdbc-template:
+    label: JdbcTemplate
+    row: 3
+    col: 2
+    contentRef: jdbc-template.ko.md
+  jdbc:
+    label: JDBC API
+    row: 3
+    col: 3
+    contentRef: jdbc-api.ko.md
+  jdbc-driver:
+    label: JDBC Driver
+    row: 3
+    col: 4
+    contentRef: jdbc-driver.ko.md
+  sql:
+    label: SQL
+    row: 3
+    col: 5
+    navigateToSceneId: server-sql
+  data-source:
+    label: DataSource
+    row: 4
+    col: 2
+    contentRef: data-source.ko.md
+
+edges:
+  - from: spring-jpa
+    fromSide: right
+    to: jdbc-client
+  - from: jdbc-client
+    to: jdbc-template
+    label: 실행 위임
+  - from: spring-jpa
+    fromSide: right
+    to: jdbc-template
+    label: 호출
+    labelSide: bottom
+  - from: jdbc-template
+    to: jdbc
+    label: SQL 실행
+  - from: jdbc
+    to: jdbc-driver
+    label: 구현 호출
+  - from: jdbc-driver
+    to: sql
+    label: 전용 Protocol
+  - from: data-source
+    to: jdbc-template
+    label: Connection 제공
+    variant: supporting

@@ -1,71 +1,133 @@
-title: Spring
-summary: Spring Container가 설정을 읽어 Bean을 생성하고 연결하며, 웹·데이터 접근과 AOP 기능이 Bean을 중심으로 결합되는 구조입니다.
+title: Spring Framework
+summary: Core의 Container·Bean·AOP와 Data Access의 Transaction·Spring JDBC를 중심으로 Spring Framework의 주요 기능 영역을 보여줍니다.
 nodes:
-  echo-system:
-    label: Spring 생태계
+  tomcat:
+    label: Tomcat
+    row: 3
+    col: 1
+    contentRef: tomcat.ko.md
+
+  web-socket:
+    label: WebSocket
+    row: 2
+    col: 3
+    contentRef: websocket.ko.md
+  spring-mvc:
+    label: Spring MVC
+    row: 3
+    col: 3
+    childSceneId: server-spring-mvc
+  rest-client:
+    label: RestClient
+    row: 4
+    col: 3
+
+  transaction:
+    label: Transaction
+    row: 2
+    col: 5
+    contentRef: transaction.ko.md
+  spring-jdbc:
+    label: Spring JDBC
+    row: 3
+    col: 5
+    childSceneId: server-spring-spring-jdbc
+
+  spring-security:
+    label: Spring Security
+    row: 3
+    col: 2
+    childSceneId: server-spring-spring-security
+  spring-data:
+    label: Spring Data
+    row: 3
+    col: 4
+    childSceneId: server-spring-spring-data
+
+  spring-batch:
+    label: Spring Batch
     row: 1
     col: 3
-    contentRef: springecosystem.ko.md
-  web-servlet:
-    label: Web Servlet
-    row: 1
-    col: 2
-    childSceneId: server-spring-web-servlet
+    contentRef: spring-batch.ko.md
 
-  data-access:
-    label: Data Access
-    row: 1
-    col: 4
-    childSceneId: server-spring-data-access
   spring-container:
     label: Spring Container
-    row: 2
-    col: 3
+    row: 5
+    col: 2
     contentRef: springcontainer.ko.md
-  application-context:
-    label: ApplicationContext
-    row: 2
-    col: 4
-    contentRef: applicationcontext.ko.md
-
+  bean:
+    label: Bean
+    row: 5
+    col: 3
+    contentRef: bean.ko.md
   spring-aop:
     label: Spring AOP
     row: 5
-    col: 3
+    col: 4
     contentRef: springaop.ko.md
-  bean:
-    label: Bean
-    row: 4
-    col: 3
-    contentRef: bean.ko.md
-
 edges:
-  - from: web-servlet
-    to: spring-container
-    toSide: top
-    label: 등록
-  - from: echo-system
-    to: spring-container
-  - from: data-access
-    to: spring-container
-    toSide: top
-    label: 등록
+  - from: tomcat
+    to: spring-security
+    label: 요청 전달
+  - from: spring-security
+    fromSide: right
+    to: web-socket
+    label: 필터 통과
+    labelSide: left
+  - from: spring-security
+    fromSide: right
+    to: spring-mvc
+
+  - from: web-socket
+    to: spring-data
+    toSide: left
+    label: 데이터 접근
+  - from: spring-mvc
+    to: spring-data
+    toSide: left
+
+  - from: spring-data
+    to: spring-jdbc
+    label: JDBC 활용
+  - from: transaction
+    to: spring-jdbc
+    label: 트랜잭션 관리
+
   - from: spring-container
     to: bean
-    label: 빈 생성
+    label: 생성·관리
   - from: spring-aop
     to: bean
     label: Proxy 적용
-  - from: spring-container
-    to: application-context
-    label: 대표 인터페이스
-    variant: supporting
-  # - from: bean
-  #   fromSide: top
-  #   to: web-servlet
-  # - from: bean
-  #   fromSide: top
-  #   to: data-access
-  # - from: bean
-  #   fromSide: top
-  #   to: echo-system
+
+areas:
+  web:
+    label: Web
+    row: 2
+    col: 1
+    rowSpan: 3
+    colSpan: 5
+  web-servlet:
+    label: Web Servlet
+    row: 2
+    col: 3
+    rowSpan: 3
+    colSpan: 1
+  data-access:
+    label: Data Access
+    row: 2
+    col: 5
+    rowSpan: 2
+    colSpan: 1
+  core:
+    label: Core
+    row: 5
+    col: 2
+    rowSpan: 1
+    colSpan: 3
+  opt:
+    label: Option
+    row: 1
+    col: 2
+    rowSpan: 1
+    colSpan: 3

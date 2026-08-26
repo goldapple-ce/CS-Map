@@ -1,92 +1,60 @@
 # 한눈에 보기
 
-Spring은 Java 애플리케이션을 만들 때 객체 생성과 연결, 웹 요청, 데이터 접근, transaction 같은 반복적인 기반 작업을 맡아 주는 오픈소스 애플리케이션 프레임워크입니다.
+이 Scene은 Spring을 사용하는 Server Application에서 요청 처리, Data Access와 객체 관리가 어디에서 만나는지 보여줍니다.
 
-중심에는 `Spring Container`와 `Bean`이 있습니다. 개발자가 객체를 직접 생성하고 연결하는 대신 Container가 설정을 읽어 Bean을 만들고, 필요한 의존성을 주입해 애플리케이션을 구성합니다.
-
----
-
-# 구성 요소
-
-- `Spring 생태계`: Spring Framework와 Spring Boot, Spring Security, Spring Data 같은 여러 프로젝트를 포괄합니다.
-- `Web Servlet`: Servlet 기반 웹 요청을 Spring MVC와 Spring Security로 처리합니다.
-- `Data Access`: JDBC, transaction, ORM과 Repository를 이용한 데이터 접근을 지원합니다.
-- `Spring Container`: 설정 정보를 읽고 Bean을 생성·조립하며 생명주기를 관리합니다.
-- `ApplicationContext`: Spring Container를 나타내는 대표적인 인터페이스입니다.
-- `Bean`: Spring Container가 생성하고 관리하는 객체입니다.
-- `Spring AOP`: 필요한 Bean을 Proxy로 감싸 공통 기능을 method 호출 전후에 적용합니다.
-
-Web, Data Access와 AOP는 서로 고립된 기능이 아닙니다. 각 기능에 필요한 객체도 Bean으로 등록되며 Container 안에서 함께 연결됩니다.
+Area는 기능의 범위를 나타내고, 화살표는 대표적인 요청 전달이나 지원 관계를 나타냅니다. 모든 Topic이 항상 한 번에 사용되거나 그림의 모든 화살표를 차례로 거치는 것은 아닙니다.
 
 ---
 
-# Spring 핵심 개념
+# Web과 Web Servlet
 
-## IoC: 객체를 제어하는 주체가 바뀝니다
+일반적인 Servlet 기반 요청은 다음 흐름으로 이어질 수 있습니다.
 
-일반적인 Java 코드에서는 객체가 필요한 객체를 직접 생성하고 연결할 수 있습니다. Spring에서는 Container가 객체의 생성, 연결과 생명주기를 맡습니다. 이렇게 프로그램의 제어권 일부가 개발자 코드에서 Framework로 넘어가는 것을 `IoC(Inversion of Control)`라고 합니다.
-
-## DI: 필요한 객체를 외부에서 받습니다
-
-`DI(Dependency Injection)`는 IoC를 구현하는 대표적인 방법입니다. 객체가 자신의 의존성을 직접 만들지 않고, 생성자 등을 통해 Container로부터 전달받습니다.
-
-```java
-@Service
-class OrderService {
-    private final OrderRepository orderRepository;
-
-    OrderService(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
-    }
-}
+```text
+Tomcat → Spring Security → Spring MVC → Spring Data
 ```
 
-`OrderService`는 구현 객체를 직접 만들지 않습니다. Spring Container가 알맞은 `OrderRepository` Bean을 찾아 생성자에 주입합니다.
+`Tomcat`은 HTTP 요청을 받아 Spring 쪽으로 전달합니다. `Spring Security`를 사용하는 Application에서는 보안 Filter가 인증 정보와 접근 권한을 확인한 뒤 요청을 다음 처리 대상으로 넘깁니다.
 
-## POJO: 특별한 상속 없이 평범한 Java 객체로 작성합니다
+`Spring MVC`는 Controller를 찾아 HTTP 요청을 처리합니다. `WebSocket`은 연결을 시작할 때 HTTP Handshake를 사용하며, 이후에는 지속된 연결로 Message를 주고받습니다. 두 경로의 Application Code는 필요한 경우 `Spring Data`를 통해 데이터를 읽거나 저장할 수 있습니다.
 
-`POJO(Plain Old Java Object)`는 특정 Framework class를 반드시 상속하거나 구현하지 않은 평범한 Java 객체를 뜻합니다. Spring은 POJO를 Bean으로 관리하면서 DI, transaction과 AOP 같은 기능을 적용할 수 있게 합니다.
+`RestClient`는 Server가 외부 HTTP API를 호출할 때 사용하는 동기식 Client입니다. 들어온 요청을 처리하는 Spring MVC와 방향이 다르므로 이 Scene에서는 요청 흐름 Edge로 연결하지 않았습니다.
 
-## AOP: 반복되는 공통 기능을 분리합니다
-
-로깅이나 transaction처럼 여러 객체에 반복되는 작업을 핵심 로직마다 작성하지 않고, 적용 대상과 실행할 기능을 따로 정의합니다. Spring AOP는 일반적으로 대상 Bean 앞에 Proxy를 두어 method 호출을 가로챕니다.
+`Web` Area는 Server 요청과 관련해 함께 쓰일 수 있는 Topic을 넓게 보여줍니다. 그 안의 `Web Servlet` Area는 중심 열의 Web 기능을 시각적으로 묶지만, `RestClient`까지 들어오는 요청 순서에 포함된다는 뜻은 아닙니다. Spring Security와 Spring Data는 Spring Framework 내부 Module이 아니라 Application이 필요에 따라 결합하는 별도 Spring 프로젝트입니다.
 
 ---
 
-# 개발자가 개입하는 지점
+# Data Access
 
-개발자는 주로 다음 코드를 작성해 Spring의 동작을 구성합니다.
+`Spring Data`는 Repository 중심의 Data Access를 제공합니다. 그중 JDBC 기반 경로는 `Spring JDBC`의 SQL 실행과 자원 관리 기능을 활용할 수 있습니다.
 
-- `@Component`, `@Service`, `@Repository`, `@Controller`로 Bean 후보 작성
-- `@Configuration`과 `@Bean`으로 생성 방법과 설정 정의
-- 생성자 parameter로 Bean 사이의 의존 관계 표현
-- Spring MVC, Spring Security와 Data Access 설정 구성
-- annotation이나 Aspect를 이용해 transaction과 공통 기능 적용
+`Spring JDBC`는 `JdbcClient`와 `JdbcTemplate`을 제공하며, 그 아래에서 `DataSource`, JDBC API와 JDBC Driver를 사용합니다. 내부 실행 흐름은 Spring JDBC Child Scene에서 확인할 수 있습니다.
 
-Container를 직접 제어하기보다 어떤 객체가 필요하고 서로 어떻게 연결되는지를 선언하는 것이 일반적인 Spring 개발 방식입니다.
+`Transaction`은 Spring JDBC 뒤에 실행되는 마지막 단계가 아닙니다. 여러 Data Access 작업이 같은 Transaction 경계와 Connection에 참여하도록 관리하는 지원 관계입니다.
 
 ---
 
-# 꼭 알아둘 점
+# Core
 
-## Spring과 Spring Boot는 다릅니다
+`Spring Container`는 설정을 읽어 `Bean`을 만들고 의존 관계와 생명주기를 관리합니다. Web Handler, Security 구성과 Data Access 객체도 Application 설정에 따라 Bean으로 관리될 수 있습니다.
 
-Spring Framework는 Container, AOP, Web MVC 같은 기반 기능을 제공합니다. Spring Boot는 이 기능들을 빠르게 조합할 수 있도록 자동 설정, starter와 실행 환경을 제공합니다.
+`Spring AOP`는 선택한 Bean을 Proxy로 감싸 Transaction 같은 공통 기능을 Method 호출 전후에 적용할 수 있습니다. 모든 Bean에 자동으로 적용되는 단계는 아닙니다.
 
-## 모든 객체가 Bean은 아닙니다
+---
 
-Java의 모든 객체를 Spring이 관리하는 것은 아닙니다. Component scan이나 `@Bean` 설정 등을 통해 Container에 등록된 객체가 Bean입니다.
+# Option
 
-## annotation 자체가 기능을 실행하는 것은 아닙니다
-
-annotation은 설정 정보에 가깝습니다. Spring Container와 관련 처리기가 annotation을 읽어 Bean 등록, 의존성 주입이나 Proxy 적용 같은 실제 동작을 수행합니다.
+`Spring Batch`는 사용자 요청에 즉시 응답하는 Web 흐름과 달리, 많은 데이터를 일정한 단위로 읽고 처리하고 쓰는 Batch 작업에 사용합니다. 필요한 Application에서 선택하는 별도 Spring 프로젝트이므로 `Option` Area에 분리되어 있습니다.
 
 ---
 
 # 참고 자료
 
-- [Spring Framework — Overview](https://docs.spring.io/spring-framework/reference/overview.html)
-- [Spring Framework — IoC Container](https://docs.spring.io/spring-framework/reference/core/beans.html)
-- [Spring Framework — Container Overview](https://docs.spring.io/spring-framework/reference/core/beans/basics.html)
-- [Spring Framework — Aspect Oriented Programming](https://docs.spring.io/spring-framework/reference/core/aop.html)
-- [Spring — Projects](https://spring.io/projects)
+- [Spring Framework — Core Technologies](https://docs.spring.io/spring-framework/reference/core.html)
+- [Spring Framework — Web on Servlet Stack](https://docs.spring.io/spring-framework/reference/web.html)
+- [Spring Framework — WebSocket API](https://docs.spring.io/spring-framework/reference/web/websocket/server.html)
+- [Spring Framework — REST Clients](https://docs.spring.io/spring-framework/reference/integration/rest-clients.html)
+- [Spring Framework — Data Access](https://docs.spring.io/spring-framework/reference/data-access.html)
+- [Spring Security — Servlet Applications](https://docs.spring.io/spring-security/reference/servlet/index.html)
+- [Spring Data Commons](https://docs.spring.io/spring-data/commons/reference/)
+- [Spring Batch — Introduction](https://docs.spring.io/spring-batch/reference/spring-batch-intro.html)

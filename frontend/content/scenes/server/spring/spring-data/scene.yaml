@@ -1,0 +1,88 @@
+title: Spring Data
+summary: 공통 Repository가 Spring Data JPA·JDBC·NoSQL Module을 통해 각각의 표준과 Driver 기반으로 이어지는 구조입니다.
+keywords: [Spring Data Repository, Spring Data JPA, Spring Data JDBC]
+nodes:
+  repository:
+    label: Repository
+    row: 3
+    col: 1
+    contentRef: repository.ko.md
+
+  spring-data-jpa:
+    label: Spring Data JPA
+    row: 1
+    col: 2
+    contentRef: springdatajpa.ko.md
+  jpa:
+    label: JPA
+    row: 1
+    col: 3
+    childSceneId: server-spring-spring-data-jpa
+  hibernate:
+    label: Hibernate
+    row: 1
+    col: 4
+    contentRef: hibernate.ko.md
+
+  spring-data-jdbc:
+    label: Spring Data JDBC
+    row: 3
+    col: 2
+    contentRef: springdatajdbc.ko.md
+  jdbc-api:
+    label: JDBC API
+    row: 3
+    col: 5
+    navigateToSceneId: server-spring-spring-jdbc
+
+  nosql-repository:
+    label: NoSQL Repository
+    row: 5
+    col: 2
+    contentRef: nosqlrepository.ko.md
+  store-driver:
+    label: 저장소별 Driver
+    row: 5
+    col: 4
+    contentRef: storespecificdriver.ko.md
+  nosql-store:
+    label: NoSQL 저장소
+    row: 5
+    col: 5
+    contentRef: nosqlstore.ko.md
+
+edges:
+  - from: repository
+    fromSide: right
+    to: spring-data-jpa
+    toSide: left
+    label: JPA 선택
+  - from: spring-data-jpa
+    to: jpa
+    toSide: left
+    label: 표준 사용
+  - from: jpa
+    to: hibernate
+    label: 구현 위임
+  - from: hibernate
+    to: jdbc-api
+
+  - from: repository
+    fromSide: right
+    to: spring-data-jdbc
+    label: JDBC 선택
+  - from: spring-data-jdbc
+    to: jdbc-api
+    label: 기반 사용
+
+  - from: repository
+    fromSide: right
+    to: nosql-repository
+    toSide: left
+    label: NoSQL 선택
+  - from: nosql-repository
+    to: store-driver
+    label: 명령 전달
+  - from: store-driver
+    to: nosql-store
+    label: 전용 Protocol

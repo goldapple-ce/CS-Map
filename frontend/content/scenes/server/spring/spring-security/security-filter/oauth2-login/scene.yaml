@@ -15,7 +15,7 @@ nodes:
     label: OAuth2Login\nAuthenticationFilter
     row: 3
     col: 3
-    childSceneId: server-spring-web-servlet-spring-security-security-filter-oauth2-login-oauth2-login-authentication-filter
+    childSceneId: server-spring-spring-security-security-filter-oauth2-login-oauth2-login-authentication-filter
   authorization-request-repository:
     label: AuthorizationRequest\nRepository
     row: 2
