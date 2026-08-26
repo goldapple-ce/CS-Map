@@ -1,0 +1,20 @@
+- question: Repository 자체가 실제 저장 방식을 결정하나요?
+  answer: 아니요. Repository는 공통 method 형태를 제공하고, 실제 저장 방식은 Spring Data JPA, Spring Data JDBC 또는 저장소별 module이 결정합니다.
+
+- question: JPA와 Hibernate는 같은 역할을 하나요?
+  answer: 아니요. JPA는 Java 객체와 관계형 Database를 연결하는 ORM 표준이고, Hibernate는 이를 실제로 동작시키는 대표적인 구현체입니다.
+
+- question: Spring Data JDBC는 JPA와 Hibernate를 거치나요?
+  answer: 아니요. Spring Data JDBC는 JPA와 Hibernate 없이 JDBC API를 직접 사용합니다.
+
+- question: Spring Data JPA와 Spring Data JDBC는 관계형 Database에 접근할 때 어디에서 합류하나요?
+  answer: 두 방식은 JDBC API, DataSource와 JDBC Driver에서 합류합니다.
+
+- question: NoSQL Repository도 JDBC API와 JDBC Driver를 사용하나요?
+  answer: 아니요. MongoDB나 Redis 같은 NoSQL 저장소는 저장소에 맞는 Driver와 network protocol을 사용합니다.
+
+- question: DataSource가 맡는 역할은 무엇인가요?
+  answer: JDBC Connection을 공급하고 일반적으로 Connection Pool을 관리합니다.
+
+- question: Transaction 지원 방식은 모든 저장소에서 같나요?
+  answer: 아니요. 실제 TransactionManager, 지원 조건과 동작은 JPA, JDBC, MongoDB와 Redis에서 서로 다릅니다.

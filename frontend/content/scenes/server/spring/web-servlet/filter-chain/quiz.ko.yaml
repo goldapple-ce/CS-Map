@@ -1,0 +1,14 @@
+- question: Servlet Filter가 다음 Filter를 실행하려면 무엇을 호출하나요?
+  answer: "`chain.doFilter()`를 호출합니다."
+
+- question: Filter는 반드시 다음 Filter로 요청을 넘겨야 하나요?
+  answer: 아니요. 직접 응답을 만들고 요청 진행을 중단할 수 있으며, 이때 뒤쪽 Filter와 DispatcherServlet은 실행되지 않습니다.
+
+- question: DelegatingFilterProxy는 요청을 어디로 전달하나요?
+  answer: Spring Container가 관리하는 Filter Bean에 전달합니다.
+
+- question: Spring Security가 원래 Servlet FilterChain 전체를 교체하나요?
+  answer: 아니요. DelegatingFilterProxy 위치에서 내부 Security Filter들이 실행된 뒤 원래 Servlet FilterChain으로 돌아옵니다.
+
+- question: DispatcherServlet은 언제 호출되나요?
+  answer: 앞의 Filter들이 요청을 계속 진행시켜 모든 Filter를 통과했을 때 호출됩니다.

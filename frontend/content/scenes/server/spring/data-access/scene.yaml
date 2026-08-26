@@ -38,11 +38,12 @@ nodes:
     row: 2
     col: 5
     contentRef: jdbcdriver.ko.md
-  relational-database:
-    label: Relational Database
+  sql:
+    label: SQL
     row: 3
     col: 5
-    contentRef: relationaldatabase.ko.md
+    # contentRef: relationaldatabase.ko.md
+    navigateToSceneId: server-sql
 
   transaction:
     label: Transaction
@@ -101,7 +102,7 @@ edges:
     to: jdbc-driver
     label: Driver 호출
   - from: jdbc-driver
-    to: relational-database
+    to: sql
     label: 전용 Protocol
 
   - from: data-source

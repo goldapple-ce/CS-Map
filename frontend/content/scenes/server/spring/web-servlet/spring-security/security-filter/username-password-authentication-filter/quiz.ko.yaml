@@ -1,0 +1,15 @@
+- question: UsernamePasswordAuthenticationFilter는 로그인 요청에서 무엇을 만들어 전달하나요?
+  answer: Username과 Password를 담은 인증 전 UsernamePasswordAuthenticationToken을 만들어 AuthenticationManager에 전달합니다.
+
+- question: ProviderManager가 맡는 역할은 무엇인가요?
+  answer: 전달된 Token을 지원해 인증을 처리할 AuthenticationProvider를 찾습니다.
+
+- question: UsernamePasswordAuthenticationFilter가 사용자 저장소를 직접 조회하나요?
+  answer: 아니요. UserDetailsService가 사용자를 조회하고 DaoAuthenticationProvider와 PasswordEncoder가 Password를 검증합니다.
+
+- question: 인증에 성공한 결과는 현재 요청에서 어디에 설정되나요?
+  answer: SecurityContextHolder의 SecurityContext에 설정됩니다.
+
+- question: 세션 기반 로그인에서 인증 결과를 다음 요청에도 사용하려면 어디에 저장하나요?
+  answer: SecurityContextRepository에 저장해 다음 요청에서 복원합니다.
+

@@ -1,0 +1,15 @@
+- question: Method Area와 Heap은 Thread마다 따로 만들어지나요?
+  answer: 아니요. Method Area와 Heap은 여러 Thread가 공유합니다.
+
+- question: PC Register와 JVM Stack은 모든 Thread가 공유하나요?
+  answer: 아니요. PC Register, JVM Stack과 Native Method Stack은 Thread마다 별도로 생성됩니다.
+
+- question: Interpreter와 JIT Compiler는 어떤 역할 차이가 있나요?
+  answer: Interpreter는 Bytecode를 실행하고, JIT Compiler는 자주 실행되는 코드를 최적화합니다.
+
+- question: Garbage Collector가 주로 정리하는 Runtime Data Area는 어디인가요?
+  answer: 객체와 배열이 생성되는 Heap입니다.
+
+- question: 같은 Bytecode를 여러 OS에서 실행할 때 JVM 실행 파일도 동일한가요?
+  answer: 아니요. Bytecode 형식과 JVM 규격은 공통이지만 JVM 구현은 OS와 CPU에 맞게 만들어집니다.
+

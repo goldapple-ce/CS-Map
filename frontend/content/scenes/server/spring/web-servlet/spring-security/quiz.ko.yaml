@@ -1,0 +1,15 @@
+- question: 인증과 인가는 각각 무엇을 확인하나요?
+  answer: 인증은 사용자가 누구인지 확인하고, 인가는 확인된 사용자가 요청을 수행할 권한이 있는지 판단합니다.
+
+- question: DelegatingFilterProxy가 요청을 직접 모두 처리하나요?
+  answer: 아니요. Spring Bean인 FilterChainProxy에 처리를 위임합니다.
+
+- question: FilterChainProxy는 여러 SecurityFilterChain 중 무엇을 선택하나요?
+  answer: 현재 요청과 처음 일치하는 SecurityFilterChain을 선택합니다.
+
+- question: 모든 요청에 같은 Security Filter 목록이 적용되나요?
+  answer: 아니요. 여러 SecurityFilterChain이 있으면 요청 경로에 따라 다른 인증 방식과 보안 정책을 적용할 수 있습니다.
+
+- question: SecurityContextHolder와 SecurityContextRepository의 역할은 어떻게 다른가요?
+  answer: SecurityContextHolder는 현재 요청에서 인증 정보에 접근하게 하고, SecurityContextRepository는 다음 요청에서도 쓰도록 인증 정보를 불러오고 저장합니다.
+

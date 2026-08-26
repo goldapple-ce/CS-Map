@@ -1,0 +1,15 @@
+- question: MongoDB는 데이터를 어떤 단위로 표현하고 저장하나요?
+  answer: 데이터를 BSON Document로 표현해 Collection에 저장합니다.
+
+- question: Replica Set에서 요청을 처리할 Member는 무엇을 바탕으로 선택되나요?
+  answer: MongoDB Driver가 Replica Set 상태와 읽기 설정을 바탕으로 선택합니다.
+
+- question: MongoDB는 Document를 찾을 때 항상 Index Scan만 사용하나요?
+  answer: 아니요. 조건과 Index에 따라 Collection Scan 또는 Index Scan으로 찾을 수 있습니다.
+
+- question: MongoDB는 Schema를 전혀 고려하지 않아도 되나요?
+  answer: 아니요. Document마다 Field 구성이 달라질 수 있어도 Application이 기대하는 구조와 Validation 규칙은 필요합니다.
+
+- question: MongoDB는 관계형 Database보다 항상 빠른가요?
+  answer: 아니요. 성능은 데이터 모델, Query, Index, 데이터 분포와 Consistency 요구 등에 따라 달라집니다.
+

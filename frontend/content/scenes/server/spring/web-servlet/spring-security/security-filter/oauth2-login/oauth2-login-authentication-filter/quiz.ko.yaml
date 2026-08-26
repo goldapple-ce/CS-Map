@@ -1,0 +1,18 @@
+- question: OAuth2LoginAuthenticationFilter는 Callback을 받은 뒤 원래 로그인 요청을 어디서 가져오나요?
+  answer: AuthorizationRequestRepository에서 로그인 시작 때 저장한 OAuth2AuthorizationRequest를 가져옵니다.
+
+- question: ProviderManager는 OAuth 2.0 Login 요청을 어떻게 처리할 Provider를 정하나요?
+  answer: 등록된 AuthenticationProvider를 순서대로 확인해 요청을 지원하는 Provider를 선택합니다.
+
+- question: Authorization Code를 Access Token으로 교환하는 책임은 어디에 있나요?
+  answer: OAuth2AuthorizationCodeAuthenticationProvider가 Authorization Server의 Token Endpoint를 호출해 교환합니다.
+
+- question: OAuth2UserService는 Access Token을 어디에 사용하나요?
+  answer: Resource Server의 UserInfo Endpoint를 호출해 사용자 속성을 조회하는 데 사용합니다.
+
+- question: OAuth2AuthenticationToken은 무엇을 나타내나요?
+  answer: OAuth2User를 Principal로 사용하는 현재 Application의 로그인 상태를 나타냅니다.
+
+- question: OAuth2AuthorizedClient는 SecurityContext와 같은 목적의 객체인가요?
+  answer: 아니요. 사용자와 ClientRegistration 및 Access Token을 연결해 이후 외부 API 호출에 사용할 정보를 보관합니다.
+

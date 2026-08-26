@@ -1,0 +1,11 @@
+- question: Browser 같은 Application이 Hardware를 매번 직접 제어하나요?
+  answer: 아니요. 일반적으로 OS가 Hardware를 관리하고 Application에 Process, Memory, File과 Network 기능을 제공합니다.
+
+- question: Memory와 Storage는 전원이 꺼진 뒤 데이터를 보관하는 역할이 같나요?
+  answer: 아니요. Memory는 실행 중인 Program의 명령과 데이터를 빠르게 보관하고, Storage는 Program과 File을 전원이 꺼진 뒤에도 보관합니다.
+
+- question: Network Interface는 Web 접속에서 어떤 역할을 하나요?
+  answer: Wi-Fi나 Ethernet 등을 이용해 연결된 Network와 Frame 및 Packet을 송수신합니다.
+
+- question: Web Application의 성능 문제는 Code만 확인하면 되나요?
+  answer: 아니요. CPU 포화, Memory 부족, Storage I/O와 Network 지연도 구분해 확인해야 합니다.

@@ -1,0 +1,18 @@
+- question: OAuth 2.0 Login은 한 번의 HTTP 요청 안에서 끝나나요?
+  answer: 아니요. Browser가 Application과 외부 Provider를 왕복하는 여러 요청으로 진행됩니다.
+
+- question: OAuth2AuthorizationRequestRedirectFilter가 사용자를 직접 인증하나요?
+  answer: 아니요. Authorization Request를 만들고 저장한 뒤 Browser를 Authorization Server로 보낼 Redirect 응답을 만듭니다.
+
+- question: Application의 Callback URL로 전달되는 핵심 값은 Access Token인가요?
+  answer: 아니요. Browser는 Authorization Code를 전달하고, 내 Server가 이를 Token Endpoint에서 Access Token으로 교환합니다.
+
+- question: Authorization Server로 실제 요청을 보내는 주체는 누구인가요?
+  answer: Redirect 응답을 받은 Browser입니다.
+
+- question: OAuth2LoginAuthenticationFilter는 저장한 Authorization Request를 왜 다시 조회하나요?
+  answer: 시작 요청과 Callback을 연결하고 `state`와 필요한 값을 검증하기 위해서입니다.
+
+- question: OAuth 2.0 Login에 성공하면 Application Resource 접근도 자동 허용되나요?
+  answer: 아니요. 로그인 뒤 실제 접근 가능 여부는 AuthorizationFilter와 AuthorizationManager가 별도로 판단합니다.
+

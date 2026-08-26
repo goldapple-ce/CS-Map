@@ -1,0 +1,15 @@
+- question: Java Source Code는 그대로 JVM에서 실행되나요?
+  answer: 아니요. Java Compiler가 Source Code를 Bytecode가 담긴 `.class` 파일로 변환합니다.
+
+- question: Bytecode는 특정 OS나 CPU의 기계어인가요?
+  answer: 아니요. JVM이 실행할 수 있는 공통 명령 형식입니다.
+
+- question: 같은 Bytecode를 여러 OS에서 실행하기 쉬운 이유는 무엇인가요?
+  answer: 각 OS와 CPU에 맞는 JVM이 같은 Bytecode를 해당 환경에 맞게 실행하기 때문입니다.
+
+- question: JAR 파일은 새로운 실행 언어인가요?
+  answer: 아니요. 여러 `.class` 파일과 Resource를 묶은 배포 형식이며 내부 Java Class는 JVM에서 실행됩니다.
+
+- question: JVM은 Spring의 구성 요소인가요?
+  answer: 아니요. Spring Application이 다른 Java Application과 마찬가지로 JVM 위에서 실행됩니다.
+
