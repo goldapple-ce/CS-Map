@@ -30,7 +30,7 @@ nodes:
     label: DNS
     row: 3
     col: 4
-    childSceneId: network-dns
+    childSceneId: dns
   router2:
     label: Router
     row: 2

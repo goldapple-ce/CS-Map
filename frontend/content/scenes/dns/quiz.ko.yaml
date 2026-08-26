@@ -1,0 +1,14 @@
+- question: Client가 Root, TLD와 Authoritative DNS에 직접 차례대로 질의하나요?
+  answer: 아니요. Client는 Recursive Resolver에 요청하고, Resolver가 여러 DNS Server에 별도의 Query를 보내 최종 답을 찾습니다.
+
+- question: 하나의 DNS Server가 모든 Domain의 IP 주소를 가지고 있나요?
+  answer: 아니요. 정보가 여러 DNS Server에 나뉘어 있으므로 Recursive Resolver가 안내를 따라 최종 답을 가진 Server를 찾습니다.
+
+- question: Root DNS와 TLD DNS가 Query를 다음 DNS Server로 전달하나요?
+  answer: 아니요. 다음으로 질의할 DNS Server의 위치를 알려 주며, Recursive Resolver가 그 Server에 새로운 Query를 보냅니다.
+
+- question: "google.com의 A 또는 AAAA Record는 어느 DNS Server가 반환하나요?"
+  answer: "`google.com`을 담당하는 Authoritative DNS가 반환합니다."
+
+- question: Recursive Resolver의 Cache에 유효한 답이 있어도 Root DNS부터 다시 확인하나요?
+  answer: 아니요. Cache에 유효한 답이 있으면 전체 탐색을 생략하고 IP 주소를 바로 반환할 수 있습니다.
