@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Search } from "@/features/search/Search"
@@ -8,6 +8,7 @@ import {
   useModeAnimation,
 } from "react-theme-switch-animation"
 import { useState } from "react"
+import logo from "/logo.svg"
 
 const GIFS = [
   "https://media.tenor.com/4oEf1dDrLOUAAAAi/heart-love.gif",
@@ -16,8 +17,6 @@ const GIFS = [
 ]
 
 export function AppHeader() {
-  const navigate = useNavigate()
-
   const [gifUrl, setGifUrl] = useState(GIFS[0])
   const { ref, toggleSwitchTheme } = useModeAnimation({
     animationType: ThemeAnimationType.GIF,
@@ -33,14 +32,13 @@ export function AppHeader() {
 
   return (
     <header className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
-      <Button
-        className="text-lg"
-        variant="ghost"
-        onClick={() => navigate("/")}
-        aria-label="홈"
+      <Link
+        to="/"
+        aria-label="홈으로 이동"
+        className="inline-flex items-center"
       >
-        CS-MAP
-      </Button>
+        <img src={logo} alt="CS Map" className="h-8 w-auto" />
+      </Link>
 
       <Search />
       <Button
