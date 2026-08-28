@@ -3,6 +3,7 @@ import { cva } from "class-variance-authority"
 import type { SceneNodeElement } from "@shared/content/types"
 import type { LayoutBox } from "@shared/layout/scene-layout-contract"
 import { estimatedSceneNodeLabelWidth } from "@shared/layout/scene-node-metrics"
+import type { LightFlowNodeState } from "@/features/explorer/light-flow-render-context"
 import { cn } from "@/lib/utils"
 
 export type SceneNodeState = "interactive" | "selected"
@@ -15,7 +16,7 @@ const sceneNodeLabelFontSizes: Record<SceneNodeDensity, number> = {
 }
 
 const sceneNodeVariants = cva(
-  "relative flex size-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card/90 text-center shadow-sm transition-[background-color,color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
+  "relative flex size-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card/90 text-center shadow-sm transition-[background-color,border-color,color,box-shadow] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-60",
   {
     variants: {
       state: {
@@ -51,6 +52,7 @@ type SceneNodeProps = {
   layout: LayoutBox
   state: SceneNodeState
   density?: SceneNodeDensity
+  lightFlowState?: LightFlowNodeState
   navigationDisabled?: boolean
   onEnterScene?: (sceneId: string) => void
   onPrefetchScene?: (sceneId: string) => void
@@ -63,6 +65,7 @@ export function SceneNode({
   layout,
   state,
   density = "near",
+  lightFlowState,
   navigationDisabled = false,
   onEnterScene,
   onSelectTopic,
@@ -89,6 +92,10 @@ export function SceneNode({
   const preview = navigationSceneId
     ? `${accessibleLabel} 내부 내용을 봅니다.`
     : `${accessibleLabel} 설명을 엽니다.`
+  const nodeClassName = cn(
+    sceneNodeVariants({ state }),
+    lightFlowState && "border-primary shadow-[0_0_16px_oklch(83%_0.13_83)]"
+  )
   const content = (
     <>
       <span
@@ -119,7 +126,7 @@ export function SceneNode({
         type="button"
         disabled={navigationDisabled}
         aria-label={`${accessibleLabel} 내부 보기`}
-        className={cn(sceneNodeVariants({ state }))}
+        className={nodeClassName}
         onClick={() => onEnterScene(navigationSceneId)}
       >
         {content}
@@ -131,7 +138,7 @@ export function SceneNode({
         type="button"
         disabled={navigationDisabled}
         aria-label={`${accessibleLabel} 설명 열기`}
-        className={cn(sceneNodeVariants({ state }))}
+        className={nodeClassName}
         onClick={() => onSelectTopic(element.id, accessibleLabel)}
       >
         {content}
@@ -142,7 +149,7 @@ export function SceneNode({
       <div
         role="group"
         aria-label={`${accessibleLabel}, ${stateLabels[state]}`}
-        className={cn(sceneNodeVariants({ state }))}
+        className={nodeClassName}
       >
         {content}
       </div>

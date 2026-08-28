@@ -6,6 +6,7 @@ import {
   type SceneNodeDensity,
   type SceneNodeState,
 } from "@/features/explorer/components/SceneNode"
+import { useLightFlowRender } from "@/features/explorer/light-flow-render-context"
 import {
   boundsIntersect,
   visibleWorldBounds,
@@ -63,6 +64,7 @@ export function WorldRenderer({
   onEnterScene,
   onSelectTopic,
 }: WorldRendererProps) {
+  const lightFlow = useLightFlowRender()
   const visibleBounds = visibleWorldBounds(camera, viewport)
   const ancestors = getSceneAncestors(layout, focusedSceneId)
   const targetChildren = new Map<string, number>()
@@ -152,10 +154,17 @@ export function WorldRenderer({
                 const points = localLayout.edges.get(element.id)
                 return points ? (
                   <SceneEdge
-                    key={element.id}
+                    key={
+                      isFocused && lightFlow.activeEdgeIds.has(element.id)
+                        ? `${element.id}-${lightFlow.playbackKey}`
+                        : element.id
+                    }
                     element={element}
                     points={points}
                     contextual={!isFocused}
+                    lightFlowActive={
+                      isFocused && lightFlow.activeEdgeIds.has(element.id)
+                    }
                   />
                 ) : null
               })}
@@ -177,6 +186,11 @@ export function WorldRenderer({
                       selectedElementId
                     )}
                     density={density}
+                    lightFlowState={
+                      isFocused && lightFlow.activeNodeIds.has(element.id)
+                        ? lightFlow.nodeState
+                        : undefined
+                    }
                     navigationDisabled={navigationDisabled}
                     onEnterScene={onEnterScene}
                     onSelectTopic={(elementId, label) =>

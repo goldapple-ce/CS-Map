@@ -81,6 +81,26 @@ const sceneAreaSchema = z
   })
   .strict()
 
+const lightFlowEdgeReferenceSchema = z.tuple([
+  contentIdSchema,
+  contentIdSchema,
+])
+
+const sceneLightFlowSchema = z
+  .object({
+    label: z.string().trim().min(1).optional(),
+    stages: z
+      .array(
+        z
+          .object({
+            edges: z.array(lightFlowEdgeReferenceSchema).min(1),
+          })
+          .strict()
+      )
+      .min(1),
+  })
+  .strict()
+
 export const sceneDocumentSchema = z
   .object({
     title: z.string().min(1),
@@ -89,6 +109,7 @@ export const sceneDocumentSchema = z
     areas: z.record(contentIdSchema, sceneAreaSchema).default({}),
     nodes: z.record(contentIdSchema, sceneNodeSchema),
     edges: z.array(sceneEdgeSchema).default([]),
+    lightFlows: z.record(contentIdSchema, sceneLightFlowSchema).optional(),
   })
   .strict()
   .superRefine((scene, context) => {
@@ -155,6 +176,97 @@ export const sceneDocumentSchema = z
         })
       }
     })
+
+    const lightFlows = Object.entries(scene.lightFlows ?? {})
+    if (lightFlows.length > 1) {
+      const labels = new Map<string, string>()
+      for (const [flowId, flow] of lightFlows) {
+        if (!flow.label) {
+          context.addIssue({
+            code: "custom",
+            path: ["lightFlows", flowId, "label"],
+            message: "A label is required when a Scene has multiple Light Flows",
+          })
+          continue
+        }
+        const previousFlowId = labels.get(flow.label)
+        if (previousFlowId) {
+          context.addIssue({
+            code: "custom",
+            path: ["lightFlows", flowId, "label"],
+            message: `Light Flow label is already used by ${previousFlowId}: ${flow.label}`,
+          })
+        } else {
+          labels.set(flow.label, flowId)
+        }
+      }
+    }
+
+    const edgesByPair = new Map<string, number[]>()
+    scene.edges.forEach((edge, index) => {
+      const key = `${edge.from}\u0000${edge.to}`
+      const indexes = edgesByPair.get(key) ?? []
+      indexes.push(index)
+      edgesByPair.set(key, indexes)
+    })
+
+    for (const [flowId, flow] of lightFlows) {
+      flow.stages.forEach((stage, stageIndex) => {
+        const stagePairs = new Set<string>()
+        stage.edges.forEach(([from, to], edgeIndex) => {
+          const path = [
+            "lightFlows",
+            flowId,
+            "stages",
+            stageIndex,
+            "edges",
+            edgeIndex,
+          ]
+          const pair = `${from}\u0000${to}`
+          if (stagePairs.has(pair)) {
+            context.addIssue({
+              code: "custom",
+              path,
+              message: `Light Flow stage repeats Edge: ${from} -> ${to}`,
+            })
+          }
+          stagePairs.add(pair)
+
+          const fromExists = Boolean(scene.nodes[from])
+          const toExists = Boolean(scene.nodes[to])
+          if (!fromExists) {
+            context.addIssue({
+              code: "custom",
+              path: [...path, 0],
+              message: `Light Flow references unknown node: ${from}`,
+            })
+          }
+          if (!toExists) {
+            context.addIssue({
+              code: "custom",
+              path: [...path, 1],
+              message: `Light Flow references unknown node: ${to}`,
+            })
+          }
+          if (!fromExists || !toExists) return
+
+          const matches = edgesByPair.get(pair) ?? []
+          if (matches.length === 0) {
+            context.addIssue({
+              code: "custom",
+              path,
+              message: `Light Flow references unknown Edge: ${from} -> ${to}`,
+            })
+          } else if (matches.length > 1) {
+            context.addIssue({
+              code: "custom",
+              path,
+              message: `Light Flow Edge reference is ambiguous: ${from} -> ${to}`,
+            })
+          }
+        })
+      })
+    }
   })
 
 export const sceneQuizSchema = z
@@ -179,6 +291,14 @@ export type SceneDerivedMetadata = {
   parentId?: string
 }
 
+/** 작성 순서까지 포함해 Layout과 Light Flow가 공유하는 runtime Edge ID를 만든다. */
+function sceneEdgeRuntimeId(
+  edge: Pick<SceneSourceDocument["edges"][number], "from" | "to">,
+  index: number
+) {
+  return `edge-${edge.from}-${edge.to}-${index + 1}`
+}
+
 /** Scene 문서에서 Child Scene 참조를 추출한다. */
 export function sceneDocumentChildren(document: SceneDocument) {
   return Object.entries(document.nodes).flatMap(([nodeId, node]) =>
@@ -192,6 +312,13 @@ export function normalizeSceneDocument(
   metadata: SceneDerivedMetadata,
   selfCheckQuiz?: SelfCheckQuestion[]
 ): Scene {
+  const edgeIdsByPair = new Map(
+    document.edges.map((edge, index) => [
+      `${edge.from}\u0000${edge.to}`,
+      sceneEdgeRuntimeId(edge, index),
+    ])
+  )
+
   return {
     id: document.id,
     title: document.title,
@@ -223,7 +350,7 @@ export function normalizeSceneDocument(
           : {}),
       })),
       ...document.edges.map((edge, index) => ({
-        id: `edge-${edge.from}-${edge.to}-${index + 1}`,
+        id: sceneEdgeRuntimeId(edge, index),
         kind: "edge" as const,
         fromElementId: edge.from,
         toElementId: edge.to,
@@ -234,6 +361,27 @@ export function normalizeSceneDocument(
         ...(edge.labelSide ? { labelSide: edge.labelSide } : {}),
       })),
     ],
+    ...(document.lightFlows
+      ? {
+          lightFlows: Object.entries(document.lightFlows).map(
+            ([id, flow]) => ({
+              id,
+              ...(flow.label ? { label: flow.label } : {}),
+              stages: flow.stages.map((stage) => ({
+                edgeIds: stage.edges.map(([from, to]) => {
+                  const edgeId = edgeIdsByPair.get(`${from}\u0000${to}`)
+                  if (!edgeId) {
+                    throw new Error(
+                      `Light Flow ${id} references unavailable Edge: ${from} -> ${to}`
+                    )
+                  }
+                  return edgeId
+                }),
+              })),
+            })
+          ),
+        }
+      : {}),
     ...(selfCheckQuiz ? { selfCheckQuiz } : {}),
   }
 }

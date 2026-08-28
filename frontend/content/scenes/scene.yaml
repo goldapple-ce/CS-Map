@@ -74,6 +74,24 @@ edges:
   - from: router2
     to: server
     label: 서버 전송
+lightFlows:
+  request-flow:
+    label: 흐름보기
+    stages:
+      - edges:
+          - [browser, user-device]
+      - edges:
+          - [user-device, router]
+      - edges:
+          - [router, dns]
+      - edges:
+          - [browser, https]
+      - edges:
+          - [https, osi-model]
+      - edges:
+          - [osi-model, router2]
+      - edges:
+          - [router2, server]
 areas:
   user-device:
     label: 사용자 기기

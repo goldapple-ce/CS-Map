@@ -79,11 +79,12 @@ flowchart LR
 
 ## 콘텐츠 모델
 
-- `Scene`: 제목, 요약, 선택적 검색 키워드, Area, Node, Edge와 선택적 Quiz를 가진 지도 단위다.
+- `Scene`: 제목, 요약, 선택적 검색 키워드, Area, Node, Edge, 선택적 Light Flow와 Quiz를 가진 지도 단위다.
 - `Node`: Scene에 배치되는 Topic 표현이다.
 - `Child Scene`: Node의 `childSceneId`로 소유 관계를 만든다.
 - `navigateToSceneId`: 포함 관계 없이 다른 Scene으로 이동한다.
 - `description`, `contentRef`: 말단 Topic의 인라인 또는 Markdown 설명이다.
+- `Light Flow`: Scene에 이미 존재하는 Edge를 순서 있는 stage로 묶은 요청 시점의 흐름 연출이다. 한 stage의 Edge는 동시에 재생되며 분기와 합류를 별도 그래프 탐색 없이 표현한다.
 
 작성 데이터에는 URL과 화면 좌표를 저장하지 않는다. Parent 관계와 URL은 Scene 참조에서, Node 좌표와 Edge 경로는 Grid 작성값에서 빌드 시 계산한다.
 
@@ -117,6 +118,7 @@ flowchart TD
 ### 빌드 책임
 
 - `scripts/content-build/schemas.ts`: 작성 데이터 형식, 기본값과 필드 간 제약 검증
+- Light Flow 검증은 각 `[from, to]`가 현재 Scene의 Edge 하나를 정확히 가리키는지와 stage 내 중복, 복수 Flow label 제약을 빌드 시점에 확인한다.
 - `scripts/content-build/scene-graph.ts`: Child 소유권, 파생 metadata와 Root 도달 가능성 계산
 - `scripts/content-build/relationship-validation.ts`: Scene 참조와 순환 검증
 - `scripts/elk-scene-layout.ts`: Grid Node box와 직교 Edge 경로 계산
@@ -141,6 +143,8 @@ type GeneratedContentData = {
 ```
 
 각 Scene record에는 검색에 사용하는 요약·키워드를 포함한 완성된 `Scene`, Scene Markdown, Topic 설명과 선택적 Quiz가 포함된다. Root에서 도달할 수 없는 Scene은 Route, Scene과 Layout record에 생성하지 않는다.
+
+작성된 Light Flow의 Edge 쌍은 normalize 단계에서 runtime Edge ID로 바뀌어 `Scene.lightFlows`에 저장된다. 브라우저는 원본 Node 쌍을 다시 해석하지 않고 생성된 ID로 기존 Edge Layout을 재사용한다.
 
 공용 타입은 `shared/content`와 `shared/layout`이 소유한다. 생성 파일은 이 계약을 구현할 뿐 별도 비즈니스 로직을 갖지 않는다.
 
@@ -223,6 +227,8 @@ Layout은 두 단계로 나뉜다.
 
 `scene-layout.ts`는 직렬화된 generated Layout을 `Map` 구조로 바꾸고 Scene별로 재사용한다. `SceneViewport`는 Camera와 전환을 관리하고, `WorldRenderer`는 현재 Camera에 보이는 Scene만 화면 좌표로 투영한다.
 
+Light Flow 재생 상태는 `SceneViewport`가 소유한다. 렌더링에 필요한 활성 Edge·Node와 재생 식별자는 `LightFlowRenderProvider`가 `WorldRenderer` 하위에 Context로 전달하며, Camera와 Layout은 명시적인 Props로 유지한다. 상단 실행 버튼은 현재 focused Scene의 Flow만 시작한다. 첫 stage와 비연속 재시작은 출발 Node를 먼저 점등하고, 기존 polyline을 한 번 통과하는 Edge pulse 뒤에 도착 Node를 점등한다. 다음 stage의 출발 Node가 직전 도착 Node에서 이어지면 출발 점등을 반복하지 않고 다음 Edge pulse로 진행한다. 같은 stage의 Edge와 Node 집합은 동시에 표시하며, Scene이 바뀌면 진행 중인 재생을 취소한다.
+
 ## 상태 소유권
 
 | 상태 | 소유 모듈 | 역할 |
@@ -230,6 +236,7 @@ Layout은 두 단계로 나뉜다.
 | URL과 현재 Scene | React Router, `ExploreRoute` | URL을 Scene ID로 해석 |
 | Panel 조립과 탐색 잠금 | `ExplorerShell` | 지도·설명·목차 연결과 Scene 이동 조율 |
 | Camera와 애니메이션 | `SceneViewport` | 현재 Scene과 Viewport에 맞는 확대·이동 관리 |
+| Light Flow 재생 | `SceneViewport` | 현재 Scene의 Flow 선택, stage 진행·완료와 Scene 이동 시 취소 관리 |
 | World 좌표 | `world-layout.ts` | Parent·Child Scene의 재귀 배치 |
 | 목차 검색과 펼침 | `Search` | Route 목록을 트리로 표현하고 Scene 제목·요약·Topic 이름·키워드를 검색하며 기본 목차와 결과에 필요한 Scene metadata를 표시 |
 | 설명 load와 탭 | `ExplanationPanel` | Scene·Topic·Quiz 표시 |

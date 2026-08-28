@@ -51,6 +51,16 @@ export type SelfCheckQuestion = {
   answer: string
 }
 
+export type SceneLightFlowStage = {
+  edgeIds: ContentId[]
+}
+
+export type SceneLightFlow = {
+  id: ContentId
+  label?: string
+  stages: SceneLightFlowStage[]
+}
+
 export type Scene = {
   id: ContentId
   slug: string
@@ -61,5 +71,6 @@ export type Scene = {
   layout: SceneGridLayout
   areas: SceneArea[]
   elements: SceneElement[]
+  lightFlows?: SceneLightFlow[]
   selfCheckQuiz?: SelfCheckQuestion[]
 }
