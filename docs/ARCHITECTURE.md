@@ -85,6 +85,7 @@ flowchart LR
 - `navigateToSceneId`: 포함 관계 없이 다른 Scene으로 이동한다.
 - `description`, `contentRef`: 말단 Topic의 인라인 또는 Markdown 설명이다.
 - `Light Flow`: Scene에 이미 존재하는 Edge를 순서 있는 stage로 묶은 요청 시점의 흐름 연출이다. 한 stage의 Edge는 동시에 재생되며 분기와 합류를 별도 그래프 탐색 없이 표현한다.
+- `Edge ID`: 같은 Node 쌍의 Edge를 Light Flow에서 구분할 때 작성자가 선택적으로 부여하는 Scene 내부 ID다. Node ID와 다른 Edge ID 모두와 중복될 수 없으며, 명시하지 않은 Edge는 기존 작성 순서 기반 runtime ID를 유지한다.
 
 작성 데이터에는 URL과 화면 좌표를 저장하지 않는다. Parent 관계와 URL은 Scene 참조에서, Node 좌표와 Edge 경로는 Grid 작성값에서 빌드 시 계산한다.
 
@@ -118,7 +119,7 @@ flowchart TD
 ### 빌드 책임
 
 - `scripts/content-build/schemas.ts`: 작성 데이터 형식, 기본값과 필드 간 제약 검증
-- Light Flow 검증은 각 `[from, to]`가 현재 Scene의 Edge 하나를 정확히 가리키는지와 stage 내 중복, 복수 Flow label 제약을 빌드 시점에 확인한다.
+- Light Flow 검증은 문자열 Edge ID 또는 `[from, to]`가 현재 Scene의 Edge 하나를 정확히 가리키는지와 Edge ID 충돌, stage 내 중복, 복수 Flow label 제약을 빌드 시점에 확인한다.
 - `scripts/content-build/scene-graph.ts`: Child 소유권, 파생 metadata와 Root 도달 가능성 계산
 - `scripts/content-build/relationship-validation.ts`: Scene 참조와 순환 검증
 - `scripts/elk-scene-layout.ts`: Grid Node box와 직교 Edge 경로 계산
@@ -144,7 +145,7 @@ type GeneratedContentData = {
 
 각 Scene record에는 검색에 사용하는 요약·키워드를 포함한 완성된 `Scene`, Scene Markdown, Topic 설명과 선택적 Quiz가 포함된다. Root에서 도달할 수 없는 Scene은 Route, Scene과 Layout record에 생성하지 않는다.
 
-작성된 Light Flow의 Edge 쌍은 normalize 단계에서 runtime Edge ID로 바뀌어 `Scene.lightFlows`에 저장된다. 브라우저는 원본 Node 쌍을 다시 해석하지 않고 생성된 ID로 기존 Edge Layout을 재사용한다.
+작성된 Light Flow의 문자열 ID와 Edge 쌍은 normalize 단계에서 runtime Edge ID로 바뀌어 `Scene.lightFlows`에 저장된다. 명시적 Edge ID는 그대로 사용하고, ID가 없는 Edge는 기존 순서 기반 ID를 사용한다. 브라우저는 원본 참조 방식을 다시 해석하지 않고 생성된 ID로 기존 Edge Layout을 재사용한다.
 
 공용 타입은 `shared/content`와 `shared/layout`이 소유한다. 생성 파일은 이 계약을 구현할 뿐 별도 비즈니스 로직을 갖지 않는다.
 

@@ -88,3 +88,11 @@ areas:
     col: 3
     rowSpan: 1
     colSpan: 2
+
+lightFlows:
+  object-aging:
+    label: 객체 이동
+    stages:
+      - edges: [[eden, survivor-0]]
+      - edges: [[survivor-0, survivor-1]]
+      - edges: [[survivor-1, old-objects]]

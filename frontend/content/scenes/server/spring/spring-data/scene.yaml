@@ -86,3 +86,23 @@ edges:
   - from: store-driver
     to: nosql-store
     label: 전용 Protocol
+
+lightFlows:
+  jpa-access:
+    label: JPA 접근
+    stages:
+      - edges: [[repository, spring-data-jpa]]
+      - edges: [[spring-data-jpa, jpa]]
+      - edges: [[jpa, hibernate]]
+      - edges: [[hibernate, jdbc-api]]
+  jdbc-access:
+    label: JDBC 접근
+    stages:
+      - edges: [[repository, spring-data-jdbc]]
+      - edges: [[spring-data-jdbc, jdbc-api]]
+  nosql-access:
+    label: NoSQL 접근
+    stages:
+      - edges: [[repository, nosql-repository]]
+      - edges: [[nosql-repository, store-driver]]
+      - edges: [[store-driver, nosql-store]]

@@ -73,3 +73,14 @@ edges:
     toSide: left
     label: Frame → Bit
     labelSide: bottom
+
+lightFlows:
+  encapsulation:
+    label: 캡슐화
+    stages:
+      - edges: [[application-layer, presentation-layer]]
+      - edges: [[presentation-layer, session-layer]]
+      - edges: [[session-layer, transport-layer]]
+      - edges: [[transport-layer, network-layer]]
+      - edges: [[network-layer, data-link-layer]]
+      - edges: [[data-link-layer, physical-layer]]

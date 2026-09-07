@@ -79,3 +79,10 @@ areas:
     col: 2
     rowSpan: 1
     colSpan: 3
+
+lightFlows:
+  bytecode-execution:
+    label: Bytecode 실행
+    stages:
+      - edges: [[class-loading, method-area]]
+      - edges: [[method-area, interpreter]]

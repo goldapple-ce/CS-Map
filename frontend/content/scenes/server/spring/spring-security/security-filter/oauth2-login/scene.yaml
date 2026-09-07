@@ -101,3 +101,20 @@ edges:
     to: client
     toSide: bottom
     label: 12. 로그인 완료
+
+lightFlows:
+  oauth2-login:
+    label: OAuth 2.0 Login
+    stages:
+      - edges: [[client, oauth2-authorization-request-redirect-filter]]
+      - edges: [[oauth2-authorization-request-redirect-filter, authorization-request-repository]]
+      - edges: [[oauth2-authorization-request-redirect-filter, client]]
+      - edges: [[client, authorization-server]]
+      - edges: [[authorization-server, client]]
+      - edges: [[client, oauth2-login-authentication-filter]]
+      - edges: [[oauth2-login-authentication-filter, authorization-request-repository]]
+      - edges: [[oauth2-login-authentication-filter, authorization-server]]
+      - edges: [[authorization-server, oauth2-login-authentication-filter]]
+      - edges: [[oauth2-login-authentication-filter, resource-server]]
+      - edges: [[resource-server, oauth2-login-authentication-filter]]
+      - edges: [[oauth2-login-authentication-filter, client]]

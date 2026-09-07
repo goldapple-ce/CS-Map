@@ -33,36 +33,51 @@ edges:
     label: Certificate 서명 발급
     # variant: supporting
 
-  - from: browser
+  - id: tcp-handshake
+    from: browser
     fromSide: right
     to: server
     toSide: left
     label: 1. TCP Handshake
     labelSide: top
-  - from: server
+  - id: tcp-connected
+    from: server
     fromSide: left
     to: browser
     toSide: right
     label: 2. TCP 연결 수립
     # variant: return
     labelSide: top
-  - from: browser
+  - id: client-hello-key-share
+    from: browser
     fromSide: right
     to: server
     toSide: left
     label: 3. ClientHello + Group / Key Share
     labelSide: bottom
-  - from: server
+  - id: server-hello-key-share
+    from: server
     fromSide: left
     to: browser
     toSide: right
     label: 4. ServerHello + Group / Key Share
     # variant: return
     labelSide: bottom
-  - from: server
+  - id: certificate-proof
+    from: server
     fromSide: left
     to: browser
     toSide: right
     label: 5. Certificate + CertificateVerify
     # variant: return
     labelSide: bottom
+
+lightFlows:
+  https-handshake:
+    label: HTTPS 연결
+    stages:
+      - edges: [tcp-handshake]
+      - edges: [tcp-connected]
+      - edges: [client-hello-key-share]
+      - edges: [server-hello-key-share]
+      - edges: [certificate-proof]

@@ -80,3 +80,21 @@ edges:
   - from: model
     to: rendered-view
     label: Model 적용
+
+lightFlows:
+  controller-invocation:
+    label: Controller 호출
+    stages:
+      - edges: [[dispatcher-servlet, handler-mapping]]
+      - edges: [[handler-mapping, dispatcher-servlet]]
+      - edges: [[dispatcher-servlet, handler-adapter]]
+      - edges: [[handler-adapter, controller]]
+  view-rendering:
+    label: View 렌더링
+    stages:
+      - edges:
+          - [controller, model]
+          - [controller, view-resolver]
+      - edges:
+          - [model, rendered-view]
+          - [view-resolver, rendered-view]

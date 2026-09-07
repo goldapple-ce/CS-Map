@@ -108,3 +108,15 @@ edges:
     labelSide: left
   - from: oauth2-login-authentication-filter
     to: security-context-repository
+
+lightFlows:
+  filter-chain:
+    label: Filter Chain
+    stages:
+      - edges: [[filter-chain-proxy, security-context-holder-filter]]
+      - edges: [[security-context-holder-filter, oauth2-authorization-request-redirect-filter]]
+      - edges: [[oauth2-authorization-request-redirect-filter, oauth2-login-authentication-filter]]
+      - edges: [[oauth2-login-authentication-filter, username-password-authentication-filter]]
+      - edges: [[username-password-authentication-filter, anonymous-authentication-filter]]
+      - edges: [[anonymous-authentication-filter, exception-translation-filter]]
+      - edges: [[exception-translation-filter, authorization-filter]]

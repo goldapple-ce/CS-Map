@@ -61,6 +61,7 @@ const sceneNodeSchema = z
 
 const sceneEdgeSchema = z
   .object({
+    id: contentIdSchema.optional(),
     from: contentIdSchema,
     to: contentIdSchema,
     label: z.string().min(1).optional(),
@@ -81,9 +82,9 @@ const sceneAreaSchema = z
   })
   .strict()
 
-const lightFlowEdgeReferenceSchema = z.tuple([
+const lightFlowEdgeReferenceSchema = z.union([
   contentIdSchema,
-  contentIdSchema,
+  z.tuple([contentIdSchema, contentIdSchema]),
 ])
 
 const sceneLightFlowSchema = z
@@ -177,6 +178,50 @@ export const sceneDocumentSchema = z
       }
     })
 
+    const edgeIndexesByExplicitId = new Map<string, number[]>()
+    const edgeIndexesByRuntimeId = new Map<string, number[]>()
+    scene.edges.forEach((edge, index) => {
+      if (edge.id) {
+        const explicitIndexes = edgeIndexesByExplicitId.get(edge.id) ?? []
+        explicitIndexes.push(index)
+        edgeIndexesByExplicitId.set(edge.id, explicitIndexes)
+      }
+
+      const runtimeId = sceneEdgeRuntimeId(edge, index)
+      if (scene.nodes[runtimeId]) {
+        context.addIssue({
+          code: "custom",
+          path: edge.id ? ["edges", index, "id"] : ["edges", index],
+          message: `Edge runtime ID conflicts with Node ID in this Scene: ${runtimeId}`,
+        })
+      }
+      const runtimeIndexes = edgeIndexesByRuntimeId.get(runtimeId) ?? []
+      runtimeIndexes.push(index)
+      edgeIndexesByRuntimeId.set(runtimeId, runtimeIndexes)
+    })
+
+    for (const [edgeId, indexes] of edgeIndexesByExplicitId) {
+      if (indexes.length < 2) continue
+      for (const index of indexes) {
+        context.addIssue({
+          code: "custom",
+          path: ["edges", index, "id"],
+          message: `Edge ID is duplicated in this Scene: ${edgeId}`,
+        })
+      }
+    }
+
+    for (const [runtimeId, indexes] of edgeIndexesByRuntimeId) {
+      if (indexes.length < 2) continue
+      for (const index of indexes) {
+        context.addIssue({
+          code: "custom",
+          path: ["edges", index, scene.edges[index].id ? "id" : "from"],
+          message: `Edge runtime ID collides in this Scene: ${runtimeId}`,
+        })
+      }
+    }
+
     const lightFlows = Object.entries(scene.lightFlows ?? {})
     if (lightFlows.length > 1) {
       const labels = new Map<string, string>()
@@ -185,7 +230,8 @@ export const sceneDocumentSchema = z
           context.addIssue({
             code: "custom",
             path: ["lightFlows", flowId, "label"],
-            message: "A label is required when a Scene has multiple Light Flows",
+            message:
+              "A label is required when a Scene has multiple Light Flows",
           })
           continue
         }
@@ -212,8 +258,8 @@ export const sceneDocumentSchema = z
 
     for (const [flowId, flow] of lightFlows) {
       flow.stages.forEach((stage, stageIndex) => {
-        const stagePairs = new Set<string>()
-        stage.edges.forEach(([from, to], edgeIndex) => {
+        const resolvedStageEdgeIds = new Set<string>()
+        stage.edges.forEach((reference, edgeIndex) => {
           const path = [
             "lightFlows",
             flowId,
@@ -222,15 +268,34 @@ export const sceneDocumentSchema = z
             "edges",
             edgeIndex,
           ]
-          const pair = `${from}\u0000${to}`
-          if (stagePairs.has(pair)) {
-            context.addIssue({
-              code: "custom",
-              path,
-              message: `Light Flow stage repeats Edge: ${from} -> ${to}`,
-            })
+          if (typeof reference === "string") {
+            const matches = edgeIndexesByExplicitId.get(reference) ?? []
+            if (matches.length !== 1) {
+              context.addIssue({
+                code: "custom",
+                path,
+                message: `Light Flow references unknown Edge ID: ${reference}`,
+              })
+              return
+            }
+
+            const runtimeId = sceneEdgeRuntimeId(
+              scene.edges[matches[0]],
+              matches[0]
+            )
+            if (resolvedStageEdgeIds.has(runtimeId)) {
+              context.addIssue({
+                code: "custom",
+                path,
+                message: `Light Flow stage repeats Edge: ${runtimeId}`,
+              })
+            }
+            resolvedStageEdgeIds.add(runtimeId)
+            return
           }
-          stagePairs.add(pair)
+
+          const [from, to] = reference
+          const pair = `${from}\u0000${to}`
 
           const fromExists = Boolean(scene.nodes[from])
           const toExists = Boolean(scene.nodes[to])
@@ -263,6 +328,19 @@ export const sceneDocumentSchema = z
               path,
               message: `Light Flow Edge reference is ambiguous: ${from} -> ${to}`,
             })
+          } else {
+            const runtimeId = sceneEdgeRuntimeId(
+              scene.edges[matches[0]],
+              matches[0]
+            )
+            if (resolvedStageEdgeIds.has(runtimeId)) {
+              context.addIssue({
+                code: "custom",
+                path,
+                message: `Light Flow stage repeats Edge: ${runtimeId}`,
+              })
+            }
+            resolvedStageEdgeIds.add(runtimeId)
           }
         })
       })
@@ -291,12 +369,12 @@ export type SceneDerivedMetadata = {
   parentId?: string
 }
 
-/** 작성 순서까지 포함해 Layout과 Light Flow가 공유하는 runtime Edge ID를 만든다. */
+/** 명시적 작성 ID를 우선하고, 없으면 작성 순서를 포함한 runtime Edge ID를 만든다. */
 function sceneEdgeRuntimeId(
-  edge: Pick<SceneSourceDocument["edges"][number], "from" | "to">,
+  edge: Pick<SceneSourceDocument["edges"][number], "id" | "from" | "to">,
   index: number
 ) {
-  return `edge-${edge.from}-${edge.to}-${index + 1}`
+  return edge.id ?? `edge-${edge.from}-${edge.to}-${index + 1}`
 }
 
 /** Scene 문서에서 Child Scene 참조를 추출한다. */
@@ -317,6 +395,11 @@ export function normalizeSceneDocument(
       `${edge.from}\u0000${edge.to}`,
       sceneEdgeRuntimeId(edge, index),
     ])
+  )
+  const edgeIdsByExplicitId = new Map(
+    document.edges.flatMap((edge, index) =>
+      edge.id ? [[edge.id, sceneEdgeRuntimeId(edge, index)] as const] : []
+    )
   )
 
   return {
@@ -363,23 +446,24 @@ export function normalizeSceneDocument(
     ],
     ...(document.lightFlows
       ? {
-          lightFlows: Object.entries(document.lightFlows).map(
-            ([id, flow]) => ({
-              id,
-              ...(flow.label ? { label: flow.label } : {}),
-              stages: flow.stages.map((stage) => ({
-                edgeIds: stage.edges.map(([from, to]) => {
-                  const edgeId = edgeIdsByPair.get(`${from}\u0000${to}`)
-                  if (!edgeId) {
-                    throw new Error(
-                      `Light Flow ${id} references unavailable Edge: ${from} -> ${to}`
-                    )
-                  }
-                  return edgeId
-                }),
-              })),
-            })
-          ),
+          lightFlows: Object.entries(document.lightFlows).map(([id, flow]) => ({
+            id,
+            ...(flow.label ? { label: flow.label } : {}),
+            stages: flow.stages.map((stage) => ({
+              edgeIds: stage.edges.map((reference) => {
+                const edgeId =
+                  typeof reference === "string"
+                    ? edgeIdsByExplicitId.get(reference)
+                    : edgeIdsByPair.get(`${reference[0]}\u0000${reference[1]}`)
+                if (!edgeId) {
+                  throw new Error(
+                    `Light Flow ${id} references unavailable Edge: ${typeof reference === "string" ? reference : `${reference[0]} -> ${reference[1]}`}`
+                  )
+                }
+                return edgeId
+              }),
+            })),
+          })),
         }
       : {}),
     ...(selfCheckQuiz ? { selfCheckQuiz } : {}),

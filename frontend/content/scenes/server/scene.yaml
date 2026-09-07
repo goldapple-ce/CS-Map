@@ -69,3 +69,21 @@ edges:
     to: redis
     variant: supporting
     label: 저장소 구현
+
+lightFlows:
+  sql-request:
+    label: SQL 요청
+    stages:
+      - edges: [[nginx, spring]]
+      - edges: [[spring, sql]]
+  mongodb-request:
+    label: MongoDB 요청
+    stages:
+      - edges: [[nginx, spring]]
+      - edges: [[spring, mongodb]]
+  redis-request:
+    label: Redis 요청
+    stages:
+      - edges: [[nginx, spring]]
+      - edges: [[spring, cache]]
+      - edges: [[cache, redis]]

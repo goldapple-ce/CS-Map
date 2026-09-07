@@ -67,3 +67,11 @@ edges:
     to: in-memory
     variant: supporting
     label: Memory 한도 관리
+
+lightFlows:
+  command-processing:
+    label: Command 처리
+    stages:
+      - edges: [[io-multiplexing, command-processing]]
+      - edges: [[command-processing, key-value]]
+      - edges: [[key-value, in-memory]]

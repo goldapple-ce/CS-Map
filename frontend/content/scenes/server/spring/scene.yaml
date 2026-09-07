@@ -131,3 +131,19 @@ areas:
     col: 2
     rowSpan: 1
     colSpan: 3
+
+lightFlows:
+  mvc-request:
+    label: MVC 요청
+    stages:
+      - edges: [[tomcat, spring-security]]
+      - edges: [[spring-security, spring-mvc]]
+      - edges: [[spring-mvc, spring-data]]
+      - edges: [[spring-data, spring-jdbc]]
+  websocket-request:
+    label: WebSocket 요청
+    stages:
+      - edges: [[tomcat, spring-security]]
+      - edges: [[spring-security, web-socket]]
+      - edges: [[web-socket, spring-data]]
+      - edges: [[spring-data, spring-jdbc]]

@@ -7,7 +7,7 @@ Scene 작성자가 기존 Edge를 이어 Light Flow를 정의하고, 사용자�
 ## 선택한 요청
 
 - Scene YAML에 선택적인 `lightFlows`를 작성한다.
-- Light Flow는 순서가 있는 `stages`를 갖고, 각 stage는 현재 Scene에 존재하는 `[from, to]` Edge 쌍을 하나 이상 갖는다.
+- Light Flow는 순서가 있는 `stages`를 갖고, 각 stage는 현재 Scene에 존재하는 Edge를 `[from, to]` 쌍 또는 명시적 Edge ID로 하나 이상 참조한다.
 - 첫 stage와 비연속으로 다시 시작하는 stage는 source Node를 먼저 점등하고, 같은 stage의 모든 Edge에서 pulse를 정확히 한 번 동시에 이동시킨 뒤 target Node를 점등한다.
 - 다음 stage의 모든 source Node가 직전 stage의 target Node 집합에 포함되면 연속 stage로 판단하고 source phase를 생략한 채 바로 Edge pulse를 보낸다. 하나라도 직전 target에 없는 source Node가 있으면 비연속 restart로 보고 source phase를 재생한다.
 - 분기에서는 한 source Node에서 여러 pulse가 갈라져 각 target Node에 도착하고, 합류에서는 여러 source Node의 pulse가 하나의 target Node로 모인다.
@@ -20,12 +20,18 @@ Scene 작성자가 기존 Edge를 이어 Light Flow를 정의하고, 사용자�
 ## 작성 계약
 
 ```yaml
+edges:
+  - id: client-hello
+    from: browser
+    to: server
+    label: ClientHello
+
 lightFlows:
   request-flow:
     label: 요청 흐름
     stages:
       - edges:
-          - [client, gateway]
+          - client-hello
       - edges:
           - [gateway, service-a]
           - [gateway, service-b]
@@ -35,11 +41,14 @@ lightFlows:
 ```
 
 - `lightFlows` key는 Scene 안에서 사용하는 kebab-case ID다.
+- Edge의 `id`는 선택적인 kebab-case 작성 필드다. 같은 Scene의 Edge끼리 명시적 ID를 중복할 수 없고, ID가 없는 기존 Edge는 현재 순서 기반 runtime ID 생성 규칙을 그대로 사용한다.
 - Flow가 하나면 `label`은 선택 사항이고 단일 버튼은 일관되게 `흐름 보기`로 표시한다.
 - Flow가 여러 개면 모든 `label`이 필수이며 같은 Scene 안에서 중복할 수 없다.
-- 각 `[from, to]`는 동일한 방향의 기존 Scene Edge 하나를 모호함 없이 참조해야 한다. 없는 Edge와 동일 노드 쌍의 중복 Edge 참조는 Content Build에서 거부한다.
-- 같은 stage에서 동일 Edge를 중복해 적을 수 없다. 다른 stage에서 같은 Edge를 다시 사용하는 것은 허용해 반복 흐름을 표현한다.
+- 문자열 참조는 같은 Scene의 명시적 Edge ID 하나를 정확히 선택한다. 없는 ID는 Content Build에서 거부한다.
+- 기존 `[from, to]` 참조는 하위 호환으로 유지하며 동일한 방향의 기존 Scene Edge 하나를 모호함 없이 가리켜야 한다. 없는 Edge와 동일 Node 쌍의 중복 Edge 참조는 계속 거부한다.
+- 같은 stage에서 ID와 `[from, to]`가 결과적으로 같은 Edge를 가리키는 경우를 포함해 동일 Edge를 중복 참조할 수 없다. 다른 stage에서 같은 Edge를 다시 사용하는 것은 허용한다.
 - normalize 단계는 각 stage의 Edge ID만 runtime 데이터에 제공한다. 브라우저는 현재 stage의 Edge element에 이미 있는 `fromElementId`와 `toElementId`를 조회하고 중복을 제거해 source·target Node 집합을 계산한다. 계산 가능한 Node ID를 generated 데이터에 중복 저장하지 않는다.
+- runtime Edge ID는 명시적 `id`가 있으면 그 값을 사용하고, 없으면 기존 `edge-{from}-{to}-{index}` 규칙을 사용한다. 명시적 ID 추가로 기존 ID 없는 Scene과 generated 계약을 바꾸지 않는다.
 - 재생 시간은 출발·도착 점등이 함께 사용하는 `NODE_DURATION` 하나와 pulse 이동의 `EDGE_DURATION` 하나로 관리한다. phase 사이에 별도 settle 시간을 더하지 않으며, 이 화면 연출 값과 빛의 크기는 콘텐츠에 저장하지 않는다.
 
 ## 완료 조건
@@ -51,6 +60,23 @@ lightFlows:
 - [x] normalize 단계가 작성자의 `[from, to]` 쌍을 안정적인 runtime Edge ID로 변환해 `Scene.lightFlows`에 보존한다.
 - [x] shared `SceneLightFlowStage`와 generated content 계약은 `edgeIds`만 제공하며, source·target Node ID를 중복 저장하지 않는다. Edge layout 계약은 기존 경로를 재사용하므로 변경하지 않는다.
 - [x] 브라우저가 현재 stage의 Edge ID로 Scene Edge를 찾고 `fromElementId`·`toElementId`를 각각 중복 제거해 source·target Node 집합을 계산한다.
+
+### 명시적 Edge ID와 혼합 참조
+
+- [x] Scene Edge Schema에 선택적 kebab-case `id`를 추가하고, 같은 Scene의 중복 명시적 ID를 각 `edges[index].id` YAML 경로와 함께 거부한다.
+- [x] 명시적 ID와 ID 없는 Edge의 fallback ID까지 합친 runtime Edge ID가 충돌하지 않도록 검증해 generated element와 layout key의 유일성을 보장한다.
+- [x] Light Flow stage의 Edge 참조가 명시적 Edge ID 문자열과 기존 `[from, to]` tuple을 함께 허용한다.
+- [x] 문자열 참조는 정확히 같은 명시적 ID의 Edge로 해석하고, 없는 ID는 해당 `lightFlows.{flow}.stages[index].edges[index]` 경로에서 거부한다.
+- [x] tuple 참조의 기존 Node 존재·Edge 존재·중복 방향 모호성 검증을 유지하고, 혼합 참조도 해석된 runtime Edge ID 기준으로 stage 내 중복을 거부한다.
+- [x] normalize가 명시적 ID를 `SceneEdgeElement.id`와 `SceneLightFlowStage.edgeIds`에 그대로 보존하고, ID 없는 Edge의 기존 생성 규칙은 변경하지 않는다.
+- [x] shared runtime type과 generated Scene 구조는 기존 `SceneEdgeElement.id`·`SceneLightFlowStage.edgeIds` 계약을 유지하고, layout 생성과 브라우저 lookup은 명시적 ID를 별도 분기 없이 기존 key로 사용한다.
+
+### HTTPS Light Flow 콘텐츠
+
+- [x] HTTPS Scene의 다섯 Browser↔Server handshake Edge에 순서가 드러나는 명시적 ID `tcp-handshake`, `tcp-connected`, `client-hello-key-share`, `server-hello-key-share`, `certificate-proof`를 부여한다.
+- [x] HTTPS Scene에 단일 `https-handshake` Light Flow를 추가하고 다섯 Edge ID를 표시 번호 순서대로 각각의 stage에서 참조한다.
+- [x] CA의 `Root CA 신뢰 기준`과 `Certificate 서명 발급` Edge는 handshake 메시지 순서가 아닌 지원 관계이므로 HTTPS Light Flow에 포함하지 않는다.
+- [x] 반복되는 `browser → server`와 `server → browser` Edge 중 지정한 ID의 실제 layout 경로만 각 stage에서 점등·재생된다.
 
 ### 재생 상태와 UI
 
@@ -67,24 +93,30 @@ lightFlows:
 - [x] `SceneEdge`는 Content Build가 계산한 기존 polyline을 그대로 재사용해 원본 Edge 위에 moving light, halo와 glowing line을 덮어 그린다. pulse는 `repeatCount=1`로 한 번만 이동하고, 재생 token으로 remount해 다시 보기에서도 처음부터 재생한다. 별도 그래프 탐색은 추가하지 않는다.
 - [x] Light Flow가 없는 Scene에는 기존 헤더·Edge DOM과 시각 결과에 불필요한 변화가 없다.
 - [x] 흐름 재생은 Camera 이동 애니메이션과 충돌하지 않도록 Scene 이동 중 실행을 막고, 재생 중 Scene 이동을 요청하면 흐름을 취소한 뒤 기존 탐색을 정상 수행한다.
-- [ ] Root Scene에서 DNS 흐름 종료 뒤 `Browser → HTTPS`로 새로 시작하는 비연속 구간을 검토한다. 기존에 없는 연결을 애니메이션이 임의로 만들지 않으며, 실제 Edge 추가 또는 별도 Light Flow 분리는 사용자 요청 범위 안에서만 결정한다.
+- [x] Root Scene에서 DNS 흐름 종료 뒤 `Browser → HTTPS`로 새로 시작하는 비연속 구간을 검토했다. 기존 Edge를 추가하거나 Flow를 나누지 않고, 현재 비연속 restart 규칙으로 Browser를 다시 점등해 다음 구간을 시작한다.
 
 ### 문서와 사용자 확인
 
 - [x] `REQUIREMENTS.md`에 첫 시작·비연속 restart만 source를 점등하고 연속 stage는 source 점등을 생략하는 전이 규칙을 반영한다.
 - [x] `ARCHITECTURE.md`에 runtime Edge lookup으로 source·target Node 집합과 stage 연속성을 계산하는 계약, 두 timing 상수와 Node·Edge overlay 렌더링 책임을 반영한다.
 - [x] `WORDS.md`에 `Light Flow`를 Scene에 이미 있는 Edge를 단계별로 재생하는 흐름 연출로 정의한다.
-- [ ] 사용자가 브라우저에서 첫 source 점등, 연속 중간 Node의 target 점등 1회 뒤 즉시 다음 Edge 연결, 비연속 source 재점등, Edge당 pulse 1회, 분기·합류, 다시 보기와 Scene 이동 취소를 확인한다.
+- [x] `REQUIREMENTS.md`에 반복 Node 쌍의 특정 Edge를 선택할 수 있는 명시적 Edge ID와 기존 쌍 참조의 하위 호환 요구를 반영한다.
+- [x] `ARCHITECTURE.md`에 optional 작성 ID, fallback runtime ID, 혼합 Light Flow 참조의 normalize·검증과 기존 generated/layout 계약 유지 방식을 반영한다.
+- [x] `CONTENT_GUIDE.md`의 Edge와 Light Flow 작성 예시에 선택적 Edge ID, 문자열 참조와 기존 tuple 참조의 사용 기준을 추가한다.
+- [x] `npm run content:build`, `npm run content:validate`, `npm run typecheck`, `npm run lint`, `npm run build`와 `git diff --check`를 통과한다. 새 자동 테스트 추가는 이번 범위에 포함하지 않는다.
+- [ ] 사용자가 HTTPS Scene에서 다섯 handshake Edge가 번호 순서대로 각각 한 번 재생되고, 같은 방향의 다른 Edge가 함께 빛나지 않는지 확인한다.
+- [x] 사용자가 브라우저에서 첫 source 점등, 연속 중간 Node의 target 점등 1회 뒤 즉시 다음 Edge 연결, 비연속 source 재점등, Edge당 pulse 1회, 분기·합류, 다시 보기와 Scene 이동 취소를 확인한다.
 
 ## 구현 순서
 
-1. 현재 stage의 Edge element에서 source·target Node ID 집합을 계산한다.
-2. 첫 stage·비연속 restart와 연속 stage를 구분하고, 연속 stage의 source phase를 생략하도록 재생 전이를 바꾼다.
-3. timing을 공용 Node 점등 상수와 Edge pulse 상수로 단순화하고 별도 settle 시간을 제거한다.
-4. Root Scene의 비연속 구간을 기존 Edge 구조와 대조하고 필요한 콘텐츠 구조 변경은 사용자 범위 안에서만 반영한다.
-5. 요구사항과 아키텍처를 실제 연속·비연속 전이 계약에 맞춘다.
-6. 사용자가 브라우저에서 단일·복수 Flow와 연속 중간 Node 1회 점등, 비연속 restart, 재생·취소 동작을 확인한다.
+1. Scene Edge Schema와 검증에 optional 명시적 ID, runtime ID 유일성과 Light Flow의 ID·tuple 혼합 참조를 추가한다.
+2. normalize가 명시적 ID와 기존 fallback ID를 같은 runtime Edge ID 계약으로 조립하도록 변경하고 generated/layout 소비 경계를 확인한다.
+3. HTTPS의 다섯 handshake Edge에 ID를 부여하고 순서대로 실행하는 단일 Light Flow를 작성한다.
+4. 요구사항·아키텍처·콘텐츠 작성 가이드를 새 작성 계약에 맞춘다.
+5. 기본 typecheck, lint, content build·validate, application build와 diff check를 실행한다.
+6. Root Scene의 비연속 구간을 기존 Edge 구조와 대조하고 필요한 콘텐츠 구조 변경은 사용자 범위 안에서만 반영한다.
+7. 사용자가 HTTPS의 특정 Edge 순서와 기존 Light Flow 재생·취소 동작을 브라우저에서 확인한다.
 
 ## 현재 상태
 
-Light Flow의 YAML 검증, Edge ID normalize, 실행 버튼, Scene 이동 취소와 다시 보기, Node·Edge·Node 표현을 구현했다. 첫 stage와 비연속 restart에서만 source를 점등하고, 직전 target에서 이어지는 stage는 source를 다시 점등하지 않고 바로 Edge pulse로 진행한다. timing은 Node 1500ms와 Edge 500ms 두 상수로 통합했고, Edge pulse가 mount된 다음 timeout을 시작하도록 맞췄다. 기준 문서를 현재 동작에 맞췄으며 Root Scene 비연속 구간 검토와 사용자 최종 확인만 남아 있다.
+optional Edge ID, Node·Edge·fallback runtime ID 충돌 검증, 문자열 ID와 tuple 혼합 참조, 명시적 ID의 runtime·layout 보존을 구현했다. HTTPS의 다섯 handshake Edge에 ID를 부여하고 `https-handshake` Flow를 1→5 순서로 작성했으며 관련 기준 문서와 콘텐츠 작성 가이드도 갱신했다. 기본 content build·validate, typecheck, lint, application build와 diff check를 통과했다. 사용자가 HTTPS Scene에서 버튼과 다섯 pulse의 실제 재생 순서를 확인하는 일만 남아 있다.

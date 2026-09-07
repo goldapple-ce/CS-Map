@@ -151,3 +151,29 @@ edges:
     to: authentication-provider
     label: implements
     variant: supporting
+
+lightFlows:
+  authentication:
+    label: 인증 처리
+    stages:
+      - edges: [[filter-chain-proxy, oauth2-login-authentication-filter]]
+      - edges: [[authorization-request-repository, oauth2-login-authentication-filter]]
+      - edges: [[oauth2-login-authentication-filter, oauth2-login-authentication-token]]
+      - edges: [[oauth2-login-authentication-filter, authentication-manager]]
+      - edges: [[authentication-manager, authentication-provider]]
+      - edges: [[authentication-provider, authentication-manager]]
+      - edges: [[authentication-manager, oauth2-login-authentication-filter]]
+      - edges:
+          - [oauth2-login-authentication-filter, security-context-holder]
+          - [oauth2-login-authentication-filter, security-context-repository]
+  oauth2-provider:
+    label: OAuth2 Provider
+    stages:
+      - edges: [[oauth2-login-authentication-provider, oauth2-authorization-code-authentication-provider]]
+      - edges: [[oauth2-authorization-code-authentication-provider, authorization-server]]
+      - edges: [[authorization-server, oauth2-authorization-code-authentication-provider]]
+      - edges: [[oauth2-authorization-code-authentication-provider, oauth2-login-authentication-provider]]
+      - edges: [[oauth2-login-authentication-provider, oauth2-user-service]]
+      - edges: [[oauth2-user-service, resource-server]]
+      - edges: [[resource-server, oauth2-user-service]]
+      - edges: [[oauth2-user-service, oauth2-login-authentication-provider]]

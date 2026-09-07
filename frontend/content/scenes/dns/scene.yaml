@@ -71,3 +71,16 @@ edges:
     toSide: right
     label: 8. IP 주소 응답
     labelSide: bottom
+
+lightFlows:
+  dns-lookup:
+    label: DNS 조회
+    stages:
+      - edges: [[client, recursive-resolver]]
+      - edges: [[recursive-resolver, root-dns]]
+      - edges: [[root-dns, recursive-resolver]]
+      - edges: [[recursive-resolver, tld-dns]]
+      - edges: [[tld-dns, recursive-resolver]]
+      - edges: [[recursive-resolver, authoritative-dns]]
+      - edges: [[authoritative-dns, recursive-resolver]]
+      - edges: [[recursive-resolver, client]]

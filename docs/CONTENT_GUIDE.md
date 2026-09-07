@@ -96,11 +96,39 @@ Node에는 아래 항목 중 하나만 사용한다.
 ### Edge
 
 - `from`, `to`: 연결할 Topic
+- `id`: 같은 방향의 Node 쌍을 잇는 Edge가 여러 개이고 Light Flow에서 구분해야 할 때 사용하는 kebab-case ID(선택). 같은 Scene의 Node ID나 다른 Edge ID와 중복할 수 없다.
 - `label`: 한글 6자 안팎의 짧은 설명
 - `variant`: 기본 흐름과 다를 때 `supporting` 또는 `return`
 - `fromSide`, `toSide`, `labelSide`: 자동 배치가 어색할 때만 사용하는 방향
 
 Side 값은 `top`, `right`, `bottom`, `left` 중 하나다. Edge는 화면에서 읽는 순서대로 작성한다.
+
+### Light Flow
+
+`lightFlows`는 사용자가 실행 버튼을 눌렀을 때 기존 Edge를 어떤 순서로 재생할지 정의한다. 각 `stage`의 Edge는 동시에 재생되고 다음 stage는 그 뒤에 시작한다.
+
+```yaml
+edges:
+  - id: client-hello
+    from: browser
+    to: server
+    label: ClientHello
+  - from: server
+    to: application
+
+lightFlows:
+  handshake:
+    label: Handshake
+    stages:
+      - edges: [client-hello]
+      - edges:
+          - [server, application]
+```
+
+- 같은 Node 쌍을 잇는 Edge가 하나면 `[from, to]`로 참조할 수 있다.
+- 같은 방향의 Node 쌍을 잇는 Edge가 여러 개면 각 Edge에 `id`를 부여하고 문자열 ID로 참조한다.
+- 한 stage에서 같은 Edge를 중복 참조하지 않는다.
+- Flow가 여러 개면 버튼을 구분할 수 있도록 서로 다른 `label`을 작성한다.
 
 ### Scene Area
 

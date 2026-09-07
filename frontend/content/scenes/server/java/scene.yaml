@@ -39,3 +39,12 @@ edges:
   - from: jvm
     to: os
     label: OS 차이 추상화
+
+lightFlows:
+  java-execution:
+    label: Java 실행
+    stages:
+      - edges: [[java-source, java-compiler]]
+      - edges: [[java-compiler, bytecode]]
+      - edges: [[bytecode, jvm]]
+      - edges: [[jvm, os]]

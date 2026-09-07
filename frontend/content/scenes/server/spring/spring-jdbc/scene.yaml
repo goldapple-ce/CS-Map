@@ -65,3 +65,20 @@ edges:
     to: jdbc-template
     label: Connection 제공
     variant: supporting
+
+lightFlows:
+  jdbc-client-query:
+    label: JdbcClient 실행
+    stages:
+      - edges: [[spring-jpa, jdbc-client]]
+      - edges: [[jdbc-client, jdbc-template]]
+      - edges: [[jdbc-template, jdbc]]
+      - edges: [[jdbc, jdbc-driver]]
+      - edges: [[jdbc-driver, sql]]
+  jdbc-template-query:
+    label: JdbcTemplate 실행
+    stages:
+      - edges: [[spring-jpa, jdbc-template]]
+      - edges: [[jdbc-template, jdbc]]
+      - edges: [[jdbc, jdbc-driver]]
+      - edges: [[jdbc-driver, sql]]

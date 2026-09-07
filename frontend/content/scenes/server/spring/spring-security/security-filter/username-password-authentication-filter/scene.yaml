@@ -108,3 +108,22 @@ edges:
     to: user-detail-service
     label: implements
     variant: supporting
+
+lightFlows:
+  form-login:
+    label: Form Login
+    stages:
+      - edges: [[filter-chain-proxy, username-password-authentication-filter]]
+      - edges: [[username-password-authentication-filter, username-password-authentication-token]]
+      - edges: [[username-password-authentication-filter, authentication-manager]]
+      - edges: [[authentication-manager, authentication-provider]]
+      - edges: [[authentication-provider, authentication-manager]]
+      - edges: [[authentication-manager, username-password-authentication-filter]]
+      - edges:
+          - [username-password-authentication-filter, security-context-holder]
+          - [username-password-authentication-filter, security-context-repository]
+  user-lookup:
+    label: 사용자 조회
+    stages:
+      - edges: [[dao-authentication-provider, user-detail-service]]
+      - edges: [[user-detail-service, dao-authentication-provider]]

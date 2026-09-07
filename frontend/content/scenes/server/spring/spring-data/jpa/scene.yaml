@@ -71,3 +71,18 @@ edges:
   - from: entity
     to: flush
     label: persist/remove 반영
+
+lightFlows:
+  dirty-checking:
+    label: 변경 감지
+    stages:
+      - edges: [[entity-manager-factory, entity-manager]]
+      - edges: [[entity-manager, persistence-context]]
+      - edges: [[persistence-context, entity]]
+      - edges: [[entity, dirty-checking]]
+      - edges: [[dirty-checking, flush]]
+  jpql-query:
+    label: JPQL 실행
+    stages:
+      - edges: [[entity-manager-factory, entity-manager]]
+      - edges: [[entity-manager, jpql]]

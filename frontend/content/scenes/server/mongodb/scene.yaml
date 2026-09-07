@@ -44,3 +44,18 @@ edges:
     to: bson-document
     variant: supporting
     label: Index Scan
+
+lightFlows:
+  collection-scan:
+    label: Collection Scan
+    stages:
+      - edges: [[document-query, replica-set]]
+      - edges: [[replica-set, collection]]
+      - edges: [[collection, bson-document]]
+  index-scan:
+    label: Index Scan
+    stages:
+      - edges: [[document-query, replica-set]]
+      - edges: [[replica-set, collection]]
+      - edges: [[collection, index]]
+      - edges: [[index, bson-document]]

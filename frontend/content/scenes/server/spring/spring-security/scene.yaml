@@ -62,3 +62,11 @@ areas:
     col: 1
     rowSpan: 1
     colSpan: 1
+
+lightFlows:
+  filter-dispatch:
+    label: Filter 전달
+    stages:
+      - edges: [[filter-chain, delegating-filter-proxy]]
+      - edges: [[delegating-filter-proxy, filter-chain-proxy]]
+      - edges: [[filter-chain-proxy, security-filter-chain]]

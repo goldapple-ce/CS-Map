@@ -46,3 +46,15 @@ edges:
     toSide: top
     label: Datagram
     labelSide: right
+
+lightFlows:
+  tcp-transfer:
+    label: TCP 전달
+    stages:
+      - edges: [[session-layer, tcp]]
+      - edges: [[tcp, network-layer]]
+  udp-transfer:
+    label: UDP 전달
+    stages:
+      - edges: [[session-layer, udp]]
+      - edges: [[udp, network-layer]]
