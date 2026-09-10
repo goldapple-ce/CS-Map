@@ -27,16 +27,13 @@ function contentHotReload(): Plugin {
     /** 작성 콘텐츠나 Layout source 변경을 직렬화해 Content Build를 다시 실행한다. */
     async handleHotUpdate({ file, server }) {
       const contentDirectory = path.resolve(__dirname, "content")
+      const isMarkdown = path.extname(file) === ".md"
       const isContentFile =
         file.startsWith(`${contentDirectory}${path.sep}`) &&
-        [
-          "scenario.yaml",
-          "scene.yaml",
-          "content.ko.md",
-          "quiz.ko.yaml",
-        ].includes(
-          path.basename(file)
-        )
+        (isMarkdown ||
+          ["scenario.yaml", "scene.yaml", "quiz.ko.yaml"].includes(
+            path.basename(file)
+          ))
       if (!isContentFile && !layoutSources.includes(file)) return
 
       rebuildQueue = rebuildQueue.catch(() => undefined).then(async () => {
