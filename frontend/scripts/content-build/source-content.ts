@@ -6,6 +6,10 @@ import type { ZodType } from "zod"
 
 import type { Scene, SelfCheckQuestion } from "@shared/content/types"
 import {
+  prepareMarkdownImages,
+  type GeneratedContentAsset,
+} from "./markdown-images.ts"
+import {
   collectSceneOwners,
   createSceneMetadataResolver,
   rootOwnershipError,
@@ -211,26 +215,50 @@ export async function prepareScenes(
   )
 
   const prepared: PreparedSceneFile[] = []
+  const assets: GeneratedContentAsset[] = []
   for (const file of files) {
     const directory = path.dirname(file.filePath)
+    const sceneMarkdownPath = path.join(directory, "content.ko.md")
     let markdown: string
     try {
-      markdown = await readFile(path.join(directory, "content.ko.md"), "utf8")
+      markdown = await readFile(sceneMarkdownPath, "utf8")
     } catch {
       errors.push(
         `${relativePath(appRoot, file.filePath)}: missing Markdown content content.ko.md`
       )
       continue
     }
+    const preparedMarkdown = await prepareMarkdownImages(
+      appRoot,
+      sceneMarkdownPath,
+      markdown
+    )
+    markdown = preparedMarkdown.markdown
+    assets.push(...preparedMarkdown.assets)
+    errors.push(
+      ...preparedMarkdown.errors.map(
+        (error) => `${relativePath(appRoot, sceneMarkdownPath)}: ${error}`
+      )
+    )
     const quiz = await loadOptionalQuiz(appRoot, directory, errors)
     const topicExplanations: Record<string, string> = {}
     for (const [elementId, node] of Object.entries(file.value.nodes)) {
       if (node.description) topicExplanations[elementId] = node.description
       if (!node.contentRef) continue
+      const topicMarkdownPath = path.join(directory, node.contentRef)
       try {
-        topicExplanations[elementId] = await readFile(
-          path.join(directory, node.contentRef),
-          "utf8"
+        const topicMarkdown = await readFile(topicMarkdownPath, "utf8")
+        const preparedTopicMarkdown = await prepareMarkdownImages(
+          appRoot,
+          topicMarkdownPath,
+          topicMarkdown
+        )
+        topicExplanations[elementId] = preparedTopicMarkdown.markdown
+        assets.push(...preparedTopicMarkdown.assets)
+        errors.push(
+          ...preparedTopicMarkdown.errors.map(
+            (error) => `${relativePath(appRoot, topicMarkdownPath)}: ${error}`
+          )
         )
       } catch {
         errors.push(
@@ -253,5 +281,5 @@ export async function prepareScenes(
       )
     }
   }
-  return { files: prepared, errors }
+  return { files: prepared, errors, assets }
 }

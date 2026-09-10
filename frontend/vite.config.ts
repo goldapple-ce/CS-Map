@@ -5,6 +5,8 @@ import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
 import { defineConfig, type Plugin } from "vite"
 
+import { isSupportedContentImage } from "./scripts/content-build/markdown-images.ts"
+
 const execFileAsync = promisify(execFile)
 
 /** 콘텐츠와 Layout source 변경 시 생성물을 갱신하고 전체 화면을 다시 불러온다. */
@@ -12,10 +14,7 @@ function contentHotReload(): Plugin {
   let rebuildQueue = Promise.resolve()
   const layoutSources = [
     path.resolve(__dirname, "scripts/elk-scene-layout.ts"),
-    path.resolve(
-      __dirname,
-      "shared/layout/scene-node-metrics.ts"
-    ),
+    path.resolve(__dirname, "shared/layout/scene-node-metrics.ts"),
   ]
 
   return {
@@ -31,21 +30,24 @@ function contentHotReload(): Plugin {
       const isContentFile =
         file.startsWith(`${contentDirectory}${path.sep}`) &&
         (isMarkdown ||
+          isSupportedContentImage(file) ||
           ["scenario.yaml", "scene.yaml", "quiz.ko.yaml"].includes(
             path.basename(file)
           ))
       if (!isContentFile && !layoutSources.includes(file)) return
 
-      rebuildQueue = rebuildQueue.catch(() => undefined).then(async () => {
-        await execFileAsync(
-          process.execPath,
-          [
-            path.resolve(__dirname, "node_modules/tsx/dist/cli.mjs"),
-            path.resolve(__dirname, "scripts/build-content-index.ts"),
-          ],
-          { cwd: __dirname }
-        )
-      })
+      rebuildQueue = rebuildQueue
+        .catch(() => undefined)
+        .then(async () => {
+          await execFileAsync(
+            process.execPath,
+            [
+              path.resolve(__dirname, "node_modules/tsx/dist/cli.mjs"),
+              path.resolve(__dirname, "scripts/build-content-index.ts"),
+            ],
+            { cwd: __dirname }
+          )
+        })
       await rebuildQueue
       server.ws.send({ type: "full-reload" })
       return []

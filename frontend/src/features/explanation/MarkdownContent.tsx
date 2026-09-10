@@ -2,6 +2,7 @@ import { isValidElement, type ReactNode } from "react"
 import ReactMarkdown, {
   defaultUrlTransform,
   type Components,
+  type UrlTransform,
 } from "react-markdown"
 import remarkGfm from "remark-gfm"
 
@@ -30,8 +31,12 @@ function headingId(text: string, used: Map<string, number>, idPrefix: string) {
   return `${idPrefix}-${count === 0 ? base : `${base}-${count + 1}`}`
 }
 
-/** HTTP(S) 외 URL을 제거해 Markdown 링크 대상을 제한한다. */
-function externalUrl(url: string) {
+/** 링크는 HTTP(S), 이미지는 HTTPS와 공개 content 경로만 허용한다. */
+const safeUrl: UrlTransform = (url, _key, node) => {
+  if (node.tagName === "img") {
+    const isAllowedImage = /^https:\/\//u.test(url) || /^\/content\//u.test(url)
+    return isAllowedImage ? defaultUrlTransform(url) : ""
+  }
   return /^https?:\/\//u.test(url) ? defaultUrlTransform(url) : ""
 }
 
@@ -88,6 +93,17 @@ export function MarkdownContent({ markdown, idPrefix }: MarkdownContentProps) {
         {children}
       </a>
     ),
+    img: ({ src, alt, title }) =>
+      src ? (
+        <img
+          src={src}
+          alt={alt ?? ""}
+          title={title}
+          loading="lazy"
+          decoding="async"
+          className="block h-auto max-w-full rounded-lg"
+        />
+      ) : null,
     code: ({ children, className }) => (
       <code
         className={`${className ?? ""} rounded bg-muted px-1.5 py-0.5 font-mono text-[0.9em] text-destructive`}
@@ -141,6 +157,7 @@ export function MarkdownContent({ markdown, idPrefix }: MarkdownContentProps) {
           "code",
           "pre",
           "a",
+          "img",
           "table",
           "thead",
           "tbody",
@@ -152,7 +169,7 @@ export function MarkdownContent({ markdown, idPrefix }: MarkdownContentProps) {
           "input",
         ]}
         skipHtml
-        urlTransform={externalUrl}
+        urlTransform={safeUrl}
       >
         {markdown}
       </ReactMarkdown>

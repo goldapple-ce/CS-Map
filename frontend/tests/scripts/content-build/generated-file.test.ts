@@ -60,4 +60,29 @@ describe("Generated file lifecycle", () => {
       )
     }
   })
+
+  it("Markdown 이미지 asset을 public에 동기화하고 오래된 asset을 찾는다", async () => {
+    const appRoot = await createAppRoot()
+    const asset = {
+      outputRelativePath: path.join("sample", "diagram.png"),
+      contents: Buffer.from("image bytes"),
+    }
+    await syncGeneratedContent(appRoot, "content", false, [asset])
+
+    const outputPath = path.join(
+      appRoot,
+      "public/content/generated/sample/diagram.png"
+    )
+    expect(await readFile(outputPath, "utf8")).toBe("image bytes")
+    await expect(
+      syncGeneratedContent(appRoot, "content", true, [asset])
+    ).resolves.toBeUndefined()
+
+    await writeFile(outputPath, "stale")
+    await expect(
+      syncGeneratedContent(appRoot, "content", true, [asset])
+    ).rejects.toThrow(
+      "public/content/generated/sample/diagram.png is stale; run npm run content:build"
+    )
+  })
 })

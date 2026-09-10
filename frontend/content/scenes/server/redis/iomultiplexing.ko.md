@@ -22,9 +22,32 @@ Redis 전체가 Thread 하나만 사용하는 것은 아닙니다. Network I/O�
 
 ---
 
-# 개발자가 개입하는 지점
+# Non-blocking I/O
 
-개발자가 I/O Multiplexing이나 Event Loop를 직접 구현할 일은 거의 없습니다. 대신 Client Connection과 Timeout을 관리하고, Command의 시간 복잡도와 데이터 크기를 확인해야 합니다.
+Blocking Socket에서는 데이터가 아직 도착하지 않았다면 read()가 대기합니다.
+
+```
+read()
+  ↓
+데이터 없음
+  ↓
+Thread 대기
+Non-blocking Socket에서는 데이터가 없다면 기다리지 않고 바로 반환합니다.
+read()
+  ↓
+데이터 없음
+  ↓
+즉시 반환
+하지만 이것만으로는 문제가 해결되지 않습니다.
+수만 개의 Socket을 계속 하나씩 확인한다면,
+Socket 1 확인
+Socket 2 확인
+Socket 3 확인
+...
+Socket 10000 확인
+```
+
+대부분 아무 데이터도 없는 Socket을 확인하는 데 CPU를 낭비하게 됩니다.
 
 ---
 

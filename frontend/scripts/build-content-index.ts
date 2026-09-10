@@ -93,7 +93,12 @@ async function main() {
     layouts,
   }
 
-  await syncGeneratedContent(appRoot, renderContentData(data), checkOnly)
+  await syncGeneratedContent(
+    appRoot,
+    renderContentData(data),
+    checkOnly,
+    sceneResult.assets
+  )
 }
 
 main().catch((error) => {
