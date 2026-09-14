@@ -1,101 +1,57 @@
 # 한눈에 보기
 
-Keyspace는 Redis가 현재 Database의 모든 Key를 관리하는 논리적 공간입니다. Event Loop가 Command를 해석하면 Keyspace에서 대상 Key를 찾아 Value를 조회하거나 변경합니다.
+Keyspace는 하나의 Redis Database가 Key와 Value를 관리하는 논리적인 공간입니다. Scene의 `Hash Table`과 `Redis Object`는 이 Keyspace를 구성하는 내부 요소입니다.
 
-```text
-GET user:1 → Keyspace → Key Lookup → Redis Object
-```
+Keyspace를 운영할 때는 Key를 얼마나 빨리 찾는지만이 아니라, 언제 제거할지와 일부 Key에 부하나 데이터가 몰리지 않는지도 함께 봐야 합니다.
 
 ---
 
-# Key-Value
+# TTL과 Expiration
 
-Redis의 데이터는 기본적으로 Key와 Value의 관계로 저장됩니다.
-
-```text
-name    → "redis"
-count   → 10
-user:1  → Value
-```
-
-Client는 Value의 위치를 직접 알 필요 없이 Key를 이용해 데이터에 접근합니다.
-
-Key는 Binary Safe한 문자열이며, Value에는 String, Hash, List, Set, Sorted Set 등 다양한 Data Type을 저장할 수 있습니다.
-
----
-
-# Hash Table
-
-Redis는 Key를 빠르게 찾기 위해 Keyspace를 Hash Table 기반 구조로 관리합니다.
-
-```text
-"user:1"
-    ↓
-  Hash
-    ↓
-Hash Table
-    ↓
- Value
-```
-
-Key를 Hashing하여 탐색하기 때문에 일반적인 Key Lookup은 평균적으로 `O(1)`에 수행됩니다.
-
-즉 Key가 많아져도 처음부터 하나씩 탐색하는 방식이 아닙니다.
-
----
-
-# Key Lookup
-
-예를 들어 다음 Command가 실행되었다고 해보겠습니다.
-
-```text
-GET user:1
-```
-
-Redis는 `user:1`을 이용해 Keyspace에서 해당 Entry를 찾습니다.
-
-```text
-"user:1"
-    ↓
-Hash 계산
-    ↓
-Keyspace 탐색
-    ↓
-Value 발견
-```
-
-Key가 존재하면 연결된 Value에 접근하고, 존재하지 않는다면 Key가 없는 것으로 처리합니다.
-
-이때 찾은 Value를 Redis 내부에서 표현하는 것이 Redis Object입니다.
-
----
-
-# Expiration
-
-Redis의 Key에는 만료 시간을 설정할 수 있습니다.
+`TTL(Time To Live)`은 Key가 앞으로 얼마나 더 유지되는지를 나타냅니다. `EXPIRE`로 만료 시간을 설정할 수 있고, `TTL`로 남은 시간을 확인할 수 있습니다.
 
 ```text
 SET session:1 value
 EXPIRE session:1 60
+TTL session:1
 ```
 
-이 경우 `session:1`은 60초 뒤 만료됩니다.
+TTL이 끝난 Key는 만료된 것으로 취급합니다. Redis는 만료된 Key를 다음 두 방법으로 Keyspace에서 제거합니다.
 
-Redis는 Key와 함께 Expiration 정보를 관리하며, 만료된 Key는 더 이상 존재하는 데이터처럼 사용할 수 없습니다.
+- `Passive Expiration`: Client가 Key에 접근했을 때 만료 여부를 확인하고 제거합니다.
+- `Active Expiration`: 다시 접근되지 않는 Key도 남지 않도록, Redis가 만료 시간이 설정된 Key 일부를 주기적으로 확인하고 제거합니다.
 
-만료된 Key를 정리하는 방식은 크게 두 가지입니다.
+따라서 TTL이 끝난 모든 Key를 정확히 그 순간 한꺼번에 찾아 지우는 방식은 아닙니다. 또한 TTL이 끝나 제거되는 Expiration은 Memory 한도 때문에 Key를 내보내는 Eviction과 다른 동작입니다.
 
-- Passive Expiration : Key에 접근했을 때 만료 여부를 확인하고 제거
-- Active Expiration : Redis가 주기적으로 만료된 Key를 찾아 제거
+---
 
-따라서 TTL이 끝난 순간 모든 Key를 즉시 한꺼번에 삭제하는 방식은 아닙니다.
+# Hot Key와 Big Key
+
+Key마다 요청량과 데이터 크기는 다를 수 있습니다.
+
+- `Hot Key`: 요청이 한 Key에 지나치게 집중된 상태입니다. 그 Key의 연산과 Network 트래픽에 부하가 몰리고, Cluster에서는 해당 Key를 가진 Shard가 병목이 될 수 있습니다.
+- `Big Key`: Value가 매우 크거나 Collection의 요소가 지나치게 많은 Key입니다. Memory를 많이 사용하며, 큰 범위를 한 번에 처리하는 Command는 다른 요청을 오래 기다리게 할 수 있습니다.
+
+둘은 원인이 다릅니다. 작은 Key도 요청이 몰리면 Hot Key가 될 수 있고, 자주 사용하지 않는 Key도 Value가 크면 Big Key가 될 수 있습니다. 실제 환경에서는 요청 분포와 Key 크기를 따로 확인해야 합니다.
+
+Hot Key는 특정 Shard의 CPU 사용량과 요청 분포를 관찰해 의심할 수 있습니다. LFU Eviction 정책을 사용하는 환경에서는 `redis-cli --hotkeys`로 표본을 확인할 수도 있습니다. Big Key는 `redis-cli --bigkeys`나 `--keystats`로 조사할 수 있습니다. 이런 조사도 Redis에 작업을 추가하므로 운영 환경에서는 실행 범위와 시점을 조절해야 합니다.
+
+---
+
+# Keyspace 전체를 확인할 때
+
+`KEYS`는 조건에 맞는 Key를 한 번에 찾습니다. Key가 많은 운영 환경에서 실행하면 서버를 오래 점유해 다른 요청을 지연시킬 수 있습니다.
+
+`SCAN`은 Cursor를 사용해 Keyspace를 여러 번에 나누어 확인합니다. 한 번의 호출이 서버를 오래 점유하는 것을 피할 수 있어 운영 중의 점진적인 조회에 적합합니다. 다만 조회하는 동안 Keyspace가 바뀔 수 있으므로, 한 시점의 고정된 목록을 반환하는 기능으로 보면 안 됩니다.
+
+개발자는 처음부터 전체 Key 조회에 의존하지 않도록 Key 이름을 설계하고, 필요할 때 `SCAN`의 `MATCH` 조건으로 범위를 좁히는 편이 좋습니다.
 
 ---
 
 # 참고 자료
 
-- [Redis — Keyspace](https://redis.io/docs/latest/develop/use/keyspace/)
-- [Redis — SCAN](https://redis.io/docs/latest/commands/scan/)
+- [Redis — Keys and values](https://redis.io/docs/latest/develop/using-commands/keyspace/)
 - [Redis — EXPIRE](https://redis.io/docs/latest/commands/expire/)
-- [Redis — Transactions](https://redis.io/docs/latest/develop/using-commands/transactions/)
-- [Medium - architecture](https://ashutoshkumars1ngh.medium.com/redis-architecture-why-redis-is-so-fast-and-a-deep-dive-into-internals-d153c064a549)
+- [Redis — SCAN](https://redis.io/docs/latest/commands/scan/)
+- [Redis — Observability and monitoring](https://redis.io/docs/latest/operate/rs/monitoring/observability/)
+- [Redis — Redis CLI](https://redis.io/docs/latest/develop/tools/cli/)

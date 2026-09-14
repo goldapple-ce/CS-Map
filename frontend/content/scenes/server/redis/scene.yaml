@@ -1,5 +1,5 @@
 title: Redis
-summary: Redis가 RESP 요청을 받아 여러 Connection을 관리하고, Keyspace의 Redis Object를 Memory에서 처리하는 흐름을 보여줍니다.
+summary: Redis가 RESP 요청을 받아 여러 Connection을 관리하고, Keyspace의 Hash Table에서 Redis Object를 찾는 흐름을 보여줍니다.
 nodes:
   resp:
     label: RESP
@@ -11,11 +11,11 @@ nodes:
     row: 3
     col: 2
     contentRef: iomultiplexing.ko.md
-  keyspace:
-    label: Keyspace
+  hash-table:
+    label: Hash Table
     row: 3
     col: 3
-    contentRef: keyspace.ko.md
+    contentRef: hashtable.ko.md
   redis-object:
     label: Redis Object
     row: 3
@@ -31,20 +31,29 @@ edges:
     to: io-multiplexing
     label: 요청 수신
   - from: io-multiplexing
-    to: keyspace
-    label: Command 실행
-  - from: keyspace
+    to: hash-table
+    label: Key로 접근
+  - from: hash-table
     to: redis-object
-    label: Value 조회
+    label: Value 참조
   - from: redis-object
     to: memory
-    label: 메모리 접근
+    label: Memory에 존재
+    variant: supporting
+
+areas:
+  keyspace:
+    label: Keyspace
+    row: 3
+    col: 3
+    rowSpan: 1
+    colSpan: 2
+    contentRef: keyspace.ko.md
 
 lightFlows:
   command-processing:
     label: Command 처리
     stages:
       - edges: [[resp, io-multiplexing]]
-      - edges: [[io-multiplexing, keyspace]]
-      - edges: [[keyspace, redis-object]]
-      - edges: [[redis-object, memory]]
+      - edges: [[io-multiplexing, hash-table]]
+      - edges: [[hash-table, redis-object]]

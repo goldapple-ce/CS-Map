@@ -77,6 +77,7 @@ export function useExplanationPanel() {
     explanationPanelRef,
     collapsed,
     mode,
+    open,
     toggleVisibility,
     toggleReadingMode,
     handleResize,

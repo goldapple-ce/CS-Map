@@ -12,6 +12,7 @@ export type GeneratedSceneContent = {
   scene: Scene
   markdown: string
   topicExplanations: Readonly<Record<ContentId, string>>
+  areaExplanations: Readonly<Record<ContentId, string>>
 }
 
 export type GeneratedContentData = {

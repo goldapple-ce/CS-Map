@@ -35,14 +35,15 @@ Redis를 볼 때도 마찬가지입니다. Redis가 단순히 하나의 요청�
 요청을 받으면 대략 다음과 같은 흐름으로 처리합니다.
 
 ```text
-RESP → I/O Multiplexing → Keyspace → Redis Object → Memory
+RESP → I/O Multiplexing → Keyspace의 Hash Table → Redis Object
 ```
 
 - `RESP(Redis Serialization Protocol)` : Client와 Server가 데이터를 주고받기 위해 사용하는 `통신 프로토콜`입니다.
 - `I/O Multiplexing` : 하나의 프로세나 스레드가 여러 소켓을 동시에 감시하고, 실제로 준비가 된 Socket을 찾아내는 기술입니다.
-- `Keyspace` : Redis가 Key를 통해 Value를 관리하고 탐색하는 공간입니다.
+- `Keyspace` : Redis Database가 Key와 Value를 관리하는 논리적 공간이며, Scene에서는 Hash Table과 Redis Object를 묶어 보여줍니다.
+- `Hash Table` : Key를 이용해 연결된 Value를 찾는 내부 조회 구조입니다.
 - `Redis Object` : Redis가 Value를 내부적으로 표현하는 객체입니다.
-- `Memory` : Redis Object와 실제 데이터가 존재하는 공간입니다.
+- `Memory` : Redis Object와 실제 데이터가 존재하는 공간이며, 일반 요청의 다음 처리 단계가 아닙니다.
 
 ---
 

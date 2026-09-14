@@ -34,10 +34,12 @@ type SceneViewportProps = {
   sceneId: string
   selectedSceneId?: string
   selectedElementId?: string
+  selectedAreaId?: string
   navigationDisabled: boolean
   reducedMotion: boolean
   onEnterScene: (sceneId: string) => void
   onSelectTopic: (sceneId: string, elementId: string, label: string) => void
+  onSelectArea: (sceneId: string, areaId: string, label: string) => void
   onAnimationChange: (animating: boolean) => void
 }
 
@@ -46,10 +48,12 @@ export function SceneViewport({
   sceneId,
   selectedSceneId,
   selectedElementId,
+  selectedAreaId,
   navigationDisabled,
   reducedMotion,
   onEnterScene,
   onSelectTopic,
+  onSelectArea,
   onAnimationChange,
 }: SceneViewportProps) {
   const world = useSceneWorld(sceneId)
@@ -84,11 +88,7 @@ export function SceneViewport({
   })
   const activeLightFlowNodeIds = useMemo(
     () =>
-      lightFlowNodeIds(
-        focusedScene,
-        lightFlow.stageEdgeIds,
-        lightFlow.phase
-      ),
+      lightFlowNodeIds(focusedScene, lightFlow.stageEdgeIds, lightFlow.phase),
     [focusedScene, lightFlow.phase, lightFlow.stageEdgeIds]
   )
 
@@ -143,9 +143,11 @@ export function SceneViewport({
             focusedSceneId={world.focusedSceneId}
             selectedSceneId={selectedSceneId}
             selectedElementId={selectedElementId}
+            selectedAreaId={selectedAreaId}
             navigationDisabled={navigationDisabled || animating}
             onEnterScene={enterScene}
             onSelectTopic={onSelectTopic}
+            onSelectArea={onSelectArea}
           />
         </LightFlowRenderProvider>
       </div>

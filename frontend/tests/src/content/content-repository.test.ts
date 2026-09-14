@@ -27,4 +27,13 @@ describe("contentRepository", () => {
       `Unknown Topic missing in Scene ${contentData.rootSceneId}`
     )
   })
+
+  it("Scene에 실제로 존재하는 Area 설명만 반환한다", () => {
+    expect(
+      contentRepository.getAreaExplanation("server-redis", "keyspace")
+    ).toContain("Keyspace")
+    expect(() =>
+      contentRepository.getAreaExplanation("server-redis", "missing")
+    ).toThrow("Unknown Area missing in Scene server-redis")
+  })
 })

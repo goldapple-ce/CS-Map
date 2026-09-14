@@ -8,24 +8,19 @@ import { QuizPanel } from "@/features/explanation/QuizPanel"
 import { MarkdownContent } from "./MarkdownContent"
 import { TopicExplanationContent } from "./TopicExplanationContent"
 import { ExplanationHeader } from "./ExplanationPanelHeader"
-
-export type TopicSelection = {
-  sceneId: string
-  elementId: string
-  label: string
-}
+import type { ExplanationSelection } from "./explanation-selection"
 
 type ExplanationPanelProps = {
   sceneId: string
-  topicSelection?: TopicSelection
-  onClearTopic: () => void
+  selection?: ExplanationSelection
+  onClearSelection: () => void
 }
 
 /** 선택된 Scene 또는 Topic의 설명과 퀴즈를 패널에 표시한다. */
 export function ExplanationPanel({
   sceneId,
-  topicSelection,
-  onClearTopic,
+  selection,
+  onClearSelection,
 }: ExplanationPanelProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null)
 
@@ -40,7 +35,7 @@ export function ExplanationPanel({
     if (!viewport) return
 
     viewport.scrollTop = 0
-  }, [topicSelection, sceneId])
+  }, [selection, sceneId])
 
   const explanation = useMemo(() => {
     const { scene, markdown } = contentRepository.getScene(sceneId)
@@ -51,16 +46,20 @@ export function ExplanationPanel({
     }
   }, [sceneId])
 
-  const topicMarkdown = useMemo(() => {
-    if (!topicSelection) return undefined
+  const selectedMarkdown = useMemo(() => {
+    if (!selection) return undefined
+    return selection.kind === "topic"
+      ? contentRepository.getTopicExplanation(
+          selection.sceneId,
+          selection.elementId
+        )
+      : contentRepository.getAreaExplanation(
+          selection.sceneId,
+          selection.areaId
+        )
+  }, [selection])
 
-    return contentRepository.getTopicExplanation(
-      topicSelection.sceneId,
-      topicSelection.elementId
-    )
-  }, [topicSelection])
-
-  const panelTitle = topicSelection?.label ?? explanation.scene.title
+  const panelTitle = selection?.label ?? explanation.scene.title
 
   return (
     <aside
@@ -69,10 +68,10 @@ export function ExplanationPanel({
     >
       <ExplanationHeader
         title={panelTitle}
-        kind={topicSelection ? "topic" : activeTab}
+        kind={selection?.kind ?? activeTab}
       />
       <Tabs
-        value={topicSelection ? "explanation" : activeTab}
+        value={selection ? "explanation" : activeTab}
         onValueChange={(value) => {
           if (value === "explanation" || value === "quiz") {
             setActiveTab(value)
@@ -80,7 +79,7 @@ export function ExplanationPanel({
         }}
         className="min-h-0 flex-1"
       >
-        {!topicSelection ? (
+        {!selection ? (
           <div className="shrink-0 border-b border-border px-5 py-2.5">
             <TabsList aria-label="Topic 콘텐츠">
               <TabsTrigger className="gap-2" value="explanation">
@@ -103,13 +102,13 @@ export function ExplanationPanel({
               className="data-hidden:hidden"
             >
               <article className="mx-auto max-w-3xl space-y-10 px-6 py-7">
-                {topicSelection ? (
+                {selection ? (
                   <TopicExplanationContent
-                    selection={topicSelection}
-                    markdown={topicMarkdown}
+                    selection={selection}
+                    markdown={selectedMarkdown}
                     onBack={() => {
                       setActiveTab("explanation")
-                      onClearTopic()
+                      onClearSelection()
                     }}
                   />
                 ) : (

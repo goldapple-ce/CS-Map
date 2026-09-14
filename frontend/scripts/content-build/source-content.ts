@@ -28,6 +28,7 @@ type PreparedSceneFile = ContentFile<Scene> & {
   document: SceneDocument
   markdown: string
   topicExplanations: Readonly<Record<string, string>>
+  areaExplanations: Readonly<Record<string, string>>
 }
 
 type SceneSourceFile = ContentFile<SceneSourceDocument>
@@ -266,6 +267,30 @@ export async function prepareScenes(
         )
       }
     }
+    const areaExplanations: Record<string, string> = {}
+    for (const [areaId, area] of Object.entries(file.value.areas)) {
+      if (!area.contentRef) continue
+      const areaMarkdownPath = path.join(directory, area.contentRef)
+      try {
+        const areaMarkdown = await readFile(areaMarkdownPath, "utf8")
+        const preparedAreaMarkdown = await prepareMarkdownImages(
+          appRoot,
+          areaMarkdownPath,
+          areaMarkdown
+        )
+        areaExplanations[areaId] = preparedAreaMarkdown.markdown
+        assets.push(...preparedAreaMarkdown.assets)
+        errors.push(
+          ...preparedAreaMarkdown.errors.map(
+            (error) => `${relativePath(appRoot, areaMarkdownPath)}: ${error}`
+          )
+        )
+      } catch {
+        errors.push(
+          `${relativePath(appRoot, file.filePath)}: missing Markdown content ${area.contentRef}`
+        )
+      }
+    }
     try {
       const metadata = resolveMetadata(file.value)
       prepared.push({
@@ -274,6 +299,7 @@ export async function prepareScenes(
         value: normalizeSceneDocument(file.value, metadata, quiz),
         markdown,
         topicExplanations,
+        areaExplanations,
       })
     } catch (error) {
       errors.push(

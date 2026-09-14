@@ -25,10 +25,12 @@ type WorldRendererProps = {
   focusedSceneId: string
   selectedSceneId?: string
   selectedElementId?: string
+  selectedAreaId?: string
   navigationDisabled: boolean
   onEnterScene: (sceneId: string) => void
   // onPrefetchScene: (sceneId: string) => void
   onSelectTopic: (sceneId: string, elementId: string, label: string) => void
+  onSelectArea: (sceneId: string, areaId: string, label: string) => void
 }
 
 const MAX_CONTEXT_RENDER_SCALE = 128
@@ -60,9 +62,11 @@ export function WorldRenderer({
   focusedSceneId,
   selectedSceneId,
   selectedElementId,
+  selectedAreaId,
   navigationDisabled,
   onEnterScene,
   onSelectTopic,
+  onSelectArea,
 }: WorldRendererProps) {
   const lightFlow = useLightFlowRender()
   const visibleBounds = visibleWorldBounds(camera, viewport)
@@ -147,6 +151,14 @@ export function WorldRenderer({
                       sceneHeight={localLayout.height}
                       columns={scene.layout.columns}
                       rows={scene.layout.rows}
+                      selected={
+                        scene.id === selectedSceneId &&
+                        area.id === selectedAreaId
+                      }
+                      disabled={navigationDisabled}
+                      onSelect={(areaId, label) =>
+                        onSelectArea(scene.id, areaId, label)
+                      }
                     />
                   ))
                 : null}

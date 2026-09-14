@@ -69,6 +69,7 @@ describe("Generated content", () => {
           },
           markdown: "scene markdown",
           topicExplanations: { topic: "topic markdown" },
+          areaExplanations: { area: "area markdown" },
         },
       },
       layouts: {
@@ -80,6 +81,7 @@ describe("Generated content", () => {
     for (const value of [
       "scene markdown",
       "topic markdown",
+      "area markdown",
       "question",
       "/explore/enter-google",
       '"width": 10',

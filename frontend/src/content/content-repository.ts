@@ -32,4 +32,14 @@ export const contentRepository = {
 
     return content.topicExplanations[elementId]
   },
+
+  /** Scene에 실제로 존재하는 Area의 최종 설명을 반환한다. */
+  getAreaExplanation(sceneId: ContentId, areaId: ContentId) {
+    const content = sceneContent(sceneId)
+    const area = content.scene.areas.find((item) => item.id === areaId)
+
+    if (!area) throw new Error(`Unknown Area ${areaId} in Scene ${sceneId}`)
+
+    return content.areaExplanations[areaId]
+  },
 }

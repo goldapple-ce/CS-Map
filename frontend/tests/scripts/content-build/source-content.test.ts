@@ -57,6 +57,47 @@ describe("Source content", () => {
     ).toThrow()
   })
 
+  it("Area contentRef를 build-only 설명 여부로 정규화한다", () => {
+    const document = {
+      ...sourceScene("Area Scene"),
+      id: "area-scene",
+      areas: {
+        group: {
+          label: "Group",
+          row: 1,
+          col: 1,
+          rowSpan: 2,
+          colSpan: 2,
+          contentRef: "group.ko.md",
+        },
+      },
+    }
+
+    const scene = normalizeSceneDocument(document, { slug: "area-scene" })
+
+    expect(scene.areas).toEqual([
+      expect.objectContaining({ id: "group", hasExplanation: true }),
+    ])
+    expect(scene.areas[0]).not.toHaveProperty("contentRef")
+    expect(() =>
+      sceneDocumentSchema.parse({
+        title: "Invalid Area",
+        summary: "Invalid Area",
+        nodes: {},
+        areas: {
+          group: {
+            label: "Group",
+            row: 1,
+            col: 1,
+            rowSpan: 1,
+            colSpan: 1,
+            contentRef: "../group.md",
+          },
+        },
+      })
+    ).toThrow()
+  })
+
   it("scenes 기준 상대 폴더 경로 전체를 Scene ID로 주입한다", () => {
     const result = deriveSceneDocuments(appRoot, [
       {

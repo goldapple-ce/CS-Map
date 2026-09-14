@@ -5,10 +5,8 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import {
-  ExplanationPanel,
-  type TopicSelection,
-} from "@/features/explanation/ExplanationPanel"
+import { ExplanationPanel } from "@/features/explanation/ExplanationPanel"
+import type { ExplanationSelection } from "@/features/explanation/explanation-selection"
 import { SceneViewport } from "@/features/viewport/SceneViewport"
 import { useSceneNavigation } from "./hooks/use-scene-navigation"
 import { useExplanationPanel } from "./hooks/use-explanation-panel"
@@ -22,13 +20,14 @@ type ExplorerShellProps = {
 /** Route와 World Viewport, Explanation Panel의 탐색 상태를 조립한다. */
 export function ExplorerShell({ sceneId }: ExplorerShellProps) {
   const panel = useExplanationPanel()
+  const { open: openExplanationPanel } = panel
   const navigation = useSceneNavigation({ sceneId })
   const reducedMotion = useReducedMotion()
 
-  const [topicSelection, setTopicSelection] = useState<TopicSelection>()
+  const [selection, setSelection] = useState<ExplanationSelection>()
 
   useEffect(() => {
-    const frame = requestAnimationFrame(() => setTopicSelection(undefined))
+    const frame = requestAnimationFrame(() => setSelection(undefined))
 
     return () => cancelAnimationFrame(frame)
   }, [sceneId])
@@ -36,9 +35,23 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
   /** 선택한 Topic 설명을 열고 접혀 있던 Panel을 펼친다. */
   const selectTopic = useCallback(
     (ownerSceneId: string, elementId: string, label: string) => {
-      setTopicSelection({ sceneId: ownerSceneId, elementId, label })
+      setSelection({
+        kind: "topic",
+        sceneId: ownerSceneId,
+        elementId,
+        label,
+      })
+      openExplanationPanel()
     },
-    []
+    [openExplanationPanel]
+  )
+  /** 선택한 Area 설명을 열고 접혀 있던 Panel을 펼친다. */
+  const selectArea = useCallback(
+    (ownerSceneId: string, areaId: string, label: string) => {
+      setSelection({ kind: "area", sceneId: ownerSceneId, areaId, label })
+      openExplanationPanel()
+    },
+    [openExplanationPanel]
   )
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -62,12 +75,18 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
           >
             <SceneViewport
               sceneId={sceneId}
-              selectedSceneId={topicSelection?.sceneId}
-              selectedElementId={topicSelection?.elementId}
+              selectedSceneId={selection?.sceneId}
+              selectedElementId={
+                selection?.kind === "topic" ? selection.elementId : undefined
+              }
+              selectedAreaId={
+                selection?.kind === "area" ? selection.areaId : undefined
+              }
               navigationDisabled={navigation.navigationDisabled}
               reducedMotion={reducedMotion}
               onEnterScene={navigation.enterScene}
               onSelectTopic={selectTopic}
+              onSelectArea={selectArea}
               onAnimationChange={navigation.handleAnimationChange}
             />
           </ResizablePanel>
@@ -95,8 +114,8 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
           >
             <ExplanationPanel
               sceneId={sceneId}
-              topicSelection={topicSelection}
-              onClearTopic={() => setTopicSelection(undefined)}
+              selection={selection}
+              onClearSelection={() => setSelection(undefined)}
             />
           </ResizablePanel>
         </ResizablePanelGroup>

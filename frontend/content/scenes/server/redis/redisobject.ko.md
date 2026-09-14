@@ -1,6 +1,6 @@
 # 한눈에 보기
 
-Redis Object는 Key에 연결된 Value를 Redis가 내부에서 표현하는 객체입니다. 객체에는 Value의 Data Type과 실제 데이터를 표현하는 내부 Encoding 등의 정보가 들어 있습니다.
+Redis Object는 Keyspace의 Hash Table Entry가 참조하는 Value를 Redis가 내부에서 표현하는 객체입니다. 객체에는 Value의 Data Type과 실제 데이터를 표현하는 내부 Encoding 등의 정보가 들어 있습니다.
 
 ---
 

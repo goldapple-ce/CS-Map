@@ -85,10 +85,12 @@ async function main() {
     rootSceneId,
     routes: buildRouteIndex(publishedScenes),
     scenes: Object.fromEntries(
-      publishedScenes.map(({ value, markdown, topicExplanations }) => [
-        value.id,
-        { scene: value, markdown, topicExplanations },
-      ])
+      publishedScenes.map(
+        ({ value, markdown, topicExplanations, areaExplanations }) => [
+          value.id,
+          { scene: value, markdown, topicExplanations, areaExplanations },
+        ]
+      )
     ),
     layouts,
   }

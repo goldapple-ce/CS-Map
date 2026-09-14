@@ -19,6 +19,7 @@ export type SceneArea = {
   grid: SceneGridPlacement
   rowSpan: number
   colSpan: number
+  hasExplanation: boolean
 }
 
 type SceneElementBase = {

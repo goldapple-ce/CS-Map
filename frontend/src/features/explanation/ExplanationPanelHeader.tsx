@@ -1,12 +1,13 @@
 type ExplanationHeaderProps = {
   title: string
-  kind: "topic" | "explanation" | "quiz"
+  kind: "topic" | "area" | "explanation" | "quiz"
 }
 
 /** 현재 설명 종류와 Panel 제어 버튼을 표시한다. */
 export function ExplanationHeader({ title, kind }: ExplanationHeaderProps) {
   const label = {
     topic: "Topic",
+    area: "Area",
     explanation: "Explanation",
     quiz: "Quiz",
   }[kind]

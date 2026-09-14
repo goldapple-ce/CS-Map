@@ -79,15 +79,17 @@ Root Scene은 브라우저에서 서버까지 이어지는 전체 흐름을 보�
 - 검색 결과를 선택하면 일반 Topic 선택과 같은 방식으로 이동한다.
 - 설명 본문 전체 검색은 현재 제공하지 않는다.
 
-### 말단 Topic
+### 말단 Topic과 Scene Area 설명
 
 - 모든 Topic은 클릭할 수 있어야 한다.
 - Child Scene이 없는 Topic은 URL과 Camera를 바꾸지 않고 Explanation Panel에서 설명을 연다.
 - 별도 설명이 없으면 빈 화면 대신 설명이 없음을 알린다.
+- 설명이 연결된 Scene Area는 색칠된 영역과 Label을 선택할 수 있으며 URL, Camera와 현재 Scene을 유지한 채 Explanation Panel에서 설명을 연다.
+- Scene Area 내부 Topic은 Area보다 우선해서 선택되고, 설명이 연결되지 않은 Area는 선택 대상이 아니다.
 
 ## 설명과 퀴즈
 
-- Explanation Panel은 Scene 설명, Topic 설명과 퀴즈를 보여준다.
+- Explanation Panel은 Scene 설명, Topic·Scene Area 설명과 퀴즈를 보여준다.
 - 긴 설명은 지도와 별도로 스크롤할 수 있어야 한다.
 - 사용자는 Panel을 접거나 같은 화면 안에서 읽기 모드로 넓힐 수 있다.
 - 짧은 Preview는 보조 정보이며 핵심 설명을 대신하지 않는다.
@@ -111,7 +113,7 @@ Root Scene은 브라우저에서 서버까지 이어지는 전체 흐름을 보�
 - Light Flow가 없는 Scene에는 실행 버튼이나 애니메이션을 표시하지 않는다.
 - 서로 다른 관계를 같은 모양의 Edge로 무분별하게 표현하지 않는다.
 - Edge의 의미가 중요하면 짧은 Label로 표시한다.
-- Scene Area는 Topic의 시각적 소속만 표현하며 클릭과 탐색 대상이 아니다.
+- Scene Area는 Topic의 시각적 소속을 표현한다. 설명이 연결된 Area는 색칠된 영역과 Label을 선택해 설명을 열 수 있으며, 설명이 없는 Area는 클릭과 탐색 대상이 아니다.
 - 콘텐츠 데이터에는 URL과 실제 화면 좌표처럼 계산할 수 있는 값을 중복 저장하지 않는다.
 
 ### 설명

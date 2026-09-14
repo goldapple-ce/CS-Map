@@ -1,4 +1,4 @@
-# Scene Light Flow
+# Scene Light Flow 및 설명 가능한 Scene Area
 
 ## 목표
 
@@ -16,6 +16,71 @@ Scene 작성자가 기존 Edge를 이어 Light Flow를 정의하고, 사용자�
 - Light Flow가 여러 개면 각 Flow의 `label`을 서로 구분되는 실행 버튼 이름으로 사용한다.
 - Light Flow가 없는 Scene에서는 버튼과 애니메이션 요소를 렌더링하지 않는다.
 - Light Flow는 기존 Edge layout을 따라가는 요청 시점의 연출이며, Edge 관계나 Scene 탐색 상태를 바꾸지 않는다.
+
+## 추가 승인 범위: 설명 가능한 Scene Area
+
+### 목표
+
+Scene 작성자가 Area에 선택적인 `contentRef`를 연결하고, 사용자가 색칠된 Area 사각형 전체를 큰 Area Node처럼 선택하면 Camera와 URL을 바꾸지 않은 채 Explanation Panel에서 Area 설명을 읽을 수 있게 한다. Area 안의 Node는 Area보다 먼저 기존 선택 동작을 받고, Node가 없는 Area 배경을 선택하면 Area 설명을 연다. `contentRef`가 없는 기존 Area의 동작과 모습은 바꾸지 않는다.
+
+Redis Scene에서는 `Keyspace` Area가 Keyspace 전체에 관한 설명을 맡고, 내부 Node 문서는 각 구성 요소의 책임만 설명하도록 분리한다.
+
+### 작성 계약
+
+```yaml
+areas:
+  keyspace:
+    label: Keyspace
+    row: 3
+    col: 3
+    rowSpan: 1
+    colSpan: 2
+    contentRef: keyspace.ko.md
+```
+
+- Area의 `contentRef`는 선택 사항이며 현재 Scene 디렉터리의 Markdown 파일만 참조한다.
+- `contentRef`가 있는 Area는 Label을 포함한 색칠된 사각형 전체를 선택할 수 있다.
+- Area 선택은 Child Scene 진입이나 다른 Scene 이동이 아니다. URL과 Camera를 유지하고 Explanation Panel에 Area Markdown을 표시한다.
+- Area 내부 Node는 Area보다 우선해서 pointer event를 받고 기존 Node 탐색·설명 동작을 그대로 사용한다.
+- `contentRef`가 없는 Area는 기존처럼 시각적 그룹 배경이며 비상호작용 상태를 유지한다.
+- 작성 파일 경로는 브라우저 runtime에 노출하지 않는다. Content Build가 Area Markdown을 읽어 생성 데이터의 Area 설명 record로 만들고, runtime Area에는 Area의 선택 가능 여부만 전달한다.
+
+현재 World Viewport에는 pointer drag/pan 기능이 없으므로 이동 거리 임계값과 drag 뒤 클릭 방지는 이번 변경에 적용되지 않는다. 이 기능을 새로 추가하는 일은 승인된 Area 설명 범위를 넘어가므로 별도 요청으로 다룬다.
+
+### 완료 조건
+
+#### 콘텐츠 계약과 생성 데이터
+
+- [x] Scene Area Schema가 선택적 `contentRef`를 같은 Scene 디렉터리의 Markdown 파일명으로 검증한다.
+- [x] Content Build가 Area Markdown의 존재 여부와 로컬 이미지 참조를 기존 Topic Markdown과 같은 규칙으로 검증·처리한다.
+- [x] 공용 `SceneArea` runtime 타입은 파일 경로 없이 설명 제공 여부를 표현하고, generated Scene 콘텐츠는 Node 설명과 구분된 Area 설명 record를 제공한다.
+- [x] Content Repository가 Scene 안에 실제로 존재하는 Area만 조회하도록 검증하고 Area 설명 또는 설명 없음 상태를 일관되게 반환한다.
+
+#### Area 선택과 Explanation Panel
+
+- [x] `SceneArea`는 `contentRef`가 있는 focused Scene의 Label과 색칠된 사각형 전체에 선택 동작을 제공한다.
+- [x] Area를 선택하면 URL·Camera·Scene을 바꾸지 않고 접힌 Explanation Panel을 열어 Area 제목과 Markdown을 표시한다.
+- [x] Node와 Area 선택을 구분하는 selection 계약을 사용해 Repository 조회와 Panel Header가 올바른 콘텐츠 종류를 표시한다.
+- [x] Area 내부 Node가 Area보다 우선해 기존 Topic 설명과 Child Scene 탐색을 수행한다.
+- [x] `contentRef`가 없는 Area는 클릭 가능한 스타일과 선택 handler를 갖지 않는다.
+
+#### Redis Keyspace 콘텐츠 분리
+
+- [x] Redis `Keyspace` Area에 `keyspace.ko.md`를 연결한다.
+- [x] `keyspace.ko.md`는 Keyspace의 범위, TTL, Passive/Active Expiration, Hot Key, Big Key와 전체 조회를 피하는 `SCAN` 사용 이유를 설명한다.
+- [x] `hashtable.ko.md`는 Key Hash 계산과 Entry 조회 구조, Redis `Hash` Data Type과의 차이에 집중하고 Keyspace 운영 내용을 중복하지 않는다.
+- [x] `redisobject.ko.md`는 Value의 Data Type, 내부 Encoding과 Memory 표현에 집중한다.
+- [x] Redis Scene의 기존 Node·Edge·Light Flow와 사용자가 직접 작성 중인 Scene 전체 설명은 이 분리에 필요한 범위를 벗어나 변경하지 않는다.
+
+#### 기준 문서와 검증
+
+- [x] `REQUIREMENTS.md`에서 설명 가능한 Area 사각형 전체의 선택과 내부 Node 우선을 명시한다.
+- [x] `WORDS.md`에서 설명 가능한 Scene Area를 Label만이 아니라 사각형 전체를 선택하는 큰 Area Node형 요소로 설명한다.
+- [x] `ARCHITECTURE.md`에 Area `contentRef`의 build-only 처리와 별도 설명 record를 유지하면서 Area hit area와 Node 우선순위를 반영한다.
+- [x] `CONTENT_GUIDE.md`에 Area `contentRef` 작성법, 사각형 전체 선택과 Keyspace 예시를 반영한다.
+- [x] Area Schema·Markdown load·Repository 조회의 기존 집중 테스트를 유지하고, 전체 hit area 선택과 내부 Node 우선을 검증하는 테스트를 추가하거나 갱신한다.
+- [ ] `npm run content:build`, `npm run content:validate`, `npm run typecheck`, `npm run test`, `npm run lint`, `npm run build`와 `git diff --check`를 통과한다.
+- [ ] 사용자가 Redis Scene에서 Keyspace 사각형의 Node 없는 부분을 클릭해 설명을 열고, 내부 Hash Table·Redis Object Node 선택이 Area보다 우선하는지 확인한다.
 
 ## 작성 계약
 
@@ -116,7 +181,15 @@ lightFlows:
 5. 기본 typecheck, lint, content build·validate, application build와 diff check를 실행한다.
 6. Root Scene의 비연속 구간을 기존 Edge 구조와 대조하고 필요한 콘텐츠 구조 변경은 사용자 범위 안에서만 반영한다.
 7. 사용자가 HTTPS의 특정 Edge 순서와 기존 Light Flow 재생·취소 동작을 브라우저에서 확인한다.
+8. Area Schema와 normalize에 선택적 설명 계약을 추가하고, Area Markdown을 별도 생성 record로 읽어 검증한다.
+9. Content Repository와 Explanation selection을 Node와 Area를 구분하는 계약으로 확장한다.
+10. focused Scene의 설명 가능한 Area 사각형 전체를 선택 가능하게 연결하고, 내부 Node를 Area보다 나중에 렌더링해 기존 pointer event가 우선하도록 유지한다.
+11. Redis Keyspace Area에 설명을 연결하고 Keyspace·Hash Table·Redis Object 문서의 책임을 분리한다.
+12. 요구사항·용어·아키텍처·콘텐츠 작성 가이드를 선택적인 Area 설명 계약에 맞춘다.
+13. 집중 테스트와 전체 정적·콘텐츠·애플리케이션 검증을 실행한 뒤 사용자가 Redis Scene의 Area 전체 선택과 내부 Node 우선을 확인한다.
 
 ## 현재 상태
 
-optional Edge ID, Node·Edge·fallback runtime ID 충돌 검증, 문자열 ID와 tuple 혼합 참조, 명시적 ID의 runtime·layout 보존을 구현했다. HTTPS의 다섯 handshake Edge에 ID를 부여하고 `https-handshake` Flow를 1→5 순서로 작성했으며 관련 기준 문서와 콘텐츠 작성 가이드도 갱신했다. 기본 content build·validate, typecheck, lint, application build와 diff check를 통과했다. 사용자가 HTTPS Scene에서 버튼과 다섯 pulse의 실제 재생 순서를 확인하는 일만 남아 있다.
+optional Edge ID, Node·Edge·fallback runtime ID 충돌 검증, 문자열 ID와 tuple 혼합 참조, 명시적 ID의 runtime·layout 보존을 구현했다. HTTPS의 다섯 handshake Edge에 ID를 부여하고 `https-handshake` Flow를 1→5 순서로 작성했으며 관련 기준 문서와 콘텐츠 작성 가이드도 갱신했다. 기본 content build·validate, typecheck, lint, application build와 diff check를 통과했다. 사용자가 HTTPS Scene에서 버튼과 다섯 pulse의 실제 재생 순서를 확인하는 일은 그대로 남아 있다.
+
+설명 가능한 Scene Area의 Schema·생성 데이터·Repository와 Node/Area 선택 계약을 구현하고 Redis Keyspace 콘텐츠를 분리했다. 사용자가 승인한 변경에 따라 Label과 색칠된 Area 사각형 전체를 선택 영역으로 만들고, 내부 Node를 위에 렌더링해 기존 클릭 동작이 우선하도록 했다. `contentRef`가 없는 Area는 계속 비상호작용 요소다. Area 전체 클릭과 Node 우선에 맞춰 네 기준 문서와 집중 테스트도 갱신했으며 focused UI·Repository 테스트 7개, typecheck와 lint를 통과했다. 이전 content build·validate와 production build 통과 상태도 유지된다. 전체 테스트는 기존 Search/DNS fixture의 `undefined` 문제 1개 때문에 완료하지 못했고, 실제 브라우저 확인도 남아 있다. 현재 Viewport에 pointer drag/pan 기능이 없으므로 관련 임계값 처리는 이번 범위에 추가하지 않았다.

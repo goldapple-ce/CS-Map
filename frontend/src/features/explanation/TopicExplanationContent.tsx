@@ -1,9 +1,9 @@
 import { MarkdownContent } from "./MarkdownContent"
 import { Button } from "@/components/ui/button"
-import type { TopicSelection } from "./ExplanationPanel"
+import type { ExplanationSelection } from "./explanation-selection"
 
 type TopicExplanationContentProps = {
-  selection: TopicSelection
+  selection: ExplanationSelection
   markdown?: string
   onBack: () => void
 }
@@ -18,11 +18,16 @@ export function TopicExplanationContent({
       {markdown ? (
         <MarkdownContent
           markdown={markdown}
-          idPrefix={`topic-${selection.sceneId}-${selection.elementId}`}
+          idPrefix={
+            selection.kind === "topic"
+              ? `topic-${selection.sceneId}-${selection.elementId}`
+              : `area-${selection.sceneId}-${selection.areaId}`
+          }
         />
       ) : (
         <p className="text-sm leading-7 text-muted-foreground">
-          이 Topic에는 아직 작성된 상세 설명이 없습니다.
+          이 {selection.kind === "topic" ? "Topic" : "Area"}에는 아직 작성된
+          상세 설명이 없습니다.
         </p>
       )}
       <Button type="button" variant="outline" onClick={onBack}>

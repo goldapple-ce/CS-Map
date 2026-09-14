@@ -7,12 +7,12 @@ export const contentIdSchema = z
   .min(1)
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
 
-const topicContentRefSchema = z
+const markdownContentRefSchema = z
   .string()
   .min(1)
   .regex(
     /^[a-zA-Z0-9][a-zA-Z0-9._-]*\.md$/,
-    "Topic contentRef must be a Markdown file in the same Scene directory"
+    "contentRef must be a Markdown file in the same Scene directory"
   )
 
 const gridCoordinateSchema = z.number().int().min(1).max(5)
@@ -29,7 +29,7 @@ const sceneNodeSchema = z
     childSceneId: contentIdSchema.optional(),
     navigateToSceneId: contentIdSchema.optional(),
     description: z.string().min(1).optional(),
-    contentRef: topicContentRefSchema.optional(),
+    contentRef: markdownContentRefSchema.optional(),
   })
   .strict()
   .superRefine((node, context) => {
@@ -79,6 +79,7 @@ const sceneAreaSchema = z
     col: gridCoordinateSchema,
     rowSpan: gridSpanSchema,
     colSpan: gridSpanSchema,
+    contentRef: markdownContentRefSchema.optional(),
   })
   .strict()
 
@@ -415,6 +416,7 @@ export function normalizeSceneDocument(
       grid: { row: area.row, col: area.col },
       rowSpan: area.rowSpan,
       colSpan: area.colSpan,
+      hasExplanation: Boolean(area.contentRef),
     })),
     elements: [
       ...Object.entries(document.nodes).map(([id, node]) => ({

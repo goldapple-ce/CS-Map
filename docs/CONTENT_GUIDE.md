@@ -67,6 +67,7 @@ areas:
     col: 1
     rowSpan: 2
     colSpan: 2
+    contentRef: example-area.ko.md
 ```
 
 - `title`: 화면에 표시할 Scene 제목
@@ -74,7 +75,7 @@ areas:
 - `keywords`: 제목과 요약만으로 찾기 어려운 한글·영문·약어 검색 별칭(선택)
 - `nodes`: 화면에 배치할 Topic
 - `edges`: Topic 사이의 흐름
-- `areas`: 여러 Topic을 배경으로 묶을 때만 사용
+- `areas`: 여러 Topic을 배경으로 묶을 때 사용하며, 필요한 경우 Area 설명을 연결
 
 Scene 제목은 `title`에만 작성하고 `content.ko.md`에서 반복하지 않는다.
 `keywords`에는 제목이나 요약을 그대로 반복하지 않고, 실제 검색에 도움이 되는 별칭만 넣는다. 검색 결과에 tag로 표시되므로 지나치게 많거나 긴 값은 피한다.
@@ -132,7 +133,22 @@ lightFlows:
 
 ### Scene Area
 
-Scene Area는 `label`, `row`, `col`, `rowSpan`, `colSpan`을 가진다. 같은 범위의 Topic을 배경으로 묶을 때만 사용하며 클릭이나 이동 대상이 아니다.
+Scene Area는 `label`, `row`, `col`, `rowSpan`, `colSpan`을 가진다. 같은 범위의 Topic을 배경으로 묶을 때만 사용한다.
+
+Area 전체에 설명이 필요하면 같은 Scene 디렉터리의 Markdown 파일을 선택적인 `contentRef`로 연결한다. 설명이 연결된 Area는 색칠된 영역과 Label을 선택할 수 있으며, 내부 Node를 선택하면 Node의 동작이 우선한다. Area 선택은 Child Scene 이동이 아니며 URL과 Camera를 바꾸지 않고 Explanation Panel만 연다. 설명이 필요하지 않으면 `contentRef`를 생략한다.
+
+```yaml
+areas:
+  keyspace:
+    label: Keyspace
+    row: 3
+    col: 3
+    rowSpan: 1
+    colSpan: 2
+    contentRef: keyspace.ko.md
+```
+
+Area Markdown은 묶음 전체의 의미와 내부 Topic 사이의 관계에 집중한다. 내부 Node의 세부 설명을 반복하지 않는다.
 
 ## Markdown 형식
 

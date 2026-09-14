@@ -16,7 +16,7 @@ CS Map에서 지식과 흐름을 구성하는 기본 단위를 정의한다.
 - `Topic:` 사용자가 선택하거나 더 자세히 탐색할 수 있는 지식 대상이다.
 - `Scene:` Topic의 내부 구조나 동작 흐름을 보여주는 공간이자 콘텐츠 단위다.
   - `Child Scene:` 특정 Topic을 통해 들어갈 수 있는 하위 Scene이다.
-  - `Scene Area:` 같은 범위에 속하는 여러 Topic을 시각적으로 묶는 배경이다. 클릭하거나 진입하는 대상은 아니다.
+  - `Scene Area:` 같은 범위에 속하는 여러 Topic을 시각적으로 묶는 영역이다. 기본적으로 비상호작용 요소이며, 설명이 연결된 경우 색칠된 영역이나 Label을 선택해 Explanation Panel에서 읽을 수 있다. 내부 Topic 선택이 우선하며 Child Scene처럼 진입하는 대상은 아니다.
   - `Node:` Scene 안에 배치되는 Topic의 표현이다. Topic은 지식 대상을, Node는 화면에 놓인 요소를 강조하는 말이다.
   - `Edge:` 두 Node 사이의 데이터 이동이나 실행 순서를 보여주는 선과 화살표다.
   - `Light Flow:` Scene에 이미 있는 Edge를 단계별로 재생해 흐름을 보여주는 선택적 연출이다. 같은 단계의 여러 Edge는 동시에 빛을 보내 분기와 합류를 표현한다.
@@ -27,7 +27,7 @@ CS Map에서 지식과 흐름을 구성하는 기본 단위를 정의한다.
 
 - `Explorer:` 지도를 탐색하고 설명을 읽는 사용자 경험 전체다.
   - `World Viewport:` Topic과 Edge를 배치한 지도를 보여주는 영역이다.
-  - `Explanation Panel:` 현재 Topic의 긴 설명과 퀴즈를 보여주는 영역이다.
+  - `Explanation Panel:` 현재 Scene, Topic 또는 설명 가능한 Scene Area의 긴 설명과 퀴즈를 보여주는 영역이다.
 
 ## 공간 탐색
 

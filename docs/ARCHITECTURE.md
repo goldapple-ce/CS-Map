@@ -80,10 +80,11 @@ flowchart LR
 ## 콘텐츠 모델
 
 - `Scene`: 제목, 요약, 선택적 검색 키워드, Area, Node, Edge, 선택적 Light Flow와 Quiz를 가진 지도 단위다.
+- `Scene Area`: 여러 Node를 시각적으로 묶는다. 작성 시 선택적인 `contentRef`로 Area 설명을 연결할 수 있지만 runtime에는 파일 경로 대신 설명 제공 여부만 남긴다.
 - `Node`: Scene에 배치되는 Topic 표현이다.
 - `Child Scene`: Node의 `childSceneId`로 소유 관계를 만든다.
 - `navigateToSceneId`: 포함 관계 없이 다른 Scene으로 이동한다.
-- `description`, `contentRef`: 말단 Topic의 인라인 또는 Markdown 설명이다.
+- `description`, `contentRef`: 말단 Topic의 인라인 또는 Markdown 설명이다. Scene Area는 Markdown 설명을 연결할 때만 선택적인 `contentRef`를 사용한다.
 - `Light Flow`: Scene에 이미 존재하는 Edge를 순서 있는 stage로 묶은 요청 시점의 흐름 연출이다. 한 stage의 Edge는 동시에 재생되며 분기와 합류를 별도 그래프 탐색 없이 표현한다.
 - `Edge ID`: 같은 Node 쌍의 Edge를 Light Flow에서 구분할 때 작성자가 선택적으로 부여하는 Scene 내부 ID다. Node ID와 다른 Edge ID 모두와 중복될 수 없으며, 명시하지 않은 Edge는 기존 작성 순서 기반 runtime ID를 유지한다.
 
@@ -143,7 +144,7 @@ type GeneratedContentData = {
 }
 ```
 
-각 Scene record에는 검색에 사용하는 요약·키워드를 포함한 완성된 `Scene`, Scene Markdown, Topic 설명과 선택적 Quiz가 포함된다. Root에서 도달할 수 없는 Scene은 Route, Scene과 Layout record에 생성하지 않는다.
+각 Scene record에는 검색에 사용하는 요약·키워드를 포함한 완성된 `Scene`, Scene Markdown, Topic 설명, Topic과 분리된 Area 설명 record와 선택적 Quiz가 포함된다. Area의 작성용 `contentRef`는 Content Build가 같은 Scene 디렉터리의 Markdown과 로컬 이미지를 검증·변환한 뒤 제거하며, runtime `SceneArea`에는 설명 제공 여부만 남긴다. Root에서 도달할 수 없는 Scene은 Route, Scene과 Layout record에 생성하지 않는다.
 
 작성된 Light Flow의 문자열 ID와 Edge 쌍은 normalize 단계에서 runtime Edge ID로 바뀌어 `Scene.lightFlows`에 저장된다. 명시적 Edge ID는 그대로 사용하고, ID가 없는 Edge는 기존 순서 기반 ID를 사용한다. 브라우저는 원본 참조 방식을 다시 해석하지 않고 생성된 ID로 기존 Edge Layout을 재사용한다.
 
@@ -174,6 +175,7 @@ flowchart LR
 - URL에 대응하는 Route 조회
 - Scene과 Markdown 조회
 - Topic 설명 조회
+- 실제 Scene에 존재하는 Area의 설명 조회
 - unknown ID에 대한 일관된 오류 반환
 
 Root Scene ID와 Route 목록은 generated data가 보장하는 index이므로 별도 Repository 메서드로 다시 감싸지 않는다. 브라우저에는 raw YAML/Markdown loader, Zod, 동적 content module과 요청 cache가 없으며 모든 콘텐츠가 애플리케이션 초기 JavaScript에 포함된다.
@@ -211,12 +213,20 @@ sequenceDiagram
 - 말단 Topic: URL과 Camera를 유지하고 Explanation Panel에서 설명을 연다.
 - 목차 선택: Scene ID를 Route로 바꿔 같은 탐색 경로로 이동한다.
 
+### Scene Area 선택
+
+- 설명이 있는 focused Scene Area의 색칠된 사각형과 Label을 선택할 수 있다.
+- Area 선택은 URL, Camera와 현재 Scene을 유지하고 Explanation Panel만 연다.
+- Area는 Edge와 Node보다 먼저 렌더링하며, 위에 놓인 내부 Node가 pointer event를 우선 받아 기존 Topic 선택을 유지한다.
+- 설명이 없는 Area의 Label은 기존 SVG Text로 렌더링하며 선택 상태를 만들지 않는다.
+
 ### 설명 표시
 
-Explanation Panel은 현재 `sceneId`와 선택한 Topic을 기준으로 Repository를 호출한다.
+Explanation Panel은 현재 `sceneId`와 Topic 또는 Area를 구분하는 선택 상태를 기준으로 Repository를 호출한다.
 
 - Scene 설명: Scene Markdown을 표시한다.
 - Topic 설명: 생성된 Topic 설명을 표시하고 없으면 안내 상태를 표시한다.
+- Area 설명: 실제 Scene에 존재하는 Area의 생성된 Markdown을 표시한다.
 - Quiz: `Scene.selfCheckQuiz`를 질문과 답변으로 표시한다.
 
 ## Layout과 렌더링
@@ -240,7 +250,7 @@ Light Flow 재생 상태는 `SceneViewport`가 소유한다. 렌더링에 필요
 | Light Flow 재생 | `SceneViewport` | 현재 Scene의 Flow 선택, stage 진행·완료와 Scene 이동 시 취소 관리 |
 | World 좌표 | `world-layout.ts` | Parent·Child Scene의 재귀 배치 |
 | 목차 검색과 펼침 | `Search` | Route 목록을 트리로 표현하고 Scene 제목·요약·Topic 이름·키워드를 검색하며 기본 목차와 결과에 필요한 Scene metadata를 표시 |
-| 설명 load와 탭 | `ExplanationPanel` | Scene·Topic·Quiz 표시 |
+| 설명 load와 탭 | `ExplanationPanel` | Scene·Topic·Area·Quiz 표시 |
 
 상태를 다른 모듈에 중복 저장하지 않는다. 화면 전환 중 유지해야 하는 Panel 상태는 `ExplorerShell`이 소유하고, Camera처럼 Scene과 Viewport에서 계산 가능한 값은 저장하지 않고 다시 계산한다.
 
