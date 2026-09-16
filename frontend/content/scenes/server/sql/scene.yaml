@@ -77,13 +77,6 @@ edges:
     label: 동시 접근 제어
 
 lightFlows:
-  table-scan:
-    label: Table Scan
-    stages:
-      - edges: [[sql-query, query-optimizer]]
-      - edges: [[query-optimizer, table]]
-      - edges: [[table, buffer-pool]]
-      - edges: [[buffer-pool, storage]]
   index-scan:
     label: Index Scan
     stages:
