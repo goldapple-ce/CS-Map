@@ -1,5 +1,5 @@
 title: Redis
-summary: Redis가 RESP 요청을 받아 여러 Connection을 관리하고, Keyspace의 Hash Table에서 Redis Object를 찾는 흐름을 보여줍니다.
+summary: Redis가 RESP 요청을 받아 Keyspace의 Redis Object를 Memory에서 처리하고, 선택적으로 Disk에 영속화하는 구조를 보여줍니다.
 nodes:
   resp:
     label: RESP
@@ -26,6 +26,11 @@ nodes:
     row: 3
     col: 5
     contentRef: inmemory.ko.md
+  disk:
+    label: Disk
+    row: 4
+    col: 5
+    contentRef: disk.ko.md
 edges:
   - from: resp
     to: io-multiplexing
@@ -38,7 +43,12 @@ edges:
     label: Value 참조
   - from: redis-object
     to: memory
-    label: Memory에 존재
+  - from: memory
+    fromSide: bottom
+    to: disk
+    toSide: top
+    label: RDB / AOF
+    labelSide: left
     variant: supporting
 
 areas:

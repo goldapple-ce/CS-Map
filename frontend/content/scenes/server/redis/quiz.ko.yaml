@@ -30,3 +30,6 @@
 
 - question: Redis에서 TTL이 만료되면 정확히 그 순간 Key가 반드시 메모리에서 제거된다. (O/X)
   answer: X. 만료된 Key는 접근 시 제거되거나 Redis의 Active Expiration 과정에서 제거될 수 있으므로, TTL이 끝나는 순간 물리적으로 즉시 삭제된다고 볼 수는 없습니다.
+
+- question: Redis는 일반적인 Key 조회마다 Disk에서 Value를 읽는다. (O/X)
+  answer: X. 일반적인 조회는 Memory의 데이터를 대상으로 하며, Disk는 RDB나 AOF를 설정했을 때 영속성 파일 저장과 재시작 복구에 사용됩니다.

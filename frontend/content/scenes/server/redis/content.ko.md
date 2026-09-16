@@ -44,6 +44,7 @@ RESP → I/O Multiplexing → Keyspace의 Hash Table → Redis Object
 - `Hash Table` : Key를 이용해 연결된 Value를 찾는 내부 조회 구조입니다.
 - `Redis Object` : Redis가 Value를 내부적으로 표현하는 객체입니다.
 - `Memory` : Redis Object와 실제 데이터가 존재하는 공간이며, 일반 요청의 다음 처리 단계가 아닙니다.
+- `Disk` : 일반 Key 조회 경로와 분리되어 있으며, RDB나 AOF를 사용하는 경우 영속성 파일을 저장합니다.
 
 ---
 
@@ -80,7 +81,7 @@ RESP → I/O Multiplexing → Keyspace의 Hash Table → Redis Object
 
 ## In-Memory라고 Disk를 전혀 사용하지 않는 것은 아닙니다
 
-Redis의 데이터 접근은 Memory를 중심으로 하지만, 필요하면 RDB나 AOF를 이용해 데이터를 Disk에 저장할 수 있습니다
+Redis의 데이터 접근은 Memory를 중심으로 하지만, 필요하면 RDB나 AOF를 이용해 데이터를 Disk에 저장할 수 있습니다. 일반 Key 조회마다 Disk에서 Value를 읽는 구조는 아닙니다.
 
 ---
 

@@ -1,30 +1,31 @@
 # 한눈에 보기
 
-Redis Object는 Keyspace의 Hash Table Entry가 참조하는 Value를 Redis가 내부에서 표현하는 객체입니다. 객체에는 Value의 Data Type과 실제 데이터를 표현하는 내부 Encoding 등의 정보가 들어 있습니다.
+Redis Object는 Keyspace의 Hash Table Entry가 참조하는 Value를 Redis가 내부에서 표현한 객체입니다.
+
+Redis Object에는 Value가 어떤 Data Type인지 나타내는 정보가 있습니다. Redis는 이 정보를 보고 같은 Key에 어떤 연산을 적용할 수 있는지 판단합니다.
 
 ---
 
-# Data Type과 Encoding
+# Value의 Data Type
 
-String, Hash, List, Set, Sorted Set와 Stream 같은 Data Type은 Value의 구조와 Client가 사용할 수 있는 Command를 정합니다. 예를 들어 String은 `GET`과 `SET`, Hash는 Field 단위 조회와 변경, Sorted Set은 Score 기반 순위 연산에 적합합니다.
+Data Type은 Value가 표현하는 데이터의 모양과 Redis가 제공할 연산을 정합니다.
 
-같은 Data Type도 데이터의 크기와 모양에 따라 서로 다른 내부 Encoding을 사용할 수 있습니다.
+- `String`: 문자열, 숫자, Binary나 직렬화한 객체처럼 하나의 값을 표현합니다. 단순 조회·저장과 Counter에 적합합니다.
+- `List`: 순서를 가진 값들을 표현하며 양쪽 끝에서 값을 넣고 꺼낼 수 있습니다. 간단한 Queue나 최근 항목 목록에 사용할 수 있습니다.
+- `Hash`: 하나의 Key 아래에 여러 Field와 Value를 표현합니다. 객체의 일부 Field를 따로 읽고 변경할 때 적합합니다.
+- `Set`: 중복 없는 값들의 모음입니다. 포함 여부 확인이나 합집합·교집합 같은 집합 연산에 적합합니다.
+- `Sorted Set`: 중복 없는 Member마다 Score를 두고 순서를 관리합니다. Ranking이나 우선순위 목록에 적합합니다.
+- `Stream`: ID를 가진 Entry를 추가 순서대로 기록합니다. Event 기록과 Consumer Group을 이용한 메시지 처리에 적합합니다.
 
-예를 들어 작은 값에 적합한 압축된 표현과 큰 값의 변경에 적합한 표현은 Memory 사용량과 연산 비용이 다릅니다. Redis는 조건에 따라 내부 Encoding을 선택하거나 바꿀 수 있으므로 Application이 특정 Encoding에 의존해서는 안 됩니다.
-
----
-
-# Memory와의 관계
-
-Redis Object와 객체가 가리키는 실제 데이터는 Memory에 존재합니다. 따라서 Value의 Payload뿐 아니라 객체 Metadata와 자료구조가 사용하는 공간도 Memory 사용량에 포함됩니다.
-
-일반 Command의 조회와 변경은 이 Memory의 객체를 대상으로 합니다. RDB와 AOF를 설정했더라도 매번 Disk에서 Value를 찾아오는 구조는 아닙니다.
+여기서 Redis `Hash` Data Type은 사용자가 선택하는 Value 구조입니다. Keyspace가 Key를 찾을 때 사용하는 내부 Hash Table과는 역할이 다릅니다.
 
 ---
 
-# 개발자가 개입하는 지점
+# Memory와 개발자의 선택
 
-개발자는 데이터 모양보다 필요한 연산에 맞는 Data Type을 고르고 Value 크기와 요소 수를 제한합니다. 내부 Encoding은 Redis가 관리하지만 `OBJECT ENCODING`으로 특정 Key가 사용하는 표현을 진단할 수 있습니다.
+Redis Object와 객체가 가리키는 실제 데이터는 Memory에 존재합니다. Value의 내용뿐 아니라 객체 Metadata와 내부 자료구조도 Memory를 사용합니다.
+
+개발자는 데이터의 겉모양보다 필요한 연산을 기준으로 Data Type을 선택하고, Value 크기와 요소 수가 계속 커지지 않도록 관리합니다.
 
 ---
 
@@ -32,4 +33,3 @@ Redis Object와 객체가 가리키는 실제 데이터는 Memory에 존재합�
 
 - [Redis — Data types](https://redis.io/docs/latest/develop/data-types/)
 - [Redis — Memory optimization](https://redis.io/docs/latest/operate/oss_and_stack/management/optimization/memory-optimization/)
-- [Redis — OBJECT ENCODING](https://redis.io/docs/latest/commands/object-encoding/)
