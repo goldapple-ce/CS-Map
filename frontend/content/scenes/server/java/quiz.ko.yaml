@@ -1,8 +1,11 @@
 - question: Java Source Code는 그대로 JVM에서 실행되나요?
-  answer: 아니요. Java Compiler가 Source Code를 Bytecode가 담긴 `.class` 파일로 변환합니다.
+  answer: 아니요. Java Compiler가 Source Code를 Bytecode와 Class 정보를 담은 `.class` Class File로 변환합니다.
 
 - question: Bytecode는 특정 OS나 CPU의 기계어인가요?
   answer: 아니요. JVM이 실행할 수 있는 공통 명령 형식입니다.
+
+- question: Class File과 Bytecode는 완전히 같은 뜻인가요?
+  answer: 아니요. Bytecode는 Class File에 포함된 Method 실행 명령이며, Class File에는 Constant Pool과 Class·Field·Method 정보 및 Attribute도 들어 있습니다.
 
 - question: 같은 Bytecode를 여러 OS에서 실행하기 쉬운 이유는 무엇인가요?
   answer: 각 OS와 CPU에 맞는 JVM이 같은 Bytecode를 해당 환경에 맞게 실행하기 때문입니다.
@@ -10,6 +13,11 @@
 - question: JAR 파일은 새로운 실행 언어인가요?
   answer: 아니요. 여러 `.class` 파일과 Resource를 묶은 배포 형식이며 내부 Java Class는 JVM에서 실행됩니다.
 
-- question: JVM은 Spring의 구성 요소인가요?
-  answer: 아니요. Spring Application이 다른 Java Application과 마찬가지로 JVM 위에서 실행됩니다.
+- question: Java는 Compile 방식과 Interpret 방식 중 하나로만 실행되나요?
+  answer: 아니요. Source는 Bytecode로 Compile되고, JVM은 Bytecode를 해석하거나 JIT Compile하여 실행할 수 있습니다.
 
+- question: String을 사용하는 switch는 언제나 정해진 하나의 Bytecode 형태로 변환되나요?
+  answer: 아니요. Compiler가 비교와 분기 구조로 Lowering하며 구체적인 Bytecode는 Compiler와 Version에 따라 달라질 수 있습니다.
+
+- question: Java Compiler가 생성한 Bytecode를 확인할 수 있는 JDK 도구는 무엇인가요?
+  answer: "`javap -c`를 사용하면 Method의 Bytecode 명령을 확인할 수 있습니다."

@@ -1,0 +1,83 @@
+title: Java Compiler
+summary: Java Source가 분석과 의미 검사를 거쳐 Class File이 되는 Java Compiler의 대표 흐름입니다.
+nodes:
+  java-source:
+    label: Java Source
+    row: 2
+    col: 1
+    contentRef: java-source.ko.md
+  lexing:
+    label: Lexing
+    row: 3
+    col: 1
+    contentRef: lexing.ko.md
+  parsing-ast:
+    label: Parsing / AST
+    row: 3
+    col: 2
+    contentRef: parsing-ast.ko.md
+  symbol-resolution:
+    label: Symbol Resolution
+    row: 3
+    col: 3
+    contentRef: symbol-resolution.ko.md
+  type-check:
+    label: Type Check
+    row: 3
+    col: 4
+    contentRef: type-check.ko.md
+  desugar:
+    label: Desugar
+    row: 3
+    col: 5
+    contentRef: desugar.ko.md
+  bytecode-generation:
+    label: Bytecode Generation
+    row: 4
+    col: 5
+    contentRef: bytecode-generation.ko.md
+  class-file:
+    label: Class File
+    row: 5
+    col: 5
+    contentRef: class-file.ko.md
+edges:
+  - from: java-source
+    to: lexing
+    label: Source 입력
+  - from: lexing
+    to: parsing-ast
+    label: Token 전달
+  - from: parsing-ast
+    to: symbol-resolution
+    label: 구조 분석
+  - from: symbol-resolution
+    to: type-check
+    label: 선언 연결
+  - from: type-check
+    to: desugar
+    label: 의미 검증
+  - from: desugar
+    to: bytecode-generation
+    label: 구조 단순화
+  - from: bytecode-generation
+    to: class-file
+    label: 파일 생성
+areas:
+  semantic-analysis:
+    label: Semantic Analysis
+    row: 3
+    col: 3
+    rowSpan: 1
+    colSpan: 2
+lightFlows:
+  compilation:
+    label: Compile
+    stages:
+      - edges: [[java-source, lexing]]
+      - edges: [[lexing, parsing-ast]]
+      - edges: [[parsing-ast, symbol-resolution]]
+      - edges: [[symbol-resolution, type-check]]
+      - edges: [[type-check, desugar]]
+      - edges: [[desugar, bytecode-generation]]
+      - edges: [[bytecode-generation, class-file]]
