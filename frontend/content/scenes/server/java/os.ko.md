@@ -8,7 +8,7 @@ Java Application은 이러한 기능을 OS마다 직접 구현하기보다 Java 
 
 # JVM과 OS의 관계
 
-같은 `.class` Bytecode를 여러 OS에서 사용할 수 있지만, JVM 실행 파일까지 완전히 같은 것은 아닙니다. Windows에는 Windows용 JVM이 필요하고 Linux에는 Linux용 JVM이 필요합니다.
+같은 `.class` Class File과 그 안의 Bytecode를 여러 OS에서 사용할 수 있지만, JVM 실행 파일까지 완전히 같은 것은 아닙니다. Windows에는 Windows용 JVM이 필요하고 Linux에는 Linux용 JVM이 필요합니다.
 
 ```text
 Java Application

@@ -1,6 +1,6 @@
 # 한눈에 보기
 
-Class Loading은 JVM이 실행에 필요한 `.class` Bytecode를 찾아 내부로 불러오고 사용할 수 있는 상태로 준비하는 과정입니다.
+Class Loading은 JVM이 실행에 필요한 `.class` Class File을 찾아 내부로 불러오고 사용할 수 있는 상태로 준비하는 과정입니다.
 
 Application의 모든 Class를 처음부터 한꺼번에 불러오는 것은 아닙니다. 일반적으로 실행 중 필요한 Class가 처음 사용되는 시점에 불러올 수 있습니다.
 
@@ -8,7 +8,7 @@ Application의 모든 Class를 처음부터 한꺼번에 불러오는 것은 아
 
 # 크게 보는 과정
 
-1. `Loading`: Class Loader가 이름에 해당하는 Class Bytecode를 찾고 JVM 내부에 Class를 만듭니다.
+1. `Loading`: Class Loader가 이름에 해당하는 Class File의 Binary Representation을 찾고 JVM 내부에 Class를 만듭니다.
 2. `Linking`: Bytecode가 올바른지 확인하고 static field를 위한 memory 등을 준비하며 필요한 참조를 연결합니다.
 3. `Initialization`: static field의 초기값과 static initializer를 실행합니다.
 

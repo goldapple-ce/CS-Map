@@ -13,3 +13,11 @@
 - question: 같은 Bytecode를 여러 OS에서 실행할 때 JVM 실행 파일도 동일한가요?
   answer: 아니요. Bytecode 형식과 JVM 규격은 공통이지만 JVM 구현은 OS와 CPU에 맞게 만들어집니다.
 
+- question: "`i++`는 `++i`보다 Runtime에서 항상 빠른가요?"
+  answer: 아니요. Expression 의미는 다르지만 생성된 Bytecode와 JIT 최적화에 따라 성능 차이가 사라질 수 있으므로 실제 환경에서 측정해야 합니다.
+
+- question: static을 붙이면 Code가 항상 더 빠르게 실행되나요?
+  answer: 아니요. `static`은 Class 소유를 나타내는 의미이며 성능은 Bytecode, JIT 최적화와 실제 실행 환경을 함께 측정해야 합니다.
+
+- question: 모든 List에서 Index 기반 for가 For-each보다 빠른가요?
+  answer: 아니요. List 구현, Iterator 사용과 JIT 최적화에 따라 달라지므로 의미와 자료구조에 맞게 선택하고 필요하면 JMH로 측정해야 합니다.

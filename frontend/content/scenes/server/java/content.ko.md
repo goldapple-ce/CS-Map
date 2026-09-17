@@ -1,30 +1,20 @@
 # 한눈에 보기
 
-Java로 작성한 Source Code는 그대로 실행되지 않습니다. Java Compiler가 JVM이 이해할 수 있는 Bytecode로 변환하고, 현재 OS에 맞게 만들어진 JVM이 이 Bytecode를 실행합니다.
+Java로 작성한 Source Code는 그대로 실행되지 않습니다. Java Compiler가 JVM이 읽을 수 있는 Class File을 만들고, 현재 OS에 맞게 만들어진 JVM이 그 안의 Bytecode를 실행합니다.
 
 ```text
-Java Source
-     ↓
-Java Compiler
-     ↓
-Bytecode
-     ↓
-JVM
-     ↓
-OS
+Java Source → Java Compiler → Class File → JVM → OS
 ```
 
-Spring Application도 이 흐름 위에서 실행되는 Java Application입니다. 따라서 이 Scene은 HTTP 요청 처리 순서가 아니라 Spring 아래의 실행 기반을 보여줍니다.
-
-이 구조의 핵심은 Java Application을 OS마다 서로 다른 기계어로 직접 만들지 않아도 된다는 점입니다. 동일한 Bytecode를 Windows용 JVM, Linux용 JVM과 macOS용 JVM이 각 환경에 맞게 실행합니다.
+이 구조의 핵심은 Java Application을 OS마다 서로 다른 기계어로 직접 만들지 않아도 된다는 점입니다. 동일한 Class File과 Bytecode를 Windows용 JVM, Linux용 JVM과 macOS용 JVM이 각 환경에 맞게 실행합니다.
 
 ---
 
 # 구성 요소
 
 - `Java Source`: 개발자가 `.java` 파일에 작성한 코드입니다.
-- `Java Compiler`: Source Code를 검사하고 Bytecode가 담긴 `.class` 파일로 변환합니다.
-- `Bytecode`: 특정 운영체제나 CPU의 기계어가 아니라 JVM이 실행할 수 있는 명령 형식입니다.
+- `Java Compiler`: Source Code를 검사하고 `.class` Class File로 변환합니다.
+- `Class File`: Class 구조와 Constant Pool, Field·Method 정보 및 Method Bytecode를 담는 JVM 입력 형식입니다.
 - `JVM`: Class를 불러오고 Bytecode를 실행하며 memory와 Garbage Collection을 관리합니다.
 - `OS`: process, thread, file, network와 memory 같은 실제 시스템 기능을 제공합니다.
 
@@ -33,10 +23,10 @@ Spring Application도 이 흐름 위에서 실행되는 Java Application입니�
 # 전체 흐름
 
 1. 개발자가 Java Source Code를 작성합니다.
-2. Java Compiler가 문법과 type을 검사하고 `.class` Bytecode를 생성합니다.
-3. Application을 시작하면 JVM이 필요한 Class를 불러옵니다.
-4. 현재 OS와 CPU에 맞는 JVM이 Bytecode를 불러옵니다.
-5. JVM이 Bytecode를 해석하거나 자주 실행되는 부분을 현재 CPU의 기계어로 컴파일해 실행합니다.
+2. Java Compiler가 문법과 type을 검사하고 `.class` Class File을 생성합니다.
+3. Application을 시작하면 JVM이 필요한 Class File을 불러옵니다.
+4. JVM이 Class 구조를 준비하고 Method Bytecode를 실행할 수 있는 상태로 만듭니다.
+5. 현재 OS와 CPU에 맞는 JVM이 Bytecode를 해석하거나 자주 실행되는 부분을 현재 CPU의 기계어로 컴파일해 실행합니다.
 6. JVM은 thread, file과 network처럼 실제 시스템 기능이 필요할 때 OS의 기능을 사용합니다.
 7. 실행 중 생성된 객체와 method 호출에 필요한 memory를 관리하고, 사용하지 않는 객체는 Garbage Collector가 정리합니다.
 
@@ -56,11 +46,7 @@ Spring Application도 이 흐름 위에서 실행되는 Java Application입니�
 
 ## Java와 JVM은 같은 것이 아닙니다
 
-Java는 Source Code를 작성하는 language와 관련 도구·library의 생태계를 가리킵니다. JVM은 컴파일된 Bytecode를 실제로 실행하는 runtime입니다.
-
-## JVM은 Spring의 구성요소가 아닙니다
-
-Spring이 JVM을 포함하는 것이 아니라, Spring Application이 다른 Java Application과 마찬가지로 JVM 위에서 실행됩니다.
+Java는 Source Code를 작성하는 language와 관련 도구/library의 생태계를 가리킵니다. JVM은 컴파일된 Bytecode를 실제로 실행하는 runtime입니다.
 
 ## JVM 자체가 모든 OS에서 동일한 것은 아닙니다
 
