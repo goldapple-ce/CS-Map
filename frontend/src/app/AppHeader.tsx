@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom"
-import { Moon, Sun } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Brain, Moon, Sun } from "lucide-react"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Search } from "@/features/search/Search"
+import { cn } from "@/lib/utils"
 
 import {
   ThemeAnimationType,
@@ -41,16 +42,25 @@ export function AppHeader() {
       </Link>
 
       <Search />
-      <Button
-        ref={ref}
-        variant="ghost"
-        size="icon"
-        aria-label="테마 변경"
-        onClick={handleThemeToggle}
-      >
-        <Sun className="hidden dark:block" />
-        <Moon className="block dark:hidden" />
-      </Button>
+      <div className="flex items-center gap-1">
+        <Link
+          to="/quiz"
+          className={cn(buttonVariants({ variant: "ghost" }), "gap-1.5")}
+        >
+          <Brain aria-hidden="true" />
+          퀴즈
+        </Link>
+        <Button
+          ref={ref}
+          variant="ghost"
+          size="icon"
+          aria-label="테마 변경"
+          onClick={handleThemeToggle}
+        >
+          <Sun className="hidden dark:block" />
+          <Moon className="block dark:hidden" />
+        </Button>
+      </div>
     </header>
   )
 }

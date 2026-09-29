@@ -48,7 +48,9 @@ frontend/
 │   ├── app/                 Route와 애플리케이션 진입점
 │   ├── content/             generated data adapter와 Repository API
 │   ├── features/explorer/   World, Camera, Scene과 목차
-│   └── features/explanation/ Markdown, Topic 설명과 Quiz
+│   ├── features/explanation/ Markdown, Topic 설명과 Scene별 Quiz
+│   ├── features/home/        홈페이지 소개와 Quiz Preview
+│   └── features/quiz/        독립 Quiz Bank, 범위 계산과 세션 화면
 └── tests/                   build, Repository와 Layout 회귀 테스트
 ```
 
@@ -156,15 +158,17 @@ type GeneratedContentData = {
 flowchart LR
     Main["main.tsx"] --> App["App"]
     App --> Router["React Router"]
-    Router --> Route["ExploreRoute"]
-    Route --> Shell["ExplorerShell"]
+    Router --> ExploreRoute["ExploreRoute"]
+    Router --> QuizRoute["QuizRoute"]
+    ExploreRoute --> Shell["ExplorerShell"]
     Shell --> Viewport["SceneViewport"]
     Shell --> Outline["TopicOutline"]
     Shell --> Panel["ExplanationPanel"]
-    Repository["Content Repository"] --> Route
+    Repository["Content Repository"] --> ExploreRoute
     Repository --> Viewport
     Repository --> Outline
     Repository --> Panel
+    Generated["generated content"] --> QuizRoute
     Viewport --> World["World Layout · Renderer"]
 ```
 
@@ -179,6 +183,16 @@ flowchart LR
 - unknown ID에 대한 일관된 오류 반환
 
 Root Scene ID와 Route 목록은 generated data가 보장하는 index이므로 별도 Repository 메서드로 다시 감싸지 않는다. 브라우저에는 raw YAML/Markdown loader, Zod, 동적 content module과 요청 cache가 없으며 모든 콘텐츠가 애플리케이션 초기 JavaScript에 포함된다.
+
+### 독립 Quiz Route
+
+`/quiz`는 World Viewport와 Explanation Panel 바깥에서 동작하는 별도 Route다. `features/quiz/quiz-bank.ts`는 generated Route와 Scene의 기존 `selfCheckQuiz`를 조합해 문제 ID, 질문·답변과 출처 Scene 제목·경로가 포함된 Quiz Bank를 만든다. 콘텐츠 원본, Schema와 생성 계약은 변경하지 않는다.
+
+범위는 generated Route의 `parentId` 관계로 계산한다. 전체 범위는 Quiz Bank의 모든 문제를, Scene 가지 범위는 선택한 Scene과 모든 자손 Scene의 문제를 포함한다. 퀴즈가 하나도 없는 가지는 선택 목록에서 제외한다.
+
+`QuizPage`는 범위 선택, 고정된 셔플 결과, 현재 문제, 정답 공개 여부와 다시 볼 문제 ID를 컴포넌트 메모리에서만 관리한다. 마지막 문제를 평가하면 같은 상태에서 결과를 만들며 URL query, 브라우저 저장소와 서버에는 기록하지 않는다. 출처 링크는 Quiz Bank에 결합된 generated Route 경로를 사용해 Explorer로 이동한다.
+
+`QuizPreview`는 상위 Route에서 퀴즈 데이터를 전달받지 않고 generated content와 같은 Quiz Bank 조합 함수를 직접 사용한다. 안정된 Quiz Bank 순서의 첫 문제만 홈페이지 대표 문제로 표시하고 정답 공개 여부는 컴포넌트 내부 상태로 관리한다. Quiz Bank가 비어 있으면 영역을 렌더링하지 않으며 CTA는 `/quiz` Route로 이동한다.
 
 ## Explorer 실행 흐름
 
@@ -251,6 +265,8 @@ Light Flow 재생 상태는 `SceneViewport`가 소유한다. 렌더링에 필요
 | World 좌표 | `world-layout.ts` | Parent·Child Scene의 재귀 배치 |
 | 목차 검색과 펼침 | `Search` | Route 목록을 트리로 표현하고 Scene 제목·요약·Topic 이름·키워드를 검색하며 기본 목차와 결과에 필요한 Scene metadata를 표시 |
 | 설명 load와 탭 | `ExplanationPanel` | Scene·Topic·Area·Quiz 표시 |
+| 홈페이지 퀴즈 소개 | `QuizPreview` | Quiz Bank의 첫 문제 선택, 정답 공개와 독립 퀴즈 진입 |
+| 독립 퀴즈 세션 | `QuizPage` | 범위 선택, 문제 순서, 정답 공개, 자기 평가와 결과를 메모리에만 유지 |
 
 상태를 다른 모듈에 중복 저장하지 않는다. 화면 전환 중 유지해야 하는 Panel 상태는 `ExplorerShell`이 소유하고, Camera처럼 Scene과 Viewport에서 계산 가능한 값은 저장하지 않고 다시 계산한다.
 
@@ -284,6 +300,7 @@ Search는 generated Route와 Scene을 결합한 `SearchEntry`를 검색 결과�
 - 생성 데이터 필드 변경: shared generated contract, renderer와 Repository test를 함께 변경한다.
 - 탐색 동작 변경: Router, ExplorerShell, SceneViewport와 snapshot 책임을 순서대로 확인한다.
 - 설명 UI 변경: Repository 결과 계약과 ExplanationPanel 상태를 확인한다.
+- 독립 퀴즈 변경: generated Route·Scene 조합, 자손 범위 계산과 QuizPage의 비저장 세션 흐름을 함께 확인한다.
 
 ## 검증
 

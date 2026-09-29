@@ -5,6 +5,7 @@ import { contentData } from "@/content/generated/content-data"
 import { EnterGooglePreview } from "@/features/home/EnterGooglePreview"
 import { UsageGuide } from "@/features/home/UsageGuide"
 import { Hero } from "@/features/home/Hero"
+import { QuizPreview } from "@/features/home/QuizPreview"
 import { MousePointerClick } from "lucide-react"
 
 /** Root Scene 미리보기와 Explorer 진입 안내를 시작 화면에 표시한다. */
@@ -15,7 +16,9 @@ export function HomeRoute() {
     ({ id }) => id === contentData.rootSceneId
   )
   if (!rootRoute) {
-    throw new Error(`Root Scene route is unavailable: ${contentData.rootSceneId}`)
+    throw new Error(
+      `Root Scene route is unavailable: ${contentData.rootSceneId}`
+    )
   }
 
   return (
@@ -48,8 +51,9 @@ export function HomeRoute() {
           onEnter={() => navigate(rootRoute.path)}
         />
       </section>
-
       <UsageGuide />
+
+      <QuizPreview />
     </main>
   )
 }

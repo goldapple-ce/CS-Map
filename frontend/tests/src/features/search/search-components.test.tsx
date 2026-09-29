@@ -25,9 +25,7 @@ describe("Search Scene 항목", () => {
     const root = orderedSearchEntries.find(
       (entry) => entry.id === "enter-google"
     )!
-    const dns = orderedSearchEntries.find(
-      (entry) => entry.id === "network-dns"
-    )!
+    const dns = orderedSearchEntries.find((entry) => entry.id === "dns")!
 
     render(
       <MemoryRouter initialEntries={[root.path]}>
