@@ -1,14 +1,14 @@
-- question: Lexing과 Parsing의 역할은 어떻게 다른가요?
-  answer: Lexing은 Source Text를 Token으로 구분하고, Parsing은 Token의 문법 관계를 분석해 Tree 구조로 표현합니다.
+- question: "int result = a + b * 10;을 Token으로 나눈 뒤, 연산의 중첩 관계를 Tree로 만드는 단계는 무엇인가요?"
+  answer: Parsing입니다. Lexing이 Source를 Token으로 나누고, Parsing이 Token 사이의 문법 관계를 AST로 만듭니다.
 
-- question: AST는 JVM이 직접 실행하는 최종 결과물인가요?
-  answer: 아니요. AST는 Compiler가 Source 구조를 분석할 때 사용하는 내부 표현이며, Compiler의 출력은 Class File입니다.
+- question: AST를 만든 직후에도 Compiler가 a의 Type을 바로 안다고 볼 수 있나요?
+  answer: 아닙니다. AST는 문장 구조를 보여 주며, Symbol Resolution이 a를 실제 선언과 연결해야 선언의 Type을 알 수 있습니다.
 
-- question: Symbol Resolution과 Type Check는 어떤 순서로 연결되나요?
-  answer: 먼저 이름을 실제 선언에 연결해야 해당 선언의 Type을 알 수 있고, 그 정보를 이용해 대입과 연산 등이 Type 규칙에 맞는지 검사합니다.
+- question: Symbol Resolution이 Type Check보다 먼저 필요한 이유는 무엇인가요?
+  answer: 이름을 실제 선언과 연결해야 그 선언의 Type을 알 수 있고, 그 정보를 이용해 대입과 연산이 가능한지 검사할 수 있기 때문입니다.
 
-- question: 모든 Enhanced for는 Iterator를 사용하는 구조로 변환되나요?
-  answer: 아니요. Array는 Index 기반 구조로, Iterable은 Iterator 기반 구조로 Lowering될 수 있습니다.
+- question: Enhanced for를 Desugar할 때 항상 Iterator 구조가 되나요?
+  answer: 아니요. Iterable은 Iterator를 이용하는 구조로, Array는 Index를 이용하는 구조로 바뀔 수 있습니다.
 
-- question: Bytecode와 Class File은 같은 것인가요?
-  answer: 아니요. Method Bytecode는 Class File의 일부이며, Class File에는 Constant Pool과 Class·Field·Method 정보 및 Attribute도 들어 있습니다.
+- question: Bytecode Generation이 끝나면 Bytecode만 단독으로 JVM에 전달되나요?
+  answer: 아니요. Bytecode는 Constant Pool과 Class·Field·Method 정보 등과 함께 Class File에 기록되며, 이 Class File이 JVM의 입력이 됩니다.

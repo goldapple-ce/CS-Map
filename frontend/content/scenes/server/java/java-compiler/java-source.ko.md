@@ -1,10 +1,12 @@
 # 한눈에 보기
 
-Java Source는 Java Compiler가 읽는 입력입니다. 개발자가 작성한 `.java` 파일에는 Class, Method, Statement와 Expression 같은 Java 코드가 들어 있습니다.
+Java Source는 개발자가 작성하고 Java Compiler에 건네는 `.java` 파일입니다.
 
-Compiler는 이 파일의 문자를 바로 실행하지 않습니다. 먼저 Source Text를 Token으로 나누는 Lexing 단계로 전달합니다.
+```java
+int result = a + b * 10;
+```
 
-이 Topic은 Compiler의 입력이라는 역할에만 집중합니다. Package, Type, Variable과 Object 같은 Java Source의 상세 내용은 Parent Scene의 Java Source 하위 Scene에서 다룹니다.
+이 코드는 아직 JVM이 실행할 명령이 아닙니다. Compiler는 먼저 글자를 의미 있는 조각으로 나눕니다. 다음 단계인 Lexing이 이 일을 합니다.
 
 ---
 

@@ -1,32 +1,36 @@
 # 한눈에 보기
 
-Symbol Resolution은 Source에 사용된 이름을 실제 선언과 연결하는 과정입니다.
+Symbol Resolution은 Compiler가 `코드에서 사용한 이름을 그 이름이 선언된 곳과 연결하는 과정`입니다.
+
+---
+
+# 이름을 찾으면
 
 ```java
-int a = 1;
-int result = a + 10;
-```
-
-두 번째 줄의 `a`를 첫 번째 줄에서 선언한 Local Variable과 연결해야 그 Type과 사용 범위를 알 수 있습니다.
-
-```text
-사용된 a → 선언된 int a
-```
-
-반면 선언하지 않은 이름은 연결할 대상을 찾을 수 없습니다.
-
-```java
-int result = x + 10;
+int count = 10;
+int result = count + 1;
 ```
 
 ```text
-사용된 x → ?
+아래에서 사용한 count → 위에서 선언한 int count
+```
+
+이름이 선언과 연결되어야 Compiler는 count가 int라는 사실을 알 수 있습니다. 이 정보는 다음 Type Check에서 사용합니다.
+
+---
+
+# 이름을 찾지 못하면
+
+```java
+int result = value + 1;
+```
+
+```text
+사용한 value → 찾을 선언 없음
 cannot find symbol
 ```
 
-이처럼 선언이 없거나 현재 Scope에서 접근할 수 없는 이름이라면 Symbol Resolution이 실패하고 Compile Error가 발생합니다.
-
-이 과정은 같은 단순 이름을 가진 선언 중 Package, Import, Scope와 Overload 후보 등을 고려해 무엇을 가리키는지 판단하는 Semantic Analysis의 일부입니다.
+Symbol Resolution은 이름의 대상을 찾고, Type Check는 찾은 대상을 그 방식으로 사용해도 되는지 검사합니다.
 
 ---
 

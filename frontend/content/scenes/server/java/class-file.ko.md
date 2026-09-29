@@ -29,16 +29,6 @@ Method Bytecode는 특정 CPU의 기계어가 아니라 JVM Instruction Set을 �
 
 ---
 
-# Source 문법의 Lowering
-
-Class File이 Java Source 문법을 그대로 보존하는 것은 아닙니다. Compiler는 Source의 의미를 여러 Bytecode 명령과 분기 구조로 낮춰 표현할 수 있습니다. 이를 Lowering이라고 합니다.
-
-예를 들어 String을 사용하는 `switch`에 대응하는 전용 JVM 명령이 반드시 필요한 것은 아닙니다. Compiler가 비교와 분기의 조합으로 변환할 수 있으며, 구체적인 Bytecode 형태는 Compiler와 Version에 따라 달라질 수 있습니다.
-
-`javap -c`를 사용하면 Method Bytecode를, `javap -v`를 사용하면 Constant Pool과 Method 정보 등 Class File의 더 자세한 구조를 확인할 수 있습니다.
-
----
-
 # 참고 자료
 
 - [JVMS 4 — The class File Format](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html)
