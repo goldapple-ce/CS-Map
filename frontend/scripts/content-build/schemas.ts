@@ -116,6 +116,13 @@ export const sceneDocumentSchema = z
   .strict()
   .superRefine((scene, context) => {
     for (const [areaId, area] of Object.entries(scene.areas)) {
+      if (area.contentRef && scene.nodes[areaId]) {
+        context.addIssue({
+          code: "custom",
+          path: ["areas", areaId, "contentRef"],
+          message: `Area with explanation conflicts with Node ID in this Scene: ${areaId}`,
+        })
+      }
       if (area.row + area.rowSpan - 1 > 5) {
         context.addIssue({
           code: "custom",

@@ -69,6 +69,9 @@ Root Scene은 브라우저에서 서버까지 이어지는 전체 흐름을 보�
 - 사용자는 Root Scene으로 돌아가거나 이전 Scene으로 돌아갈 수 있다.
 - 뒤로 가기와 앞으로 가기는 이전 Scene을 열고 현재 Viewport 크기에 맞춰 Camera를 다시 배치한다.
 - 모든 게시 Scene은 공유 가능한 URL을 가지며 직접 접근해도 같은 위치가 열린다.
+- 선택한 말단 Topic과 설명 가능한 Scene Area는 Scene 경로 뒤의 bare Fragment `#<selection-id>`로 공유하며, 직접 접근·새로고침·뒤로 가기·앞으로 가기에서 같은 선택과 설명을 복원한다.
+- Child Scene이나 다른 Scene으로 이동할 때는 이전 Scene의 선택 Fragment를 목적지 URL에 남기지 않는다.
+- 현재 Scene에서 선택할 수 없는 Fragment는 오류 대신 Scene 기본 설명을 표시하고 Fragment가 없는 canonical Scene URL로 정리한다.
 - 다른 Scene으로 이동하는 Topic은 말단 Topic과 시각적으로 구분한다.
 
 ### 전체 Topic 목차
@@ -84,9 +87,10 @@ Root Scene은 브라우저에서 서버까지 이어지는 전체 흐름을 보�
 ### 말단 Topic과 Scene Area 설명
 
 - 모든 Topic은 클릭할 수 있어야 한다.
-- Child Scene이 없는 Topic은 URL과 Camera를 바꾸지 않고 Explanation Panel에서 설명을 연다.
+- Child Scene이 없는 Topic은 Camera를 바꾸지 않고 현재 Scene URL에 Topic ID Fragment를 추가해 Explanation Panel에서 설명을 연다.
+- World Viewport에 함께 보이는 다른 Scene의 말단 Topic을 선택하면 해당 Topic을 소유한 Scene 경로와 Topic ID Fragment로 이동한다.
 - 별도 설명이 없으면 빈 화면 대신 설명이 없음을 알린다.
-- 설명이 연결된 Scene Area는 색칠된 영역과 Label을 선택할 수 있으며 URL, Camera와 현재 Scene을 유지한 채 Explanation Panel에서 설명을 연다.
+- 설명이 연결된 Scene Area는 색칠된 영역과 Label을 선택할 수 있으며 Camera와 현재 Scene 경로를 유지하고 Area ID Fragment만 추가해 Explanation Panel에서 설명을 연다.
 - Scene Area 내부 Topic은 Area보다 우선해서 선택되고, 설명이 연결되지 않은 Area는 선택 대상이 아니다.
 
 ## 설명과 퀴즈
@@ -94,6 +98,7 @@ Root Scene은 브라우저에서 서버까지 이어지는 전체 흐름을 보�
 - Explanation Panel은 Scene 설명, Topic·Scene Area 설명과 퀴즈를 보여준다.
 - 긴 설명은 지도와 별도로 스크롤할 수 있어야 한다.
 - 사용자는 Panel을 접거나 같은 화면 안에서 읽기 모드로 넓힐 수 있다.
+- 선택 Fragment가 직접 열리거나 history에서 복원되면 Panel을 열지만, Panel의 접힘과 읽기 모드는 URL에 저장하지 않는다.
 - 짧은 Preview는 보조 정보이며 핵심 설명을 대신하지 않는다.
 - 독립적인 내부 구조나 별도 흐름이 필요한 내용은 Child Scene으로 분리한다.
 - 현재 Scene의 관계, 예시와 주의사항은 불필요하게 다른 Scene으로 나누지 않는다.

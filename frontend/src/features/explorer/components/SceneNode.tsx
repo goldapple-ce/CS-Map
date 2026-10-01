@@ -5,6 +5,7 @@ import type { LayoutBox } from "@shared/layout/scene-layout-contract"
 import { estimatedSceneNodeLabelWidth } from "@shared/layout/scene-node-metrics"
 import type { LightFlowNodeState } from "@/features/explorer/light-flow-render-context"
 import { cn } from "@/lib/utils"
+import { normalizedSceneNodeLabel } from "@shared/content/scene-label"
 
 export type SceneNodeState = "interactive" | "selected"
 export type SceneNodeDensity = "far" | "medium" | "near"
@@ -73,10 +74,7 @@ export function SceneNode({
   const { x, y, width, height } = layout
   const label = element.label
   const labelLines = label.split(/\r?\n|\\n/u)
-  const accessibleLabel = labelLines
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .join(" ")
+  const accessibleLabel = normalizedSceneNodeLabel(label)
   const labelFontSize = sceneNodeLabelFontSizes[density]
   const navigationSceneId = element.targetSceneId ?? element.navigateToSceneId
   const estimatedLabelWidth =

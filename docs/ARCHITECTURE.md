@@ -122,6 +122,7 @@ flowchart TD
 ### 빌드 책임
 
 - `scripts/content-build/schemas.ts`: 작성 데이터 형식, 기본값과 필드 간 제약 검증
+- 설명이 연결된 Area ID는 bare Fragment에서 Node와 구분할 수 있도록 같은 Scene의 Node ID와 충돌하면 `areas.<id>.contentRef` 위치에서 거부한다. 설명이 없는 Area와 Node의 기존 동일 ID는 허용한다.
 - Light Flow 검증은 문자열 Edge ID 또는 `[from, to]`가 현재 Scene의 Edge 하나를 정확히 가리키는지와 Edge ID 충돌, stage 내 중복, 복수 Flow label 제약을 빌드 시점에 확인한다.
 - `scripts/content-build/scene-graph.ts`: Child 소유권, 파생 metadata와 Root 도달 가능성 계산
 - `scripts/content-build/relationship-validation.ts`: Scene 참조와 순환 검증
@@ -180,6 +181,7 @@ flowchart LR
 - Scene과 Markdown 조회
 - Topic 설명 조회
 - 실제 Scene에 존재하는 Area의 설명 조회
+- Fragment ID가 현재 Scene의 leaf Topic 또는 설명 가능한 Area인지 판별
 - unknown ID에 대한 일관된 오류 반환
 
 Root Scene ID와 Route 목록은 generated data가 보장하는 index이므로 별도 Repository 메서드로 다시 감싸지 않는다. 브라우저에는 raw YAML/Markdown loader, Zod, 동적 content module과 요청 cache가 없으며 모든 콘텐츠가 애플리케이션 초기 JavaScript에 포함된다.
@@ -224,19 +226,24 @@ sequenceDiagram
 
 - Child Scene Node: Route Index에서 대상 URL을 찾아 이동하고 Camera를 대상 Scene으로 이동한다.
 - 다른 Scene 이동 Node: 포함 관계를 만들지 않고 지정한 Scene Route로 이동한다.
-- 말단 Topic: URL과 Camera를 유지하고 Explanation Panel에서 설명을 연다.
+- focused Scene의 말단 Topic: Camera와 Scene path를 유지하고 Topic ID를 bare Fragment로 추가해 Explanation Panel에서 설명을 연다.
+- contextual Scene의 말단 Topic: owner Scene의 canonical Route와 Topic ID Fragment로 이동한다.
 - 목차 선택: Scene ID를 Route로 바꿔 같은 탐색 경로로 이동한다.
+
+Child Scene과 다른 Scene 이동 URL에는 현재 Fragment를 전달하지 않는다.
 
 ### Scene Area 선택
 
 - 설명이 있는 focused Scene Area의 색칠된 사각형과 Label을 선택할 수 있다.
-- Area 선택은 URL, Camera와 현재 Scene을 유지하고 Explanation Panel만 연다.
+- Area 선택은 Camera와 현재 Scene path를 유지하고 Area ID를 bare Fragment로 추가해 Explanation Panel을 연다.
 - Area는 Edge와 Node보다 먼저 렌더링하며, 위에 놓인 내부 Node가 pointer event를 우선 받아 기존 Topic 선택을 유지한다.
 - 설명이 없는 Area의 Label은 기존 SVG Text로 렌더링하며 선택 상태를 만들지 않는다.
 
 ### 설명 표시
 
-Explanation Panel은 현재 `sceneId`와 Topic 또는 Area를 구분하는 선택 상태를 기준으로 Repository를 호출한다.
+`explanation-url.ts`는 `location.hash`를 안전하게 bare ID로 읽고, owner Scene path와 ID로 canonical 선택 URL을 만들거나 hash를 제거한다. Content Repository는 현재 `sceneId`와 ID를 조합해 선택 가능한 leaf Topic 또는 설명 Area인지 검증한다. `ExplorerShell`은 두 결과에서 `ExplanationSelection`을 파생하며 별도 selection state를 보관하지 않는다.
+
+Topic·Area 선택과 선택 해제는 history entry를 추가한다. valid Fragment 직접 접근과 뒤로 가기·앞으로 가기는 선택 스타일과 설명을 복원하고 Panel을 연다. malformed·unknown Fragment와 navigation Node ID는 선택 없음으로 처리하고 현재 Scene의 base URL로 replace한다.
 
 - Scene 설명: Scene Markdown을 표시한다.
 - Topic 설명: 생성된 Topic 설명을 표시하고 없으면 안내 상태를 표시한다.
@@ -258,8 +265,8 @@ Light Flow 재생 상태는 `SceneViewport`가 소유한다. 렌더링에 필요
 
 | 상태 | 소유 모듈 | 역할 |
 | --- | --- | --- |
-| URL과 현재 Scene | React Router, `ExploreRoute` | URL을 Scene ID로 해석 |
-| Panel 조립과 탐색 잠금 | `ExplorerShell` | 지도·설명·목차 연결과 Scene 이동 조율 |
+| URL, 현재 Scene과 설명 선택 | React Router, `ExploreRoute`, `ExplorerShell` | path를 Scene으로, hash를 검증된 Topic·Area 선택으로 해석 |
+| Panel 조립과 탐색 잠금 | `ExplorerShell` | URL 선택과 지도·설명·목차 연결, Scene 이동 조율 |
 | Camera와 애니메이션 | `SceneViewport` | 현재 Scene과 Viewport에 맞는 확대·이동 관리 |
 | Light Flow 재생 | `SceneViewport` | 현재 Scene의 Flow 선택, stage 진행·완료와 Scene 이동 시 취소 관리 |
 | World 좌표 | `world-layout.ts` | Parent·Child Scene의 재귀 배치 |
@@ -268,7 +275,7 @@ Light Flow 재생 상태는 `SceneViewport`가 소유한다. 렌더링에 필요
 | 홈페이지 퀴즈 소개 | `QuizPreview` | Quiz Bank의 첫 문제 선택, 정답 공개와 독립 퀴즈 진입 |
 | 독립 퀴즈 세션 | `QuizPage` | 범위 선택, 문제 순서, 정답 공개, 자기 평가와 결과를 메모리에만 유지 |
 
-상태를 다른 모듈에 중복 저장하지 않는다. 화면 전환 중 유지해야 하는 Panel 상태는 `ExplorerShell`이 소유하고, Camera처럼 Scene과 Viewport에서 계산 가능한 값은 저장하지 않고 다시 계산한다.
+상태를 다른 모듈에 중복 저장하지 않는다. Topic·Area 선택은 URL hash가 source of truth다. Panel의 접힘·읽기 모드는 `useExplanationPanel`의 독립 UI state로 유지하며 URL에 직렬화하지 않는다. valid hash가 새로 열리거나 history에서 복원되면 Panel을 펼치지만, 이후 사용자가 접는 동작은 hash를 바꾸지 않는다. Camera처럼 Scene과 Viewport에서 계산 가능한 값은 저장하지 않고 다시 계산한다.
 
 Search는 generated Route와 Scene을 결합한 `SearchEntry`를 검색 결과와 기본 목차에 함께 사용한다. `SearchItemContent`가 Scene 제목, 요약과 현재 위치 표시를 공통으로 담당하며 명시적인 옵션에 따라 검색 키워드와 Topic 이름 tag를 표시한다. `SearchResults`는 tag를 포함한 평탄한 결과 목록과 이동을, `SearchOutline`은 tag를 제외한 기본 목차의 트리 들여쓰기, 가지 펼침·접힘과 Link 이동을 각각 소유한다.
 
@@ -277,6 +284,7 @@ Search는 generated Route와 Scene을 결합한 `SearchEntry`를 검색 결과�
 - 작성 데이터 오류는 Content Build에서 모아 사람이 수정 가능한 파일 경로와 함께 보고한다. 잘못된 Scene 경로 세그먼트와 중복 파생 ID도 이 단계에서 검사하며, 중복이면 관련된 두 파일 경로를 함께 표시한다.
 - 잘못된 참조, 중복 소유, 순환과 도달 불가능 Scene은 브라우저 실행 전에 처리한다.
 - 생성 Layout 누락과 unknown Route·Scene·Topic은 브라우저에서 명확한 오류가 된다.
+- malformed·unknown 설명 Fragment는 실행 오류로 만들지 않고 선택 없음으로 처리해 base Scene URL로 정리한다.
 - Markdown은 React Markdown을 통해 허용된 요소로 렌더링하며 임의 HTML과 JavaScript를 실행하지 않는다.
 - 생성 데이터와 작성 파일의 동기화는 `content:validate`가 확인한다.
 

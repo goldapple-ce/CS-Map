@@ -23,9 +23,7 @@ describe("contentRepository", () => {
     )
     expect(() =>
       contentRepository.getTopicExplanation(contentData.rootSceneId, "missing")
-    ).toThrow(
-      `Unknown Topic missing in Scene ${contentData.rootSceneId}`
-    )
+    ).toThrow(`Unknown Topic missing in Scene ${contentData.rootSceneId}`)
   })
 
   it("Scene에 실제로 존재하는 Area 설명만 반환한다", () => {
@@ -35,5 +33,45 @@ describe("contentRepository", () => {
     expect(() =>
       contentRepository.getAreaExplanation("server-redis", "missing")
     ).toThrow("Unknown Area missing in Scene server-redis")
+  })
+
+  it("Fragment ID를 leaf Topic과 설명 가능한 Area로만 해석한다", () => {
+    expect(
+      contentRepository.findExplanationTarget(
+        contentData.rootSceneId,
+        "browser"
+      )
+    ).toEqual({
+      kind: "topic",
+      sceneId: contentData.rootSceneId,
+      elementId: "browser",
+      label: "Browser",
+    })
+    expect(
+      contentRepository.findExplanationTarget("server-redis", "keyspace")
+    ).toEqual({
+      kind: "area",
+      sceneId: "server-redis",
+      areaId: "keyspace",
+      label: "Keyspace",
+    })
+    expect(
+      contentRepository.findExplanationTarget(contentData.rootSceneId, "https")
+    ).toBeUndefined()
+    expect(
+      contentRepository.findExplanationTarget(
+        contentData.rootSceneId,
+        "missing"
+      )
+    ).toBeUndefined()
+  })
+
+  it("Fragment에서 복원한 Topic label을 Node의 접근 가능한 이름과 같게 정규화한다", () => {
+    expect(
+      contentRepository.findExplanationTarget("server-java-java-source", "oop")
+    ).toMatchObject({
+      kind: "topic",
+      label: "Object Oriented Programming",
+    })
   })
 })

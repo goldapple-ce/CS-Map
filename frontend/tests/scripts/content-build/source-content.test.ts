@@ -98,6 +98,56 @@ describe("Source content", () => {
     ).toThrow()
   })
 
+  it("설명 가능한 Area와 Node의 같은 ID만 정확한 contentRef 위치에서 거부한다", () => {
+    const collision = sceneDocumentSchema.safeParse({
+      title: "Collision",
+      summary: "Collision",
+      nodes: {
+        group: { label: "Node", row: 1, col: 1 },
+      },
+      areas: {
+        group: {
+          label: "Area",
+          row: 1,
+          col: 1,
+          rowSpan: 1,
+          colSpan: 1,
+          contentRef: "group.ko.md",
+        },
+      },
+    })
+
+    expect(collision.success).toBe(false)
+    if (!collision.success) {
+      expect(collision.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ["areas", "group", "contentRef"],
+          message:
+            "Area with explanation conflicts with Node ID in this Scene: group",
+        })
+      )
+    }
+
+    expect(() =>
+      sceneDocumentSchema.parse({
+        title: "Visual grouping",
+        summary: "Visual grouping",
+        nodes: {
+          group: { label: "Node", row: 1, col: 1 },
+        },
+        areas: {
+          group: {
+            label: "Area",
+            row: 1,
+            col: 1,
+            rowSpan: 1,
+            colSpan: 1,
+          },
+        },
+      })
+    ).not.toThrow()
+  })
+
   it("scenes 기준 상대 폴더 경로 전체를 Scene ID로 주입한다", () => {
     const result = deriveSceneDocuments(appRoot, [
       {

@@ -135,7 +135,9 @@ lightFlows:
 
 Scene Area는 `label`, `row`, `col`, `rowSpan`, `colSpan`을 가진다. 같은 범위의 Topic을 배경으로 묶을 때만 사용한다.
 
-Area 전체에 설명이 필요하면 같은 Scene 디렉터리의 Markdown 파일을 선택적인 `contentRef`로 연결한다. 설명이 연결된 Area는 색칠된 영역과 Label을 선택할 수 있으며, 내부 Node를 선택하면 Node의 동작이 우선한다. Area 선택은 Child Scene 이동이 아니며 URL과 Camera를 바꾸지 않고 Explanation Panel만 연다. 설명이 필요하지 않으면 `contentRef`를 생략한다.
+Area 전체에 설명이 필요하면 같은 Scene 디렉터리의 Markdown 파일을 선택적인 `contentRef`로 연결한다. 설명이 연결된 Area는 색칠된 영역과 Label을 선택할 수 있으며, 내부 Node를 선택하면 Node의 동작이 우선한다. Area 선택은 Child Scene 이동이 아니며 Scene path와 Camera를 유지하고 URL에 Area ID Fragment만 추가해 Explanation Panel을 연다. 설명이 필요하지 않으면 `contentRef`를 생략한다.
+
+Fragment는 종류 prefix 없이 `#<area-id>`를 사용하므로, `contentRef`가 있는 Area ID는 같은 Scene의 어떤 Node ID와도 같을 수 없다. 설명이 없는 시각적 Area는 Node와 같은 ID를 계속 사용할 수 있지만, 나중에 Area 설명을 연결하려면 먼저 둘 중 하나의 ID를 바꾼다.
 
 ```yaml
 areas:

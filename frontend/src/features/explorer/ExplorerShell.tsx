@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 
 import {
   ResizableHandle,
@@ -7,6 +8,12 @@ import {
 } from "@/components/ui/resizable"
 import { ExplanationPanel } from "@/features/explanation/ExplanationPanel"
 import type { ExplanationSelection } from "@/features/explanation/explanation-selection"
+import {
+  explanationBaseUrl,
+  explanationSelectionUrl,
+  parseExplanationHash,
+} from "@/features/explanation/explanation-url"
+import { contentRepository } from "@/content/content-repository"
 import { SceneViewport } from "@/features/viewport/SceneViewport"
 import { useSceneNavigation } from "./hooks/use-scene-navigation"
 import { useExplanationPanel } from "./hooks/use-explanation-panel"
@@ -23,36 +30,78 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
   const { open: openExplanationPanel } = panel
   const navigation = useSceneNavigation({ sceneId })
   const reducedMotion = useReducedMotion()
-
-  const [selection, setSelection] = useState<ExplanationSelection>()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const parsedHash = useMemo(
+    () => parseExplanationHash(location.hash),
+    [location.hash]
+  )
+  const selection: ExplanationSelection | undefined = useMemo(
+    () =>
+      parsedHash.kind === "selection"
+        ? contentRepository.findExplanationTarget(
+            sceneId,
+            parsedHash.selectionId
+          )
+        : undefined,
+    [parsedHash, sceneId]
+  )
+  const selectionKey = selection
+    ? `${selection.sceneId}:${selection.kind === "topic" ? selection.elementId : selection.areaId}`
+    : undefined
+  const invalidHash =
+    parsedHash.kind === "invalid" ||
+    (parsedHash.kind === "selection" && !selection)
 
   useEffect(() => {
-    const frame = requestAnimationFrame(() => setSelection(undefined))
+    if (!invalidHash) return
+    const route = contentRepository.findSceneRoute(sceneId)
+    if (!route) return
+    navigate(explanationBaseUrl(route.path, location.search), { replace: true })
+  }, [invalidHash, location.search, navigate, sceneId])
 
-    return () => cancelAnimationFrame(frame)
-  }, [sceneId])
+  useEffect(() => {
+    if (selectionKey) openExplanationPanel()
+  }, [openExplanationPanel, selectionKey])
 
   /** 선택한 Topic 설명을 열고 접혀 있던 Panel을 펼친다. */
   const selectTopic = useCallback(
-    (ownerSceneId: string, elementId: string, label: string) => {
-      setSelection({
-        kind: "topic",
-        sceneId: ownerSceneId,
-        elementId,
-        label,
-      })
+    (ownerSceneId: string, elementId: string) => {
+      const route = contentRepository.findSceneRoute(ownerSceneId)
+      if (!route) return
       openExplanationPanel()
+      navigate(
+        explanationSelectionUrl(
+          route.path,
+          elementId,
+          ownerSceneId === sceneId ? location.search : ""
+        )
+      )
     },
-    [openExplanationPanel]
+    [location.search, navigate, openExplanationPanel, sceneId]
   )
   /** 선택한 Area 설명을 열고 접혀 있던 Panel을 펼친다. */
   const selectArea = useCallback(
-    (ownerSceneId: string, areaId: string, label: string) => {
-      setSelection({ kind: "area", sceneId: ownerSceneId, areaId, label })
+    (ownerSceneId: string, areaId: string) => {
+      const route = contentRepository.findSceneRoute(ownerSceneId)
+      if (!route) return
       openExplanationPanel()
+      navigate(
+        explanationSelectionUrl(
+          route.path,
+          areaId,
+          ownerSceneId === sceneId ? location.search : ""
+        )
+      )
     },
-    [openExplanationPanel]
+    [location.search, navigate, openExplanationPanel, sceneId]
   )
+
+  const clearSelection = useCallback(() => {
+    const route = contentRepository.findSceneRoute(sceneId)
+    if (!route) return
+    navigate(explanationBaseUrl(route.path, location.search))
+  }, [location.search, navigate, sceneId])
   return (
     <div className="flex h-full flex-col overflow-hidden">
       <main className="relative min-h-0 flex-1">
@@ -115,7 +164,7 @@ export function ExplorerShell({ sceneId }: ExplorerShellProps) {
             <ExplanationPanel
               sceneId={sceneId}
               selection={selection}
-              onClearSelection={() => setSelection(undefined)}
+              onClearSelection={clearSelection}
             />
           </ResizablePanel>
         </ResizablePanelGroup>
