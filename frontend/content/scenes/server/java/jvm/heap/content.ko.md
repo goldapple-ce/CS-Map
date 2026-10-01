@@ -2,19 +2,7 @@
 
 Heap은 JVM이 객체와 배열을 생성하는 공유 memory 영역입니다. 하나의 JVM process 안에 있는 여러 Thread가 같은 Heap을 사용합니다.
 
-많은 Garbage Collector는 대부분의 객체가 짧게 사용된다는 특성을 활용하기 위해 Heap을 세대별로 관리합니다. 이 Scene은 그 전형적인 흐름을 크게 보여줍니다.
-
-```text
-Young Generation                              Old Generation
-┌──────────────────────────────┐              ┌───────────────┐
-│ Eden → Survivor             │              │               │
-│        ┌──────────────┐      │ ─Promotion→ │ Old Objects   │
-│        │ S0 ⇄ S1      │      │              │               │
-│        └──────────────┘      │              │               │
-└──────────────────────────────┘              └───────────────┘
-                  ↑                                  ↑
-                  └────── Garbage Collector ─────────┘
-```
+많은 Garbage Collector는 대부분의 객체가 짧게 사용된다는 특성을 활용하기 위해 Heap을 세대별로 관리합니다. 이 Scene은 Eden에서 시작한 객체가 Garbage Collection에서 살아남아 Survivor를 거치고 Old Generation으로 Promotion될 수 있는 전형적인 흐름을 보여줍니다.
 
 새 객체는 일반적으로 Young Generation의 Eden에서 시작합니다. Garbage Collection 이후에도 필요한 객체는 S0와 S1 중 현재 `To Survivor` 역할을 맡은 공간으로 이동합니다. 다음 Garbage Collection에서는 두 공간이 역할을 바꾸며, 충분히 오래 살아남은 객체는 Old Generation으로 Promotion될 수 있습니다.
 
@@ -57,7 +45,7 @@ Garbage Collector는 단순히 사용하지 않는 객체를 삭제하는 것만
 
 내부적으로는 살아 있는 객체의 내용을 새 위치에 복사하고 객체를 가리키던 참조를 새 위치로 갱신한 다음 기존 영역을 비웁니다. 같은 객체를 두 개 남겨 두는 것이 아니므로 이 Scene에서는 이해하기 쉽게 `생존 객체 이동`이라고 표현합니다.
 
-Scene의 `Garbage Collector → Eden` 연결은 Young Generation 수집을 대표하고, `Garbage Collector → Old Objects` 연결은 Old Generation도 수집 대상이라는 것을 보여줍니다. 실제 GC는 Eden 하나나 특정 Old 객체 하나만 확인하는 것이 아니라 해당 수집 작업의 대상 영역과 객체 관계를 함께 처리합니다.
+Scene에서 Garbage Collector와 Eden의 연결은 Young Generation 수집을 대표하고, Old Objects와의 연결은 Old Generation도 수집 대상이라는 것을 보여줍니다. 실제 GC는 Eden 하나나 특정 Old 객체 하나만 확인하는 것이 아니라 해당 수집 작업의 대상 영역과 객체 관계를 함께 처리합니다.
 
 GC 대상 판단과 수집 중 일어나는 자세한 과정, Serial·Parallel·G1·ZGC의 차이는 `Garbage Collector` Topic 설명에서 다룹니다.
 
@@ -67,20 +55,13 @@ GC 대상 판단과 수집 중 일어나는 자세한 과정, Serial·Parallel·
 
 method 안의 local variable은 JVM Stack의 frame에 존재할 수 있지만, 그 변수가 가리키는 객체는 Heap에 존재할 수 있습니다.
 
-```text
-Thread의 JVM Stack              공유 Heap
-┌─────────────────┐           ┌──────────────┐
-│ order 참조 ─────┼──────────→│ Order 객체   │
-└─────────────────┘           └──────────────┘
-```
-
-서로 다른 Thread의 local variable이 같은 Heap 객체를 가리킬 수도 있습니다. 그 객체의 변경 가능한 상태를 동시에 수정한다면 동시성 제어가 필요합니다.
+서로 다른 Thread의 local variable이 같은 Heap 객체를 가리킬 수도 있습니다. 공유 객체의 동시성 문제와 Java가 보장하는 기준은 Parent JVM Scene의 Runtime Data Area 설명에서 다룹니다.
 
 ---
 
 # Collector에 따라 실제 모습은 달라집니다
 
-`Young Generation → Old Generation`은 세대별 Garbage Collection을 이해하기 위한 대표적인 구조입니다. JVM Specification이 Heap을 반드시 Eden, Survivor와 연속된 Old 공간으로 나누도록 정한 것은 아닙니다.
+Young Generation에서 Old Generation으로 이어지는 흐름은 세대별 Garbage Collection을 이해하기 위한 대표적인 구조입니다. JVM Specification이 Heap을 반드시 Eden, Survivor와 연속된 Old 공간으로 나누도록 정한 것은 아닙니다.
 
 예를 들어 G1은 Heap을 여러 Region으로 나누고 각 Region에 Eden, Survivor 또는 Old 역할을 부여합니다. 따라서 이 Scene의 Area는 물리적으로 항상 붙어 있는 memory 주소를 그린 것이 아니라 객체의 세대와 이동을 설명하는 논리적 구조입니다.
 

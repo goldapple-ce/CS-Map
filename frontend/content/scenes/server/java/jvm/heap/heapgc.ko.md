@@ -16,13 +16,7 @@ Garbage Collector는 단순히 `변수에 null을 넣은 객체`나 `오래된 �
 - Class의 static field에서 가리키는 객체
 - JVM 내부에서 유지하는 참조와 JNI 같은 native code의 참조
 
-```text
-GC Roots → A → B        C → D
-           도달 가능    Roots에서 도달 불가
-           생존         수집 대상
-```
-
-`B`가 다른 객체를 참조하더라도 B 자체가 Roots에서 도달 가능하면 함께 살아 있습니다. 반대로 객체끼리 서로 순환 참조하더라도 그 묶음 전체가 GC Roots에서 도달할 수 없다면 수집 대상이 될 수 있습니다.
+GC Roots에서 참조를 따라 도달할 수 있는 객체와 그 객체가 가리키는 객체는 살아 있습니다. 반대로 객체끼리 서로 순환 참조하더라도 그 묶음 전체가 GC Roots에서 도달할 수 없다면 수집 대상이 될 수 있습니다.
 
 도달할 수 없다고 판단된 객체가 그 순간 하나씩 삭제되는 것은 아닙니다. 해당 Garbage Collection이 그 객체가 차지한 memory를 다시 사용할 수 있도록 회수합니다.
 
@@ -77,33 +71,25 @@ Old Generation의 객체도 더 이상 도달할 수 없다면 회수 대상이 
 
 하나의 GC Thread가 수집 작업을 수행합니다. 구조가 단순하고 GC Thread 사이의 조정 비용이 적어 작은 Heap이나 제한된 실행 환경에 적합할 수 있습니다. GC 중에는 Application이 멈추므로 큰 Heap이나 짧은 응답 시간이 중요한 Server에는 불리할 수 있습니다.
 
-```text
--XX:+UseSerialGC
-```
+대표 option은 `-XX:+UseSerialGC`입니다.
 
 ## Parallel GC
 
 여러 GC Thread가 수집 작업을 병렬로 수행합니다. Application을 멈춘 동안 여러 CPU를 사용해 GC 작업을 빨리 끝내고 전체 처리량을 높이는 데 초점을 둡니다. 짧고 예측 가능한 정지 시간보다 처리량이 중요한 작업에 어울릴 수 있습니다.
 
-```text
--XX:+UseParallelGC
-```
+대표 option은 `-XX:+UseParallelGC`입니다.
 
 ## G1 GC
 
 Heap을 동일한 크기의 여러 Region으로 나누고 각 Region에 Eden, Survivor와 Old 역할을 부여합니다. Young 영역과 일부 Old Region을 선택해 점진적으로 회수하며 목표 정지 시간을 맞추는 것과 처리량 사이의 균형을 추구합니다. Server급 환경의 HotSpot JVM에서 일반적으로 기본 Collector로 선택됩니다.
 
-```text
--XX:+UseG1GC
-```
+대표 option은 `-XX:+UseG1GC`입니다.
 
 ## ZGC
 
 Application과 동시에 수행하는 작업을 크게 늘려 매우 짧은 정지 시간을 목표로 하는 Collector입니다. 큰 Heap과 낮은 latency가 중요한 Application에 적합할 수 있지만, 동시 작업을 위한 CPU와 memory 비용이 추가될 수 있습니다.
 
-```text
--XX:+UseZGC
-```
+대표 option은 `-XX:+UseZGC`입니다.
 
 사용하는 Java version에 따라 세대별 ZGC의 기본 여부와 option이 달라질 수 있으므로 배포 JDK의 문서를 확인해야 합니다.
 

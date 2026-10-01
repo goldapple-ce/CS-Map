@@ -2,20 +2,7 @@
 
 JVM(Java Virtual Machine)은 Java Bytecode를 현재 OS와 CPU에서 실행하는 runtime입니다. Spring Application도 하나의 JVM process 안에서 실행됩니다.
 
-JVM 내부는 Class Loading과 Runtime Data Area, Execution Engine으로 크게 나눠 볼 수 있습니다. Runtime Data Area와 Execution Engine은 별도의 Topic이 아니라 내부 구성요소를 묶는 Area로 표시합니다.
-
-```text
-Class Loading
-      ↓
-Runtime Data Area
-├─ 공유: Method Area, Heap
-└─ Thread별: PC Register, JVM Stack, Native Method Stack
-      ↓
-Execution Engine
-├─ Interpreter
-├─ JIT Compiler
-└─ Garbage Collector → Heap 정리
-```
+JVM 내부는 Class Loading과 Runtime Data Area, Execution Engine으로 크게 나눠 볼 수 있습니다. Runtime Data Area 안에는 Thread별 영역과 공유 영역을 나누어 표시합니다.
 
 - 필요한 Class를 불러옵니다.
 - 실행에 필요한 정보와 객체를 memory에 관리합니다.
@@ -25,13 +12,7 @@ Execution Engine
 
 # OS 차이를 맡는 실행 계층
 
-Java Compiler는 Source Code를 특정 OS의 기계어가 아니라 공통 Bytecode로 만듭니다. 그 Bytecode를 Windows용 JVM, Linux용 JVM과 macOS용 JVM이 각 OS와 CPU에 맞게 실행합니다.
-
-```text
-                 ┌→ Windows용 JVM → Windows
-같은 Bytecode ──┼→ Linux용 JVM   → Linux
-                 └→ macOS용 JVM   → macOS
-```
+Java Compiler는 Source Code를 특정 OS의 기계어가 아니라 공통 Bytecode로 만듭니다. 같은 Bytecode를 Windows용 JVM, Linux용 JVM과 macOS용 JVM이 각 OS와 CPU에 맞게 실행합니다.
 
 공통인 것은 Bytecode 형식과 JVM 규격입니다. JVM 실행 파일 자체는 OS와 CPU에 맞게 구현됩니다. JVM이 Java Application과 OS 사이에서 환경 차이를 맡기 때문에 같은 Bytecode를 여러 환경에서 실행하기 쉬워집니다.
 
@@ -49,7 +30,7 @@ Java Compiler는 Source Code를 특정 OS의 기계어가 아니라 공통 Bytec
 - `Native Method Stack`: 각 Thread의 native method 실행을 지원합니다.
 - `Execution Engine`: Interpreter로 Bytecode를 실행하고, JIT Compiler로 자주 실행되는 코드를 최적화하며, Garbage Collector로 Heap의 미사용 객체를 정리합니다.
 
-Runtime Data Area 안에서도 Method Area와 Heap은 모든 Thread가 공유하고, PC Register와 JVM Stack, Native Method Stack은 Thread마다 별도로 생성됩니다. Garbage Collector는 Execution Engine 안에서 동작하지만 정리 대상인 객체는 Runtime Data Area의 Heap에 있습니다.
+Runtime Data Area의 소유 관계와 공유 상태에서 생기는 동시성 문제는 Area 설명에서 다룹니다. Garbage Collector는 Execution Engine 안에서 동작하지만 정리 대상인 객체는 Runtime Data Area의 Heap에 있습니다.
 
 ---
 

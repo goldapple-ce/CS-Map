@@ -4,6 +4,12 @@
 - question: PC Register와 JVM Stack은 모든 Thread가 공유하나요?
   answer: 아니요. PC Register, JVM Stack과 Native Method Stack은 Thread마다 별도로 생성됩니다.
 
+- question: CPU Cache는 JVM의 Runtime Data Area에 포함되나요?
+  answer: 아니요. CPU Cache는 Hardware 영역입니다. Java Code가 따라야 할 Visibility와 Ordering의 기준은 JMM이 정의합니다.
+
+- question: count가 volatile Field라면 count++ 전체가 Atomic하게 실행되나요?
+  answer: 아니요. volatile은 Visibility와 Ordering을 제공하지만 읽기, 계산, 쓰기로 이루어진 복합 연산 전체의 Atomicity를 보장하지 않습니다.
+
 - question: Interpreter와 JIT Compiler는 어떤 역할 차이가 있나요?
   answer: Interpreter는 Bytecode를 실행하고, JIT Compiler는 자주 실행되는 코드를 최적화합니다.
 

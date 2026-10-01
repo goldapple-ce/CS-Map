@@ -4,33 +4,41 @@ nodes:
   class-loading:
     label: Class Loading
     row: 1
-    col: 3
-    contentRef: classloading.ko.md
-  pc-register:
-    label: PC Register
-    row: 3
-    col: 1
-    contentRef: pcregister.ko.md
-  jvm-stack:
-    label: JVM Stack
-    row: 3
     col: 2
-    contentRef: jvmstack.ko.md
-  method-area:
-    label: Method Area
-    row: 3
-    col: 3
-    contentRef: methodarea.ko.md
+    contentRef: classloading.ko.md
+
   heap:
     label: Heap
     row: 3
-    col: 4
+    col: 1
     childSceneId: server-java-jvm-heap
+  method-area:
+    label: Method Area
+    row: 3
+    col: 2
+    contentRef: methodarea.ko.md
+
+  jvm-stack:
+    label: JVM Stack
+    row: 3
+    col: 3
+    contentRef: jvmstack.ko.md
+  pc-register:
+    label: PC Register
+    row: 3
+    col: 4
+    contentRef: pcregister.ko.md
   native-method-stack:
     label: Native Method Stack
     row: 3
     col: 5
     contentRef: nativemethodstack.ko.md
+
+  garbage-collector:
+    label: Garbage Collector
+    row: 5
+    col: 2
+    contentRef: garbagecollector.ko.md
   interpreter:
     label: Interpreter
     row: 5
@@ -39,25 +47,22 @@ nodes:
   jit-compiler:
     label: JIT Compiler
     row: 5
-    col: 2
-    contentRef: jitcompiler.ko.md
-  garbage-collector:
-    label: Garbage Collector
-    row: 5
     col: 4
-    contentRef: garbagecollector.ko.md
+    contentRef: jitcompiler.ko.md
+
 edges:
   - from: class-loading
+    # fromSide: bottom
     to: method-area
     label: Class 정보 적재
   - from: method-area
+    fromSide: bottom
     to: interpreter
     label: Bytecode 제공
   - from: jvm-stack
     fromSide: bottom
     to: interpreter
     label: 실행 상태 제공
-    # labelSide: left
   - from: interpreter
     to: jit-compiler
     label: Code 최적화
@@ -73,6 +78,13 @@ areas:
     col: 1
     rowSpan: 1
     colSpan: 5
+    contentRef: runtime-data-area.ko.md
+  thread-specific-area:
+    label: Thread별 영역
+    row: 3
+    col: 3
+    rowSpan: 1
+    colSpan: 3
   execution-engine:
     label: Execution Engine
     row: 5

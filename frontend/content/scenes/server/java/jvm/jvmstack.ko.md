@@ -8,18 +8,7 @@ method가 호출될 때 frame이 쌓이고 method가 끝나면 해당 frame이 �
 
 # Method 호출과 Stack Frame
 
-```text
-JVM Stack
-┌────────────────────┐
-│ payment() Frame    │  ← 현재 실행 중
-├────────────────────┤
-│ order() Frame      │
-├────────────────────┤
-│ main() Frame       │
-└────────────────────┘
-```
-
-위쪽 method가 끝나면 해당 frame이 사라지고 그 아래 method의 실행으로 돌아갑니다. 이 구조 덕분에 각 method 호출의 local variable과 계산 상태를 서로 구분할 수 있습니다.
+method가 다른 method를 호출하면 새 frame이 기존 frame 위에 쌓입니다. 현재 method가 끝나면 그 frame이 사라지고 호출한 method의 실행으로 돌아갑니다. 이 구조 덕분에 각 method 호출의 local variable과 계산 상태를 서로 구분할 수 있습니다.
 
 ---
 
