@@ -27,3 +27,12 @@
 
 - question: 모든 List에서 Index 기반 for가 For-each보다 빠른가요?
   answer: 아니요. List 구현, Iterator 사용과 JIT 최적화에 따라 달라지므로 의미와 자료구조에 맞게 선택하고 필요하면 JMH로 측정해야 합니다.
+
+- question: GC(Garbage Collection)란 무엇이며, 어떤 원리로 제거할 객체를 판단하고 메모리를 회수하나요?
+  answer: GC는 JVM Heap에서 더 이상 사용되지 않는 객체의 메모리를 자동으로 회수하는 기능입니다. JVM은 단순 참조 횟수가 아니라 GC Root를 시작점으로 객체 그래프를 탐색하는 도달 가능성 분석을 사용합니다. GC Root에서 도달 가능한 객체는 살아 있는 객체로 판단하고, 도달할 수 없는 객체는 Garbage로 판단합니다. 이후 Collector에 따라 Mark-Sweep, Mark-Compact 또는 Copying 등의 방법으로 메모리를 회수합니다.
+
+- question: Java가 Reference Counting 대신 GC Root 기반의 도달 가능성 분석을 사용하는 이유는 무엇인가요? 구체적인 객체 관계를 예로 들어 설명해 주세요.
+  answer: Reference Counting은 객체들이 서로 순환 참조하면 실제로 애플리케이션에서 사용되지 않더라도 참조 횟수가 0이 되지 않는 문제가 있습니다. 예를 들어 객체 A와 B가 서로를 참조하지만, Stack이나 Static Field 등 외부 GC Root에서 A와 B를 가리키는 참조가 모두 사라지면 두 객체는 사용할 수 없습니다. Reference Counting에서는 각각의 참조 횟수가 남아 있어 회수하기 어렵지만, GC Root 기반 도달 가능성 분석에서는 두 객체 모두 Root에서 도달할 수 없으므로 Garbage로 판단할 수 있습니다.
+
+- question: JVM의 대표적인 GC Root에는 무엇이 있나요? 그리고 static 컬렉션이 메모리 누수의 원인이 될 수 있는 이유를 GC Root 관점에서 설명해 주세요.
+  answer: 대표적인 GC Root에는 실행 중인 Thread의 Stack Frame에 있는 지역 변수와 매개변수, 로딩된 클래스의 Static Field를 통해 참조되는 객체, JNI Reference 등이 있습니다. Static Collection이 애플리케이션 실행 기간 내내 유지되면 컬렉션 자체뿐 아니라 컬렉션이 참조하는 모든 요소도 GC Root에서 도달 가능한 상태가 됩니다. 따라서 더 이상 비즈니스 로직에서 사용하지 않는 객체라도 컬렉션에서 제거하지 않으면 GC가 회수하지 못해 메모리 누수가 발생할 수 있습니다.

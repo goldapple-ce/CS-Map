@@ -13,3 +13,14 @@
 - question: 모든 Garbage Collector가 Eden, S0, S1과 Old 영역을 같은 물리 구조로 사용하나요?
   answer: 아니요. 이 Scene은 전형적인 세대별 구조이며 실제 영역 구성과 Promotion 기준은 Collector와 실행 상황에 따라 달라질 수 있습니다.
 
+- question: Weak Generational Hypothesis란 무엇이며, 이 가설이 JVM Heap의 Young Generation과 Old Generation 구조에 어떻게 반영됐나요?
+  answer: 약한 세대 가설은 대부분의 객체가 생성된 후 짧은 시간 안에 Garbage가 된다는 가설입니다. 이를 바탕으로 JVM Heap을 Young과 Old Generation으로 나눕니다. 새 객체는 주로 Eden에 할당하고 Young GC를 자주 수행하여 죽은 객체를 빠르게 회수합니다. 여러 번의 GC에도 살아남은 객체는 Survivor 영역을 거쳐 Old Generation으로 승격시킵니다. 이를 통해 매번 전체 Heap을 검사하지 않고 대부분의 Garbage를 효율적으로 회수할 수 있습니다.
+
+- question: Eden에서 생성된 객체가 계속 살아남으면 일반적으로 어떤 과정을 거쳐 Old Generation으로 이동하나요?
+  answer: 객체는 일반적으로 Eden에 생성됩니다. Young GC가 발생했을 때 살아남은 객체는 Survivor 영역으로 복사되고 age가 증가합니다. 이후 Survivor 영역 사이를 이동하면서 계속 살아남아 age가 승격 임계값에 도달하면 Old Generation으로 Promotion됩니다. 다만 Survivor 공간이 부족하거나 객체가 큰 경우 등에는 더 일찍 승격될 수도 있으며, 세부 동작은 Collector에 따라 달라집니다.
+
+- question: Young GC가 발생하면 애플리케이션 Thread는 계속 실행될까요? Stop-The-World가 무엇이며 왜 필요한지 설명해 주세요.
+  answer: Young GC가 발생하면 일반적인 세대형 Collector에서는 애플리케이션 Thread가 일시 정지하며, 이를 Stop-The-World라고 합니다. 애플리케이션 Thread가 실행되면서 객체를 새로 생성하거나 참조 관계를 계속 변경하면 GC가 객체 그래프를 일관되게 분석하기 어렵기 때문입니다. 또한 객체를 다른 메모리 영역으로 이동하고 해당 객체를 가리키는 참조를 갱신할 때도 정합성을 보장해야 합니다. 최신 Collector는 Concurrent Marking과 Write Barrier 등을 이용해 정지 시간을 줄이지만, 일부 STW 구간까지 완전히 없애기는 어렵습니다.
+
+- question: GC가 모든 애플리케이션 Thread를 임의의 시점에 바로 정지시키지 않고 Safepoint에서 정지시키는 이유는 무엇인가요?
+  answer: JVM은 GC Root와 객체 참조를 정확하게 파악하고 실행 상태의 일관성을 보장하기 위해 Thread를 Safepoint에서 정지시킵니다. 임의의 명령 실행 도중에 Thread를 멈추면 객체 참조가 Stack과 Register 사이에서 변경되는 중일 수 있어 GC가 참조 위치를 정확히 판단하기 어렵습니다.

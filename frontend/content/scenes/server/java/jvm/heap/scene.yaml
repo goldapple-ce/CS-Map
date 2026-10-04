@@ -3,7 +3,7 @@ summary: 새 객체가 Young Generation에 생성되고 Garbage Collection에서
 nodes:
   eden:
     label: Eden
-    row: 1
+    row: 2
     col: 3
     contentRef: eden.ko.md
   survivor-0:
@@ -18,14 +18,14 @@ nodes:
     contentRef: survivor.ko.md
   old-objects:
     label: Old Objects
-    row: 5
+    row: 4
     col: 3
     contentRef: oldobjects.ko.md
   garbage-collector:
     label: Garbage Collector
     row: 3
     col: 1
-    contentRef: heapgc.ko.md
+    contentRef: garbagecollector.ko.md
 edges:
   - from: eden
     to: survivor-0
@@ -57,24 +57,23 @@ edges:
     # toSide: bottom
     label: 생존 객체 이동
     variant: supporting
-  # - from: garbage-collector
-  #   # fromSide: top
-  #   to: survivor-1
-  #   toSide: bottom
-  #   label: 생존 객체 이동
-  #   variant: supporting
   - from: garbage-collector
     # fromSide: top
     to: old-objects
-    # toSide: bottom
     label: Old 영역 수집
     variant: supporting
 areas:
+  heap:
+    label: Heap Area
+    row: 1
+    col: 2
+    rowSpan: 5
+    colSpan: 4
   young-generation:
     label: Young Generation
-    row: 1
+    row: 2
     col: 3
-    rowSpan: 3
+    rowSpan: 2
     colSpan: 2
   survivor:
     label: Survivor
@@ -84,7 +83,7 @@ areas:
     colSpan: 2
   old-generation:
     label: Old Generation
-    row: 5
+    row: 4
     col: 3
     rowSpan: 1
     colSpan: 2

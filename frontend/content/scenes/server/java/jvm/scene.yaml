@@ -2,37 +2,39 @@ title: JVM
 summary: JVM이 Class를 불러오고 memory에 실행 상태를 관리하며 Bytecode를 실행하고 사용하지 않는 객체를 정리하는 구조입니다.
 nodes:
   class-loading:
-    label: Class Loading
+    label: Class Loader
     row: 1
-    col: 2
-    contentRef: classloading.ko.md
+    col: 3
+    contentRef: classloader.ko.md
 
   heap:
     label: Heap
-    row: 3
-    col: 1
+    row: 2
+    rowSpan: 2
+    col: 2
     childSceneId: server-java-jvm-heap
   method-area:
     label: Method Area
-    row: 3
-    col: 2
+    row: 2
+    rowSpan: 2
+    col: 3
     contentRef: methodarea.ko.md
 
-  jvm-stack:
-    label: JVM Stack
-    row: 3
-    col: 3
-    contentRef: jvmstack.ko.md
   pc-register:
     label: PC Register
-    row: 3
+    row: 2
     col: 4
     contentRef: pcregister.ko.md
   native-method-stack:
     label: Native Method Stack
     row: 3
-    col: 5
+    col: 4
     contentRef: nativemethodstack.ko.md
+  jvm-stack:
+    label: JVM Stack
+    row: 4
+    col: 4
+    contentRef: jvmstack.ko.md
 
   garbage-collector:
     label: Garbage Collector
@@ -74,17 +76,17 @@ edges:
 areas:
   runtime-data-area:
     label: Runtime Data Area
-    row: 3
-    col: 1
-    rowSpan: 1
-    colSpan: 5
+    row: 2
+    col: 2
+    rowSpan: 3
+    colSpan: 3
     contentRef: runtime-data-area.ko.md
   thread-specific-area:
     label: Thread별 영역
-    row: 3
-    col: 3
-    rowSpan: 1
-    colSpan: 3
+    row: 2
+    col: 4
+    rowSpan: 3
+    colSpan: 1
   execution-engine:
     label: Execution Engine
     row: 5

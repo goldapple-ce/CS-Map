@@ -1,86 +1,188 @@
 # 한눈에 보기
 
-Heap은 JVM이 객체와 배열을 생성하는 공유 memory 영역입니다. 하나의 JVM process 안에 있는 여러 Thread가 같은 Heap을 사용합니다.
+Heap은 Java Application에서 생성되는 객체와 배열을 저장하는 공유 Memory 영역입니다.
 
-많은 Garbage Collector는 대부분의 객체가 짧게 사용된다는 특성을 활용하기 위해 Heap을 세대별로 관리합니다. 이 Scene은 Eden에서 시작한 객체가 Garbage Collection에서 살아남아 Survivor를 거치고 Old Generation으로 Promotion될 수 있는 전형적인 흐름을 보여줍니다.
+Heap의 세부 구조는 Garbage Collector에 따라 다를 수 있습니다. 여기서는 세대형 GC를 이해하기 위한 대표적인 구조인 `Young Generation`, `Old Generation`, `Eden`, `Survivor`를 기준으로 설명합니다.
 
-새 객체는 일반적으로 Young Generation의 Eden에서 시작합니다. Garbage Collection 이후에도 필요한 객체는 S0와 S1 중 현재 `To Survivor` 역할을 맡은 공간으로 이동합니다. 다음 Garbage Collection에서는 두 공간이 역할을 바꾸며, 충분히 오래 살아남은 객체는 Old Generation으로 Promotion될 수 있습니다.
-
-이 이동과 memory 회수를 수행하는 주체가 Garbage Collector입니다. Young 영역을 수집할 때는 도달할 수 없는 객체를 제거하고 살아남은 객체를 Survivor나 Old 영역으로 옮길 수 있습니다. Old 영역의 객체도 계속 살아 있는지 확인하고 필요 없어진 객체의 memory를 회수합니다.
+Heap을 이해하면 객체가 어디에 생성되고 어떻게 오래 살아남는지, Memory Leak이나 `OutOfMemoryError: Java heap space` 같은 문제가 왜 발생하는지 분석하는 데 도움이 됩니다.
 
 ---
 
-# 구성 요소
+# Heap이란
 
-- `Eden`: 새 객체가 일반적으로 처음 생성되는 Young Generation 영역입니다.
-- `S0`, `S1`: Young GC에서 살아남은 객체를 보관하는 두 Survivor 공간입니다. 한쪽이 From, 다른 쪽이 To 역할을 맡고 GC가 끝날 때마다 역할을 교대합니다.
-- `Old Objects`: 여러 번의 GC에도 살아남아 Old Generation에서 관리되는 객체입니다.
-- `Garbage Collector`: GC Roots에서 객체를 따라가 생존 여부를 판단하고, 필요 없는 객체의 memory를 회수하며 살아 있는 객체를 이동할 수 있습니다.
-- `Young Generation`: 새 객체와 생명주기가 짧은 객체를 주로 관리하며 비교적 자주 수집됩니다.
-- `Old Generation`: 오래 살아남아 Promotion된 객체를 관리하며 일반적으로 Young 영역보다 덜 자주 수집되지만 한 번의 작업이 더 무거울 수 있습니다.
+Heap은 JVM이 객체와 배열을 저장하기 위해 사용하는 Runtime Data Area입니다.
 
----
+예를 들어 다음 코드가 있다고 가정합니다.
 
-# 왜 세대를 나누는가
+```java
+User user = new User();
+```
 
-Application에서 만들어지는 많은 객체는 method 처리나 한 번의 요청이 끝나면 금방 필요 없어집니다. 새 객체가 모인 영역을 자주 확인하면 Heap 전체를 매번 같은 방식으로 검사하지 않고도 많은 memory를 회수할 수 있습니다.
+`new User()`로 생성된 실제 `User` 객체는 Heap에 생성됩니다.
 
-반대로 여러 번의 Garbage Collection에도 살아남은 객체는 앞으로도 오래 사용할 가능성이 있다고 보고 Old Generation에서 관리합니다.
+반면 `user`라는 Local Reference Variable은 현재 Method의 Stack Frame에서 관리될 수 있습니다.
 
-세대를 나눈다고 객체가 반드시 일정 횟수만큼 살아남아야 한다는 하나의 고정 규칙이 생기는 것은 아닙니다. Promotion 기준은 Collector, 객체 크기와 실행 상황에 따라 달라질 수 있습니다.
+즉 객체 자체와 객체를 가리키는 Reference는 서로 다른 영역에 존재할 수 있습니다.
 
-## Young Generation과 Old Generation의 차이
-
-Young Generation은 새 객체가 많이 생성되고 빠르게 사라진다는 가정을 활용합니다. 죽은 객체가 많으면 살아 있는 소수의 객체만 Survivor로 옮긴 뒤 나머지 공간을 빠르게 다시 사용할 수 있습니다.
-
-Old Generation에는 여러 번 살아남은 객체가 모입니다. 살아 있는 객체의 비율이 높은 경우가 많아 무엇이 살아 있는지 확인하고 memory를 정리하는 비용이 Young Generation보다 커질 수 있습니다.
-
-따라서 차이는 단순히 memory 크기나 객체의 종류가 아니라 `객체가 얼마나 오래 살아남았는지`와 `어떤 방식과 빈도로 수집하는지`에 있습니다.
+Heap은 특정 Thread만 사용하는 영역이 아니라 여러 Thread가 공유합니다. 따라서 여러 Thread가 같은 객체를 참조하면 Heap에 존재하는 동일한 객체를 함께 사용하게 됩니다.
 
 ---
 
-# Garbage Collector의 역할
+# Heap의 구성
 
-Garbage Collector는 단순히 사용하지 않는 객체를 삭제하는 것만이 아니라, 사용하는 Collector에 따라 살아 있는 객체를 다른 memory 영역으로 옮기고 빈 memory를 다시 사용할 수 있도록 정리합니다.
+대표적인 세대형 Heap 구조는 다음과 같이 나눠 볼 수 있습니다.
 
-내부적으로는 살아 있는 객체의 내용을 새 위치에 복사하고 객체를 가리키던 참조를 새 위치로 갱신한 다음 기존 영역을 비웁니다. 같은 객체를 두 개 남겨 두는 것이 아니므로 이 Scene에서는 이해하기 쉽게 `생존 객체 이동`이라고 표현합니다.
+- `Young Generation`: 새 객체와 생명주기가 짧은 객체를 주로 관리합니다.
+  - `Eden`: 새 객체가 일반적으로 처음 생성되는 Young Generation 영역입니다.
+  - `S0`, `S1`: Young GC에서 살아남은 객체를 보관하는 Survivor 공간입니다.
+- `Old Generation`: 여러 번의 GC에서도 살아남은 객체를 주로 관리합니다.
 
-Scene에서 Garbage Collector와 Eden의 연결은 Young Generation 수집을 대표하고, Old Objects와의 연결은 Old Generation도 수집 대상이라는 것을 보여줍니다. 실제 GC는 Eden 하나나 특정 Old 객체 하나만 확인하는 것이 아니라 해당 수집 작업의 대상 영역과 객체 관계를 함께 처리합니다.
+`S0`, `S1`은 한쪽이 From, 다른 쪽이 To 역할을 맡고 GC가 끝날 때마다 역할을 교대할 수 있습니다.
 
-GC 대상 판단과 수집 중 일어나는 자세한 과정, Serial·Parallel·G1·ZGC의 차이는 `Garbage Collector` Topic 설명에서 다룹니다.
-
----
-
-# Heap과 객체 참조
-
-method 안의 local variable은 JVM Stack의 frame에 존재할 수 있지만, 그 변수가 가리키는 객체는 Heap에 존재할 수 있습니다.
-
-서로 다른 Thread의 local variable이 같은 Heap 객체를 가리킬 수도 있습니다. 공유 객체의 동시성 문제와 Java가 보장하는 기준은 Parent JVM Scene의 Runtime Data Area 설명에서 다룹니다.
+다만 실제 Heap 구조는 Garbage Collector에 따라 다를 수 있습니다. 예를 들어 G1 GC는 Heap을 여러 Region으로 나누고 각 Region에 Eden, Survivor, Old 역할을 부여합니다.
 
 ---
 
-# Collector에 따라 실제 모습은 달라집니다
+# 객체는 어디에서 시작할까
 
-Young Generation에서 Old Generation으로 이어지는 흐름은 세대별 Garbage Collection을 이해하기 위한 대표적인 구조입니다. JVM Specification이 Heap을 반드시 Eden, Survivor와 연속된 Old 공간으로 나누도록 정한 것은 아닙니다.
+새롭게 생성된 객체는 일반적으로 Young Generation의 Eden 영역에서 시작합니다.
 
-예를 들어 G1은 Heap을 여러 Region으로 나누고 각 Region에 Eden, Survivor 또는 Old 역할을 부여합니다. 따라서 이 Scene의 Area는 물리적으로 항상 붙어 있는 memory 주소를 그린 것이 아니라 객체의 세대와 이동을 설명하는 논리적 구조입니다.
+```java
+Order order = new Order();
+User user = new User();
+```
 
-`S0`와 `S1`이라는 두 고정 공간을 번갈아 사용하는 그림도 전통적인 세대별 Collector를 설명하기 위한 모델입니다. 모든 Collector가 이와 동일한 물리 구조를 사용하는 것은 아닙니다.
+객체가 더 이상 필요하지 않으면 이후 GC 과정에서 Memory가 회수될 수 있습니다.
+
+반대로 GC 이후에도 계속 살아 있는 객체는 Survivor 영역으로 이동할 수 있습니다.
+
+여러 번의 GC에서도 계속 살아남은 객체는 일정 조건을 만족하면 Old Generation으로 이동할 수 있습니다.
+
+이를 `Promotion`이라고 합니다.
+
+개념적으로는 다음과 같이 볼 수 있습니다.
+
+`Eden → Survivor → Old Generation`
+
+모든 객체가 반드시 이 경로를 그대로 거치는 것은 아니며 객체 크기나 Survivor 공간, Garbage Collector 정책에 따라 달라질 수 있습니다.
 
 ---
 
-# 개발자가 개입하는 지점
+# 왜 Young과 Old로 나눌까
 
-개발자는 JVM option으로 초기 Heap 크기와 최대 Heap 크기를 설정하고 Heap 사용량, 객체 할당 속도, Promotion과 Garbage Collection 상태를 관찰할 수 있습니다.
+많은 Java 객체는 생성된 뒤 짧은 시간 안에 더 이상 사용되지 않고, 한 번 오래 살아남은 객체는 이후에도 계속 살아남을 가능성이 높다는 경험적 특성이 있습니다. 이를 `Weak Generational Hypothesis`라고 합니다.
 
-Heap이 계속 증가한다면 크기만 늘리기보다 필요 없는 객체가 참조로 계속 유지되는지 확인해야 합니다. Heap dump와 profiler를 이용하면 어떤 객체가 memory를 차지하고 무엇이 그 객체를 참조하는지 분석할 수 있습니다.
+이 가설을 기반으로 많은 Garbage Collector는 Heap을 세대별로 나눠 관리합니다.
 
-Collector와 세대 크기를 세밀하게 조정할 수도 있지만, 먼저 실제 응답 시간, 처리량과 GC log를 측정한 뒤 병목과 관련된 설정만 변경해야 합니다.
+- 새롭게 생성된 객체는 `Young Generation`에서 관리
+- Young GC에서도 계속 살아남은 객체는 `Old Generation`으로 Promotion
+- 짧게 살아가는 객체가 많은 Young 영역은 비교적 자주 수집
+- 오래 살아남은 객체가 많은 Old 영역은 별도로 관리
+
+예를 들어 Request를 처리하면서 생성되는 DTO나 임시 Collection은 짧게 살아가는 경우가 많지만, Cache나 Application 전체에서 사용하는 객체는 오래 살아남을 수 있습니다.
+
+따라서 모든 객체를 매번 동일한 방식으로 검사하기보다 객체의 생존 특성에 따라 세대를 나눠 관리하는 것이 효율적일 수 있습니다.
+
+---
+
+# 객체의 생명주기
+
+객체가 더 이상 필요하지 않다고 해서 즉시 Heap에서 제거되는 것은 아닙니다.
+
+```java
+User user = new User();
+
+user = null;
+```
+
+`user = null`이 되더라도 객체를 가리키는 다른 Reference가 존재할 수 있습니다.
+
+Garbage Collector가 해당 객체에 더 이상 도달할 수 없다고 판단하고 Memory를 회수해야 실제로 Heap 공간을 다시 사용할 수 있습니다.
+
+객체의 생존 여부를 판단하는 `GC Roots`, Reachability 같은 내용은 Garbage Collector에서 따로 다룹니다.
+
+---
+
+# Memory Leak
+
+Java에는 Garbage Collector가 있지만 Memory Leak이 발생할 수 있습니다.
+
+Memory Leak은 더 이상 필요하지 않은 객체를 Application이 계속 참조하고 있어서 Memory가 회수되지 않는 상태라고 볼 수 있습니다.
+
+예를 들어 다음 Cache가 있다고 가정합니다.
+
+```java
+private static final Map<Long, User> cache = new HashMap<>();
+
+public void add(User user) {
+    cache.put(user.getId(), user);
+}
+```
+
+객체를 계속 추가하면서 제거하지 않으면 `cache`가 `User` 객체들을 계속 참조합니다.
+
+이 객체들은 GC에서 계속 살아남을 수 있고, 오래 유지되면 Old Generation까지 이동하면서 Heap 사용량을 계속 차지할 수 있습니다.
+
+---
+
+# OutOfMemoryError
+
+GC를 수행해도 새로운 객체를 생성할 충분한 Heap 공간을 확보하지 못하면 다음 오류가 발생할 수 있습니다.
+
+```text
+java.lang.OutOfMemoryError: Java heap space
+```
+
+대표적인 원인은 다음과 같습니다.
+
+- Application에 비해 Heap 크기가 너무 작음
+- 객체가 예상보다 많이 생성됨
+- Memory Leak으로 객체가 계속 살아 있음
+- 한 번에 매우 큰 객체나 배열을 생성함
+
+따라서 `Java heap space`가 발생했다고 단순히 Heap 크기만 늘리는 것이 항상 해결책은 아닙니다.
+
+어떤 객체가 Heap을 차지하고 있고 왜 계속 살아 있는지 확인해야 합니다.
+
+---
+
+# Heap Dump
+
+Heap 문제를 분석할 때 대표적으로 `Heap Dump`를 사용합니다.
+
+Heap Dump를 통해 특정 시점에 Heap에 존재하는 객체와 객체 사이의 Reference 관계를 확인할 수 있습니다.
+
+대표적으로 다음을 확인할 수 있습니다.
+
+- 어떤 Class의 객체가 많이 존재하는지
+- 어떤 객체가 Memory를 많이 차지하는지
+- 어떤 객체가 예상보다 오래 살아 있는지
+- 어떤 Reference가 해당 객체를 계속 참조하고 있는지
+
+Memory Leak을 분석할 때는 단순히 객체가 많다는 사실보다 `왜 해당 객체가 계속 살아 있는지`를 확인하는 것이 중요합니다.
+
+---
+
+# Heap 크기
+
+JVM에서는 Heap 크기를 Option으로 설정할 수 있습니다.
+
+```text
+-Xms512m
+-Xmx2g
+```
+
+`-Xms`는 초기 Heap 크기이고 `-Xmx`는 최대 Heap 크기입니다.
+
+Heap이 너무 작으면 GC가 자주 발생하거나 Memory 부족 문제가 더 쉽게 발생할 수 있습니다.
+
+반대로 Heap을 크게 설정한다고 항상 문제가 해결되는 것은 아닙니다.
+
+Memory Leak이 있다면 Heap을 늘려도 결국 다시 Memory가 가득 찰 수 있습니다.
 
 ---
 
 # 참고 자료
 
-- [Java Virtual Machine Specification — Heap](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-2.html#jvms-2.5.3)
 - [Oracle Java — Garbage Collector Implementation](https://docs.oracle.com/en/java/javase/21/gctuning/garbage-collector-implementation.html)
 - [Oracle Java — Garbage-First Garbage Collector](https://docs.oracle.com/en/java/javase/21/gctuning/garbage-first-garbage-collector.html)
