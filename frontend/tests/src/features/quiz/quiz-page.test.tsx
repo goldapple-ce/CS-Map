@@ -23,7 +23,15 @@ const content = {
   ],
   scenes: {
     root: {
-      scene: { selfCheckQuiz: [{ question: "첫 문제?", answer: "첫 답" }] },
+      scene: {
+        selfCheckQuiz: [
+          {
+            question:
+              "첫 문제를 확인하세요.\n\n- 첫 조건\n- `둘째` 조건\n\n```java\nint value = 1;\n```",
+            answer: "**첫 답**입니다.\n\n> 설명",
+          },
+        ],
+      },
     },
     child: {
       scene: { selfCheckQuiz: [{ question: "둘째 문제?", answer: "둘째 답" }] },
@@ -71,9 +79,8 @@ describe("독립 퀴즈 페이지", () => {
     ).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole("button", { name: "1문제 시작하기" }))
-    expect(
-      screen.getByRole("heading", { name: "둘째 문제?" })
-    ).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "문제 1" })).toBeInTheDocument()
+    expect(screen.getByText("둘째 문제?")).toBeInTheDocument()
     expect(
       screen.queryByRole("button", { name: "알겠어요" })
     ).not.toBeInTheDocument()
@@ -87,7 +94,16 @@ describe("독립 퀴즈 페이지", () => {
     renderQuiz()
     fireEvent.click(screen.getByRole("button", { name: "2문제 시작하기" }))
 
+    expect(screen.getByRole("heading", { name: "문제 1" })).toBeInTheDocument()
+    expect(screen.getAllByRole("listitem")).toHaveLength(2)
+    expect(document.querySelector("pre code")).toHaveTextContent(
+      "int value = 1;"
+    )
+
     fireEvent.click(screen.getByRole("button", { name: "정답 보기" }))
+    expect(
+      screen.getByRole("status").querySelector("strong")
+    ).toHaveTextContent("첫 답")
     fireEvent.click(screen.getByRole("button", { name: "다시 볼래요" }))
     expect(screen.getByLabelText("퀴즈 진행 상황")).toHaveTextContent("2 / 2")
 
@@ -104,6 +120,14 @@ describe("독립 퀴즈 페이지", () => {
       "href",
       "/explore/root"
     )
+    expect(
+      screen.getByRole("heading", { level: 3, name: "문제 1" })
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole("listitem")).toHaveLength(2)
+    expect(document.querySelector("pre code")).toHaveTextContent(
+      "int value = 1;"
+    )
+    expect(document.querySelector("strong")).toHaveTextContent("첫 답")
 
     fireEvent.click(screen.getByRole("button", { name: "같은 범위 다시 풀기" }))
     expect(screen.getByLabelText("퀴즈 진행 상황")).toHaveTextContent("1 / 2")

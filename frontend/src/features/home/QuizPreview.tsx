@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { contentData } from "@/content/generated/content-data"
+import { QuizMarkdown } from "@/features/quiz/QuizMarkdown"
 import { buildQuizBank } from "@/features/quiz/quiz-bank"
 import { cn } from "@/lib/utils"
 
@@ -41,9 +42,13 @@ export function QuizPreview() {
         <p className="text-sm font-medium text-muted-foreground">
           {representativeQuestion.sceneTitle}
         </p>
-        <h3 className="mt-3 text-lg leading-7 font-semibold">
-          {representativeQuestion.question}
-        </h3>
+        <h3 className="mt-3 text-lg leading-7 font-semibold">대표 문제</h3>
+        <div className="mt-2">
+          <QuizMarkdown
+            markdown={representativeQuestion.question}
+            variant="question"
+          />
+        </div>
         <Button
           type="button"
           variant="outline"
@@ -60,13 +65,16 @@ export function QuizPreview() {
           {answerRevealed ? "답변 숨기기" : "정답 보기"}
         </Button>
         {answerRevealed ? (
-          <p
+          <div
             id="quiz-preview-answer"
             role="status"
-            className="mt-4 rounded-lg bg-muted/60 px-4 py-3 text-sm leading-7 whitespace-pre-line"
+            className="mt-4 rounded-lg bg-muted/60 px-4 py-3"
           >
-            {representativeQuestion.answer}
-          </p>
+            <QuizMarkdown
+              markdown={representativeQuestion.answer}
+              variant="answer"
+            />
+          </div>
         ) : null}
       </article>
     </section>

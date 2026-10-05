@@ -6,6 +6,7 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { contentData } from "@/content/generated/content-data"
 import { cn } from "@/lib/utils"
 import type { GeneratedContentData } from "@shared/content/generated-contract"
+import { QuizMarkdown } from "./QuizMarkdown"
 import {
   buildQuizBank,
   buildQuizScopes,
@@ -197,8 +198,11 @@ export function QuizPage({
             {current.sceneTitle}
           </Link>
           <h1 className="mt-5 text-2xl leading-snug font-semibold tracking-tight sm:text-3xl">
-            {current.question}
+            문제 {session.currentIndex + 1}
           </h1>
+          <div className="mt-4">
+            <QuizMarkdown markdown={current.question} variant="question" />
+          </div>
 
           <div className="mt-auto pt-10">
             {!session.answerRevealed ? (
@@ -216,9 +220,9 @@ export function QuizPage({
                 <div
                   id={answerId}
                   role="status"
-                  className="rounded-xl bg-muted/60 p-5 leading-7 whitespace-pre-line"
+                  className="rounded-xl bg-muted/60 p-5"
                 >
-                  {current.answer}
+                  <QuizMarkdown markdown={current.answer} variant="answer" />
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Button
@@ -243,9 +247,9 @@ export function QuizPage({
   }
 
   const reviewIds = new Set(session.reviewQuestionIds)
-  const reviewQuestions = session.questions.filter((item) =>
-    reviewIds.has(item.id)
-  )
+  const reviewQuestions = session.questions
+    .map((item, index) => ({ item, problemNumber: index + 1 }))
+    .filter(({ item }) => reviewIds.has(item.id))
 
   return (
     <div className="mx-auto h-full w-full max-w-3xl overflow-y-auto px-6 py-12">
@@ -264,7 +268,7 @@ export function QuizPage({
           <h2 id="review-title" className="text-xl font-semibold">
             다시 볼 문제
           </h2>
-          {reviewQuestions.map((item) => (
+          {reviewQuestions.map(({ item, problemNumber }) => (
             <article
               key={item.id}
               className="rounded-xl border border-border bg-card p-5"
@@ -275,10 +279,13 @@ export function QuizPage({
               >
                 {item.sceneTitle}
               </Link>
-              <h3 className="mt-3 font-semibold">{item.question}</h3>
-              <p className="mt-3 rounded-lg bg-muted/60 px-4 py-3 text-sm leading-7 whitespace-pre-line">
-                {item.answer}
-              </p>
+              <h3 className="mt-3 font-semibold">문제 {problemNumber}</h3>
+              <div className="mt-2">
+                <QuizMarkdown markdown={item.question} variant="question" />
+              </div>
+              <div className="mt-3 rounded-lg bg-muted/60 px-4 py-3">
+                <QuizMarkdown markdown={item.answer} variant="answer" />
+              </div>
             </article>
           ))}
         </section>

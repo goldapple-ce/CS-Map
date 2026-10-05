@@ -37,7 +37,12 @@ beforeEach(() => {
   mockContentData.scenes = {
     first: {
       scene: {
-        selfCheckQuiz: [{ question: "대표 질문?", answer: "대표 정답" }],
+        selfCheckQuiz: [
+          {
+            question: "대표 질문입니다.\n\n- 첫 항목\n- `둘째` 항목",
+            answer: "**대표 정답**\n\n> 설명",
+          },
+        ],
       },
     },
     second: {
@@ -61,15 +66,23 @@ describe("QuizPreview", () => {
     )
 
     expect(
-      screen.getByRole("heading", { name: "대표 질문?" })
+      screen.getByRole("heading", { name: "대표 문제" })
     ).toBeInTheDocument()
+    expect(screen.getByText("대표 질문입니다.")).toBeInTheDocument()
+    expect(screen.getAllByRole("listitem")).toHaveLength(2)
     expect(screen.queryByText("다른 질문?")).not.toBeInTheDocument()
     expect(screen.queryByText("대표 정답")).not.toBeInTheDocument()
 
     fireEvent.click(screen.getByRole("button", { name: "정답 보기" }))
     expect(screen.getByRole("status")).toHaveTextContent("대표 정답")
     expect(
-      screen.getByRole("heading", { name: "대표 질문?" })
+      screen.getByRole("status").querySelector("strong")
+    ).toHaveTextContent("대표 정답")
+    expect(
+      screen.getByRole("status").querySelector("blockquote")
+    ).toHaveTextContent("설명")
+    expect(
+      screen.getByRole("heading", { name: "대표 문제" })
     ).toBeInTheDocument()
   })
 

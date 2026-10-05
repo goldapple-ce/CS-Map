@@ -11,3 +11,5 @@
 - 실제 초기 로딩 병목이 측정되면 Scene별 generated module, dynamic import, module Promise cache와 인접 Scene prefetch를 복구하고 압축된 초기 JavaScript 크기와 실제 로딩 시간을 전후 비교한다.
 
 - 카메라 애니메이션 중 `setCamera`로 `WorldRenderer` 전체를 매 프레임 다시 렌더링하는 구조를 개선한다. Scene 트리는 안정적으로 유지하고 `requestAnimationFrame`에서 SVG World `<g>`의 transform만 갱신하며, 애니메이션 중 임계값 기반 Scene mount/unmount를 막고 종료 시 React 카메라 상태를 동기화한다. 변경 전후 frame time과 dropped frame을 측정해 효과를 확인한다.
+
+- 설명과 퀴즈 Markdown 렌더링 통일: 별도 `QuizMarkdown`을 제거하거나 축소하고 공통 Markdown renderer 하나로 Scene·Topic·Area 설명, Scene Quiz, 독립 Quiz와 Home Preview가 heading, list, emphasis, code, blockquote, link, image와 table을 같은 규칙으로 지원하게 한다. Raw HTML과 JavaScript는 계속 차단하며, `quiz.ko.yaml`의 상대 로컬 이미지도 설명 Markdown과 같은 Content Build 경로로 검증·처리한다.

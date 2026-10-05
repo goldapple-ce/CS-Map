@@ -2,6 +2,7 @@ import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { QuizMarkdown } from "@/features/quiz/QuizMarkdown"
 import type { SelfCheckQuestion } from "@shared/content/types"
 
 type QuizPanelProps = {
@@ -40,9 +41,10 @@ export function QuizPanel({ questions }: QuizPanelProps) {
             key={`${index}-${item.question}`}
             className="space-y-4 rounded-xl border border-border p-5"
           >
-            <h4 className="text-base font-semibold">
-              {index + 1}. {item.question}
-            </h4>
+            <div className="space-y-2">
+              <h4 className="text-base font-semibold">문제 {index + 1}</h4>
+              <QuizMarkdown markdown={item.question} variant="question" />
+            </div>
             <Button
               type="button"
               variant="outline"
@@ -68,9 +70,9 @@ export function QuizPanel({ questions }: QuizPanelProps) {
               <div
                 id={answerId}
                 role="status"
-                className="rounded-lg bg-muted/50 px-4 py-3 text-sm leading-7 text-muted-foreground"
+                className="rounded-lg bg-muted/50 px-4 py-3"
               >
-                {item.answer}
+                <QuizMarkdown markdown={item.answer} variant="answer" />
               </div>
             ) : null}
           </section>

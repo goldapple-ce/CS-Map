@@ -196,6 +196,8 @@ Root Scene ID와 Route 목록은 generated data가 보장하는 index이므로 �
 
 `QuizPreview`는 상위 Route에서 퀴즈 데이터를 전달받지 않고 generated content와 같은 Quiz Bank 조합 함수를 직접 사용한다. 안정된 Quiz Bank 순서의 첫 문제만 홈페이지 대표 문제로 표시하고 정답 공개 여부는 컴포넌트 내부 상태로 관리한다. Quiz Bank가 비어 있으면 영역을 렌더링하지 않으며 CTA는 `/quiz` Route로 이동한다.
 
+`QuizMarkdown`은 `SelfCheckQuestion`의 기존 `question`, `answer` 문자열을 runtime에서 React Markdown과 GFM으로 표시한다. Scene `QuizPanel`, `QuizPage`와 `QuizPreview`가 같은 컴포넌트를 사용하며 Schema와 generated content 계약은 바꾸지 않는다. 문제 번호나 `대표 문제` heading은 화면이 별도로 만들고 Markdown question은 heading 밖의 body로 렌더링한다. Quiz allowlist는 문단, blockquote, 목록, 강조, code와 줄바꿈으로 제한되며, heading, link, image, table, task input과 Raw HTML까지 지원하는 Explanation `MarkdownContent`보다 의도적으로 좁다.
+
 ## Explorer 실행 흐름
 
 ### Scene URL 진입

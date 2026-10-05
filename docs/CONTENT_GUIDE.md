@@ -195,14 +195,40 @@ Area Markdown은 묶음 전체의 의미와 내부 Topic 사이의 관계에 집
 
 ## 퀴즈 형식
 
+한 줄 질문과 답변은 기존처럼 작성한다.
+
 ```yaml
 - question: Key Share는 Session Key 자체인가요?
   answer: 아니요. Session Key를 만들기 위해 서로 공개하는 재료입니다.
 ```
 
+문단, 목록, 강조나 Code Block이 필요하면 YAML block scalar `|`를 사용한다.
+
+````yaml
+- question: |
+    다음 코드의 실행 결과를 설명해보세요.
+
+    ```java
+    int result = 1 + 2;
+    ```
+
+    - `result`의 값
+    - 덧셈이 수행되는 시점
+  answer: |
+    **결과는 3입니다.**
+    첫 번째 줄과 이 줄은 화면에서도 줄을 바꿔 표시합니다.
+
+    빈 줄을 두면 새로운 문단이 됩니다.
+````
+
 - 질문 하나에는 내용 하나만 담는다.
 - 답변은 결론부터 한두 문장으로 작성한다.
 - 본문에 없는 핵심 정보를 퀴즈에서 처음 소개하지 않는다.
+- `|` 아래의 모든 줄은 같은 깊이로 들여쓴다.
+- 한 번의 줄바꿈은 같은 문단 안에서 화면의 줄바꿈으로 보이고, 빈 줄은 문단을 나눈다.
+- 문단과 목록의 경계가 분명하도록 목록 앞뒤에 빈 줄을 둔다.
+- 퀴즈는 문단, blockquote, 순서 있는·없는 목록, 굵게, 기울임, 취소선, inline code와 fenced code를 지원한다.
+- Heading, image, table, link, horizontal rule, task list와 Raw HTML은 퀴즈에 작성하지 않는다.
 
 ## 검증
 
