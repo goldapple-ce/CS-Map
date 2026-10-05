@@ -52,6 +52,12 @@ nodes:
     col: 4
     contentRef: jitcompiler.ko.md
 
+  thread:
+    label: Thread
+    row: 3
+    col: 5
+    contentRef: thread.ko.md
+
 edges:
   - from: class-loading
     # fromSide: bottom
@@ -73,6 +79,20 @@ edges:
     to: heap
     label: 미사용 객체 정리
     variant: supporting
+
+  - from: thread
+    fromSide: left
+    to: pc-register
+    variant: supporting
+  - from: thread
+    fromSide: left
+    to: native-method-stack
+    variant: supporting
+  - from: thread
+    fromSide: left
+    to: jvm-stack
+    variant: supporting
+
 areas:
   runtime-data-area:
     label: Runtime Data Area

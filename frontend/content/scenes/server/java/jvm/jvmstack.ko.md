@@ -43,13 +43,14 @@ public void c() {
 
 Stack Frame은 하나의 Java Method를 실행하는 데 필요한 정보를 담는 단위입니다.
 
-대표적으로 다음 정보를 가지고 있습니다.
+대표적으로 다음과 같은 정보로 구성됩니다.
 
-- `Local Variable Array`
-- `Operand Stack`
-- 현재 Method 실행에 필요한 부가 정보
+- `Local Variable Array` : Parameter와 Local Variable을 저장
+- `Operand Stack` : Bytecode 연산에 필요한 값을 임시로 저장
+- `Dynamic Linking` : 현재 Method의 Bytecode가 다른 Method나 Field 등을 참조할 때 실제 대상과 연결하는 데 필요한 정보
+- `Method Return과 관련된 정보` : Method 실행이 끝난 뒤 호출한 Method로 돌아가기 위해 필요한 정보
 
-Method가 호출될 때마다 새로운 Stack Frame이 생성되기 때문에 서로 다른 Method의 Local Variable은 각각 자신의 Frame 안에서 관리됩니다.
+Method가 호출될 때마다 새로운 Stack Frame이 생성되기 때문에 서로 다른 Method의 Local Variable과 연산 상태는 각각 자신의 Frame 안에서 관리됩니다.
 
 예를 들어 다음 Method가 있다고 가정합니다.
 
@@ -60,7 +61,7 @@ public int add(int a, int b) {
 }
 ```
 
-이 Method의 Stack Frame에는 `a`, `b`, `result` 같은 Local Variable과 연산을 위한 Operand Stack이 존재합니다.
+이 Method의 Stack Frame에는 `a`, `b`, `result`를 관리하는 Local Variable Array와 연산에 사용하는 Operand Stack 등이 존재합니다.
 
 ---
 
@@ -125,9 +126,27 @@ istore_3    // 결과를 Local Variable 3번 Slot에 저장
 
 ---
 
+# Dynamic Linking
+
+Class File의 Bytecode는 다른 Method나 Field를 이름 기반의 `Symbolic Reference` 형태로 참조할 수 있습니다.
+
+Stack Frame은 현재 Method가 실행되는 동안 이러한 Symbolic Reference를 실제 Runtime 대상과 연결하는 데 필요한 정보를 가집니다.  
+이를 `Dynamic Linking`이라고 합니다.
+
+예를 들어 다음 코드에서 `add()`를 호출한다고 가정합니다.
+
+```java
+return add(1, 2);
+```
+
+Bytecode에는 단순히 실제 Memory 주소가 직접 기록되어 있는 것이 아니라 Method에 대한 Symbolic Reference가 존재할 수 있습니다.  
+JVM은 Runtime에 이를 실제 실행할 Method와 연결하여 호출합니다.
+
+---
+
 # Method 호출과 Stack Frame
 
-Method 안에서 다른 Method를 호출하면 새로운 Stack Frame이 생성됩니다.
+Method 안에서 다른 Method를 호출하면 새로운 Stack Frame이 생성되어 현재 Thread의 JVM Stack 위에 추가됩니다.
 
 예를 들어 다음 코드가 있다고 가정합니다.
 
@@ -141,13 +160,26 @@ public int add(int a, int b) {
 }
 ```
 
-`calculate()`가 실행되면 `calculate()`의 Stack Frame이 생성됩니다.
+먼저 `calculate()`가 호출되면 `calculate()`의 Stack Frame이 생성됩니다.
 
-그 안에서 `add()`를 호출하면 그 위에 `add()`의 새로운 Stack Frame이 생성됩니다.
+그 안에서 `add()`를 호출하면 `calculate()`의 Frame은 그대로 유지된 상태에서 그 위에 `add()`의 새로운 Stack Frame이 생성됩니다.
 
-`add()`가 결과를 반환하면 `add()`의 Frame이 제거되고 실행 흐름은 다시 `calculate()`의 Frame으로 돌아갑니다.
+현재 가장 위에 있는 `add()`의 Stack Frame을 사용해 Method가 실행됩니다.
 
-그래서 Method 호출이 깊어질수록 JVM Stack에는 더 많은 Stack Frame이 쌓입니다.
+`add()`가 결과를 반환하면 반환값이 호출한 Method에 전달되고 `add()`의 Stack Frame은 제거됩니다.  
+이후 실행 흐름은 다시 `calculate()`의 Stack Frame으로 돌아갑니다.
+
+즉 Method 호출과 반환은 다음과 같은 흐름으로 동작합니다.
+
+1. Method 호출
+2. 새로운 Stack Frame 생성
+3. JVM Stack 위에 Frame 추가
+4. 해당 Frame을 이용해 Method 실행
+5. Method가 결과를 반환
+6. Stack Frame 제거
+7. 호출한 Method의 Frame으로 실행 복귀
+
+이 때문에 Method 호출이 깊어질수록 JVM Stack에는 더 많은 Stack Frame이 쌓입니다.
 
 ---
 

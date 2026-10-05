@@ -24,7 +24,7 @@ Class를 사용할 수 있는 상태로 만드는 과정은 크게 다음과 같
 
 `Loading`은 필요한 `.class` 파일을 찾아 Bytecode를 읽고 JVM 내부에 Class 정보를 생성하는 과정입니다.
 
-Java는 모든 Class를 Application 시작 시 한 번에 Loading하지 않고, 필요한 시점에 Class Loader를 통해 Loading할 수 있습니다.
+Java는 모든 Class를 Application 시작 시 한 번에 Loading하지 않고, 필요한 시점에 Class Loader를 통해 Loading할 수 있습니다.  
 이 특성을 이용하면 Application이 Compile 시점에 모든 구현 Class를 직접 알고 있지 않아도 Runtime에 존재하는 Class를 찾아 사용할 수 있습니다.
 
 ## 활용 예시
@@ -51,30 +51,85 @@ Application은 `PaymentProvider` Interface만 알고 있고, 실제 구현체는
 다음 세 단계로 나눌 수 있습니다.
 
 1. `Verification` : Bytecode가 JVM 규칙에 맞는지 검사합니다.
-2. `Preparation` : `static` Field를 위한 Memory를 준비하고 기본값을 할당합니다.
+2. `Preparation` : `static` Field를 위한 Memory를 준비하고 값을 초기화합니다.
 3. `Resolution` : Class, Method, Field의 Symbolic Reference를 Runtime에서 실제 사용할 대상과 연결합니다.
 
-예를 들어 다음 Field가 있다고 가정합니다.
+## Preparation
+
+일반적인 `static` Field는 Preparation 단계에서 먼저 Type에 따른 기본값을 할당받습니다.
 
 ```java
 static int count = 10;
 ```
 
-Preparation 단계에서는 먼저 기본값인 `0`이 준비되고, 실제 값인 `10`은 이후 Initialization 단계에서 할당됩니다.
+이 경우 Preparation 단계에서는 `count`에 `0`이 할당되고, 실제 값인 `10`은 이후 Initialization 단계에서 할당됩니다.
 
-`Resolution`에서는 Compile 시 Bytecode에 기록된 Class, Method, Field에 대한 이름 기반 참조를 Runtime에서 실제 사용할 대상과 연결합니다.
+하지만 `static final`이라고 해서 항상 같은 방식으로 처리되는 것은 아닙니다.  
+Compile-time Constant인 경우에는 값이 Class File의 `ConstantValue`에 기록될 수 있으며 Preparation 단계에서 해당 값이 설정됩니다.
 
-이 과정을 알면 Compile은 정상적으로 끝났지만 Runtime에서 Method나 Field를 찾지 못하는 문제가 왜 발생할 수 있는지 이해하기 쉬워집니다.
+예를 들어 다음과 같습니다.
+
+```java
+class Example {
+    static int a = 10;
+    static final int b = 20;
+    static final Integer c = 30;
+}
+```
+
+Preparation 단계에서는 다음과 같이 준비됩니다.
+
+- `a` : 일반적인 `static int`이므로 기본값 `0`
+- `b` : Compile-time Constant이므로 `20`
+- `c` : `Integer` 객체를 참조하는 Field이므로 기본값 `null`
+
+즉 `static final`이라는 Modifier만으로 결정되는 것이 아니라, `Compile-time Constant인지 여부`가 중요합니다.
+
+Primitive Type이나 `String`이 `final`이고 Compile 시점에 값을 결정할 수 있는 Constant Expression으로 초기화된 경우 Compile-time Constant가 될 수 있습니다.
+
+반면 다음과 같은 값은 Compile-time Constant가 아닙니다.
+
+```java
+static final Integer c = 30;
+static final int d = getValue();
+```
+
+`c`는 객체 Reference이고, `d`는 Method 호출 결과가 Runtime에 결정되기 때문입니다.
+
+## Resolution
+
+`Resolution`에서는 Compile 시 Bytecode에 기록된 Class, Method, Field에 대한 Symbolic Reference를 Runtime에서 실제 사용할 대상과 연결합니다.
+
+이 과정을 알면 Compile은 정상적으로 끝났지만 Runtime에서 Class, Method, Field를 찾지 못하는 문제가 왜 발생할 수 있는지 이해하기 쉬워집니다.
 
 ---
 
 # Initialization
 
-`Initialization`은 Class의 `static` Field에 실제 값을 할당하고 `static` Block을 실행하는 단계입니다.
+`Initialization`은 Class의 `static` Field 초기화 코드와 `static` Block을 실행하는 단계입니다.
 
-Class가 Loading됐다고 해서 바로 Initialization까지 완료된 것은 아닙니다. Java는 일반적으로 Class가 실제로 처음 사용되는 시점에 Initialization합니다.
+Class가 Loading됐다고 해서 바로 Initialization까지 완료된 것은 아닙니다.  
+Java는 일반적으로 Class가 실제로 처음 사용되는 시점에 Initialization합니다.
 
-예를 들어 다음과 같은 Class가 있다고 가정합니다.
+앞에서 본 예제를 다시 보면 다음과 같습니다.
+
+```java
+class Example {
+    static int a = 10;
+    static final int b = 20;
+    static final Integer c = 30;
+}
+```
+
+Preparation 이후 Initialization이 진행되면 다음과 같이 됩니다.
+
+- `a` : `0 → 10`
+- `b` : Preparation 단계에서 이미 `20`
+- `c` : `null → Integer.valueOf(30)`에 해당하는 Reference
+
+즉 일반적인 `static` Field의 실제 초기값은 Initialization 단계에서 설정되지만, Compile-time Constant는 Preparation 단계에서 이미 값이 설정될 수 있습니다.
+
+또한 `static` Field 초기화와 `static` Block은 소스 코드에 작성된 순서에 따라 실행됩니다.
 
 ```java
 public class Config {
@@ -87,9 +142,9 @@ public class Config {
 }
 ```
 
-`Config`가 처음 실제로 사용되는 시점에 `host`의 값이 설정되고 `static` Block이 실행됩니다.
+`Config`가 Initialization되는 시점에 `host`를 초기화하는 코드가 실행되고 이후 `static` Block이 실행됩니다.
 
-이 과정을 알면 `static` Field가 언제 만들어지는지, 초기화 순서에 따라 왜 예상과 다른 값이나 오류가 발생할 수 있는지 분석할 수 있습니다.
+이 과정을 알면 `static` Field가 언제 초기화되는지, 초기화 순서에 따라 왜 예상과 다른 값이나 오류가 발생할 수 있는지 분석할 수 있습니다.
 
 ---
 
@@ -109,13 +164,14 @@ JVM에서는 여러 Class Loader가 역할을 나눠 Class를 Loading합니다.
 
 Class Loader는 일반적으로 자신이 바로 Class를 Loading하지 않고 먼저 상위 Class Loader에게 요청합니다.
 
-```
+```text
 Application Class Loader → Platform Class Loader → Bootstrap Class Loader
 ```
 
 상위 Class Loader가 Class를 찾지 못하면 하위 Class Loader가 자신이 담당하는 위치에서 Class를 찾습니다.
 
-이를 `Parent Delegation Model`이라고 합니다. 이 구조를 사용하면 Java의 핵심 Class가 Application에서 정의한 같은 이름의 Class에 의해 쉽게 대체되는 것을 방지할 수 있습니다.
+이를 `Parent Delegation Model`이라고 합니다.  
+이 구조를 사용하면 Java의 핵심 Class가 Application에서 정의한 같은 이름의 Class에 의해 쉽게 대체되는 것을 방지할 수 있습니다.
 
 예를 들어 Application에서 `java.lang.String`과 같은 이름의 Class를 정의하더라도 일반적인 Parent Delegation 구조에서는 Bootstrap Class Loader가 제공하는 Java의 실제 `String`이 우선 사용됩니다.
 
@@ -125,11 +181,11 @@ Application Class Loader → Platform Class Loader → Bootstrap Class Loader
 
 JVM에서 Class의 정체성은 Class 이름만으로 결정되지 않습니다.
 
-`Class 이름 + Class를 Loading한 Class Loader`
+`Class 이름 + Class를 정의한 Class Loader`
 
 이 두 가지가 함께 같아야 같은 Type으로 취급됩니다.
 
-따라서 이름과 Bytecode가 같은 Class라도 서로 다른 Class Loader가 Loading하면 JVM에서는 서로 다른 Type이 될 수 있습니다.
+따라서 이름과 Bytecode가 같은 Class라도 서로 다른 Class Loader가 정의하면 JVM에서는 서로 다른 Type이 될 수 있습니다.
 
 ## 활용 예시
 

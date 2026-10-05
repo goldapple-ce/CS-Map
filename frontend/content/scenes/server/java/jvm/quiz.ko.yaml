@@ -1,38 +1,116 @@
-- question: Method Area와 Heap은 Thread마다 따로 만들어지나요?
-  answer: 아니요. Method Area와 Heap은 여러 Thread가 공유합니다.
-
-- question: PC Register와 JVM Stack은 모든 Thread가 공유하나요?
-  answer: 아니요. PC Register, JVM Stack과 Native Method Stack은 Thread마다 별도로 생성됩니다.
-
-- question: CPU Cache는 JVM의 Runtime Data Area에 포함되나요?
-  answer: 아니요. CPU Cache는 Hardware 영역입니다. Java Code가 따라야 할 Visibility와 Ordering의 기준은 JMM이 정의합니다.
-
-- question: count가 volatile Field라면 count++ 전체가 Atomic하게 실행되나요?
-  answer: 아니요. volatile은 Visibility와 Ordering을 제공하지만 읽기, 계산, 쓰기로 이루어진 복합 연산 전체의 Atomicity를 보장하지 않습니다.
-
-- question: Interpreter와 JIT Compiler는 어떤 역할 차이가 있나요?
-  answer: Interpreter는 Bytecode를 실행하고, JIT Compiler는 자주 실행되는 코드를 최적화합니다.
-
-- question: Garbage Collector가 주로 정리하는 Runtime Data Area는 어디인가요?
-  answer: 객체와 배열이 생성되는 Heap입니다.
-
-- question: 같은 Bytecode를 여러 OS에서 실행할 때 JVM 실행 파일도 동일한가요?
-  answer: 아니요. Bytecode 형식과 JVM 규격은 공통이지만 JVM 구현은 OS와 CPU에 맞게 만들어집니다.
-
-- question: "`i++`는 `++i`보다 Runtime에서 항상 빠른가요?"
-  answer: 아니요. Expression 의미는 다르지만 생성된 Bytecode와 JIT 최적화에 따라 성능 차이가 사라질 수 있으므로 실제 환경에서 측정해야 합니다.
-
-- question: static을 붙이면 Code가 항상 더 빠르게 실행되나요?
-  answer: 아니요. `static`은 Class 소유를 나타내는 의미이며 성능은 Bytecode, JIT 최적화와 실제 실행 환경을 함께 측정해야 합니다.
-
-- question: 모든 List에서 Index 기반 for가 For-each보다 빠른가요?
-  answer: 아니요. List 구현, Iterator 사용과 JIT 최적화에 따라 달라지므로 의미와 자료구조에 맞게 선택하고 필요하면 JMH로 측정해야 합니다.
-
 - question: GC(Garbage Collection)란 무엇이며, 어떤 원리로 제거할 객체를 판단하고 메모리를 회수하나요?
-  answer: GC는 JVM Heap에서 더 이상 사용되지 않는 객체의 메모리를 자동으로 회수하는 기능입니다. JVM은 단순 참조 횟수가 아니라 GC Root를 시작점으로 객체 그래프를 탐색하는 도달 가능성 분석을 사용합니다. GC Root에서 도달 가능한 객체는 살아 있는 객체로 판단하고, 도달할 수 없는 객체는 Garbage로 판단합니다. 이후 Collector에 따라 Mark-Sweep, Mark-Compact 또는 Copying 등의 방법으로 메모리를 회수합니다.
+  answer: |
+    GC는 JVM Heap에서 더 이상 사용되지 않는 객체의 메모리를 자동으로 회수하는 기능입니다.
+
+    1. GC Root를 시작점으로 객체 그래프를 탐색합니다.
+    2. Root에서 도달 가능한 객체는 살아 있는 객체로, 도달할 수 없는 객체는 Garbage로 판단합니다.
+    3. Collector에 따라 Mark-Sweep, Mark-Compact 또는 Copying 등의 방법으로 메모리를 회수합니다.
+
+    즉, 단순한 참조 횟수가 아니라 도달 가능성을 기준으로 판단합니다.
 
 - question: Java가 Reference Counting 대신 GC Root 기반의 도달 가능성 분석을 사용하는 이유는 무엇인가요? 구체적인 객체 관계를 예로 들어 설명해 주세요.
-  answer: Reference Counting은 객체들이 서로 순환 참조하면 실제로 애플리케이션에서 사용되지 않더라도 참조 횟수가 0이 되지 않는 문제가 있습니다. 예를 들어 객체 A와 B가 서로를 참조하지만, Stack이나 Static Field 등 외부 GC Root에서 A와 B를 가리키는 참조가 모두 사라지면 두 객체는 사용할 수 없습니다. Reference Counting에서는 각각의 참조 횟수가 남아 있어 회수하기 어렵지만, GC Root 기반 도달 가능성 분석에서는 두 객체 모두 Root에서 도달할 수 없으므로 Garbage로 판단할 수 있습니다.
+  answer: |
+    Reference Counting은 객체가 서로 순환 참조하면 애플리케이션에서 더 이상 사용하지 않아도 참조 횟수가 0이 되지 않는 문제가 있습니다.
+
+    예를 들어 객체 A와 B가 서로를 참조하더라도 Stack이나 Static Field 같은 외부 GC Root에서 두 객체를 가리키는 참조가 모두 사라지면 더는 사용할 수 없습니다. Reference Counting에서는 횟수가 남지만, 도달 가능성 분석에서는 둘 다 Root에서 도달할 수 없으므로 Garbage로 판단할 수 있습니다.
 
 - question: JVM의 대표적인 GC Root에는 무엇이 있나요? 그리고 static 컬렉션이 메모리 누수의 원인이 될 수 있는 이유를 GC Root 관점에서 설명해 주세요.
-  answer: 대표적인 GC Root에는 실행 중인 Thread의 Stack Frame에 있는 지역 변수와 매개변수, 로딩된 클래스의 Static Field를 통해 참조되는 객체, JNI Reference 등이 있습니다. Static Collection이 애플리케이션 실행 기간 내내 유지되면 컬렉션 자체뿐 아니라 컬렉션이 참조하는 모든 요소도 GC Root에서 도달 가능한 상태가 됩니다. 따라서 더 이상 비즈니스 로직에서 사용하지 않는 객체라도 컬렉션에서 제거하지 않으면 GC가 회수하지 못해 메모리 누수가 발생할 수 있습니다.
+  answer: |
+    대표적인 GC Root는 다음과 같습니다.
+
+    - 실행 중인 Thread의 Stack Frame에 있는 지역 변수와 매개변수
+    - 로딩된 Class의 Static Field를 통해 참조되는 객체
+    - JNI Reference
+
+    Static Collection이 애플리케이션 실행 기간 내내 유지되면 Collection이 참조하는 요소도 GC Root에서 계속 도달 가능한 상태가 됩니다. 더 이상 사용하지 않는 객체를 Collection에서 제거하지 않으면 GC가 회수하지 못해 메모리 누수가 발생할 수 있습니다.
+
+- question: Java 클래스가 JVM에 로딩된 후 사용할 수 있게 되기까지의 전체 절차를 설명해 주세요. 특히 Linking 내부 단계까지 알고 있다면 함께 설명해 주세요.
+  answer: |
+    Class는 크게 Loading → Linking → Initialization 순서로 사용할 수 있는 상태가 됩니다.
+
+    1. Loading: ClassLoader가 Bytecode를 읽고 JVM이 Class Metadata와 대응하는 Class 객체를 생성합니다.
+    2. Linking
+       - Verification: Bytecode의 구조와 안전성을 검사합니다.
+       - Preparation: Static Field에 필요한 메모리를 확보하고 기본값을 할당합니다.
+       - Resolution: Constant Pool의 Symbolic Reference를 실제 Class, Field와 Method의 Direct Reference로 연결합니다. 이 단계는 필요할 때까지 지연될 수 있습니다.
+    3. Initialization: Static Field의 명시적 초기값을 할당하고 Static Initializer를 실행합니다.
+
+- question: 클래스 로딩 과정에서 Preparation과 Initialization은 Static Field를 각각 어떻게 처리하나요? 일반 Static Field와 컴파일 타임 상수의 차이도 함께 설명해 주세요.
+  answer: |
+    - Preparation: Static Field의 메모리를 확보하고 일반적으로 Type의 기본값을 할당합니다. 숫자형은 0, boolean은 false, Reference Type은 null입니다.
+    - Initialization: 개발자가 작성한 명시적 초기값을 할당하고 Static Initializer를 실행합니다.
+
+    다만 Primitive Type이나 String Type의 static final Field가 Compile-time Constant라면 값이 Class File의 ConstantValue Attribute에 저장됩니다. 이 경우 Preparation에서 기본값 대신 상숫값이 설정될 수 있습니다. 객체 생성이나 Method 호출이 필요한 값은 Compile-time Constant가 아니므로 Initialization에서 할당됩니다.
+
+- question: JVM의 ClassLoader는 어떤 종류가 있으며, Parent Delegation Model이 무엇인지 설명해 주세요. 또한 이 구조를 사용하는 이유는 무엇인가요?
+  answer: |
+    ClassLoader는 크게 다음과 같이 나눌 수 있습니다.
+
+    - Application ClassLoader: Application Classpath의 Class와 외부 Library를 Loading합니다.
+    - Platform Class Loader: Java Platform이 제공하는 Module과 Library를 Loading합니다.
+    - Bootstrap ClassLoader: Java의 핵심 Class를 Loading합니다.
+
+    Parent Delegation Model에서는 ClassLoader가 자신이 바로 Class를 Loading하기 전에 먼저 상위 ClassLoader에 요청합니다. 이 구조는 Java 핵심 Class가 Application이 정의한 같은 이름의 Class로 쉽게 대체되는 것을 막습니다.
+
+- question: 패키지명과 클래스명이 완전히 같은 두 클래스라도 서로 다른 ClassLoader가 각각 로딩하면 JVM은 이들을 같은 타입으로 볼까요? 그 이유도 설명해 주세요.
+  answer: |
+    아니요. 패키지명과 Class 이름이 같더라도 서로 다른 ClassLoader가 각각 Loading했다면 JVM은 서로 다른 Type으로 판단합니다.
+
+    JVM에서 Class의 정체성은 완전한 이름과 그 Class를 정의한 ClassLoader의 조합으로 결정됩니다. 따라서 두 Class를 서로 형변환하면 ClassCastException이 발생할 수 있습니다.
+
+- question: JVM의 Runtime Data Area를 설명해 주세요. 특히 Heap, Method Area, JVM Stack, PC Register, Native Method Stack이 각각 어떤 데이터를 저장하며 Thread 간 공유 여부는 어떻게 다른가요?
+  answer: |
+    Runtime Data Area는 JVM이 프로그램을 실행하면서 사용하는 Memory 영역입니다.
+
+    - 모든 Thread가 공유
+      - Heap: 객체와 배열이 저장되며 GC의 주요 관리 대상입니다.
+      - Method Area: Class Metadata, Method 정보, Runtime Constant Pool과 Static Field 관련 정보가 저장됩니다. HotSpot JVM에서는 이를 구현한 영역으로 Metaspace를 사용합니다.
+    - Thread마다 독립
+      - JVM Stack: Method 호출마다 Stack Frame을 만들며 Local Variable Array, Operand Stack과 반환 정보 등을 저장합니다.
+      - PC Register: 현재 실행 중인 JVM Instruction의 위치를 나타냅니다.
+      - Native Method Stack: JNI 등을 통한 Native Method 실행에 사용됩니다.
+
+- question: StackOverflowError와 OutOfMemoryError는 각각 어떤 상황에서 발생하나요? JVM Stack과 Heap 관점에서 비교해 주세요.
+  answer: |
+    StackOverflowError는 특정 Thread의 JVM Stack에 Stack Frame을 더 만들 수 없을 때 발생합니다. 종료 조건이 없는 재귀 호출이나 지나치게 깊은 Method 호출이 대표 원인이며, 일반적으로 해당 Thread의 호출 깊이와 관련됩니다.
+
+    OutOfMemoryError는 JVM이 필요한 Memory를 더 확보할 수 없을 때 발생합니다. Heap 부족이 대표적이지만 Metaspace, Thread 생성을 위한 Native Memory, Direct Buffer Memory 부족 등도 원인이 될 수 있습니다.
+
+    즉, StackOverflowError는 주로 한 Thread의 호출 Stack 깊이 문제이고, OutOfMemoryError는 JVM이 특정 Memory 자원을 더 할당하지 못하는 문제입니다.
+
+- question: JVM Stack에 생성되는 Stack Frame은 어떤 요소로 구성되며, 메서드가 호출되고 반환될 때 Stack Frame은 어떻게 동작하나요?
+  answer: |
+    Stack Frame은 하나의 Method 호출에 필요한 실행 정보를 저장합니다.
+
+    - Local Variable Array: Parameter, this Reference와 Local Variable을 저장합니다.
+    - Operand Stack: 연산 값, Method Argument와 Return Value를 처리합니다.
+    - 그 밖에 Dynamic Linking과 Method 반환 정보 등이 들어 있습니다.
+
+    Method가 호출되면 해당 Thread의 JVM Stack에 새 Frame이 Push되어 현재 Frame이 됩니다. Method가 정상 종료되면 결과를 호출한 Method에 전달하고 Frame이 Pop되어 이전 Frame으로 돌아갑니다. 예외 처리기를 찾는 동안 Frame이 차례로 제거되는 과정은 Stack Unwinding이라고 합니다.
+
+- question: JVM은 Java Bytecode를 어떻게 실행하나요? Interpreter와 JIT Compiler의 역할 및 차이를 설명해 주세요.
+  answer: |
+    ClassLoader가 클래스의 Bytecode를 JVM에 로딩하면 처음에는 Interpreter가 Bytecode 명령어를 하나씩 해석하여 실행합니다. Interpreter는 컴파일을 기다리지 않고 바로 실행할 수 있지만, 같은 코드를 실행할 때마다 반복해서 해석해야 한다는 단점이 있습니다.
+    JVM은 실행 중 메서드 호출 횟수와 반복문 실행 빈도 등의 프로파일링 정보를 수집합니다. 자주 실행되는 Hot Code를 발견하면 JIT Compiler가 해당 Bytecode를 현재 CPU가 직접 실행할 수 있는 Native Machine Code로 컴파일하고 Code Cache에 저장합니다. 이후에는 해석하지 않고 컴파일된 코드를 실행하므로 성능이 향상됩니다.
+    즉 Interpreter는 빠른 시작에 유리하고, JIT Compiler는 반복 실행 성능과 런타임 최적화에 유리합니다.
+
+- question: Java 애플리케이션을 시작한 직후보다 일정 시간 실행한 뒤 성능이 좋아지는 JVM Warm-up 현상이 발생하는 이유는 무엇인가요?
+  answer: |
+    JVM Warm-up은 애플리케이션 실행 초기에 충분한 런타임 정보와 최적화된 Native Code가 아직 준비되지 않았기 때문에 발생합니다. 초기에는 Interpreter가 Bytecode를 해석하여 실행하고, JVM은 메서드 호출 횟수, 반복문 실행 빈도, 실제 사용 타입 등의 프로파일링 정보를 수집합니다.
+    이후 자주 실행되는 Hot Code를 JIT Compiler가 Native Machine Code로 컴파일하고 인라이닝, 불필요한 코드 제거 등의 최적화를 적용합니다. 클래스 로딩과 초기화도 점차 완료되기 때문에 일정 시간 후에는 초기보다 성능이 좋아집니다.
+    따라서 Warm-up은 JIT 컴파일뿐 아니라 클래스 로딩 및 초기화, 런타임 프로파일 수집과 최적화가 누적된 결과입니다.
+
+- question: 일반 Thread와 Daemon Thread는 무엇이 다르며, JVM은 어떤 조건에서 종료되나요?
+  answer: |
+    User Thread는 애플리케이션의 주요 작업을 수행하는 일반 Thread입니다. 하나 이상의 User Thread가 실행 중이면 main Thread가 끝났더라도 JVM은 일반적으로 종료되지 않습니다.
+    Daemon Thread는 User Thread를 보조하는 백그라운드 작업에 사용됩니다. JVM은 살아 있는 User Thread가 하나도 없으면 Daemon Thread가 남아 있더라도 종료 절차를 시작합니다. 이때 Daemon Thread의 작업 완료나 finally 실행을 기다려주지 않을 수 있습니다.
+    따라서 반드시 완료되어야 하는 파일 저장, 데이터베이스 반영 같은 작업을 Daemon Thread에만 맡기면 안 됩니다. Thread를 시작하기 전에 setDaemon(true)를 호출해야 하며, 시작한 뒤 변경하면 IllegalThreadStateException이 발생합니다
+
+- question: Heap 공간이 충분히 남아 있는데도 Thread를 너무 많이 생성하면 OutOfMemoryError unable to create native thread가 발생할 수 있는 이유는 무엇인가요?
+  answer: |
+    Java의 Platform Thread는 일반적으로 운영체제 Thread와 연결되며, Thread마다 JVM Stack을 비롯한 Native Memory와 운영체제의 Thread 관리 자원이 필요합니다.
+    따라서 Heap에 여유가 있어도 프로세스가 사용할 수 있는 Native Memory가 부족하거나, 운영체제의 Thread 수 제한 또는 가상 주소 공간 제한에 도달하면 새로운 Thread를 만들 수 없습니다. 이때 JVM은 OutOfMemoryError: unable to create native thread를 발생시킬 수 있습니다.
+
+- question: Young GC에서 Old Generation 전체를 매번 탐색하지 않고도 Old 객체가 참조하는 Young 객체를 찾아낼 수 있는 이유는 무엇인가요?
+  answer: |
+    JVM은 세대 간 참조를 추적하기 위해 Write Barrier와 Card Table 또는 Remembered Set을 사용합니다. 애플리케이션이 Old 객체의 필드에 Young 객체 참조를 저장하면 Write Barrier가 해당 사실을 기록합니다. 이후 Young GC는 Old Generation 전체를 탐색하지 않고 기록된 영역만 검사하여 Old에서 참조되는 Young 객체를 살아 있는 객체로 판단할 수 있습니다. 이는 세대 간 참조가 비교적 적다는 가설을 활용한 최적화입니다.

@@ -26,6 +26,11 @@ nodes:
     row: 3
     col: 1
     contentRef: garbagecollector.ko.md
+  heap-dump:
+    label: Heap Dump
+    row: 4
+    col: 5
+    contentRef: heapdump.ko.md
 edges:
   - from: eden
     to: survivor-0
@@ -44,6 +49,12 @@ edges:
   - from: survivor-1
     to: old-objects
     label: Promotion
+  - from: old-objects
+    fromSide: right
+    to: heap-dump
+    toSide: left
+    label: 장기 생존 객체 분석
+    variant: supporting
 
   - from: garbage-collector
     # fromSide: top
@@ -65,10 +76,10 @@ edges:
 areas:
   heap:
     label: Heap Area
-    row: 1
+    row: 2
     col: 2
-    rowSpan: 5
-    colSpan: 4
+    rowSpan: 3
+    colSpan: 3
   young-generation:
     label: Young Generation
     row: 2
