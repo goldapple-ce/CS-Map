@@ -101,7 +101,7 @@ export function ExplanationPanel({
               keepMounted
               className="data-hidden:hidden"
             >
-              <article className="mx-auto max-w-3xl space-y-10 px-6 py-7">
+              <article className="mx-auto max-w-5xl space-y-10 px-6 py-7">
                 {selection ? (
                   <TopicExplanationContent
                     selection={selection}
@@ -125,7 +125,7 @@ export function ExplanationPanel({
               keepMounted
               className="data-hidden:hidden"
             >
-              <article className="mx-auto max-w-3xl px-6 py-7">
+              <article className="mx-auto max-w-5xl px-6 py-7">
                 <QuizPanel
                   key={explanation.scene.id}
                   questions={explanation.scene.selfCheckQuiz ?? []}
