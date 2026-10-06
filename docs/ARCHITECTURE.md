@@ -261,6 +261,8 @@ Layout은 두 단계로 나뉜다.
 
 `scene-layout.ts`는 직렬화된 generated Layout을 `Map` 구조로 바꾸고 Scene별로 재사용한다. `SceneViewport`는 Camera와 전환을 관리하고, `WorldRenderer`는 현재 Camera에 보이는 Scene만 화면 좌표로 투영한다.
 
+`SceneNode`는 작성 Label의 실제 개행과 `\n` 표기만 줄 경계로 사용한다. 브라우저의 자동 줄바꿈은 허용하지 않으며, 각 줄의 예상 너비와 Node의 사용 가능한 높이를 기준으로 글씨 크기를 축소해 Label을 Node 내부에 맞춘다.
+
 Light Flow 재생 상태는 `SceneViewport`가 소유한다. 렌더링에 필요한 활성 Edge·Node와 재생 식별자는 `LightFlowRenderProvider`가 `WorldRenderer` 하위에 Context로 전달하며, Camera와 Layout은 명시적인 Props로 유지한다. 상단 실행 버튼은 현재 focused Scene의 Flow만 시작한다. 첫 stage와 비연속 재시작은 출발 Node를 먼저 점등하고, 기존 polyline을 한 번 통과하는 Edge pulse 뒤에 도착 Node를 점등한다. 다음 stage의 출발 Node가 직전 도착 Node에서 이어지면 출발 점등을 반복하지 않고 다음 Edge pulse로 진행한다. 같은 stage의 Edge와 Node 집합은 동시에 표시하며, Scene이 바뀌면 진행 중인 재생을 취소한다.
 
 ## 상태 소유권
