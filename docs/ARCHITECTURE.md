@@ -198,6 +198,8 @@ Root Scene ID와 Route 목록은 generated data가 보장하는 index이므로 �
 
 `QuizMarkdown`은 `SelfCheckQuestion`의 기존 `question`, `answer` 문자열을 runtime에서 React Markdown과 GFM으로 표시한다. Scene `QuizPanel`, `QuizPage`와 `QuizPreview`가 같은 컴포넌트를 사용하며 Schema와 generated content 계약은 바꾸지 않는다. 문제 번호나 `대표 문제` heading은 화면이 별도로 만들고 Markdown question은 heading 밖의 body로 렌더링한다. Quiz allowlist는 문단, blockquote, 목록, 강조, code와 줄바꿈으로 제한되며, heading, link, image, table, task input과 Raw HTML까지 지원하는 Explanation `MarkdownContent`보다 의도적으로 좁다.
 
+Explanation과 Quiz Markdown은 GFM 처리 뒤 공통 `remarkSoftBreaks`를 적용한다. 일반 Text 안의 Enter 한 번은 명시적인 줄바꿈으로 바꾸고, 빈 줄로 나뉜 문단과 Code Block 내부 개행은 기존 Markdown 구조를 유지한다.
+
 ## Explorer 실행 흐름
 
 ### Scene URL 진입

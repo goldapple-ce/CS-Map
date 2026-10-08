@@ -6,6 +6,8 @@ import ReactMarkdown, {
 } from "react-markdown"
 import remarkGfm from "remark-gfm"
 
+import { remarkSoftBreaks } from "@/lib/remark-soft-breaks"
+
 /** React Node에서 제목 ID 생성에 사용할 평문 문자열을 재귀적으로 추출한다. */
 function textContent(node: ReactNode): string {
   if (typeof node === "string" || typeof node === "number") {
@@ -137,7 +139,7 @@ export function MarkdownContent({ markdown, idPrefix }: MarkdownContentProps) {
   return (
     <div className="space-y-3">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkSoftBreaks]}
         components={components}
         allowedElements={[
           "h1",

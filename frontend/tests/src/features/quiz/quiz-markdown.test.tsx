@@ -17,9 +17,9 @@ describe("QuizMarkdown", () => {
 
     const paragraphs = container.querySelectorAll("p")
     expect(paragraphs).toHaveLength(2)
-    expect(paragraphs[0]).toHaveTextContent("첫 줄 둘째 줄")
-    expect(paragraphs[0]).toHaveClass("whitespace-pre-line")
-    expect(paragraphs[0].textContent).toBe("첫 줄\n둘째 줄")
+    expect(paragraphs[0]?.textContent).toBe("첫 줄\n둘째 줄")
+    expect(paragraphs[0]?.querySelectorAll("br")).toHaveLength(1)
+    expect(paragraphs[0]).not.toHaveClass("whitespace-pre-line")
     expect(paragraphs[1]).toHaveTextContent("새 문단")
   })
 
@@ -28,6 +28,7 @@ describe("QuizMarkdown", () => {
       <QuizMarkdown
         markdown={[
           "- **굵게**",
+          "  이어지는 설명",
           "- *기울임*과 ~~취소선~~, `inline`",
           "",
           "1. 첫째",
@@ -46,6 +47,7 @@ describe("QuizMarkdown", () => {
     expect(container.querySelector("ul")).toBeInTheDocument()
     expect(container.querySelector("ol")).toBeInTheDocument()
     expect(container.querySelector("strong")).toHaveTextContent("굵게")
+    expect(container.querySelector("li br")).toBeInTheDocument()
     expect(container.querySelector("em")).toHaveTextContent("기울임")
     expect(container.querySelector("del")).toHaveTextContent("취소선")
     expect(container.querySelector("li code")).toHaveTextContent("inline")
@@ -54,6 +56,7 @@ describe("QuizMarkdown", () => {
     expect(container.querySelector("pre code")?.textContent).toContain(
       "int value = 1;\n"
     )
+    expect(container.querySelector("pre br")).not.toBeInTheDocument()
   })
 
   it("지원하지 않는 element와 raw HTML을 Quiz UI로 렌더링하지 않는다", () => {

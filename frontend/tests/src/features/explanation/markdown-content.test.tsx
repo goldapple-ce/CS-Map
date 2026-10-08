@@ -9,7 +9,44 @@ import { MarkdownContent } from "../../../../src/features/explanation/MarkdownCo
 
 afterEach(cleanup)
 
-describe("MarkdownContent 이미지", () => {
+describe("MarkdownContent", () => {
+  it("soft line break와 빈 줄 문단을 구분하고 block Markdown을 유지한다", () => {
+    const { container } = render(
+      <MarkdownContent
+        idPrefix="soft-break-test"
+        markdown={[
+          "첫 줄",
+          "둘째 줄",
+          "",
+          "새 문단",
+          "",
+          "- 목록 첫 줄",
+          "  목록 둘째 줄",
+          "",
+          "```text",
+          "code line 1",
+          "code line 2",
+          "```",
+          "",
+          "| 열 1 | 열 2 |",
+          "| --- | --- |",
+          "| 값 1 | 값 2 |",
+        ].join("\n")}
+      />
+    )
+
+    const paragraphs = container.querySelectorAll("p")
+    expect(paragraphs[0]?.querySelectorAll("br")).toHaveLength(1)
+    expect(paragraphs[0]?.textContent).toBe("첫 줄\n둘째 줄")
+    expect(paragraphs[1]).toHaveTextContent("새 문단")
+    expect(container.querySelector("li br")).toBeInTheDocument()
+    expect(container.querySelector("pre")?.textContent).toContain(
+      "code line 1\ncode line 2"
+    )
+    expect(container.querySelector("pre br")).not.toBeInTheDocument()
+    expect(container.querySelector("table")).toBeInTheDocument()
+  })
+
   it("HTTPS와 public content 이미지를 설명 안에서 렌더링한다", () => {
     render(
       <MarkdownContent

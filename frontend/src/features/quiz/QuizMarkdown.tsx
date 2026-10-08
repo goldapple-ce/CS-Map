@@ -2,6 +2,7 @@ import ReactMarkdown, { type Components } from "react-markdown"
 import remarkGfm from "remark-gfm"
 
 import { cn } from "@/lib/utils"
+import { remarkSoftBreaks } from "@/lib/remark-soft-breaks"
 
 type QuizMarkdownProps = {
   markdown: string
@@ -23,7 +24,7 @@ const allowedElements = [
 ]
 
 const components: Components = {
-  p: ({ children }) => <p className="whitespace-pre-line">{children}</p>,
+  p: ({ children }) => <p>{children}</p>,
   blockquote: ({ children }) => (
     <blockquote className="border-l-2 border-border pl-4 text-muted-foreground">
       {children}
@@ -62,7 +63,7 @@ export function QuizMarkdown({ markdown, variant }: QuizMarkdownProps) {
       )}
     >
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkSoftBreaks]}
         components={components}
         allowedElements={allowedElements}
         skipHtml
