@@ -1,0 +1,92 @@
+title: Garbage Collector
+summary: GC Roots에서 객체의 생존을 판단하고, Young과 Old 수집에 필요한 Reference 정보와 실행 결과를 추적하는 구조입니다.
+keywords: [GC, Young GC, Full GC, Stop-The-World, Safepoint]
+
+nodes:
+  gc:
+    label: Garbage Collector
+    row: 3
+    col: 1
+    contentRef: gc.ko.md
+
+  mark:
+    label: Mark
+    row: 2
+    col: 2
+    contentRef: mark.ko.md
+  gc-roots:
+    label: GC Roots
+    row: 2
+    col: 3
+    contentRef: gc-roots.ko.md
+  young-objects:
+    label: Young Objects
+    row: 1
+    col: 4
+    contentRef: young-objects.ko.md
+  old-objects:
+    label: Old Objects
+    row: 2
+    col: 4
+    contentRef: old-objects.ko.md
+  barrier:
+    label: Barrier
+    row: 2
+    col: 5
+    contentRef: write-barrier.ko.md
+  reference-records:
+    label: Card Table/\nRemembered Set
+    row: 3
+    col: 3
+    contentRef: reference-records.ko.md
+
+  sweep:
+    label: Sweep / Compact / Copy
+    row: 4
+    col: 2
+    contentRef: sweep-compact-copy.ko.md
+
+edges:
+  - from: gc
+    fromSide: right
+    to: mark
+    toSide: left
+    label: mark
+  - from: mark
+    to: gc-roots
+  - from: mark
+    fromSide: right
+    to: reference-records
+    label: 추가 탐색 정보
+  - from: gc-roots
+    to: young-objects
+    label: Young GC
+  - from: gc-roots
+    fromSide: right
+    to: old-objects
+    label: Old GC
+  - from: old-objects
+    to: barrier
+    # label: Young Reference 대입
+  - from: barrier
+    to: reference-records
+    label: 추적 정보 갱신
+  # - from: reference-records
+  #   to: young-objects
+  #   label: 추가 탐색 정보
+  #   variant: supporting
+  - from: gc
+    fromSide: right
+    to: sweep
+    toSide: left
+  # - from: gc
+  #   to: gc-monitoring
+  #   label: 동작 관찰
+  #   variant: supporting
+
+# lightFlows:
+#   young-collection:
+#     label: Young 수집
+#     stages:
+#       - edges: [[gc, gc-roots]]
+#       - edges: [[gc-roots, young-objects]]

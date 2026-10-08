@@ -40,7 +40,7 @@ nodes:
     label: Garbage Collector
     row: 5
     col: 2
-    contentRef: garbagecollector.ko.md
+    navigateToSceneId: server-java-jvm-heap-garbage-collector
   interpreter:
     label: Interpreter
     row: 5

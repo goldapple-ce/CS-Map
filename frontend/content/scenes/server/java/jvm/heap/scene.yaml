@@ -25,7 +25,7 @@ nodes:
     label: Garbage Collector
     row: 3
     col: 1
-    contentRef: garbagecollector.ko.md
+    childSceneId: server-java-jvm-heap-garbage-collector
   heap-dump:
     label: Heap Dump
     row: 4

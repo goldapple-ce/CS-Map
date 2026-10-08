@@ -22,20 +22,6 @@
 
     다만 Survivor 공간이 부족하거나 객체가 큰 경우에는 더 일찍 Promotion될 수 있으며, 세부 동작은 Collector에 따라 달라집니다.
 
-- question: Young GC가 발생하면 애플리케이션 Thread는 계속 실행될까요? Stop-The-World가 무엇이며 왜 필요한지 설명해 주세요.
-  answer: |
-    일반적인 세대형 Collector의 Young GC에서는 애플리케이션 Thread가 일시 정지할 수 있습니다. 이를 Stop-The-World라고 합니다.
-
-    애플리케이션이 객체를 생성하거나 참조 관계를 바꾸는 동안에는 GC가 객체 그래프를 일관되게 분석하기 어렵습니다. 객체를 다른 Memory 영역으로 옮기고 참조를 갱신할 때도 정합성을 보장해야 합니다.
-
-    최신 Collector는 Concurrent Marking과 Write Barrier 등으로 정지 시간을 줄이지만, 일부 STW 구간까지 완전히 없애기는 어렵습니다.
-
-- question: GC가 모든 애플리케이션 Thread를 임의의 시점에 바로 정지시키지 않고 Safepoint에서 정지시키는 이유는 무엇인가요?
-  answer: |
-    JVM은 GC Root와 객체 참조를 정확하게 파악하고 실행 상태의 일관성을 보장하기 위해 Thread를 Safepoint에서 정지시킵니다.
-
-    임의의 명령 실행 도중에 멈추면 객체 Reference가 Stack과 Register 사이에서 변경되는 중일 수 있어 GC가 참조 위치를 정확히 판단하기 어렵습니다.
-
 - question: 운영 중인 Java 애플리케이션의 Heap 사용량이 계속 증가한다면, Memory Leak 여부를 어떤 순서와 도구로 진단하겠습니까?
   answer: |
     먼저 APM과 GC Log를 통해 Heap 사용량이 GC 이후에도 계속 증가하는지 확인합니다. 단순히 Heap 사용량이 순간적으로 높아지는 것보다, Full GC 이후에도 살아남는 객체의 기준선이 지속적으로 상승하는지가 중요합니다.
@@ -45,8 +31,8 @@
 
 - question: Heap Dump 분석에서 Shallow Size와 Retained Size는 무엇이 다르며, 메모리 누수 원인을 찾을 때 Retained Size가 중요한 이유는 무엇인가요?
   answer: |
-    Shallow Size는 특정 객체 자체가 직접 차지하는 메모리 크기입니다. Retained Size는 해당 객체가 제거될 경우 함께 도달 불가능해져 회수될 수 있는 객체들의 메모리까지 포함한 크기입니다. 
-    메모리 누수의 원인이 되는 객체는 자기 크기보다 많은 객체를 참조하여 유지하는 경우가 많으므로, Shallow Size만으로는 실제 영향도를 알기 어렵습니다. 
+    Shallow Size는 특정 객체 자체가 직접 차지하는 메모리 크기입니다. Retained Size는 해당 객체가 제거될 경우 함께 도달 불가능해져 회수될 수 있는 객체들의 메모리까지 포함한 크기입니다.
+    메모리 누수의 원인이 되는 객체는 자기 크기보다 많은 객체를 참조하여 유지하는 경우가 많으므로, Shallow Size만으로는 실제 영향도를 알기 어렵습니다.
     따라서 Retained Size와 GC Root 경로를 함께 분석해야 합니다.
 
 - question: Java 객체를 생성하면 항상 Heap에 할당될까요? Escape Analysis와 관련하여 설명해 주세요.
@@ -60,24 +46,3 @@
     TLAB은 JVM이 각 Thread에 미리 할당하는 Heap 내부의 작은 전용 할당 영역입니다. 일반적으로 Young Generation의 Eden 영역 일부를 Thread별로 나누어 제공합니다.
     각 Thread는 자신의 TLAB 안에서 포인터를 이동시키는 방식으로 객체를 빠르게 생성할 수 있습니다. 다른 Thread와 객체 할당 위치를 공유하지 않으므로 대부분의 작은 객체를 생성할 때 매번 Lock이나 원자적 연산으로 할당 위치를 조정할 필요가 줄어듭니다.
     TLAB 공간이 부족하면 Thread는 새로운 TLAB을 할당받거나 공유 영역에 객체를 할당할 수 있으며, 큰 객체는 TLAB 밖에 직접 할당될 수 있습니다. TLAB은 할당 과정만 Thread별로 분리할 뿐, 생성된 객체 자체는 일반적인 Heap 객체이므로 다른 Thread와 공유될 수 있습니다.
-
-- question: Minor GC, Major GC, Full GC는 각각 무엇이며 어떤 차이가 있나요?
-  answer: |
-    Minor GC 또는 Young GC는 주로 Young Generation을 수집합니다. 살아 있는 객체가 비교적 적고 수집 범위가 작아 일반적으로 짧지만, 보통 Stop-The-World가 발생합니다.
-    Major GC는 일반적으로 Old Generation 수집을 의미하지만 Collector마다 용어와 범위가 다를 수 있습니다. Old 영역이 크고 살아 있는 객체가 많아 비용이 커질 수 있으며, 일부 Collector는 작업의 상당 부분을 애플리케이션과 동시에 수행합니다.
-    Full GC는 일반적으로 Young과 Old를 포함한 전체 Heap을 수집하고 필요하면 클래스 언로딩 등도 수행합니다. 대체로 긴 Stop-The-World를 유발하지만, 정확한 동작과 정지 시간은 Collector에 따라 다릅니다.
-
-- question: 코드에서 System.gc()를 호출하면 Full GC가 반드시 즉시 실행될까요? 그 이유와 운영 환경에서 사용을 주의해야 하는 이유를 설명해 주세요.
-  answer: |
-    System.gc()는 JVM에 GC 실행을 요청하는 메서드일 뿐, GC가 즉시 또는 반드시 실행된다는 보장은 없습니다. 실제 실행 여부와 방식은 JVM 구현, 사용 중인 Collector, JVM 옵션에 따라 결정됩니다.
-    HotSpot JVM의 기본 설정에서는 명시적 GC 요청이 Full GC 또는 그에 준하는 큰 수집을 유발할 수 있어 긴 Pause가 발생할 가능성이 있습니다.
-    따라서 애플리케이션 코드가 GC 시점을 직접 통제하려 하기보다 JVM의 메모리 관리에 맡기는 것이 일반적이며, 운영 코드에서 System.gc()를 무분별하게 호출하면 응답 시간에 악영향을 줄 수 있습니다.
-
-- question: Young GC에서 Old Generation 전체를 매번 탐색하지 않고도 Old 객체가 참조하는 Young 객체를 찾아낼 수 있는 이유는 무엇인가요?
-  answer: |
-    JVM은 세대 간 참조를 추적하기 위해 Write Barrier와 Card Table 또는 Remembered Set을 사용합니다. 애플리케이션이 Old 객체의 필드에 Young 객체 참조를 저장하면 Write Barrier가 해당 사실을 기록합니다. 이후 Young GC는 Old Generation 전체를 탐색하지 않고 기록된 영역만 검사하여 Old에서 참조되는 Young 객체를 살아 있는 객체로 판단할 수 있습니다. 이는 세대 간 참조가 비교적 적다는 가설을 활용한 최적화입니다.
-
-- question: Write Barrier를 사용하면 GC는 빨라질 수 있지만 애플리케이션 실행에는 추가 비용이 발생합니다. 어떤 비용이며, 왜 이 트레이드오프를 감수할 가치가 있을까요?
-  answer: |
-    Write Barrier는 애플리케이션 Thread가 객체의 참조 필드를 변경할 때 추가 명령을 실행하여 참조 변경 사실을 Card Table이나 Remembered Set 등에 기록합니다. 이로 인해 객체 참조를 쓸 때마다 조건 검사, 추가 메모리 쓰기, CPU Cache 사용 등의 작은 오버헤드가 발생합니다.
-    하지만 GC가 발생했을 때 Old Generation 전체를 탐색하지 않고 변경된 영역만 확인할 수 있어 GC 작업량과 Pause Time을 크게 줄일 수 있습니다. 즉 평상시의 작은 분산 비용을 감수하여 GC 시점의 큰 집중 비용을 줄이는 트레이드오프입니다.

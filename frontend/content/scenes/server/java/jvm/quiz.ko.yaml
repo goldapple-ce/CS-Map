@@ -111,6 +111,3 @@
     Java의 Platform Thread는 일반적으로 운영체제 Thread와 연결되며, Thread마다 JVM Stack을 비롯한 Native Memory와 운영체제의 Thread 관리 자원이 필요합니다.
     따라서 Heap에 여유가 있어도 프로세스가 사용할 수 있는 Native Memory가 부족하거나, 운영체제의 Thread 수 제한 또는 가상 주소 공간 제한에 도달하면 새로운 Thread를 만들 수 없습니다. 이때 JVM은 OutOfMemoryError: unable to create native thread를 발생시킬 수 있습니다.
 
-- question: Young GC에서 Old Generation 전체를 매번 탐색하지 않고도 Old 객체가 참조하는 Young 객체를 찾아낼 수 있는 이유는 무엇인가요?
-  answer: |
-    JVM은 세대 간 참조를 추적하기 위해 Write Barrier와 Card Table 또는 Remembered Set을 사용합니다. 애플리케이션이 Old 객체의 필드에 Young 객체 참조를 저장하면 Write Barrier가 해당 사실을 기록합니다. 이후 Young GC는 Old Generation 전체를 탐색하지 않고 기록된 영역만 검사하여 Old에서 참조되는 Young 객체를 살아 있는 객체로 판단할 수 있습니다. 이는 세대 간 참조가 비교적 적다는 가설을 활용한 최적화입니다.

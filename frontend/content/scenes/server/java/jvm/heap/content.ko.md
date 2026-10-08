@@ -195,6 +195,7 @@ Escape Analysis를 설명할 때 `Escape하지 않는 객체는 Stack에 생성�
 
 ---
 
+
 # TLAB(Thread-Local Allocation Buffer)
 
 Heap은 여러 Thread가 공유하는 Memory 영역입니다. 따라서 여러 Thread가 동시에 객체를 생성하면 같은 Heap 공간에 객체를 할당하기 위해 경쟁이 발생할 수 있습니다.
