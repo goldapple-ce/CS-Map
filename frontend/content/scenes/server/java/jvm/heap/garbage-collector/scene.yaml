@@ -5,85 +5,110 @@ keywords: [GC, Young GC, Full GC, Stop-The-World, Safepoint]
 nodes:
   gc:
     label: Garbage Collector
-    row: 3
+    row: 1
     col: 1
     contentRef: gc.ko.md
 
   mark:
     label: Mark
-    row: 2
+    row: 1
     col: 2
     contentRef: mark.ko.md
+  initial-mark:
+    label: Initial Mark
+    row: 1
+    col: 3
+    contentRef: initial-mark.ko.md
   gc-roots:
     label: GC Roots
-    row: 2
-    col: 3
-    contentRef: gc-roots.ko.md
-  young-objects:
-    label: Young Objects
     row: 1
     col: 4
-    contentRef: young-objects.ko.md
-  old-objects:
-    label: Old Objects
+    contentRef: gc-roots.ko.md
+
+  concurrent-mark:
+    label: Concurrent Mark
+    row: 2
+    col: 3
+    contentRef: concurrent-mark.ko.md
+
+  objects:
+    label: Old / Young Objects
     row: 2
     col: 4
-    contentRef: old-objects.ko.md
+    contentRef: objects.ko.md
   barrier:
     label: Barrier
     row: 2
     col: 5
     contentRef: write-barrier.ko.md
-  reference-records:
+  card-table:
     label: Card Table/\nRemembered Set
     row: 3
-    col: 3
+    col: 4
     contentRef: reference-records.ko.md
+
+  remark:
+    label: Remark
+    row: 4
+    col: 3
+    contentRef: remark.ko.md
+  satb:
+    label: SATB \n/ Incremental Update
+    row: 4
+    col: 4
+    contentRef: satb-incremental-update.ko.md
 
   sweep:
     label: Sweep / Compact / Copy
-    row: 4
+    row: 5
     col: 2
     contentRef: sweep-compact-copy.ko.md
 
 edges:
   - from: gc
-    fromSide: right
     to: mark
-    toSide: left
-    label: mark
+    label: 생존 판단
   - from: mark
+    fromSide: right
+    to: initial-mark
+  - from: mark
+    fromSide: right
+    to: concurrent-mark
+  - from: mark
+    fromSide: right
+    to: remark
+  - from: initial-mark
     to: gc-roots
-  - from: mark
-    fromSide: right
-    to: reference-records
-    label: 추가 탐색 정보
+    label: Root Scan
   - from: gc-roots
-    to: young-objects
-    label: Young GC
-  - from: gc-roots
+    to: objects
+    label: Reachability 시작
+  - from: concurrent-mark
+    to: objects
+    label: 객체 탐색
+  - from: concurrent-mark
     fromSide: right
-    to: old-objects
-    label: Old GC
-  - from: old-objects
+    to: card-table
+    label: 참조 탐색
+    labelSide: left
+  - from: objects
     to: barrier
-    # label: Young Reference 대입
+    label: 참조 변경
   - from: barrier
-    to: reference-records
-    label: 추적 정보 갱신
-  # - from: reference-records
-  #   to: young-objects
-  #   label: 추가 탐색 정보
-  #   variant: supporting
+    to: card-table
+    label: 변경 위치 기록
+  - from: remark
+    to: satb
+    label: 기록 탐색
+  - from: barrier
+    to: satb
+    label: 변경 정보 기록
+
   - from: gc
     fromSide: right
     to: sweep
-    toSide: left
-  # - from: gc
-  #   to: gc-monitoring
-  #   label: 동작 관찰
-  #   variant: supporting
-
+    label: Memory 회수 방식
+    labelSide: left
 # lightFlows:
 #   young-collection:
 #     label: Young 수집

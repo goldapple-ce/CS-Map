@@ -1,67 +1,122 @@
-- question: Young GC가 발생하면 Application Thread는 계속 실행되나요? Stop-The-World가 필요한 이유는 무엇인가요?
+- question: GC(Garbage Collection)란 무엇인가요?
   answer: |
-    일반적인 세대형 Collector의 Young GC에서는 Application Thread가 일시 정지할 수 있습니다. 이 상태를 Stop-The-World라고 합니다.
+    GC는 Heap 영역에서 더 이상 사용하지 않는 객체를 찾아 메모리를 자동으로 회수하는 JVM의 기능입니다.
+    GC Roots에서 Reference를 따라가며 도달 가능한 객체를 살아 있는 객체로 판단하는 Reachability를 기반으로 동작합니다.
+    이를 통해 개발자가 직접 메모리를 해제해야 하는 부담을 줄여줍니다.
 
-    객체를 이동하고 Reference를 고치는 동안 일관된 상태를 유지해야 하기 때문입니다. 최신 Collector는 동시에 수행하는 작업을 늘려 pause를 줄이지만 일부 정지 구간은 남을 수 있습니다.
-
-- question: JVM이 Application Thread를 Safepoint에서 정지시키는 이유는 무엇인가요?
+- question: GC Roots란 무엇이며, 어떤 것들이 포함되나요?
   answer: |
-    Safepoint는 JVM이 Thread의 실행 상태와 Reference 위치를 안전하게 파악하며 멈출 수 있는 지점입니다.
+    GC Roots는 객체의 Reachability를 판단하기 위한 탐색 시작점입니다.
+    대표적으로 Stack Frame의 객체 참조, Static 참조 필드, JNI Reference 등이 있습니다.
+    JVM은 GC Roots에서 Reference를 따라가며 도달 가능한 객체를 살아 있는 객체로 판단합니다.
 
-    임의의 명령 실행 중에 바로 멈추기보다 GC가 필요한 상태를 정확히 확인할 수 있는 지점에 Thread가 도달한 뒤 정지시킵니다. Safepoint는 안전하게 멈출 수 있는 지점이고, Stop-The-World는 Application Thread들이 실제로 멈춰 있는 상태입니다.
-
-- question: Young GC, Major GC, Full GC는 항상 순서대로 실행되는 단계인가요?
+- question: Reference Counting 방식은 무엇이며, 순환 참조가 발생하면 왜 객체를 회수하지 못하나요?
   answer: |
-    아닙니다. Young GC는 주로 Young Generation을 수집하고, Full GC는 일반적으로 Young과 Old를 포함한 넓은 범위를 수집합니다.
+    Reference Counting은 객체를 참조하는 개수를 관리하고, 참조 개수가 0이 되면 메모리를 회수하는 방식입니다.
+    하지만 객체들이 서로 순환 참조하면 외부에서 접근할 수 없더라도 참조 개수가 0이 되지 않는 문제가 있습니다.
+    JVM의 GC는 GC Roots에서 도달 가능한지를 기준으로 판단하므로, 순환 참조가 존재하더라도 회수할 수 있습니다.
 
-    Major GC는 흔히 Old Generation 수집을 뜻하지만 Collector와 도구에 따라 범위가 다를 수 있습니다. 이 이름들은 고정된 실행 순서가 아니므로 실제 수집 범위는 GC Log와 해당 Collector 문서로 확인해야 합니다.
-
-- question: 코드에서 System.gc()를 호출하면 Full GC가 반드시 즉시 실행되나요?
+- question: GC는 어떤 방식으로 객체를 탐색하고 메모리를 회수하나요?
   answer: |
-    아닙니다. `System.gc()`는 JVM에 GC를 요청할 뿐 즉시 또는 반드시 실행된다고 보장하지 않습니다.
+    GC는 GC Roots에서 Reference를 따라 살아 있는 객체를 식별하고, GC 알고리즘에 따라 메모리를 회수합니다.
+    대표적인 방식에는 Mark-Sweep, Mark-Compact, Copying이 있습니다.
+    Mark-Sweep은 살아 있는 객체를 표시하고 나머지 객체의 메모리를 회수하지만, 메모리 단편화가 발생할 수 있습니다.
+    Mark-Compact는 살아 있는 객체들을 한쪽으로 이동시켜 연속된 빈 공간을 확보합니다.
+    Copying은 살아 있는 객체만 다른 메모리 영역으로 복사하고 기존 영역을 재사용합니다.
+    Mark-Compact는 별도의 복사 공간을 크게 확보할 필요가 없는 반면, Copying은 복사 대상 공간이 필요합니다.
+    Copying은 살아 있는 객체의 비율이 낮을수록 복사해야 할 객체가 적어 유리합니다.
 
-    JVM과 Collector 설정에 따라 큰 수집과 긴 pause로 이어질 수 있으므로 운영 코드에서 GC 시점을 직접 통제하려고 무분별하게 호출하면 응답 시간에 악영향을 줄 수 있습니다.
-
-- question: Young GC가 Old Generation 전체를 매번 탐색하지 않고도 Old 객체가 가리키는 Young 객체를 찾는 방법은 무엇인가요?
+- question: Young GC는 Old Generation 전체를 탐색하지 않고 어떻게 Old → Young Reference를 찾나요?
   answer: |
-    Reference가 바뀔 때 Write Barrier가 Card Table이나 Remembered Set에 필요한 추적 정보를 갱신합니다.
+    Young GC에서는 Old Generation에서 Young Generation으로 들어오는 Reference도 확인해야 합니다.
+    이를 위해 Remembered Set을 활용합니다.
+    CMS 계열에서는 Card Table을 사용합니다.
+    Card Table은 Heap을 일반적으로 512Byte 단위의 Card로 나누고, Reference 변경이 발생한 영역을 Dirty로 표시하는 자료구조입니다.
+    G1에서는 Region별 RSet을 사용합니다.
+    RSet은 특정 Region을 참조할 가능성이 있는 외부 Card의 위치를 관리합니다.
+    이러한 정보는 Write Barrier를 통해 추적됩니다.
+    Reference 변경 시 작은 Runtime 비용이 발생하지만, GC에서 Old Generation 전체를 탐색하는 비용을 줄일 수 있습니다.
 
-    Young GC는 이 기록을 추가 탐색 정보로 사용해 Old 전체가 아니라 관련 구역이나 외부 Reference를 확인하고, Old 객체에서 도달 가능한 Young 객체를 살아 있는 객체로 판단합니다.
-
-- question: Card Table과 Remembered Set은 같은 자료구조인가요?
+- question: STW(Stop-The-World)란 무엇이며, 시간이 길어지면 어떤 문제가 발생하나요?
   answer: |
-    같은 개념은 아닙니다. Card Table은 Reference 변경이 있었던 Memory 구역을 표시하고, Remembered Set은 특정 수집 영역으로 외부에서 들어오는 Reference 정보를 관리하는 데 초점을 둡니다.
+    STW는 GC 등의 작업을 안전하게 수행하기 위해 Application Thread의 실행을 일시적으로 중지하는 것입니다.
+    GC가 객체의 참조 관계를 안정적으로 확인하거나 객체를 이동하는 작업을 안전하게 수행하기 위해 필요합니다.
 
-    구현에서는 Card 단위 정보가 Remembered Set을 구성하거나 갱신하는 데 사용될 수 있습니다.
+    STW가 발생하면 요청 처리가 지연되고, 심한 경우 Timeout이 발생할 수 있습니다.
+    특히 Old Generation은 크기가 크고 살아 있는 객체가 많아 GC 작업량이 증가할 수 있습니다.
+    이러한 문제를 개선하기 위해 JVM에서는 서로 다른 목표를 가진 다양한 GC Collector를 제공합니다.
 
-- question: Write Barrier의 비용을 감수하면서 Reference 변경을 기록하는 이유는 무엇인가요?
+- question: JVM의 대표적인 GC Collector에는 어떤 것들이 있으며, 각각 어떤 특징이 있나요?
   answer: |
-    Reference를 쓸 때 조건 검사와 추가 Memory 쓰기 같은 작은 Runtime 비용이 발생합니다.
+    대표적으로 Serial, Parallel, CMS, G1이 있습니다.
 
-    대신 GC가 Old Generation이나 Heap 전체를 다시 탐색하지 않고 필요한 부분을 찾을 수 있어 수집 작업과 pause를 줄일 수 있습니다. 평상시의 작은 분산 비용으로 GC 시점의 큰 탐색 비용을 줄이는 선택입니다.
+    Serial GC는 단일 GC Thread로 작업을 수행합니다.
+    Parallel GC는 여러 GC Thread를 활용해 STW 상태에서 병렬로 작업하며 Throughput을 높입니다.
+    CMS는 Old Generation의 Mark와 Sweep을 Application Thread와 동시에 수행해 STW를 줄였습니다.
+    G1은 Heap을 여러 Region으로 나누고, 수집할 Region을 선택적으로 조절해 STW 시간을 관리합니다.
 
-- question: Concurrent Marking 중 Reference 관계가 바뀌어도 GC가 살아 있는 객체를 놓치지 않는 방법은 무엇인가요?
+- question: CMS는 Concurrent Marking을 사용한다고 했는데, 구체적으로 어떤 단계로 동작하나요?
   answer: |
-    Collector는 Application이 Reference를 바꿀 때 Barrier로 변경 정보를 기록하고 Mark 결과에 반영합니다.
+    CMS는 크게 Initial Mark, Concurrent Mark, Remark, Concurrent Sweep 순서로 동작합니다.
 
-    SATB는 Mark 시작 시점의 객체 관계를 보존하는 관점으로 이전 Reference를 기록하고, Incremental Update는 Mark 중 새롭게 생긴 관계를 반영하는 관점입니다. 사용하는 방식과 세부 구현은 Collector마다 다릅니다.
+    Initial Mark에서는 STW 상태에서 탐색 출발점을 식별합니다.
+    Concurrent Mark에서는 Application Thread와 동시에 Object Graph를 탐색합니다.
+    Remark에서는 다시 STW를 발생시켜 Marking 중 놓쳤을 수 있는 객체를 추가로 탐색합니다.
+    Concurrent Sweep에서는 Application Thread와 동시에 Garbage가 차지한 공간을 회수합니다.
+
+- question: Concurrent Marking 중 Reference가 변경되면 어떤 문제가 발생하며, CMS는 이를 어떻게 해결하나요?
+  answer: |
+    Concurrent Marking 중 Reference가 변경되면 살아 있는 객체를 놓칠 수 있습니다.
+    예를 들어 GC가 A 객체의 탐색을 완료했고, 아직 탐색하지 않은 B 객체가 C 객체를 참조하고 있다고 가정하겠습니다.
+    이때 B → C 참조가 제거되고 A → C 참조가 새롭게 생성되면 문제가 발생합니다.
+    GC는 이미 A를 탐색했고 B에서도 C를 찾을 수 없으므로, 살아 있는 C를 놓칠 수 있습니다.
+    CMS는 Incremental Update를 통해 이를 해결합니다.
+    Write Barrier로 Reference 변경이 발생한 Card를 기록하고, Concurrent Preclean이나 Remark에서 해당 영역을 다시 탐색합니다.
+    CMS는 이 과정에서 Card Table과 Mod Union Table 등의 정보를 활용합니다.
+
+- question: G1은 Concurrent Marking 중 Reference 변경 문제를 어떻게 해결하며, Floating Garbage란 무엇인가요?
+  answer: |
+    G1은 SATB(Snapshot At The Beginning)를 사용합니다.
+    SATB는 Marking 시작 시점에 살아 있던 객체를 이번 Marking에서 살아 있는 것으로 간주하는 방식입니다.
+    Reference가 변경되기 직전에 Pre-write Barrier를 통해 필요한 기존 Reference를 SATB Queue에 기록합니다.
+    GC는 이 정보를 활용해 Concurrent Marking 중 Reference가 변경되더라도 객체를 놓치지 않도록 합니다.
+    다만 Marking 도중 실제로 Garbage가 된 객체도 이번 Marking에서는 살아 있는 것으로 간주될 수 있습니다.
+    이러한 객체를 Floating Garbage라고 하며, 이후 GC에서 회수될 수 있습니다.
+
+- question: G1의 Young GC와 Mixed GC는 어떤 차이가 있으며, 어떻게 STW 시간을 관리하나요?
+  answer: |
+    Young GC는 Young Region을 대상으로 수행하며 STW가 발생합니다.
+    Mixed GC는 Young Region과 선택된 일부 Old Region을 함께 수집하며, 마찬가지로 STW가 발생합니다.
+    G1은 Concurrent Marking을 통해 Region별 생존 정보를 미리 파악합니다.
+    이후 Mixed GC에서는 Garbage 회수 효율이 높은 Old Region을 선택적으로 수집합니다.
+    이때 목표 STW 시간을 고려해 수집할 Region을 조절합니다.
+    단, 목표 STW 시간은 보장되는 값이 아닙니다.
+
+- question: G1은 CMS의 어떤 문제점을 개선했나요?
+  answer: |
+    CMS는 Old Generation에서 Mark-Sweep 방식으로 동작하므로 메모리 단편화가 발생할 수 있습니다.
+    전체 여유 공간이 충분하더라도 연속된 공간이 부족하면 객체 할당에 실패해 Full GC가 발생할 수 있습니다.
+    또한 Concurrent GC가 메모리를 충분히 회수하기 전에 Old Generation이 가득 차는 Concurrent Mode Failure가 발생할 수 있습니다.
+    G1은 살아 있는 객체를 다른 Region으로 복사해 메모리 단편화를 줄입니다.
+    또한 Region 단위로 수집 범위를 조절하여 긴 STW가 발생할 가능성을 낮춥니다.
+
+- question: Safepoint란 무엇이며, JVM은 왜 Application Thread를 임의의 시점에서 중지하지 않나요?
+  answer: |
+    Safepoint는 JVM이 Application Thread를 안전하게 중지할 수 있는 지점입니다.
+    GC에서는 Stack이나 Register의 객체 Reference를 정확하게 식별해야 하므로 Thread를 임의의 위치에서 중지하지 않습니다.
+    HotSpot은 Safepoint에서 OopMap을 통해 객체 Reference의 위치를 파악할 수 있습니다.
+    실행 중인 Thread는 Safepoint Poll에 도달해 중지되며, GC 작업이 완료되면 실행을 재개합니다.
+
+- question: Java의 Strong, Soft, Weak, Phantom Reference는 각각 어떤 차이가 있나요?
+  answer: |
+    Strong Reference는 일반적인 객체 참조이며, Strong Reference로 도달 가능한 객체는 GC가 회수하지 않습니다.
+    Soft Reference는 메모리 상황에 따라 GC가 제거할 수 있는 참조로, 캐시 등에 활용할 수 있습니다.
+    Weak Reference는 약한 참조만 남아 있다면 메모리가 충분하더라도 GC가 객체를 회수할 수 있습니다.
+    대표적으로 WeakHashMap에서 사용합니다.
+    Phantom Reference는 객체에 직접 접근할 수 없으며, ReferenceQueue와 함께 자원 정리 작업에 활용할 수 있습니다.
 
 - question: GC가 자주 발생하면 곧바로 Memory Leak이라고 판단할 수 있나요?
   answer: |
-    아닙니다. Allocation Rate가 높아 짧게 사는 객체를 빠르게 만들고 버리는 Application도 Young GC가 자주 발생할 수 있습니다.
-
-    GC 빈도만 보지 말고 pause, GC 전후 Heap 사용량과 회수량, Allocation Rate, Old 영역의 증가 추세를 함께 확인해야 합니다.
-
-- question: Mark는 Garbage 객체에 표시하는 작업인가요?
-  answer: |
-    핵심은 GC Roots에서 Reference를 따라가며 **살아 있는 객체를 식별하는 것**입니다.
-
-    Mark 탐색으로 도달하지 못한 객체가 이후 Sweep 등의 Memory 회수 대상이 될 수 있습니다. 객체끼리 순환 참조해도 GC Roots에서 도달할 수 없다면 살아 있는 객체로 표시되지 않습니다.
-
-- question: Sweep, Compact, Copy는 Memory를 어떤 방식으로 확보하나요?
-  answer: |
-    - Sweep는 수집 대상이 사용하던 공간을 다시 사용할 수 있게 만듭니다.
-    - Compact는 살아 있는 객체를 모아 흩어진 빈 공간을 줄입니다.
-    - Copy는 살아 있는 객체만 다른 영역으로 옮기고 기존 영역을 비웁니다.
-
-    Compact와 Copy는 객체를 이동하므로 Reference 갱신이 필요합니다. Copy는 수집 영역에 살아 있는 객체가 적을 때 옮길 객체가 적어 유리할 수 있습니다.
+    아닙니다. 짧게 사용하는 객체를 빠르게 생성하고 버리는 Application에서도 Young GC가 자주 발생할 수 있습니다.
+    GC 빈도만으로 판단하기보다는 STW 시간, GC 전후 Heap 사용량, 객체 생성 속도, Old Generation의 사용량 추세 등을 함께 확인해야 합니다.
+    특히 GC를 반복한 후에도 살아 있는 객체가 지속적으로 증가한다면 Memory Leak을 의심할 수 있습니다.
