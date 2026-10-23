@@ -1,0 +1,44 @@
+title: HashMap
+summary: Key의 Hash로 Bucket을 찾고 Collision을 처리하는 HashMap의 내부 흐름입니다.
+keywords: [Java HashMap, Hash Table, Bucket, Hash, Hash Collision]
+
+nodes:
+  key-object:
+    label: Key Object
+    row: 3
+    col: 1
+    contentRef: key-object.ko.md
+  hash:
+    label: hash()
+    row: 3
+    col: 2
+    contentRef: hash.ko.md
+  bucket:
+    label: Bucket
+    row: 3
+    col: 3
+    contentRef: bucket.ko.md
+  node:
+    label: Node
+    row: 3
+    col: 4
+    contentRef: node.ko.md
+  tree-node:
+    label: Tree Node
+    row: 3
+    col: 5
+    contentRef: tree-node.ko.md
+
+edges:
+  - from: key-object
+    to: hash
+    label: hashCode()
+  - from: hash
+    to: bucket
+    label: Index 계산
+  - from: bucket
+    to: node
+    label: Entry 저장
+  - from: node
+    to: tree-node
+    label: Treeification

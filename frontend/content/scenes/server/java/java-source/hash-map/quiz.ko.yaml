@@ -1,0 +1,121 @@
+- question: HashMap이란 무엇인가?
+  answer: |
+    HashMap은 Java의 Map 인터페이스를 구현한 클래스로, 데이터를 Key-Value 쌍으로 저장하는 자료구조입니다.
+    내부적으로 Hash Table을 사용하며, Key의 해시값으로 데이터가 저장될 Bucket을 결정합니다.
+    따라서 검색, 삽입, 삭제를 평균 O(1)의 시간 복잡도로 수행할 수 있습니다.
+
+- question: HashMap은 내부적으로 어떻게 데이터를 저장하고 조회하나요?
+  answer: |
+    put()은 Key의 hashCode()에 Hash Spreading을 적용하고, 비트 AND 연산으로 Bucket Index를 결정합니다.
+    Bucket이 비어 있다면 새로운 Node를 저장하고, 이미 데이터가 있다면 Key를 비교합니다. 동일한 Key라면 Value를 갱신하고, 다르다면 Chaining으로 Node를 연결합니다.
+    get()도 동일한 방식으로 Bucket을 찾은 뒤, 해시값과 Key를 비교해 Value를 반환합니다.
+
+- question: HashMap에서 hashCode()와 equals()는 각각 어떤 역할을 하며, 왜 둘 다 필요한가요?
+  answer: |
+    hashCode()는 해시값을 생성해 Bucket 위치를 결정하고, equals()는 Key의 논리적 동일성을 판단합니다.
+    서로 다른 Key라도 해시값이 같을 수 있으므로, 해시값만으로는 동일성을 보장할 수 없습니다.
+    따라서 HashMap은 해시값이 일치하면 먼저 == 연산자로 참조를 비교하고, 서로 다른 객체라면 equals()로 비교합니다.
+
+- question: hashCode()와 equals()의 규약은 무엇이며, 이를 위반하면 어떤 문제가 발생하나요?
+  answer: |
+    - equals()가 true라면 hashCode()는 반드시 같아야 합니다.
+    - hashCode()가 같더라도 equals()는 false일 수 있습니다.
+    - 동일성 판단에 사용되는 정보가 변경되지 않는다면 결과도 일관되어야 합니다.
+
+    규약을 위반하면 논리적으로 동일한 Key를 조회하지 못하거나 중복 저장할 수 있습니다.
+    두 메서드를 모두 재정의하지 않으면 Object의 기본 구현을 사용하므로, 필드값이 같더라도 서로 다른 인스턴스는 다른 Key로 취급됩니다.
+
+- question: HashMap에 저장한 Key 객체의 내부 상태가 변경되면 어떤 문제가 발생할까요?
+  answer: |
+    HashMap의 Node는 삽입 당시 계산한 해시값을 별도로 저장합니다.
+    Key의 상태가 변경되면 get()에서 새로 계산한 해시값과 저장된 해시값이 달라질 수 있습니다.
+    이로 인해 Bucket 위치가 달라지거나 해시값 비교에 실패해, 동일한 객체라도 조회하지 못할 수 있습니다.
+    따라서 Key는 불변 객체를 사용하는 것이 권장됩니다.
+
+- question: HashMap은 해시 충돌이 많아지면 어떻게 처리하나요?
+  answer: |
+    HashMap은 기본적으로 Chaining을 이용해 충돌을 처리합니다.
+    특정 Bucket의 노드 수가 TREEIFY_THRESHOLD(8)를 초과하고 전체 Capacity가 MIN_TREEIFY_CAPACITY(64) 이상이면 Linked List를 Red-Black Tree로 변환합니다.
+    이를 통해 충돌이 집중된 Bucket의 탐색 성능을 일반적으로 O(n)에서 O(log n)으로 개선할 수 있습니다.
+
+- question: HashMap은 왜 Treeification보다 Resize를 우선할까요?
+  answer: |
+    Bucket 수가 부족해 충돌이 발생했을 가능성이 있기 때문입니다.
+    Resize를 수행하면 기존 Bucket에 집중된 Node들이 다른 Bucket으로 분산될 수 있습니다.
+    따라서 Capacity가 64 미만이라면 Treeification 대신 Resize를 우선합니다.
+
+- question: 모든 Key의 hashCode()가 동일하다면 HashMap의 조회 성능은 어떻게 될까요?
+  answer: |
+    모든 Key가 동일한 Bucket에 배치되지만, equals()를 통해 구분하므로 정상적인 저장과 조회가 가능합니다.
+    Treeification 이후에도 Key가 Comparable이라면 O(log n) 탐색이 가능하지만, 비교할 수 없다면 양쪽 서브트리를 탐색해야 할 수 있습니다.
+    따라서 최악의 경우 O(n)의 탐색 비용이 발생할 수 있습니다.
+
+- question: HashMap은 언제 Resize하며, 기존 Node들은 어떻게 재배치되나요?
+  answer: |
+    저장된 데이터 수가 Capacity × Load Factor로 계산된 Threshold를 초과하면 Resize를 수행합니다.
+    Capacity는 일반적으로 2배로 증가하며, 기존 Node는 해시값과 이전 Capacity의 AND 연산 결과에 따라 기존 Index 또는 기존 Index + 이전 Capacity로 이동합니다.
+    이 과정에서 hashCode()를 다시 호출하지 않고 저장된 해시값을 사용합니다.
+
+- question: HashMap은 왜 Capacity를 2의 거듭제곱으로 유지할까요?
+  answer: |
+    Bucket Index 계산과 Resize를 효율적으로 처리하기 위해서입니다.
+    2의 거듭제곱을 사용하면 나머지 연산 대신 (capacity - 1) & hash 연산으로 Bucket Index를 계산할 수 있습니다.
+    또한 Resize 시 기존 Node를 두 위치 중 하나로 효율적으로 재배치할 수 있습니다.
+    초기 Capacity를 10으로 지정하면 16으로 조정되며, 해시값이 음수여도 AND 마스크의 부호 비트가 0이므로 유효한 Index를 얻습니다.
+
+- question: HashMap은 null Key와 null Value를 어떻게 처리하나요?
+  answer: |
+    HashMap은 null Key와 null Value를 모두 허용합니다.
+    null Key는 해시값을 0으로 처리하므로 0번 Bucket에 저장됩니다.
+    get()은 Key가 없거나 Value가 null이면 모두 null을 반환하므로 containsKey()로 구분할 수 있습니다.
+    getOrDefault()는 Key가 존재하지 않을 때만 기본값을 반환하며, Value가 null이라면 null을 반환합니다.
+
+- question: HashMap은 왜 데이터의 삽입 순서를 보장하지 않을까요?
+  answer: |
+    HashMap은 해시값을 이용해 Bucket 위치를 결정하며, 순회할 때는 내부 Bucket 배열을 순서대로 탐색합니다.
+    따라서 삽입 순서와 순회 순서가 다를 수 있으며, Resize 이후에도 순서가 변경될 수 있습니다.
+    삽입 순서를 유지해야 한다면 LinkedHashMap을 사용할 수 있습니다.
+
+- question: HashMap은 생성하는 즉시 Bucket 배열을 할당할까요?
+  answer: |
+    HashMap은 실제 데이터가 처음 삽입될 때 Bucket 배열을 생성하는 Lazy Initialization 방식을 사용합니다.
+    이는 데이터가 저장되지 않는 HashMap에 불필요한 메모리를 할당하지 않기 위해서입니다.
+    예를 들어 new HashMap<>(16)은 초기 Capacity를 지정하지만, 실제 배열은 첫 번째 put() 시 생성됩니다.
+
+- question: HashMap의 순회 시간 복잡도는 어떻게 될까요?
+  answer: |
+    HashMap의 순회 시간 복잡도는 O(Capacity + Size)입니다.
+    Bucket 배열을 순서대로 탐색하면서 각 Bucket에 저장된 Node를 순회하기 때문입니다.
+    따라서 데이터가 적더라도 Capacity가 크다면 순회 비용이 높을 수 있습니다.
+
+- question: HashMap의 containsKey()와 containsValue()는 어떤 차이가 있을까요?
+  answer: |
+    - containsKey(): 해시값으로 Bucket을 찾아 탐색하므로 평균 O(1)입니다.
+    - containsValue(): 전체 Bucket과 Node를 순회하므로 O(Capacity + Size)입니다.
+
+    HashMap은 Key를 이용한 탐색에 최적화되어 있으므로 Value 기반 탐색은 상대적으로 비효율적입니다.
+
+- question: HashMap에서 서로 다른 두 객체가 논리적으로 동일한 Key라면, 두 번째 put() 이후에는 어떤 객체가 저장되어 있을까요?
+  answer: |
+    기존 Key 객체는 유지되고 Value만 갱신됩니다.
+    HashMap은 hashCode()와 equals() 등을 통해 동일한 Key를 찾으면 새로운 Node를 생성하지 않고 기존 Node의 Value를 변경합니다.
+    따라서 최초에 저장한 Key 객체가 유지되며, 구조적 변경이 없으므로 size와 modCount도 변경되지 않습니다.
+
+- question: HashMap은 왜 Thread-Safe하지 않을까요?
+  answer: |
+    HashMap은 여러 Thread가 동시에 수정할 때 원자성과 가시성을 보장하는 동시성 제어가 없기 때문입니다.
+    - Race Condition: 동일한 Bucket을 동시에 수정하면 데이터가 유실될 수 있습니다.
+    - Resize: 데이터 재배치와 수정이 겹치면 데이터가 누락될 수 있습니다.
+    - Visibility: 한 Thread의 변경 사항이 다른 Thread에 보이지 않을 수 있습니다.
+
+    따라서 동시 수정이 필요한 환경에서는 ConcurrentHashMap이나 외부 동기화를 사용해야 합니다.
+
+- question: HashMap의 TreeNode는 일반 Node와 어떤 차이가 있을까요?
+  answer: |
+    HashMap의 TreeNode는 일반 Node의 hash, key, value, next 외에도 Red-Black Tree를 구성하기 위한 필드를 가집니다.
+    - parent: 부모 노드 참조
+    - left, right: 왼쪽·오른쪽 자식 노드 참조
+    - red: 노드의 색상으로 트리 균형 유지
+    - prev: 연결 리스트에서 이전 노드 참조, 삭제 시 연결 해제에 활용
+
+    참고로 next는 Bucket 내부의 순회와 데이터 재배치에도 사용하기 때문에 유지합니다.
