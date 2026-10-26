@@ -12,3 +12,9 @@ nodes:
     row: 1
     col: 2
     childSceneId: server-java-java-source-hash-map
+
+  pass-by-value:
+    label: Pass By Value
+    row: 1
+    col: 3
+    contentRef: pass-by-value.ko.md
