@@ -57,6 +57,11 @@ nodes:
     row: 3
     col: 5
     contentRef: thread.ko.md
+  jmm:
+    label: JMM
+    row: 4
+    col: 5
+    childSceneId: server-java-jvm-jmm
 
 edges:
   - from: class-loading
@@ -91,6 +96,12 @@ edges:
   - from: thread
     fromSide: left
     to: jvm-stack
+    variant: supporting
+  - from: thread
+    fromSide: bottom
+    to: jmm
+    toSide: top
+    label: 공유 상태 규칙
     variant: supporting
 
 areas:

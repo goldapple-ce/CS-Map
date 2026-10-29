@@ -1,0 +1,87 @@
+title: JMM
+summary: JMM은 여러 스레드에서 수행하는 메모리 읽기와 쓰기에 어떤 결과가 허용되는지를 정의합니다.
+nodes:
+  visibility:
+    label: 가시성
+    row: 1
+    col: 2
+    contentRef: visibility.ko.md
+  ordering:
+    label: 순서
+    row: 1
+    col: 3
+    contentRef: ordering.ko.md
+  happens-before:
+    label: Happens-Before
+    row: 3
+    col: 2
+    colSpan: 2
+    contentRef: happens-before.ko.md
+  volatile:
+    label: volatile
+    row: 5
+    col: 2
+    contentRef: volatile.ko.md
+  thread:
+    label: Thread 연산
+    row: 5
+    col: 3
+    contentRef: thread.ko.md
+
+  atomicity:
+    label: 원자성
+    row: 1
+    col: 4
+    contentRef: atomicity.ko.md
+  synchronized:
+    label: synchronized
+    row: 5
+    col: 4
+    contentRef: synchronized.ko.md
+
+  safe-publication:
+    label: Safe Publication
+    row: 3
+    col: 1
+    contentRef: safe-publication.ko.md
+  final-field-semantics:
+    label: Final Field Semantics
+    row: 5
+    col: 1
+    contentRef: final-field-semantics.ko.md
+
+edges:
+  - from: visibility
+    to: happens-before
+    label: 가시성 보장
+  - from: ordering
+    to: happens-before
+    label: 순서 보장
+  - from: happens-before
+    fromSide: bottom
+    to: volatile
+    toSide: top
+    label: Write-Read 규칙
+  - from: happens-before
+    fromSide: bottom
+    to: thread
+    toSide: top
+  - from: happens-before
+    fromSide: bottom
+    to: synchronized
+    toSide: top
+    label: unlock-lock 규칙
+
+  - from: atomicity
+    fromSide: bottom
+    to: synchronized
+    toSide: top
+    label: 임계 영역 보호
+
+  - from: happens-before
+    to: safe-publication
+    label: 안전한 공개
+    variant: supporting
+  - from: safe-publication
+    to: final-field-semantics
+    label: 초기화 안전성
