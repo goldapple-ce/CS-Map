@@ -1,0 +1,161 @@
+title: Concurrency
+summary: 동시성
+nodes:
+  multi-thread:
+    label: Multi Thread
+    row: 2
+    col: 1
+    contentRef: multi-thread.ko.md
+  shared-mutable-state:
+    label: 공유 가변 상태
+    row: 3
+    col: 1
+    contentRef: shared-mutable-state.ko.md
+  thread-local:
+    label: Thread local
+    row: 5
+    col: 1
+    contentRef: thread-local.ko.md
+  immutability:
+    label: Immutability
+    row: 5
+    col: 2
+    contentRef: immutability.ko.md
+
+  data-race:
+    label: Data Race
+    row: 1
+    col: 2
+    contentRef: data-race.ko.md
+  race-condition:
+    label: Race Condition
+    row: 3
+    col: 2
+    contentRef: race-condition.ko.md
+
+  jmm:
+    label: JMM
+    row: 1
+    col: 3
+    navigateToSceneId: server-java-jvm-jmm
+
+  lock-based:
+    label: Lock Based
+    row: 3
+    col: 3
+    contentRef: lock-based.ko.md
+
+  lock-free:
+    label: Lock Free
+    row: 5
+    col: 3
+    contentRef: lock-free.ko.md
+
+  starvation:
+    label: Starvation
+    row: 4
+    col: 3
+    contentRef: starvation.ko.md
+  dead-lock:
+    label: Dead Lock
+    row: 4
+    col: 4
+    contentRef: dead-lock.ko.md
+  live-lock:
+    label: Live Lock
+    row: 4
+    col: 5
+    contentRef: live-lock.ko.md
+
+  synchronized:
+    label: synchronized
+    row: 2
+    col: 3
+    navigateToSceneId: server-java-jvm-jmm
+  reentrant-lock:
+    label: ReentRant Lock
+    row: 3
+    col: 4
+    contentRef: reentrant-lock.ko.md
+  semaphore:
+    label: Semaphore
+    row: 2
+    col: 4
+    contentRef: semaphore.ko.md
+  abtract-queued-synchronizer:
+    label: AQS
+    row: 2
+    rowSpan: 2
+    col: 5
+    contentRef: abtract-queued-synchronizer.ko.md
+
+  atomic:
+    label: Atomic Class
+    row: 5
+    col: 4
+    contentRef: atomic-class.ko.md
+
+edges:
+  - from: multi-thread
+    fromSide: right
+    to: data-race
+    toSide: left
+  - from: multi-thread
+    to: race-condition
+    toSide: left
+  - from: shared-mutable-state
+    to: data-race
+    toSide: left
+  - from: shared-mutable-state
+    to: race-condition
+    toSide: left
+
+  - from: shared-mutable-state
+    to: thread-local
+    label: 격리
+  - from: shared-mutable-state
+    to: immutability
+    label: 불변
+
+  - from: data-race
+    to: jmm
+
+  - from: race-condition
+    to: lock-based
+  - from: race-condition
+    fromSide: right
+    to: lock-free
+
+  - from: lock-based
+    to: synchronized
+    toSide: bottom
+  - from: lock-based
+    to: reentrant-lock
+  - from: lock-based
+    to: semaphore
+
+  - from: reentrant-lock
+    to: abtract-queued-synchronizer
+    variant: supporting
+  - from: semaphore
+    to: abtract-queued-synchronizer
+    variant: supporting
+
+  - from: lock-free
+    to: atomic
+  - from: lock-free
+    to: starvation
+
+  - from: lock-based
+    fromSide: bottom
+    to: starvation
+  - from: lock-based
+    fromSide: bottom
+    to: dead-lock
+  - from: lock-based
+    fromSide: bottom
+    to: live-lock
+
+  - from: synchronized
+    to: jmm
+    variant: supporting

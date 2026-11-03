@@ -18,3 +18,9 @@ nodes:
     row: 1
     col: 3
     contentRef: pass-by-value.ko.md
+
+  concurrency:
+    label: Concurrency
+    row: 1
+    col: 4
+    childSceneId: server-java-java-source-concurrency
