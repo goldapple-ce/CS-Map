@@ -1,6 +1,6 @@
 # 한눈에 보기
 
-Network Layer는 서로 다른 Network에 있는 목적지 Host까지 Packet을 전달하는 역할을 합니다. 대표적인 Protocol은 IP입니다.
+Internet Layer는 서로 다른 Network에 있는 목적지 Host까지 Packet을 전달합니다. 이 계층의 핵심 Protocol이 IP입니다.
 
 IP는 전송할 데이터에 출발지와 목적지 IP 주소 등이 담긴 Header를 붙여 IP Packet을 만듭니다.
 
@@ -42,7 +42,7 @@ Router를 하나 지날 때마다 값이 감소하고, 0이 되면 Packet은 더
 
 IP는 Packet을 목적지 방향으로 전달하려고 하지만 도착, 순서와 중복 방지를 보장하지 않는 Best Effort 방식입니다.
 
-신뢰성 있는 전달이 필요하다면 Transport Layer의 TCP 같은 Protocol이 순서 확인과 재전송을 담당합니다. 이것이 Network Layer와 Transport Layer를 분리해서 보는 이유입니다.
+신뢰성 있는 전달이 필요하다면 Transport Layer의 TCP 같은 Protocol이 순서 확인과 재전송을 담당합니다. 이것이 Internet Layer와 Transport Layer를 분리해서 보는 이유입니다.
 
 ---
 

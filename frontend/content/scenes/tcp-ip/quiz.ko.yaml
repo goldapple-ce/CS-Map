@@ -1,0 +1,26 @@
+- question: TCP/IP 모델에서 HTTP는 어느 계층에 속하나요?
+  answer: Application Layer입니다. Client와 Server가 주고받을 요청과 응답의 의미와 형식을 정의합니다.
+
+- question: TCP와 UDP는 차례대로 실행되는 단계인가요?
+  answer: 아니요. 둘은 Transport Layer의 서로 다른 Protocol이며 Application Protocol이 필요한 방식에 맞춰 사용합니다.
+
+- question: HTTP/3가 UDP를 사용한다면 신뢰성 있는 전달도 UDP가 제공하나요?
+  answer: 아니요. HTTP/3가 사용하는 QUIC이 UDP 위에서 연결, 신뢰성, 보안과 혼잡 제어 기능을 제공합니다.
+
+- question: IP 주소와 Port 번호는 각각 무엇을 구분하나요?
+  answer: IP 주소는 Network의 목적지 Host를, Port 번호는 그 Host 안에서 통신할 Process의 Endpoint를 구분합니다.
+
+- question: Router와 Switch는 전달할 대상을 무엇으로 판단하나요?
+  answer: Router는 목적지 IP 주소와 Routing Table을 사용하고, Switch는 MAC 주소 Table을 사용해 Frame을 전달합니다.
+
+- question: Packet과 Frame의 차이는 무엇인가요?
+  answer: Packet은 Internet Layer의 IP 전달 단위이고, Frame은 Network Access Layer에서 현재 구간을 따라 Packet을 운반하는 단위입니다.
+
+- question: HTTPS는 HTTP 다음에 실행되는 별도의 Application Protocol인가요?
+  answer: 아니요. HTTPS는 HTTP Message를 TLS로 보호해 전송하는 방식이며, HTTP의 요청과 응답 의미는 그대로 사용합니다.
+
+- question: Packet이 Router를 지날 때 Network Access Layer의 Frame은 항상 그대로 유지되나요?
+  answer: 아니요. IP Packet이 다음 Network 구간으로 이동할 때 그 구간의 Ethernet이나 Wi-Fi 같은 기술에 맞는 Frame으로 다시 감싸질 수 있습니다.
+
+- question: Application Layer와 Transport Layer Area 안의 Topic은 모두 차례대로 실행되나요?
+  answer: 아니요. HTTP와 HTTPS는 Protocol과 보호 관계이고, TCP와 UDP는 목적에 따라 선택되는 서로 다른 Transport Protocol입니다.

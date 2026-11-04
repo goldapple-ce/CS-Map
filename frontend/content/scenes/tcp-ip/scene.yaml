@@ -1,0 +1,92 @@
+title: TCP/IP
+summary: HTTP 데이터가 Transport Layer, Internet Layer와 Network Access Layer를 거쳐 전달되는 구조입니다.
+keywords: [Internet Protocol Suite, Network Stack]
+
+nodes:
+  http:
+    label: HTTP
+    row: 1
+    col: 2
+    contentRef: http.ko.md
+  https:
+    label: HTTPS
+    row: 1
+    col: 4
+    childSceneId: https
+
+  tcp:
+    label: TCP
+    row: 3
+    col: 2
+    contentRef: tcp.ko.md
+  udp:
+    label: UDP
+    row: 3
+    col: 4
+    contentRef: udp.ko.md
+
+  internet-layer:
+    label: Internet Layer
+    row: 4
+    col: 3
+    contentRef: internet-layer.ko.md
+
+  network-access-layer:
+    label: Network Access Layer
+    row: 5
+    col: 3
+    contentRef: network-access-layer.ko.md
+
+edges:
+  - from: http
+    to: https
+    label: TLS로 보호
+    variant: supporting
+  - from: http
+    to: tcp
+    label: HTTP/1·2
+    labelSide: left
+  - from: http
+    fromSide: bottom
+    to: udp
+    label: QUIC / UDP
+  - from: tcp
+    fromSide: bottom
+    to: internet-layer
+    toSide: top
+    label: Segment
+  - from: udp
+    fromSide: bottom
+    to: internet-layer
+    toSide: top
+    label: Datagram
+  - from: internet-layer
+    to: network-access-layer
+    label: Packet
+
+areas:
+  application-layer:
+    label: Application Layer
+    row: 1
+    col: 2
+    rowSpan: 1
+    colSpan: 3
+  transport-layer:
+    label: Transport Layer
+    row: 3
+    col: 2
+    rowSpan: 1
+    colSpan: 3
+lightFlows:
+  http-over-tcp:
+    label: HTTP/1·2 전달
+    stages:
+      - edges: [[http, tcp]]
+      - edges: [[tcp, internet-layer]]
+      - edges: [[internet-layer, network-access-layer]]
+  http-over-udp:
+    label: HTTP/3 전달
+    stages:
+      - edges: [[http, udp]]
+      - edges: [[udp, internet-layer]]
+      - edges: [[internet-layer, network-access-layer]]

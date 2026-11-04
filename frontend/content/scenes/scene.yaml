@@ -11,16 +11,11 @@ nodes:
     row: 3
     col: 1
     contentRef: browser.ko.md
-  https:
-    label: HTTPS
-    row: 2
-    col: 2
-    childSceneId: https
-  osi-model:
-    label: OSI 7계층
+  tcp-ip:
+    label: TCP/IP
     row: 2
     col: 3
-    childSceneId: osi-model
+    childSceneId: tcp-ip
   router:
     label: Router
     row: 3
@@ -60,17 +55,12 @@ edges:
     label: IP 확인
   - from: browser
     fromSide: top
-    to: https
+    to: tcp-ip
     toSide: left
-    label: 보안 연결
-  - from: https
-    fromSide: right
-    to: osi-model
-    toSide: left
-    label: 계층 처리
-  - from: osi-model
+    label: 서버 통신
+  - from: tcp-ip
     to: router2
-    label: 서버 요청
+    label: Packet 전달
   - from: router2
     to: server
     label: 서버 전송
@@ -85,11 +75,9 @@ lightFlows:
       - edges:
           - [router, dns]
       - edges:
-          - [browser, https]
+          - [browser, tcp-ip]
       - edges:
-          - [https, osi-model]
-      - edges:
-          - [osi-model, router2]
+          - [tcp-ip, router2]
       - edges:
           - [router2, server]
 areas:

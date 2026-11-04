@@ -2,11 +2,11 @@
 
 사용자가 Browser 주소창에 `google.com`을 입력하면 어떤 일이 발생하는지 보여줍니다.
 
-가운데 줄은 요청이 실제 Network를 따라 이동하는 흐름이고, 위쪽 줄은 Server와 통신할 때 사용하는 Protocol을 보여줍니다.
+가운데 줄은 DNS를 조회하는 흐름이고, 위쪽 줄은 TCP/IP를 이용해 Server와 통신하는 흐름을 보여줍니다.
 
 ```text
 이름 확인: Browser → 사용자 기기 → Router → DNS
-Server 통신: Browser → HTTPS → OSI 7계층 → Router → Server
+Server 통신: Browser → TCP/IP → Router → Server
 ```
 
 ---
@@ -27,8 +27,7 @@ Server 통신: Browser → HTTPS → OSI 7계층 → Router → Server
 - `Router`: Packet을 다음 Network로 전달합니다. 가정용 공유기도 Router 기능을 포함합니다.
 - `DNS`: `Domain Name System`의 약자로, Domain Name에 대응하는 IP 주소를 찾아 Browser 쪽으로 반환합니다.
 - `Server`: 요청을 받아 처리하고 응답합니다.
-- `HTTPS`: HTTP Data를 암호화하고 Server를 인증하는 통신 방식입니다.
-- `OSI 7계층`: Network Protocol의 역할을 일곱 계층으로 나누어 이해하는 개념입니다.
+- `TCP/IP`: HTTP와 HTTPS, TCP·UDP, Internet Layer와 Network Access Layer가 함께 데이터를 전달하는 구조입니다.
 
 ---
 
@@ -38,7 +37,7 @@ Server 통신: Browser → HTTPS → OSI 7계층 → Router → Server
 2. Browser와 운영체제가 Cache된 IP 주소를 확인합니다.
 3. 없으면 Router를 통해 DNS에 질의하고 IP 주소를 받습니다.
 4. Browser가 해당 IP 주소로 Server 통신을 시작합니다.
-5. HTTP Data를 HTTPS로 보호해 Router를 거쳐 Server로 보냅니다.
+5. HTTP Data를 HTTPS로 보호하고 TCP/IP Stack을 통해 Router를 거쳐 Server로 보냅니다.
 
 DNS Query와 Server 요청 모두 실제로는 Router를 거칩니다. 그림에서는 이해하기 쉽도록 Internet 안의 여러 Router와 반환 경로를 생략했습니다.
 
