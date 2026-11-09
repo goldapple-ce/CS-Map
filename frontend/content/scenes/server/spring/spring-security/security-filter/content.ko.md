@@ -12,6 +12,7 @@ Security Filter는 Spring Security가 요청에 인증, 인가와 여러 보안 
 - `OAuth2AuthorizationRequestRedirectFilter`: OAuth2 로그인을 시작하고 브라우저에 Authorization Server로 이동할 주소를 전달합니다.
 - `OAuth2LoginAuthenticationFilter`: Authorization Server에서 돌아온 Callback을 처리합니다.
 - `UsernamePasswordAuthenticationFilter`: Form Login의 username과 password를 처리합니다.
+- `Custom JWT Filter`: Bearer 방식으로 전달된 JWT를 직접 검증해 Authentication을 만드는 사용자 정의 Filter 예시입니다.
 - `AnonymousAuthenticationFilter`: 앞선 Filter에서 인증되지 않았다면 익명 Authentication을 설정합니다.
 - `ExceptionTranslationFilter`: 뒤에서 발생한 인증·인가 예외를 로그인 시작이나 접근 거부 응답으로 바꿉니다.
 - `AuthorizationFilter`: 현재 사용자가 요청을 수행할 수 있는지 확인합니다.
@@ -24,13 +25,15 @@ Security Filter는 Spring Security가 요청에 인증, 인가와 여러 보안 
 
 1. FilterChainProxy가 선택한 SecurityFilterChain의 Filter 실행을 시작합니다.
 2. SecurityContextHolderFilter가 이전 요청에서 저장된 SecurityContext를 불러옵니다.
-3. 로그인 요청과 일치하는 Authentication Filter가 있으면 인증을 시도합니다.
+3. 로그인 요청과 일치하는 Authentication Filter가 있거나 JWT가 전달되면 해당 Filter가 인증을 시도합니다.
 4. 아무 Filter도 사용자를 인증하지 않았다면 AnonymousAuthenticationFilter가 익명 Authentication을 설정합니다.
 5. AuthorizationFilter가 현재 Authentication과 접근 규칙을 이용해 요청을 허용할지 판단합니다.
 6. 인증·인가 예외가 발생하면 ExceptionTranslationFilter가 적절한 후속 처리를 시작합니다.
 7. 요청이 허용되면 원래 Servlet FilterChain으로 돌아가 DispatcherServlet까지 진행할 수 있습니다.
 
 모든 요청이 화면의 인증 Filter를 전부 실행하는 것은 아닙니다. 각 Filter는 자신이 담당하는 요청이 아니면 인증을 시도하지 않고 다음 Filter로 넘깁니다.
+
+Custom JWT Filter는 Spring Security 기본 제공 Filter가 아닙니다. 개발자가 직접 등록한 Filter가 실행 흐름의 어디에 놓이는지 보여주기 위한 예시입니다.
 
 ---
 

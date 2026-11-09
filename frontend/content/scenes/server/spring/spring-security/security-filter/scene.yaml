@@ -8,43 +8,48 @@ nodes:
     contentRef: filterchainproxy.ko.md
   security-context-holder-filter:
     label: SecurityContext\nHolderFilter
-    row: 1
-    col: 3
+    row: 2
+    col: 1
     contentRef: securitycontextholderfilter.ko.md
   oauth2-authorization-request-redirect-filter:
     label: OAuth2Authorization\nRequestRedirectFilter
-    row: 2
-    col: 3
+    row: 3
+    col: 1
     childSceneId: server-spring-spring-security-security-filter-oauth2-login
   oauth2-login-authentication-filter:
     label: OAuth2Login\nAuthenticationFilter
     row: 3
-    col: 3
+    col: 2
     navigateToSceneId: server-spring-spring-security-security-filter-oauth2-login
   username-password-authentication-filter:
     label: UsernamePassword\nAuthenticationFilter
-    row: 4
+    row: 3
     col: 3
     childSceneId: server-spring-spring-security-security-filter-username-password-authentication-filter
+  custom-jwt-filter:
+    label: Custom JWT Filter
+    row: 3
+    col: 4
+    childSceneId: server-spring-spring-security-security-filter-custom-jwt-filter
   anonymous-authentication-filter:
     label: Anonymous\nAuthenticationFilter
-    row: 5
-    col: 3
+    row: 3
+    col: 5
     contentRef: anonymousauthenticationfilter.ko.md
   security-context-repository:
     label: SecurityContext\nRepository
     row: 2
-    col: 2
+    col: 3
     contentRef: securitycontextrepository.ko.md
   security-context-holder:
     label: SecurityContextHolder
-    row: 3
-    col: 4
+    row: 4
+    col: 3
     contentRef: securitycontextholder.ko.md
   exception-translation-filter:
     label: ExceptionTranslation\nFilter
-    row: 5
-    col: 4
+    row: 4
+    col: 5
     contentRef: exceptiontranslationfilter.ko.md
   authorization-filter:
     label: AuthorizationFilter
@@ -66,46 +71,54 @@ edges:
     to: username-password-authentication-filter
     label: doFilter
   - from: username-password-authentication-filter
+    to: custom-jwt-filter
+    label: doFilter
+  - from: custom-jwt-filter
     to: anonymous-authentication-filter
     label: doFilter
   - from: anonymous-authentication-filter
     to: exception-translation-filter
     label: doFilter
-    labelSide: bottom
+    # labelSide: bottom
   - from: exception-translation-filter
     to: authorization-filter
     label: doFilter
-    labelSide: bottom
+    # labelSide: bottom
 
   - from: security-context-holder-filter
+    fromSide: left
     to: security-context-holder
-    toSide: left
+    toSide: top
     label: securityContext 등록
+    labelSide: bottom
   - from: oauth2-login-authentication-filter
     to: security-context-holder
-    toSide: left
+    toSide: top
   - from: username-password-authentication-filter
     to: security-context-holder
-    toSide: left
+    toSide: top
+  - from: custom-jwt-filter
+    to: security-context-holder
+    toSide: top
   - from: anonymous-authentication-filter
     to: security-context-holder
-    toSide: left
+    toSide: top
   - from: security-context-holder
-    fromSide: bottom
     to: exception-translation-filter
   - from: security-context-holder
-    fromSide: bottom
+    fromSide: right
     to: authorization-filter
     label: Authentication 확인
+    labelSide: bottom
 
   - from: security-context-holder-filter
     to: security-context-repository
     label: SecurityContext 조회
-    labelSide: left
+    # labelSide: left
   - from: username-password-authentication-filter
     to: security-context-repository
     label: SecurityContext 등록
-    labelSide: left
+    # labelSide: left
   - from: oauth2-login-authentication-filter
     to: security-context-repository
 
@@ -114,9 +127,28 @@ lightFlows:
     label: Filter Chain
     stages:
       - edges: [[filter-chain-proxy, security-context-holder-filter]]
-      - edges: [[security-context-holder-filter, oauth2-authorization-request-redirect-filter]]
-      - edges: [[oauth2-authorization-request-redirect-filter, oauth2-login-authentication-filter]]
-      - edges: [[oauth2-login-authentication-filter, username-password-authentication-filter]]
-      - edges: [[username-password-authentication-filter, anonymous-authentication-filter]]
+      - edges:
+          [
+            [
+              security-context-holder-filter,
+              oauth2-authorization-request-redirect-filter,
+            ],
+          ]
+      - edges:
+          [
+            [
+              oauth2-authorization-request-redirect-filter,
+              oauth2-login-authentication-filter,
+            ],
+          ]
+      - edges:
+          [
+            [
+              oauth2-login-authentication-filter,
+              username-password-authentication-filter,
+            ],
+          ]
+      - edges: [[username-password-authentication-filter, custom-jwt-filter]]
+      - edges: [[custom-jwt-filter, anonymous-authentication-filter]]
       - edges: [[anonymous-authentication-filter, exception-translation-filter]]
       - edges: [[exception-translation-filter, authorization-filter]]

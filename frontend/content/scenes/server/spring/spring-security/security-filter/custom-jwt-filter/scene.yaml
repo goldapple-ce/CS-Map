@@ -1,0 +1,136 @@
+title: Custom JWT 인증 흐름
+summary: 로그인 성공 후 JWT를 발급하는 흐름과 API 요청의 JWT를 검증해 Authentication을 등록하는 흐름입니다.
+nodes:
+  login-request:
+    label: 로그인 요청
+    row: 1
+    col: 1
+    contentRef: login-request.ko.md
+  abstract-authentication-processing-filter:
+    label: AbstractAuthentication\nProcessingFilter
+    row: 1
+    col: 2
+    contentRef: abstract-authentication-processing-filter.ko.md
+  authentication-success-handler:
+    label: Authentication\nSuccessHandler
+    row: 1
+    col: 4
+    contentRef: authentication-success-handler.ko.md
+  custom-authentication-success-handler:
+    label: CustomAuthentication\nSuccessHandler
+    row: 1
+    col: 5
+    contentRef: custom-authentication-success-handler.ko.md
+
+  jwt-provider:
+    label: JWT Provider
+    row: 3
+    col: 3
+    contentRef: custom-jwt-provider.ko.md
+  access-token:
+    label: Access Token /\n Refresh Token
+    row: 3
+    col: 5
+    contentRef: access-token.ko.md
+  jwt:
+    label: JWT
+    row: 4
+    col: 5
+    contentRef: jwt.ko.md
+
+  api-request:
+    label: API Request
+    row: 5
+    col: 1
+    contentRef: api-request.ko.md
+  custom-jwt-filter:
+    label: Custom JWT Filter
+    row: 5
+    col: 2
+    contentRef: custom-jwt-filter.ko.md
+  security-context-holder:
+    label: SecurityContextHolder
+    row: 5
+    col: 4
+    navigateToSceneId: server-spring-spring-security-security-filter
+  authorization-filter:
+    label: AuthorizationFilter
+    row: 5
+    col: 5
+    navigateToSceneId: server-spring-spring-security-security-filter
+
+edges:
+  - from: login-request
+    to: abstract-authentication-processing-filter
+    label: 인증 요청
+  - from: abstract-authentication-processing-filter
+    to: authentication-success-handler
+    label: 인증 성공
+
+  - from: custom-authentication-success-handler
+    to: authentication-success-handler
+    label: implements
+    variant: supporting
+  - from: custom-authentication-success-handler
+    to: jwt-provider
+    toSide: top
+    label: 발급
+    labelSide: bottom
+  - from: jwt-provider
+    to: access-token
+    label: 생성
+
+  - from: api-request
+    to: custom-jwt-filter
+    label: Token 전달
+
+  - from: custom-jwt-filter
+    to: jwt-provider
+    toSide: left
+    label: 검증
+    labelSide: left
+  - from: jwt-provider
+    fromSide: left
+    to: custom-jwt-filter
+    label: 검증 결과
+    variant: supporting
+  - from: jwt
+    to: access-token
+    label: 구현
+    variant: supporting
+
+  - from: custom-jwt-filter
+    to: security-context-holder
+    label: 저장
+  - from: access-token
+    to: custom-authentication-success-handler
+    toSide: bottom
+    label: 전달
+    variant: supporting
+  - from: security-context-holder
+    to: authorization-filter
+    label: 확인
+
+lightFlows:
+  login:
+    label: 로그인
+    stages:
+      - edges: [[login-request, abstract-authentication-processing-filter]]
+      - edges:
+          [
+            [
+              abstract-authentication-processing-filter,
+              authentication-success-handler,
+            ],
+          ]
+      - edges: [[custom-authentication-success-handler, jwt-provider]]
+      - edges: [[jwt-provider, access-token]]
+      - edges: [[access-token, custom-authentication-success-handler]]
+  authentication-authorization:
+    label: 인증 / 인가
+    stages:
+      - edges: [[api-request, custom-jwt-filter]]
+      - edges: [[custom-jwt-filter, jwt-provider]]
+      - edges: [[jwt-provider, custom-jwt-filter]]
+      - edges: [[custom-jwt-filter, security-context-holder]]
+      - edges: [[security-context-holder, authorization-filter]]
