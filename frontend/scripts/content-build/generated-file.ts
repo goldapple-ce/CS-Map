@@ -106,6 +106,7 @@ export async function syncGeneratedContent(
       )
     }
   } else {
+    await mkdir(generatedRoot, { recursive: true })
     await writeFile(outputPath, output)
   }
 

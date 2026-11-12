@@ -25,6 +25,31 @@ afterEach(async () => {
 })
 
 describe("Generated file lifecycle", () => {
+  it("생성 디렉터리가 없는 새 환경에서도 build가 content-data.ts를 만든다", async () => {
+    const buildRoot = await mkdtemp(path.join(tmpdir(), "cs-map-generated-"))
+    temporaryRoots.push(buildRoot)
+
+    await syncGeneratedContent(buildRoot, "generated content", false)
+
+    await expect(
+      readFile(
+        path.join(buildRoot, "src/content/generated/content-data.ts"),
+        "utf8"
+      )
+    ).resolves.toBe("generated content")
+
+    const checkRoot = await mkdtemp(path.join(tmpdir(), "cs-map-generated-"))
+    temporaryRoots.push(checkRoot)
+    await expect(
+      syncGeneratedContent(checkRoot, "generated content", true)
+    ).rejects.toThrow(
+      "src/content/generated/content-data.ts is stale; run npm run content:build"
+    )
+    await expect(
+      access(path.join(checkRoot, "src/content/generated"))
+    ).rejects.toMatchObject({ code: "ENOENT" })
+  })
+
   it("check에서는 stale과 첫 obsolete 파일을 순서대로 보고하고 build에서는 동기화한다", async () => {
     const staleRoot = await createAppRoot()
     await expect(
