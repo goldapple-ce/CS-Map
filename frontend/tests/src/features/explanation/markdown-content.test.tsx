@@ -99,6 +99,32 @@ describe("MarkdownContent", () => {
     })
   })
 
+  it("언어가 지정된 code block만 문법 강조한다", () => {
+    const { container } = render(
+      <MarkdownContent
+        idPrefix="syntax-test"
+        markdown={[
+          "```java",
+          'String value = "hello";',
+          "```",
+          "",
+          "`String inline`",
+        ].join("\n")}
+      />
+    )
+
+    const blockCode = container.querySelector("pre code")
+    expect(blockCode).toHaveClass("hljs", "language-java")
+    expect(blockCode?.querySelector(".hljs-type")).toHaveTextContent("String")
+    expect(blockCode?.querySelector(".hljs-string")).toHaveTextContent(
+      '"hello"'
+    )
+
+    const inlineCode = container.querySelector("p code")
+    expect(inlineCode).not.toHaveClass("hljs")
+    expect(inlineCode?.querySelector("span")).not.toBeInTheDocument()
+  })
+
   it("위험한 링크 URL도 계속 차단한다", () => {
     render(
       <MarkdownContent

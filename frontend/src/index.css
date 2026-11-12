@@ -52,6 +52,13 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0 0 0 / 30%);
+  --syntax-comment: oklch(0.48 0.02 260);
+  --syntax-keyword: oklch(0.48 0.18 295);
+  --syntax-string: oklch(0.45 0.13 145);
+  --syntax-number: oklch(0.48 0.16 255);
+  --syntax-title: oklch(0.43 0.14 205);
+  --syntax-built-in: oklch(0.5 0.17 25);
+  --syntax-meta: oklch(0.5 0.13 75);
   --radius: 0.625rem;
 }
 
@@ -67,6 +74,13 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(1 0 0 / 30%);
+  --syntax-comment: oklch(0.7 0.03 260);
+  --syntax-keyword: oklch(0.75 0.16 305);
+  --syntax-string: oklch(0.76 0.13 145);
+  --syntax-number: oklch(0.75 0.14 250);
+  --syntax-title: oklch(0.78 0.12 205);
+  --syntax-built-in: oklch(0.76 0.14 25);
+  --syntax-meta: oklch(0.78 0.12 80);
 }
 
 @layer base {
@@ -78,5 +92,62 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer components {
+  .markdown-syntax .hljs-comment,
+  .markdown-syntax .hljs-quote {
+    color: var(--syntax-comment);
+    font-style: italic;
+  }
+
+  .markdown-syntax .hljs-keyword,
+  .markdown-syntax .hljs-selector-tag,
+  .markdown-syntax .hljs-subst {
+    color: var(--syntax-keyword);
+  }
+
+  .markdown-syntax .hljs-string,
+  .markdown-syntax .hljs-doctag,
+  .markdown-syntax .hljs-regexp,
+  .markdown-syntax .hljs-attribute {
+    color: var(--syntax-string);
+  }
+
+  .markdown-syntax .hljs-number,
+  .markdown-syntax .hljs-literal,
+  .markdown-syntax .hljs-variable,
+  .markdown-syntax .hljs-template-variable,
+  .markdown-syntax .hljs-symbol,
+  .markdown-syntax .hljs-bullet {
+    color: var(--syntax-number);
+  }
+
+  .markdown-syntax .hljs-title,
+  .markdown-syntax .hljs-section,
+  .markdown-syntax .hljs-selector-id,
+  .markdown-syntax .hljs-selector-class,
+  .markdown-syntax .hljs-type {
+    color: var(--syntax-title);
+  }
+
+  .markdown-syntax .hljs-built_in,
+  .markdown-syntax .hljs-name,
+  .markdown-syntax .hljs-tag {
+    color: var(--syntax-built-in);
+  }
+
+  .markdown-syntax .hljs-meta,
+  .markdown-syntax .hljs-meta .hljs-keyword {
+    color: var(--syntax-meta);
+  }
+
+  .markdown-syntax .hljs-emphasis {
+    font-style: italic;
+  }
+
+  .markdown-syntax .hljs-strong {
+    font-weight: 700;
   }
 }

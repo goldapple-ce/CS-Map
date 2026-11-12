@@ -6,6 +6,7 @@ import ReactMarkdown, {
 } from "react-markdown"
 import remarkGfm from "remark-gfm"
 
+import { syntaxHighlightPlugins } from "@/lib/markdown-syntax-highlighting"
 import { remarkSoftBreaks } from "@/lib/remark-soft-breaks"
 
 /** React Node에서 제목 ID 생성에 사용할 평문 문자열을 재귀적으로 추출한다. */
@@ -137,9 +138,10 @@ export function MarkdownContent({ markdown, idPrefix }: MarkdownContentProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="markdown-syntax space-y-3">
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkSoftBreaks]}
+        rehypePlugins={syntaxHighlightPlugins}
         components={components}
         allowedElements={[
           "h1",
@@ -169,6 +171,7 @@ export function MarkdownContent({ markdown, idPrefix }: MarkdownContentProps) {
           "hr",
           "br",
           "input",
+          "span",
         ]}
         skipHtml
         urlTransform={safeUrl}

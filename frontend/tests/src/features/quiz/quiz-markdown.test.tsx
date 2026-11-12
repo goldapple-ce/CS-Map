@@ -56,6 +56,14 @@ describe("QuizMarkdown", () => {
     expect(container.querySelector("pre code")?.textContent).toContain(
       "int value = 1;\n"
     )
+    expect(container.querySelector("pre code")).toHaveClass(
+      "hljs",
+      "language-java"
+    )
+    expect(container.querySelector("pre code .hljs-type")).toHaveTextContent(
+      "int"
+    )
+    expect(container.querySelector("li code")).not.toHaveClass("hljs")
     expect(container.querySelector("pre br")).not.toBeInTheDocument()
   })
 

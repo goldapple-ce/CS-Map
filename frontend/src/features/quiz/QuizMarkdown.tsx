@@ -2,6 +2,7 @@ import ReactMarkdown, { type Components } from "react-markdown"
 import remarkGfm from "remark-gfm"
 
 import { cn } from "@/lib/utils"
+import { syntaxHighlightPlugins } from "@/lib/markdown-syntax-highlighting"
 import { remarkSoftBreaks } from "@/lib/remark-soft-breaks"
 
 type QuizMarkdownProps = {
@@ -21,6 +22,7 @@ const allowedElements = [
   "code",
   "pre",
   "br",
+  "span",
 ]
 
 const components: Components = {
@@ -56,7 +58,7 @@ export function QuizMarkdown({ markdown, variant }: QuizMarkdownProps) {
   return (
     <div
       className={cn(
-        "[&>*+*]:mt-3",
+        "markdown-syntax [&>*+*]:mt-3",
         variant === "question"
           ? "text-base leading-7 text-foreground"
           : "text-sm leading-7 text-muted-foreground"
@@ -64,6 +66,7 @@ export function QuizMarkdown({ markdown, variant }: QuizMarkdownProps) {
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkSoftBreaks]}
+        rehypePlugins={syntaxHighlightPlugins}
         components={components}
         allowedElements={allowedElements}
         skipHtml
