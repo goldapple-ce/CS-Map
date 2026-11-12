@@ -1,43 +1,59 @@
 # 한눈에 보기
 
-`SecurityContextHolder`는 현재 요청을 처리하는 동안 사용자의 인증 정보에 접근할 수 있게 합니다.
+SecurityContextHolder는 `현재 실행 흐름의 SecurityContext를 관리`하며, 기본적으로 `ThreadLocal`을 사용합니다.
 
-```text
-SecurityContextHolder -> SecurityContext -> Authentication
+---
+
+# SecurityContextHolder란
+
+SecurityContextHolder는 Spring Security에서 `현재 실행 중인` Thread의 `인증 정보를 관리`하는 클래스입니다.
+인증에 성공하면 Authentication을 SecurityContext에 저장하고, SecurityContextHolder를 통해 애플리케이션 `어디서든 현재 사용자의 인증 정보에 접근`할 수 있습니다.
+
+---
+
+# SecurityContextHolder의 구조
+
+SecurityContextHolder는 SecurityContextHolderStrategy를 이용하여 SecurityContext를 관리합니다.
+기본적으로 `ThreadLocalSecurityContextHolderStrategy`를 사용하며, SecurityContext를 ThreadLocal에 저장합니다.
+
+핵심 구현은 다음과 같습니다.
+
+```java
+public class SecurityContextHolder {
+
+    private static SecurityContextHolderStrategy strategy;
+
+    public static SecurityContext getContext() {
+        return strategy.getContext();
+    }
+
+    public static void setContext(SecurityContext context) {
+        strategy.setContext(context);
+    }
+
+    public static void clearContext() {
+        strategy.clearContext();
+    }
+
+    public static SecurityContext createEmptyContext() {
+        return strategy.createEmptyContext();
+    }
+}
 ```
 
-- `SecurityContext`: 현재 실행 흐름의 보안 정보를 담습니다.
-- `Authentication`: 사용자 정보, 인증 여부와 권한을 나타냅니다.
+- `getContext()`: 현재 Thread의 SecurityContext를 조회합니다.
+- `setContext()`: 현재 Thread에 SecurityContext를 설정합니다.
+- `clearContext()`: 현재 Thread의 SecurityContext를 제거합니다.
+- `createEmptyContext()`: 새로운 SecurityContext를 생성합니다.
 
 ---
 
-# 동작 방식
+# ThreadLocal을 사용하는 이유
 
-- SecurityContextHolderFilter가 저장된 Context를 Holder에 설정합니다.
-- Authentication Filter가 인증에 성공하면 인증된 Authentication을 담은 Context를 설정합니다.
-- AnonymousAuthenticationFilter는 인증 정보가 없을 때 익명 Authentication을 설정합니다.
-- AuthorizationFilter는 현재 Authentication을 읽어 인가 판단에 사용합니다.
+Spring Security는 여러 사용자의 HTTP 요청을 동시에 처리하므로, 요청마다 `인증 정보를 격리`해야 합니다.
+SecurityContextHolder는 기본적으로 ThreadLocal을 이용하여 각 Thread가 서로 다른 SecurityContext를 사용하도록 합니다.
 
-기본적으로 현재 thread를 기준으로 Context를 보관하며 요청이 끝나면 정리되어야 합니다.
+따라서 여러 요청이 동시에 실행되더라도 Thread 간에 인증 정보가 직접 공유되지 않습니다.
 
----
-
-# 개발자가 개입하는 지점
-
-일반적인 인증 흐름에서는 개발자가 SecurityContextHolder를 직접 조작할 지점이 많지 않습니다.
-
-custom Authentication Filter를 만들거나 현재 로그인 사용자를 직접 조회할 때 사용할 수 있습니다.
-
-다만 이 구조를 알면 인증에 성공했는데도 사용자가 익명으로 보이거나, 비동기 작업에서 인증 정보가 전달되지 않는 문제를 추적하는 데 도움이 됩니다.
-
----
-
-# 헷갈리기 쉬운 점
-
-- SecurityContextHolder는 다음 요청까지 로그인 상태를 저장하는 저장소가 아닙니다.
-- 다음 요청을 위한 Context 저장과 복원은 SecurityContextRepository가 담당합니다.
-- 익명 Authentication도 `authenticated=true`일 수 있으므로 이 값만으로 실제 로그인을 판단하면 안 됩니다.
-
-# 참고 자료
-
-- [Spring Security — SecurityContextHolder](https://docs.spring.io/spring-security/reference/servlet/authentication/architecture.html#servlet-authentication-securitycontextholder)
+다만 WAS는 Thread Pool을 사용하여 요청을 처리하므로, 이전 요청의 인증 정보가 재사용된 Thread에 남아 있지 않도록 정리해야 합니다.
+이를 위해 SecurityContextHolderFilter는 요청 처리가 끝나면 clearContext()를 호출합니다.

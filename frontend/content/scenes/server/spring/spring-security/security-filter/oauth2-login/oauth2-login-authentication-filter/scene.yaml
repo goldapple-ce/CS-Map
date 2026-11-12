@@ -46,13 +46,8 @@ nodes:
   oauth2-authorized-client-repository:
     label: OAuth2Authorized\nClientRepository
     row: 4
-    col: 2
+    col: 1
     contentRef: oauth2-authorized-client-repository.ko.md
-  security-context-holder:
-    label: SecurityContextHolder
-    row: 5
-    col: 2
-    navigateToSceneId: server-spring-spring-security-security-filter
 
 edges:
   - from: oauth2-login-authentication-filter
@@ -107,38 +102,79 @@ edges:
   - from: oauth2-login-authentication-filter
     to: oauth2-authorized-client-repository
     label: Authorized Client 저장
-  - from: oauth2-login-authentication-filter
-    to: security-context-holder
-    label: Context 등록
 
 lightFlows:
   oauth2-login:
     label: OAuth 2.0 Login
     stages:
-      - edges: [[oauth2-login-authentication-filter, authorization-request-repository]]
-      - edges: [[authorization-request-repository, oauth2-login-authentication-filter]]
-      - edges: [[oauth2-login-authentication-filter, client-registration-repository]]
-      - edges: [[client-registration-repository, oauth2-login-authentication-filter]]
+      - edges:
+          [
+            [
+              oauth2-login-authentication-filter,
+              authorization-request-repository,
+            ],
+          ]
+      - edges:
+          [
+            [
+              authorization-request-repository,
+              oauth2-login-authentication-filter,
+            ],
+          ]
+      - edges:
+          [[oauth2-login-authentication-filter, client-registration-repository]]
+      - edges:
+          [[client-registration-repository, oauth2-login-authentication-filter]]
       - edges: [[oauth2-login-authentication-filter, provider-manager]]
       - edges: [[provider-manager, authentication-provider]]
       - edges: [[oauth2-login-authentication-provider, authorization-server]]
       - edges: [[authorization-server, oauth2-login-authentication-provider]]
       - edges: [[provider-manager, oauth2-login-authentication-filter]]
       - edges:
-          - [oauth2-login-authentication-filter, oauth2-authorized-client-repository]
-          - [oauth2-login-authentication-filter, security-context-holder]
+          - [
+              oauth2-login-authentication-filter,
+              oauth2-authorized-client-repository,
+            ]
   oidc-login:
     label: OIDC Login
     stages:
-      - edges: [[oauth2-login-authentication-filter, authorization-request-repository]]
-      - edges: [[authorization-request-repository, oauth2-login-authentication-filter]]
-      - edges: [[oauth2-login-authentication-filter, client-registration-repository]]
-      - edges: [[client-registration-repository, oauth2-login-authentication-filter]]
+      - edges:
+          [
+            [
+              oauth2-login-authentication-filter,
+              authorization-request-repository,
+            ],
+          ]
+      - edges:
+          [
+            [
+              authorization-request-repository,
+              oauth2-login-authentication-filter,
+            ],
+          ]
+      - edges:
+          [[oauth2-login-authentication-filter, client-registration-repository]]
+      - edges:
+          [[client-registration-repository, oauth2-login-authentication-filter]]
       - edges: [[oauth2-login-authentication-filter, provider-manager]]
       - edges: [[provider-manager, authentication-provider]]
-      - edges: [[oidc-authorization-code-authentication-provider, authorization-server]]
-      - edges: [[authorization-server, oidc-authorization-code-authentication-provider]]
+      - edges:
+          [
+            [
+              oidc-authorization-code-authentication-provider,
+              authorization-server,
+            ],
+          ]
+      - edges:
+          [
+            [
+              authorization-server,
+              oidc-authorization-code-authentication-provider,
+            ],
+          ]
       - edges: [[provider-manager, oauth2-login-authentication-filter]]
       - edges:
-          - [oauth2-login-authentication-filter, oauth2-authorized-client-repository]
-          - [oauth2-login-authentication-filter, security-context-holder]
+          - [
+              oauth2-login-authentication-filter,
+              oauth2-authorized-client-repository,
+            ]

@@ -21,11 +21,6 @@ nodes:
     row: 3
     col: 3
     childSceneId: server-spring-spring-security-security-filter-oauth2-login-oauth2-login-authentication-filter
-  security-context-holder:
-    label: SecurityContextHolder /\nSecurityContextRepository
-    row: 4
-    col: 2
-    navigateToSceneId: server-spring-spring-security-security-filter
   authorization-server:
     label: Authorization Server
     row: 5
@@ -83,20 +78,17 @@ edges:
     label: 11. UserInfo
     labelSide: bottom
   - from: oauth2-login-authentication-filter
-    to: security-context-holder
-    label: 12. Context 등록
-  - from: oauth2-login-authentication-filter
     to: resource-owner
     toSide: right
-    label: 13. 로그인 완료
+    label: 12. 로그인 완료
     labelSide: bottom
 areas:
   client:
     label: Client
     row: 1
-    col: 2
-    rowSpan: 4
-    colSpan: 3
+    col: 3
+    rowSpan: 3
+    colSpan: 1
 lightFlows:
   oauth2-oidc-login:
     label: OAuth 2.0 / OIDC Login
@@ -124,5 +116,4 @@ lightFlows:
       - edges: [[authorization-server, oauth2-login-authentication-filter]]
       - edges: [[oauth2-login-authentication-filter, resource-server]]
       - edges: [[resource-server, oauth2-login-authentication-filter]]
-      - edges: [[oauth2-login-authentication-filter, security-context-holder]]
       - edges: [[oauth2-login-authentication-filter, resource-owner]]

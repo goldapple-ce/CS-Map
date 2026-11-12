@@ -1,129 +1,80 @@
 title: UsernamePasswordAuthenticationFilter
 summary: UsernamePasswordAuthenticationFilter가 username과 password를 AuthenticationManager에 전달하고, 인증 결과를 SecurityContext에 저장하는 흐름입니다.
 nodes:
-  filter-chain-proxy:
-    label: FilterChainProxy
-    row: 2
-    col: 1
-    contentRef: filterchainproxy.ko.md
   username-password-authentication-filter:
     label: UsernamePassword\nAuthenticationFilter
-    row: 2
-    col: 2
+    row: 1
+    col: 3
     contentRef: usernamepasswordauthenticationfilter.ko.md
   username-password-authentication-token:
     label: UsernamePassword\nAuthenticationToken
     row: 1
-    col: 3
+    col: 2
     contentRef: usernamepasswordauthenticationtoken.ko.md
-  authentication-manager:
-    label: AuthenticationManager
+  provider-manager:
+    label: ProviderManager
     row: 2
-    col: 4
-    contentRef: authenticationmanager.ko.md
-  authentication-provider:
-    label: AuthenticationProvider
-    row: 3
-    col: 4
-    contentRef: authenticationprovider.ko.md
+    col: 3
+    contentRef: providermanager.ko.md
   dao-authentication-provider:
     label: DaoAuthenticationProvider
     row: 3
-    col: 5
+    col: 3
     contentRef: daoauthenticationprovider.ko.md
   user-detail-service:
     label: UserDetailsService
     row: 4
-    col: 5
+    col: 3
     contentRef: userdetailsservice.ko.md
   user-detail-service-impl:
     label: UserDetailsServiceImpl
     row: 5
-    col: 5
-    contentRef: userdetailsserviceimpl.ko.md
-  security-context-holder:
-    label: SecurityContextHolder
-    row: 4
-    col: 2
-    contentRef: securitycontextholder.ko.md
-  security-context-repository:
-    label: SecurityContext\nRepository
-    row: 4
     col: 3
-    contentRef: securitycontextrepository.ko.md
-  provider-manager:
-    label: ProviderManager
-    row: 2
-    col: 5
-    contentRef: providermanager.ko.md
-
+    contentRef: userdetailsserviceimpl.ko.md
 edges:
-  - from: filter-chain-proxy
-    to: username-password-authentication-filter
-    label: 호출
   - from: username-password-authentication-filter
     to: username-password-authentication-token
     label: 1. 생성
   - from: username-password-authentication-filter
-    to: authentication-manager
-    label: 2. authenticate
-    labelSide: bottom
-  - from: authentication-manager
-    to: authentication-provider
+    to: provider-manager
+    label: 2. 위임
+    labelSide: left
+  - from: provider-manager
+    to: dao-authentication-provider
     label: 3. 위임
     labelSide: left
   - from: dao-authentication-provider
     to: user-detail-service
     label: 4. 호출
     labelSide: left
-
   - from: user-detail-service
     to: dao-authentication-provider
     label: 5. UserDetails
-  - from: authentication-provider
-    to: authentication-manager
+  - from: dao-authentication-provider
+    to: provider-manager
     label: 6. Authentication
-  - from: authentication-manager
+  - from: provider-manager
     to: username-password-authentication-filter
     label: 7. Authentication
-  - from: username-password-authentication-filter
-    to: security-context-holder
-    label: 8. SecurityContext 저장
-    labelSide: left
-  - from: username-password-authentication-filter
-    fromSide: bottom
-    to: security-context-repository
-    label: SecurityContext 저장
-    labelSide: left
-
-  - from: provider-manager
-    to: authentication-manager
-    label: implements
-    variant: supporting
-  - from: dao-authentication-provider
-    to: authentication-provider
-    label: implements
-    variant: supporting
   - from: user-detail-service-impl
     to: user-detail-service
     label: implements
     variant: supporting
 
 lightFlows:
-  form-login:
-    label: Form Login
+  login-authentication:
+    label: 로그인 인증
     stages:
-      - edges: [[filter-chain-proxy, username-password-authentication-filter]]
-      - edges: [[username-password-authentication-filter, username-password-authentication-token]]
-      - edges: [[username-password-authentication-filter, authentication-manager]]
-      - edges: [[authentication-manager, authentication-provider]]
-      - edges: [[authentication-provider, authentication-manager]]
-      - edges: [[authentication-manager, username-password-authentication-filter]]
       - edges:
-          - [username-password-authentication-filter, security-context-holder]
-          - [username-password-authentication-filter, security-context-repository]
-  user-lookup:
-    label: 사용자 조회
-    stages:
+          [
+            [
+              username-password-authentication-filter,
+              username-password-authentication-token,
+            ],
+          ]
+      - edges: [[username-password-authentication-filter, provider-manager]]
+      - edges: [[provider-manager, dao-authentication-provider]]
       - edges: [[dao-authentication-provider, user-detail-service]]
       - edges: [[user-detail-service, dao-authentication-provider]]
+      - edges: [[dao-authentication-provider, provider-manager]]
+      - edges: [[provider-manager, username-password-authentication-filter]]

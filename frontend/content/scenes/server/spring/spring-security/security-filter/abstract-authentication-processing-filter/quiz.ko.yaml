@@ -1,0 +1,14 @@
+- question: AbstractAuthenticationProcessingFilter가 실제 인증 로직을 하위 클래스에 위임하는 이유는 무엇인가요?
+  answer: 인증 방식마다 자격 증명을 추출하고 Authentication을 생성하는 방법이 다르기 때문입니다. 하위 클래스는 `attemptAuthentication()`을 구현하고, 부모 클래스는 인증 성공과 실패에 대한 공통 처리를 담당합니다.
+
+- question: AbstractAuthenticationProcessingFilter가 인증에 성공해도 기본적으로 다음 Filter를 실행하지 않는 이유는 무엇인가요?
+  answer: 로그인 요청은 인증 완료 후 AuthenticationSuccessHandler가 응답을 처리하도록 설계되었기 때문입니다.
+
+- question: AuthenticationSuccessHandler와 AuthenticationFailureHandler는 인증 결과를 직접 판단하나요?
+  answer: 아닙니다. 인증 결과에 따른 분기는 AbstractAuthenticationProcessingFilter가 수행합니다. Handler는 전달받은 결과를 바탕으로 리다이렉트, JWT 발급, 오류 응답 등 후속 작업을 처리합니다.
+
+- question: unsuccessfulAuthentication()은 왜 SecurityContextHolder를 초기화하나요?
+  answer: 실패한 인증 요청에서 기존 인증 정보가 남아 후속 처리에 사용되는 것을 방지하기 위해서입니다. 현재 SecurityContextHolder를 초기화하고 RememberMeServices와 AuthenticationFailureHandler에 실패 처리를 위임합니다. 다만 저장소에 남아 있는 기존 인증 정보까지 자동으로 삭제하는 것은 아닙니다.
+
+- question: AbstractAuthenticationProcessingFilter에서 AuthenticationManager가 인증에 성공한 경우와 최종 로그인에 성공한 경우는 항상 일치하나요?
+  answer: 아닙니다. AuthenticationManager가 인증된 Authentication을 반환하더라도 이후 SessionAuthenticationStrategy에서 예외가 발생하면 로그인 성공 처리로 진행하지 못합니다. 따라서 인증 결과 반환과 최종 로그인 성공 처리는 구분해야 합니다.

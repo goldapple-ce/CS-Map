@@ -1,0 +1,88 @@
+title: AbstractAuthenticationProcessingFilter
+summary: 로그인 요청의 인증을 위임하고 결과에 따라 성공 또는 실패 Handler를 호출하는 흐름입니다.
+nodes:
+  abstract-authentication-processing-filter:
+    label: AbstractAuthentication\nProcessingFilter
+    row: 3
+    col: 1
+    contentRef: abstract-authentication-processing-filter.ko.md
+  authentication-manager:
+    label: AuthenticationManager
+    row: 3
+    col: 3
+    contentRef: authentication-manager.ko.md
+  provider-manager:
+    label: ProviderManager
+    row: 3
+    col: 4
+    contentRef: provider-manager.ko.md
+  authentication-provider:
+    label: AuthenticationProvider
+    row: 3
+    col: 5
+    contentRef: authentication-provider.ko.md
+  # authentication-success-handler:
+  #   label: Authentication\nSuccessHandler
+  #   row: 3
+  #   col: 2
+  #   contentRef: authentication-success-handler.ko.md
+
+  # authentication-failure-handler:
+  #   label: Authentication\nFailureHandler
+  #   row: 4
+  #   col: 2
+  #   contentRef: authentication-failure-handler.ko.md
+  security-context-holder:
+    label: SecurityContextHolder /\nSecurityContextRepository
+    row: 4
+    col: 1
+    navigateToSceneId: server-spring-spring-security-security-filter
+edges:
+  - from: abstract-authentication-processing-filter
+    fromSide: right
+    to: authentication-manager
+    label: 인증 위임
+  - from: provider-manager
+    to: authentication-manager
+    label: implements
+    variant: supporting
+  - from: provider-manager
+    fromSide: right
+    to: authentication-provider
+    label: 인증 위임
+  - from: authentication-provider
+    to: provider-manager
+    toSide: right
+    label: 인증 결과
+    labelSide: bottom
+    # variant: return
+  - from: authentication-manager
+    to: abstract-authentication-processing-filter
+    toSide: right
+    label: Authentication
+    labelSide: bottom
+  - from: abstract-authentication-processing-filter
+    to: security-context-holder
+    label: Context 등록 / Clear
+  # - from: authentication-success-handler
+  #   to: security-context-holder
+  #   label: Context 등록
+  # - from: abstract-authentication-processing-filter
+  #   to: authentication-failure-handler
+  #   label: 인증 실패
+  #   labelSide: left
+  # - from: authentication-failure-handler
+  #   to: security-context-holder
+  #   label: Clear
+lightFlows:
+  authentication:
+    label: 인증
+    stages:
+      - edges:
+          [[abstract-authentication-processing-filter, authentication-manager]]
+      - edges: [[provider-manager, authentication-provider]]
+      - edges: [[authentication-provider, provider-manager]]
+      - edges:
+          [[authentication-manager, abstract-authentication-processing-filter]]
+      - edges:
+          [[abstract-authentication-processing-filter, security-context-holder]]
