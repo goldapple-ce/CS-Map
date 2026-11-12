@@ -11,6 +11,14 @@ CS Map의 화면, 탐색과 콘텐츠 표시 기능을 구현하는 React 애플
 
 배포 파일은 `npm run build`, 생성 결과 확인은 `npm run preview`를 사용한다. 콘텐츠 형식만 확인하려면 `npm run content:validate`를 실행한다.
 
+## GitHub Pages 배포
+
+기본 branch의 변경은 [GitHub Pages workflow](../.github/workflows/deploy-pages.yml)가 `frontend`를 빌드해 배포한다. 저장소 이름이나 Custom Domain에 따른 base path는 GitHub Pages 설정에서 받아오므로 코드에 고정하지 않는다.
+
+저장소의 `Settings > Pages > Build and deployment > Source`에서 `GitHub Actions`를 선택한다. 이후 `main` branch에 push하거나 Actions 화면에서 workflow를 직접 실행한다.
+
+배포 후에는 홈페이지, `/quiz`, 깊은 `/explore/...` 경로와 Topic·Area Fragment가 붙은 공유 URL을 직접 열고 새로고침해 확인한다. GitHub Pages는 SPA rewrite를 제공하지 않으므로 workflow가 `index.html`과 같은 `404.html`을 함께 배포한다. 이 fallback으로 Browser Router가 직접 경로를 복원하지만 최초 HTTP 응답 상태는 `404`다.
+
 ## 주요 디렉터리
 
 - `content`: Scene, Topic 설명과 퀴즈

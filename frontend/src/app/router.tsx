@@ -30,4 +30,8 @@ export const routes: RouteObject[] = [
   },
 ]
 
-export const router = createBrowserRouter(routes)
+const routerBasename = import.meta.env.BASE_URL.replace(/\/+$/u, "") || "/"
+
+export const router = createBrowserRouter(routes, {
+  basename: routerBasename,
+})
