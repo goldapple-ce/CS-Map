@@ -1,120 +1,128 @@
-title: OAuth 2.0 Login
-summary: OAuth2AuthorizationRequestRedirectFilter가 로그인을 시작하고 OAuth2LoginAuthenticationFilter가 콜백을 인증하는 Authorization Code 흐름입니다.
+title: OAuth 2.0 / OIDC Login
+summary: Browser Redirect, Authorization Code, Token 발급과 사용자 정보 조회로 이어지는 OAuth 2.0 및 OIDC Login의 공통 흐름입니다.
 nodes:
-  client:
-    label: 사용자
-    row: 2
+  resource-owner:
+    label: Resource Owner
+    row: 3
     col: 1
-    contentRef: client.ko.md
+    contentRef: resource-owner.ko.md
   oauth2-authorization-request-redirect-filter:
     label: OAuth2Authorization\nRequestRedirectFilter
     row: 2
     col: 3
     contentRef: oauth2authorizationrequestredirectfilter.ko.md
+  authorization-request-repository:
+    label: AuthorizationRequest\nRepository
+    row: 1
+    col: 3
+    contentRef: authorizationrequestrepository.ko.md
   oauth2-login-authentication-filter:
     label: OAuth2Login\nAuthenticationFilter
     row: 3
     col: 3
     childSceneId: server-spring-spring-security-security-filter-oauth2-login-oauth2-login-authentication-filter
-  authorization-request-repository:
-    label: AuthorizationRequest\nRepository
-    row: 2
-    col: 4
-    contentRef: authorizationrequestrepository.ko.md
-
-  my-server:
-    label: 내 서버
-    row: 1
-    col: 3
-    contentRef: myserver.ko.md
+  security-context-holder:
+    label: SecurityContextHolder /\nSecurityContextRepository
+    row: 4
+    col: 2
+    navigateToSceneId: server-spring-spring-security-security-filter
   authorization-server:
-    label: 인증 서버
+    label: Authorization Server
     row: 5
     col: 3
     contentRef: authorizationserver.ko.md
   resource-server:
-    label: 자원 서버
-    row: 5
+    label: Resource Server
+    row: 3
     col: 5
     contentRef: resourceserver.ko.md
-
 edges:
-  - from: client
-    fromSide: right
+  - from: resource-owner
+    fromSide: top
     to: oauth2-authorization-request-redirect-filter
-    toSide: left
-    label: 1. 로그인 요청
-    # labelSide: bottom
+    label: 1. /oauth2/authorization/{registrationId}
   - from: oauth2-authorization-request-redirect-filter
     to: authorization-request-repository
-    label: 2. 인증 요청 저장
+    label: 2. Request 저장
+    labelSide: left
   - from: oauth2-authorization-request-redirect-filter
-    fromSide: left
-    to: client
-    toSide: right
-    label: 3. 리다이렉트 응답
+    to: resource-owner
+    label: 3. {authorization_uri}?client_id=...&redirect_uri=...
     labelSide: bottom
-  - from: client
-    fromSide: bottom
+  - from: resource-owner
     to: authorization-server
-    toSide: left
-    label: 4. Authorization 요청
+    label: 4. {authorization_uri}?client_id=...&redirect_uri=...
     labelSide: bottom
   - from: authorization-server
-    # fromSide: left
-    to: client
-    toSide: bottom
-    label: 5. 인가 코드 Callback
-    labelSide: top
-
-  - from: client
-    fromSide: bottom
+    to: resource-owner
+    label: 5. {redirect_uri}?code=...&state=...
+  - from: resource-owner
+    fromSide: right
     to: oauth2-login-authentication-filter
-    toSide: left
-    label: 6. Callback 요청
-    labelSide: bottom
+    # toSide: left
+    label: 6. {redirect_uri}?code=...&state=...
   - from: oauth2-login-authentication-filter
+    fromSide: top
     to: authorization-request-repository
-    label: 7. 인증 요청 조회
+    toSide: right
+    label: 7. Request 조회
   - from: oauth2-login-authentication-filter
-    fromSide: bottom
     to: authorization-server
-    toSide: top
-    label: 8. 토큰 요청
+    label: 8. Token 요청
     labelSide: left
   - from: authorization-server
-    fromSide: top
     to: oauth2-login-authentication-filter
-    toSide: bottom
-    label: 9. Access Token
+    label: 9. Access Token 발급
   - from: oauth2-login-authentication-filter
     fromSide: right
     to: resource-server
-    toSide: top
-    label: 10. 사용자 정보 요청
+    label: 10. {user_info_uri}
   - from: resource-server
     to: oauth2-login-authentication-filter
+    toSide: right
     label: 11. UserInfo
-    labelSide: left
+    labelSide: bottom
   - from: oauth2-login-authentication-filter
-    # fromSide: left
-    to: client
-    toSide: bottom
-    label: 12. 로그인 완료
-
+    to: security-context-holder
+    label: 12. Context 등록
+  - from: oauth2-login-authentication-filter
+    to: resource-owner
+    toSide: right
+    label: 13. 로그인 완료
+    labelSide: bottom
+areas:
+  client:
+    label: Client
+    row: 1
+    col: 2
+    rowSpan: 4
+    colSpan: 3
 lightFlows:
-  oauth2-login:
-    label: OAuth 2.0 Login
+  oauth2-oidc-login:
+    label: OAuth 2.0 / OIDC Login
     stages:
-      - edges: [[client, oauth2-authorization-request-redirect-filter]]
-      - edges: [[oauth2-authorization-request-redirect-filter, authorization-request-repository]]
-      - edges: [[oauth2-authorization-request-redirect-filter, client]]
-      - edges: [[client, authorization-server]]
-      - edges: [[authorization-server, client]]
-      - edges: [[client, oauth2-login-authentication-filter]]
-      - edges: [[oauth2-login-authentication-filter, authorization-request-repository]]
+      - edges: [[resource-owner, oauth2-authorization-request-redirect-filter]]
+      - edges:
+          [
+            [
+              oauth2-authorization-request-redirect-filter,
+              authorization-request-repository,
+            ],
+          ]
+      - edges: [[oauth2-authorization-request-redirect-filter, resource-owner]]
+      - edges: [[resource-owner, authorization-server]]
+      - edges: [[authorization-server, resource-owner]]
+      - edges: [[resource-owner, oauth2-login-authentication-filter]]
+      - edges:
+          [
+            [
+              oauth2-login-authentication-filter,
+              authorization-request-repository,
+            ],
+          ]
       - edges: [[oauth2-login-authentication-filter, authorization-server]]
       - edges: [[authorization-server, oauth2-login-authentication-filter]]
       - edges: [[oauth2-login-authentication-filter, resource-server]]
       - edges: [[resource-server, oauth2-login-authentication-filter]]
-      - edges: [[oauth2-login-authentication-filter, client]]
+      - edges: [[oauth2-login-authentication-filter, security-context-holder]]
+      - edges: [[oauth2-login-authentication-filter, resource-owner]]

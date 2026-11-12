@@ -20,7 +20,7 @@ nodes:
     label: OAuth2Login\nAuthenticationFilter
     row: 3
     col: 2
-    navigateToSceneId: server-spring-spring-security-security-filter-oauth2-login
+    navigateToSceneId: server-spring-spring-security-security-filter-oauth2-login-oauth2-login-authentication-filter
   username-password-authentication-filter:
     label: UsernamePassword\nAuthenticationFilter
     row: 3

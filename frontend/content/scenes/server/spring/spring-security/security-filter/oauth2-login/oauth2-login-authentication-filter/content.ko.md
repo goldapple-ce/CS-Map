@@ -1,112 +1,75 @@
-# 개요
+# 한눈에 보기
 
-`OAuth2LoginAuthenticationFilter`는 Authorization Server가 브라우저를 통해 전달한 OAuth 2.0 콜백을 Spring Security의 인증 파이프라인으로 연결합니다. 필터는 요청을 직접 모두 처리하지 않고 `AuthenticationManager`, 여러 `AuthenticationProvider`, `OAuth2UserService`에 단계별 책임을 위임합니다.
-
-이 Scene은 `openid` scope가 없는 순수 OAuth 2.0 Login을 설명합니다. OIDC 요청은 같은 필터에서 시작하지만 `OidcAuthorizationCodeAuthenticationProvider`와 `OidcUserService`가 처리합니다.
+OAuth2LoginAuthenticationFilter는 Authorization Server에서 반환한 `Callback 요청을 처리`하고 AuthenticationManager에 `인증을 위임`합니다.
+인증 결과를 OAuth2AuthenticationToken으로 변환하고, 외부에서 발급받은 토큰을 `OAuth2AuthorizedClientRepository에 저장`합니다.
+이후 AbstractAuthenticationProcessingFilter의 인증 성공 처리를 통해 AuthenticationSuccessHandler가 실행됩니다.
 
 ---
 
-# 전체 호출 구조
+# OAuth2LoginAuthenticationFilter란
 
-```text
-FilterChainProxy
-└─ OAuth2LoginAuthenticationFilter
-   ├─ AuthorizationRequestRepository에서 원래 요청 조회
-   ├─ OAuth2LoginAuthenticationToken 생성
-   └─ AuthenticationManager
-      └─ ProviderManager
-         └─ OAuth2LoginAuthenticationProvider
-            ├─ OAuth2AuthorizationCodeAuthenticationProvider
-            │  └─ Authorization Server의 Token Endpoint
-            └─ OAuth2UserService
-               └─ Resource Server의 UserInfo Endpoint
+OAuth2LoginAuthenticationFilter는 Authorization Server에서 반환한 `Authorization Code를 처리`하고, AuthenticationManager에 `인증을 위임`하는 Filter입니다.
+앞서 OAuth2AuthorizationRequestRedirectFilter가 사용자를 Authorization Server로 리다이렉트했다면, OAuth2LoginAuthenticationFilter는 인증과 권한 승인이 완료된 후 Callback 요청을 처리합니다.
+
+---
+
+# OAuth2LoginAuthenticationFilter의 동작
+
+Authorization Server는 인증과 권한 승인이 완료되면 Client의 Redirect URI로 Authorization Code와 state를 전달합니다.
+Spring Security는 기본적으로 `/login/oauth2/code/{registrationId}` 경로에서 Callback 요청을 처리합니다.
+
+```http
+GET /login/oauth2/code/google?code=...&state=...
 ```
 
-인증이 성공하면 호출 결과는 반대 방향으로 돌아옵니다.
+핵심 구현은 다음과 같습니다.
 
-```text
-Resource Server
-→ OAuth2User
-→ 인증된 OAuth2LoginAuthenticationToken
-→ OAuth2LoginAuthenticationFilter
-→ OAuth2AuthenticationToken
-→ SecurityContextHolder
-→ SecurityContextRepository
+```java
+public class OAuth2LoginAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+
+    private ClientRegistrationRepository clientRegistrationRepository;
+    private OAuth2AuthorizedClientRepository authorizedClientRepository;
+    private AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository = new HttpSessionOAuth2AuthorizationRequestRepository();
+
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
+        MultiValueMap<String, String> params = OAuth2AuthorizationResponseUtils.toMultiMap(request.getParameterMap());
+
+        OAuth2AuthorizationRequest authorizationRequest = this.authorizationRequestRepository.removeAuthorizationRequest(request, response);
+        String registrationId = authorizationRequest.getAttribute(OAuth2ParameterNames.REGISTRATION_ID);
+        ClientRegistration clientRegistration = this.clientRegistrationRepository.findByRegistrationId(registrationId);
+
+        String redirectUri = /* 현재 Callback URI */;
+
+        OAuth2AuthorizationResponse authorizationResponse = OAuth2AuthorizationResponseUtils.convert(params, redirectUri);
+        OAuth2LoginAuthenticationToken authenticationRequest = new OAuth2LoginAuthenticationToken(clientRegistration, new OAuth2AuthorizationExchange(authorizationRequest, authorizationResponse));
+        OAuth2LoginAuthenticationToken authenticationResult = (OAuth2LoginAuthenticationToken) this.getAuthenticationManager().authenticate(authenticationRequest);
+        OAuth2AuthenticationToken oauth2Authentication = this.authenticationResultConverter.convert(authenticationResult);
+        OAuth2AuthorizedClient authorizedClient = new OAuth2AuthorizedClient(authenticationResult.getClientRegistration(), oauth2Authentication.getName(), authenticationResult.getAccessToken(), authenticationResult.getRefreshToken());
+
+        this.authorizedClientRepository.saveAuthorizedClient(authorizedClient, oauth2Authentication, request, response);
+
+        return oauth2Authentication;
+    }
+}
 ```
 
----
-
-# 1단계: 콜백을 인증 요청으로 변환
-
-Authorization Server는 사용자의 승인 결과를 브라우저를 통해 `/login/oauth2/code/{registrationId}`로 전달합니다. 성공 응답에는 `code`와 `state`가, 실패 응답에는 OAuth 2.0 오류가 포함될 수 있습니다.
-
-필터는 `AuthorizationRequestRepository`에서 로그인 시작 때 저장한 `OAuth2AuthorizationRequest`를 가져옵니다. 원래 요청과 콜백 응답, `ClientRegistration`을 묶어 인증 전 `OAuth2LoginAuthenticationToken`을 만들고 `AuthenticationManager`에 전달합니다.
-
----
-
-# 2단계: ProviderManager가 로그인 Provider 선택
-
-일반적인 `AuthenticationManager` 구현인 `ProviderManager`는 등록된 `AuthenticationProvider`를 순서대로 확인합니다. 순수 OAuth 2.0 요청은 `OAuth2LoginAuthenticationProvider`가 담당합니다.
-
-`OAuth2LoginAuthenticationProvider`는 Authorization Request의 scope에 `openid`가 포함되어 있으면 `null`을 반환합니다. 이 경우 `ProviderManager`가 다음 후보인 `OidcAuthorizationCodeAuthenticationProvider`에 처리를 맡길 수 있습니다.
+1. `AuthorizationRequestRepository`: 최초 Authorization 요청에서 저장했던 OAuth2AuthorizationRequest를 가져오고 제거합니다.
+2. `ClientRegistrationRepository`: Authorization Request에 저장된 registrationId로 Client 설정을 조회합니다.
+3. `OAuth2AuthorizationExchange`: 최초 Authorization Request와 Callback으로 반환된 Authorization Response를 묶습니다.
+4. `OAuth2LoginAuthenticationToken`: 인증에 필요한 정보를 담아 AuthenticationManager에 전달합니다.
+5. `AuthenticationManager`: OAuth2LoginAuthenticationProvider 또는 OidcAuthorizationCodeAuthenticationProvider에 인증을 위임합니다.
+6. `OAuth2AuthenticationToken`: 인증된 Principal과 GrantedAuthority를 포함하는 Authentication 객체로 변환합니다.
+7. `OAuth2AuthorizedClientRepository`: 인증 과정에서 발급받은 외부 Access Token과 Refresh Token을 저장합니다.
 
 ---
 
-# 3단계: Authorization Code 교환
+# OAuth2LoginAuthenticationToken과 OAuth2AuthenticationToken의 차이
 
-`OAuth2LoginAuthenticationProvider`는 내부에 `OAuth2AuthorizationCodeAuthenticationProvider`를 가지고 있습니다. 로그인 토큰을 `OAuth2AuthorizationCodeAuthenticationToken`으로 바꾸어 이 내부 Provider에 전달합니다.
+OAuth2LoginAuthenticationToken은 Authorization Code를 이용한 인증 요청과 그 처리 결과를 표현하는 객체입니다.
+반면 OAuth2AuthenticationToken은 인증이 완료된 사용자를 나타내는 Authentication 객체입니다.
 
-내부 Provider는 Authorization Response의 오류와 `state`를 검증한 뒤 `OAuth2AccessTokenResponseClient`를 통해 Authorization Server의 Token Endpoint를 호출합니다. 성공하면 Access Token, 선택적 Refresh Token과 추가 파라미터를 담은 인증 결과를 반환합니다.
+따라서 OAuth2LoginAuthenticationFilter는 AuthenticationManager가 반환한 OAuth2LoginAuthenticationToken을 OAuth2AuthenticationToken으로 변환합니다.
 
----
-
-# 4단계: OAuth2User 조회
-
-Access Token을 받은 `OAuth2LoginAuthenticationProvider`는 `OAuth2UserRequest`를 만들고 `OAuth2UserService.loadUser()`를 호출합니다.
-
-기본 `DefaultOAuth2UserService`는 `ClientRegistration`에 설정된 UserInfo Endpoint로 요청하면서 Access Token을 Bearer Token으로 전달합니다. Resource Server가 반환한 사용자 속성은 `OAuth2User`로 변환됩니다.
-
-```text
-OAuth2UserRequest
-├─ ClientRegistration
-├─ OAuth2AccessToken
-└─ additionalParameters
-
-OAuth2User
-├─ name
-├─ attributes
-└─ authorities
-```
-
-Provider는 이 `OAuth2User`와 토큰을 담은 인증된 `OAuth2LoginAuthenticationToken`을 만들어 `AuthenticationManager`와 필터로 반환합니다.
-
----
-
-# 5단계: 내 애플리케이션 로그인 완료
-
-필터는 인증 결과의 `OAuth2User`를 principal로 사용하는 `OAuth2AuthenticationToken`을 만듭니다. 이 객체는 현재 내 애플리케이션에 로그인한 사용자를 나타냅니다.
-
-동시에 `ClientRegistration`, 사용자와 Access·Refresh Token을 묶은 `OAuth2AuthorizedClient`를 저장합니다. 이후 외부 API를 호출해야 한다면 저장된 Access Token을 다시 사용할 수 있습니다.
-
-마지막으로 `OAuth2AuthenticationToken`이 담긴 `SecurityContext`를 `SecurityContextHolder`에 설정하고, 구성된 `SecurityContextRepository`에 저장합니다. 세션 기반 구성에서는 이후 요청이 세션 쿠키로 로그인 상태를 복원합니다.
-
----
-
-# 비슷한 객체 구분
-
-| 객체 | 의미 |
-| --- | --- |
-| `OAuth2LoginAuthenticationToken` | OAuth2 Login 인증 요청과 Provider의 인증 결과 |
-| `OAuth2AuthorizationCodeAuthenticationToken` | Code를 Access Token으로 교환하는 내부 단계의 요청과 결과 |
-| `OAuth2User` | Resource Server에서 조회한 사용자 principal |
-| `OAuth2AuthenticationToken` | 내 애플리케이션의 최종 로그인 Authentication |
-| `OAuth2AuthorizedClient` | 사용자·ClientRegistration·Access Token의 연결 |
-
----
-
-# 참고 자료
-
-- [Spring Security - OAuth2LoginAuthenticationFilter API](https://docs.spring.io/spring-security/reference/api/java/org/springframework/security/oauth2/client/web/OAuth2LoginAuthenticationFilter.html)
-- [Spring Security - OAuth2LoginAuthenticationProvider 소스](https://github.com/spring-projects/spring-security/blob/main/oauth2/oauth2-client/src/main/java/org/springframework/security/oauth2/client/authentication/OAuth2LoginAuthenticationProvider.java)
-- [Spring Security - OAuth2AuthorizationCodeAuthenticationProvider 소스](https://github.com/spring-projects/spring-security/blob/main/oauth2/oauth2-client/src/main/java/org/springframework/security/oauth2/client/authentication/OAuth2AuthorizationCodeAuthenticationProvider.java)
-- [Spring Security - DefaultOAuth2UserService API](https://docs.spring.io/spring-security/reference/api/java/org/springframework/security/oauth2/client/userinfo/DefaultOAuth2UserService.html)
+이후 발급받은 토큰을 OAuth2AuthorizedClient로 구성하여 OAuth2AuthorizedClientRepository에 저장합니다.
+여기서 저장하는 Access Token은 Google과 같은 외부 Authorization Server에서 발급한 토큰이며, 우리 서비스에서 자체 발급하는 JWT와는 별개입니다.

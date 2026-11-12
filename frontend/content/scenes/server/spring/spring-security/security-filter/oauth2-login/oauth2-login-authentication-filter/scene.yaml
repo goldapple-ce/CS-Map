@@ -1,179 +1,144 @@
 title: OAuth2LoginAuthenticationFilter
-summary: OAuth2LoginAuthenticationFilter가 콜백을 인증 요청으로 바꾸고 Code 교환과 사용자 조회를 거쳐 로그인 상태를 저장하는 흐름입니다.
+summary: Callback 인증 요청을 Provider에 위임하고 성공한 Authentication을 SecurityContext에 등록·저장하는 과정입니다.
 nodes:
-  filter-chain-proxy:
-    label: FilterChainProxy
-    row: 2
-    col: 1
-    contentRef: filterchainproxy.ko.md
   oauth2-login-authentication-filter:
     label: OAuth2Login\nAuthenticationFilter
-    row: 2
-    col: 2
-    contentRef: oauth2loginauthenticationfilter.ko.md
+    row: 3
+    col: 1
+    contentRef: oauth2-login-authentication-filter.ko.md
   authorization-request-repository:
     label: AuthorizationRequest\nRepository
     row: 1
-    col: 2
-    contentRef: authorizationrequestrepository.ko.md
-  oauth2-login-authentication-token:
-    label: OAuth2Login\nAuthenticationToken
-    row: 1
     col: 3
-    contentRef: oauth2loginauthenticationtoken.ko.md
-  authentication-manager:
-    label: AuthenticationManager
+    navigateToSceneId: server-spring-spring-security-security-filter-oauth2-login
+  client-registration-repository:
+    label: ClientRegistration\nRepository
     row: 2
     col: 3
-    contentRef: authenticationmanager.ko.md
+    contentRef: client-registration-repository.ko.md
   provider-manager:
     label: ProviderManager
-    row: 2
-    col: 4
-    contentRef: providermanager.ko.md
+    row: 3
+    col: 2
+    contentRef: provider-manager.ko.md
   authentication-provider:
     label: AuthenticationProvider
     row: 3
+    rowSpan: 2
     col: 3
-    contentRef: authenticationprovider.ko.md
+    contentRef: authentication-provider.ko.md
   oauth2-login-authentication-provider:
     label: OAuth2Login\nAuthenticationProvider
     row: 3
     col: 4
-    contentRef: oauth2loginauthenticationprovider.ko.md
-  oauth2-authorization-code-authentication-provider:
-    label: OAuth2AuthorizationCode\nAuthenticationProvider
-    row: 3
-    col: 5
-    contentRef: oauth2authorizationcodeauthenticationprovider.ko.md
-
-  oauth2-user-service:
-    label: OAuth2UserService
+    contentRef: oauth2-login-authentication-provider.ko.md
+  oidc-authorization-code-authentication-provider:
+    label: OidcAuthorizationCode\nAuthenticationProvider
     row: 4
     col: 4
-    contentRef: oauth2userservice.ko.md
-
-  resource-server:
-    label: Resource Server
-    row: 5
-    col: 4
-    contentRef: resourceserver.ko.md
+    contentRef: oidc-authorization-code-authentication-provider.ko.md
   authorization-server:
-    label: Authorization Server
-    row: 5
+    label: Authorization Server \n/ Resource Server
+    row: 3
+    rowSpan: 2
     col: 5
-    contentRef: authorizationserver.ko.md
-
-  security-context-holder:
-    label: SecurityContextHolder
+    navigateToSceneId: server-spring-spring-security-security-filter-oauth2-login
+  oauth2-authorized-client-repository:
+    label: OAuth2Authorized\nClientRepository
     row: 4
     col: 2
-    contentRef: securitycontextholder.ko.md
-  security-context-repository:
-    label: SecurityContext\nRepository
-    row: 4
-    col: 3
-    contentRef: securitycontextrepository.ko.md
+    contentRef: oauth2-authorized-client-repository.ko.md
+  security-context-holder:
+    label: SecurityContextHolder
+    row: 5
+    col: 2
+    navigateToSceneId: server-spring-spring-security-security-filter
 
 edges:
-  - from: filter-chain-proxy
-    to: oauth2-login-authentication-filter
-    label: 호출
-  - from: authorization-request-repository
-    to: oauth2-login-authentication-filter
-    label: 1. 조회
-    labelSide: left
   - from: oauth2-login-authentication-filter
     fromSide: top
-    to: oauth2-login-authentication-token
-    label: 2. 생성
-  - from: oauth2-login-authentication-filter
-    to: authentication-manager
-    label: 3. 호출
-    labelSide: bottom
-  - from: authentication-manager
-    to: authentication-provider
-    label: 4. 위임
-    labelSide: left
-  - from: oauth2-login-authentication-provider
-    fromSide: right
-    to: oauth2-authorization-code-authentication-provider
-    toSide: left
-    label: 5. 호출
-  - from: oauth2-authorization-code-authentication-provider
-    to: authorization-server
-    label: 6. 토큰 요청
-    labelSide: left
-  - from: authorization-server
-    to: oauth2-authorization-code-authentication-provider
-    label: 7. accessToken
-  - from: oauth2-authorization-code-authentication-provider
-    fromSide: left
-    to: oauth2-login-authentication-provider
-    toSide: right
-    label: 8. Token
-    labelSide: bottom
-  - from: oauth2-login-authentication-provider
-    to: oauth2-user-service
-    label: 9. 호출
-    labelSide: left
-  - from: oauth2-user-service
-    to: resource-server
-    label: 10. 호출
-    labelSide: left
-  - from: resource-server
-    to: oauth2-user-service
-    label: 11. UserInfo
-  - from: oauth2-user-service
-    to: oauth2-login-authentication-provider
-    label: 12. OAuth2User
-  - from: authentication-provider
-    to: authentication-manager
-    label: 13. Authentication
-  - from: authentication-manager
+    to: authorization-request-repository
+    label: request 조회
+  - from: authorization-request-repository
     to: oauth2-login-authentication-filter
-    label: 14. Auth..
+    label: 반환
+    labelSide: bottom
+
   - from: oauth2-login-authentication-filter
-    to: security-context-holder
-    label: 15. SecurityContext 저장
-    labelSide: left
+    fromSide: top
+    to: client-registration-repository
+    label: Registration 조회
+  - from: client-registration-repository
+    to: oauth2-login-authentication-filter
+    toSide: top
+    label: Registration 반환
+    labelSide: bottom
+
   - from: oauth2-login-authentication-filter
-    fromSide: bottom
-    to: security-context-repository
-    label: SecurityContext 저장
-    labelSide: left
+    fromSide: right
+    to: provider-manager
+    label: 인증 위임
+  - from: provider-manager
+    to: authentication-provider
+    label: 인증 위임
+  - from: oauth2-login-authentication-provider
+    to: authentication-provider
+    label: implements
+    variant: supporting
+  - from: oidc-authorization-code-authentication-provider
+    to: authentication-provider
+    label: implements
+    variant: supporting
+
+  - from: oauth2-login-authentication-provider
+    to: authorization-server
+  - from: authorization-server
+    to: oauth2-login-authentication-provider
+  - from: oidc-authorization-code-authentication-provider
+    to: authorization-server
+  - from: authorization-server
+    to: oidc-authorization-code-authentication-provider
 
   - from: provider-manager
-    to: authentication-manager
-    label: implements
-    variant: supporting
-  - from: oauth2-login-authentication-provider
-    to: authentication-provider
-    label: implements
-    variant: supporting
+    to: oauth2-login-authentication-filter
+    toSide: right
+    label: 반환
+    labelSide: bottom
+  - from: oauth2-login-authentication-filter
+    to: oauth2-authorized-client-repository
+    label: Authorized Client 저장
+  - from: oauth2-login-authentication-filter
+    to: security-context-holder
+    label: Context 등록
 
 lightFlows:
-  authentication:
-    label: 인증 처리
+  oauth2-login:
+    label: OAuth 2.0 Login
     stages:
-      - edges: [[filter-chain-proxy, oauth2-login-authentication-filter]]
+      - edges: [[oauth2-login-authentication-filter, authorization-request-repository]]
       - edges: [[authorization-request-repository, oauth2-login-authentication-filter]]
-      - edges: [[oauth2-login-authentication-filter, oauth2-login-authentication-token]]
-      - edges: [[oauth2-login-authentication-filter, authentication-manager]]
-      - edges: [[authentication-manager, authentication-provider]]
-      - edges: [[authentication-provider, authentication-manager]]
-      - edges: [[authentication-manager, oauth2-login-authentication-filter]]
+      - edges: [[oauth2-login-authentication-filter, client-registration-repository]]
+      - edges: [[client-registration-repository, oauth2-login-authentication-filter]]
+      - edges: [[oauth2-login-authentication-filter, provider-manager]]
+      - edges: [[provider-manager, authentication-provider]]
+      - edges: [[oauth2-login-authentication-provider, authorization-server]]
+      - edges: [[authorization-server, oauth2-login-authentication-provider]]
+      - edges: [[provider-manager, oauth2-login-authentication-filter]]
       - edges:
+          - [oauth2-login-authentication-filter, oauth2-authorized-client-repository]
           - [oauth2-login-authentication-filter, security-context-holder]
-          - [oauth2-login-authentication-filter, security-context-repository]
-  oauth2-provider:
-    label: OAuth2 Provider
+  oidc-login:
+    label: OIDC Login
     stages:
-      - edges: [[oauth2-login-authentication-provider, oauth2-authorization-code-authentication-provider]]
-      - edges: [[oauth2-authorization-code-authentication-provider, authorization-server]]
-      - edges: [[authorization-server, oauth2-authorization-code-authentication-provider]]
-      - edges: [[oauth2-authorization-code-authentication-provider, oauth2-login-authentication-provider]]
-      - edges: [[oauth2-login-authentication-provider, oauth2-user-service]]
-      - edges: [[oauth2-user-service, resource-server]]
-      - edges: [[resource-server, oauth2-user-service]]
-      - edges: [[oauth2-user-service, oauth2-login-authentication-provider]]
+      - edges: [[oauth2-login-authentication-filter, authorization-request-repository]]
+      - edges: [[authorization-request-repository, oauth2-login-authentication-filter]]
+      - edges: [[oauth2-login-authentication-filter, client-registration-repository]]
+      - edges: [[client-registration-repository, oauth2-login-authentication-filter]]
+      - edges: [[oauth2-login-authentication-filter, provider-manager]]
+      - edges: [[provider-manager, authentication-provider]]
+      - edges: [[oidc-authorization-code-authentication-provider, authorization-server]]
+      - edges: [[authorization-server, oidc-authorization-code-authentication-provider]]
+      - edges: [[provider-manager, oauth2-login-authentication-filter]]
+      - edges:
+          - [oauth2-login-authentication-filter, oauth2-authorized-client-repository]
+          - [oauth2-login-authentication-filter, security-context-holder]

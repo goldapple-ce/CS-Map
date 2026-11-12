@@ -1,28 +1,64 @@
-# 개요
+# 한눈에 보기
 
-OAuth 2.0 로그인을 시작하는 Spring Security 필터입니다. 기본적으로 `/oauth2/authorization/{registrationId}` 요청을 처리합니다.
+OAuth2AuthorizationRequestRedirectFilter는 OAuth 2.0의 Authorization Code Flow를 시작하는 Filter입니다.
+OAuth2AuthorizationRequestResolver를 통해 `Authorization Request를 생성`하고, AuthorizationRequestRepository에 저장합니다.
+이후 `Authorization Server로 브라우저를 리다이렉트`하여 사용자 인증과 권한 승인 과정을 시작합니다.
 
 ---
 
-# 처리 과정
+# OAuth2AuthorizationRequestRedirectFilter란?
 
-필터는 `OAuth2AuthorizationRequestResolver`를 통해 `ClientRegistrationRepository`에서 Client 설정을 조회하고 `OAuth2AuthorizationRequest`를 만듭니다. 요청에는 `client_id`, `scope`, `state`, `response_type=code`, `redirect_uri` 등이 포함됩니다.
+OAuth2AuthorizationRequestRedirectFilter는 OAuth 2.0의 Authorization Code Flow를 시작하는 Filter입니다.
+사용자가 OAuth2 로그인을 요청하면 `Authorization Request를 생성`하고, 이를 저장한 뒤 브라우저를 `Authorization Server로 리다이렉트`합니다.
+Spring Security에서는 기본적으로 `/oauth2/authorization/{registrationId}` 경로를 통해 OAuth2 로그인을 시작합니다.
 
-생성한 요청은 콜백 검증을 위해 `AuthorizationRequestRepository`에 저장합니다. 그다음 인증 서버의 Authorization Endpoint URL을 `Location` 헤더에 담은 HTTP 리다이렉트 응답을 클라이언트에 반환합니다.
+---
 
-```text
-내 서버 → 브라우저
-HTTP 302 또는 다른 3xx 응답
-Location: https://provider.example/authorize?...
+# Authorization 요청 처리
 
-브라우저 → 인증 서버
-GET https://provider.example/authorize?...
+예를 들어 사용자가 Google 로그인을 요청하면 다음 URL로 접근합니다.
+
+```http
+GET /oauth2/authorization/google
 ```
 
-필터가 인증 서버를 직접 호출하는 것이 아니라, 응답을 받은 브라우저가 인증 서버로 새 요청을 보낸다는 점이 중요합니다.
+OAuth2AuthorizationRequestRedirectFilter는 OncePerRequestFilter를 상속하며, `doFilterInternal()`에서 Authorization 요청을 처리합니다.
 
----
+```java
+public class OAuth2AuthorizationRequestRedirectFilter extends OncePerRequestFilter {
+    private OAuth2AuthorizationRequestResolver authorizationRequestResolver;
+    private AuthorizationRequestRepository<OAuth2AuthorizationRequest>
+            authorizationRequestRepository = new HttpSessionOAuth2AuthorizationRequestRepository();
+    private RedirectStrategy authorizationRedirectStrategy = new DefaultRedirectStrategy();
 
-# 참고 자료
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
+        OAuth2AuthorizationRequest authorizationRequest = this.authorizationRequestResolver.resolve(request);
 
-- [Spring Security - OAuth2AuthorizationRequestRedirectFilter API](https://docs.spring.io/spring-security/reference/api/java/org/springframework/security/oauth2/client/web/OAuth2AuthorizationRequestRedirectFilter.html)
+        this.sendRedirectForAuthorization(request, response, authorizationRequest);
+    }
+
+    private void sendRedirectForAuthorization(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            OAuth2AuthorizationRequest authorizationRequest
+    ) throws IOException {
+
+        this.authorizationRequestRepository.saveAuthorizationRequest(
+            authorizationRequest, request, response);
+
+        this.authorizationRedirectStrategy.sendRedirect(
+                request, response, authorizationRequest.getAuthorizationRequestUri());
+    }
+}
+```
+
+- `authorizationRequestResolver.resolve()`: 요청 URL의 registrationId를 확인하고, Client 설정을 이용해 OAuth2AuthorizationRequest를 생성합니다.
+- `sendRedirectForAuthorization()`: 생성된 Authorization Request를 저장하고 Authorization Server로 리다이렉트하는 메서드입니다.
+- `authorizationRequestRepository.saveAuthorizationRequest()`: Callback 요청에서 사용할 Authorization Request를 저장합니다.
+- `authorizationRedirectStrategy.sendRedirect()`: `authorizationRequestUri`를 이용해 브라우저를 Authorization Server로 이동시킵니다.
+- `filterChain.doFilter()`: OAuth2 Authorization 요청이 아니라면 다음 Filter로 요청을 전달합니다.

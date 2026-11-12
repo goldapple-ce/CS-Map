@@ -1,18 +1,36 @@
-- question: OAuth2LoginAuthenticationFilter는 Callback을 받은 뒤 원래 로그인 요청을 어디서 가져오나요?
-  answer: AuthorizationRequestRepository에서 로그인 시작 때 저장한 OAuth2AuthorizationRequest를 가져옵니다.
+- question: 이미 SecurityContextRepository에 Authentication을 등록하여 로그인 처리를 완료할 수 있는데, OAuth2AuthorizedClientRepository에 별도로 정보를 저장하는 이유는 무엇인가요?
+  answer: |
+    SecurityContextRepository는 Authentication을 포함하는 SecurityContext를 저장하여 이후 요청에서도 사용자의 인증 상태를 복원할 수 있도록 합니다.
+    반면 OAuth2AuthorizedClientRepository는 OAuth2AuthorizedClient를 저장하여 Client가 외부 Resource Server에 접근할 때 필요한 Access Token과 Refresh Token 등을 관리합니다.
+    즉, SecurityContextRepository는 자사 서비스의 사용자 인증 상태를 유지하기 위한 저장소이고, OAuth2AuthorizedClientRepository는 외부 서비스에 대한 권한 위임 정보를 관리하기 위한 저장소입니다.
 
-- question: ProviderManager는 OAuth 2.0 Login 요청을 어떻게 처리할 Provider를 정하나요?
-  answer: 등록된 AuthenticationProvider를 순서대로 확인해 요청을 지원하는 Provider를 선택합니다.
+- question: Google OAuth 로그인을 성공적으로 완료한 뒤, 자사 서비스에서 별도의 JWT를 발급하여 이후 API 요청을 인증한다고 가정하겠습니다. 이 경우에도 OAuth2AuthorizedClientRepository에 Google의 Access Token과 Refresh Token을 반드시 저장해야 할까요? 저장이 필요한 경우와 필요하지 않은 경우를 구분해서 설명해 주세요.
+  answer: |
+    토큰 저장 여부는 로그인 이후 외부 리소스에 다시 접근해야 하는지에 따라 결정됩니다.
+    OAuth 로그인 이후 자사 서비스에서 JWT를 발급하여 인증을 처리하고, Google API에 추가로 접근할 필요가 없다면 외부 Access Token을 지속적으로 보관하지 않아도 됩니다.
+    반면 Google Calendar처럼 외부 Resource Server에 지속적으로 접근해야 한다면 Access Token과 필요한 경우 Refresh Token을 저장해야 합니다.
 
-- question: Authorization Code를 Access Token으로 교환하는 책임은 어디에 있나요?
-  answer: OAuth2AuthorizationCodeAuthenticationProvider가 Authorization Server의 Token Endpoint를 호출해 교환합니다.
+- question: OAuth 2.0과 OIDC의 핵심 차이점은 무엇이며, OIDC가 필요한 이유는 무엇인가요?
+  answer: |
+    OAuth 2.0은 사용자의 리소스에 대한 접근 권한을 Client에 위임하기 위한 인가 프레임워크입니다.
+    OAuth 2.0을 이용해 사용자 정보를 조회하고 로그인 기능을 구현할 수 있지만, 사용자 인증 자체에 대한 표준은 정의하지 않습니다.
+    반면 OIDC는 OAuth 2.0을 기반으로 사용자 인증을 표준화한 프로토콜입니다.
+    기존 OAuth 2.0의 흐름을 확장하여 ID Token을 통해 사용자 인증 정보를 전달하고, Client가 인증 결과를 검증할 수 있는 표준을 제공합니다.
 
-- question: OAuth2UserService는 Access Token을 어디에 사용하나요?
-  answer: Resource Server의 UserInfo Endpoint를 호출해 사용자 속성을 조회하는 데 사용합니다.
+- question: OAuth2UserService는 Access Token으로 UserInfo Endpoint를 호출해 사용자 정보를 조회하는데, OidcUserService는 이미 ID Token을 발급받았는데도 왜 별도로 존재할까요? 두 서비스의 역할에는 어떤 차이가 있나요?
+  answer: |
+    OAuth2UserService는 일반적인 OAuth 2.0 Login에서 Access Token을 이용해 사용자 정보를 조회하고 OAuth2User를 생성합니다.
+    반면 OidcUserService는 ID Token을 기반으로 OidcUser를 생성하며, 필요에 따라 Access Token으로 UserInfo Endpoint를 호출하여 추가 정보를 가져옵니다.
+    따라서 OidcUserService는 ID Token과 UserInfo를 함께 처리할 수 있다는 차이가 있습니다.
 
-- question: OAuth2AuthenticationToken은 무엇을 나타내나요?
-  answer: OAuth2User를 Principal로 사용하는 현재 Application의 로그인 상태를 나타냅니다.
+- question: Spring Security에서는 OAuth 2.0 Login과 OIDC Login 모두 OAuth2LoginAuthenticationFilter를 사용합니다. 그렇다면 Spring Security는 어떤 정보를 기준으로 일반 OAuth 2.0 Login과 OIDC Login을 구분하고, 서로 다른 사용자 정보 처리 경로를 선택할까요?
+  answer: |
+    Spring Security는 최초 AuthorizationRequest의 Scope에 openid가 포함되어 있는지 확인하여 OAuth 2.0 Login과 OIDC Login을 구분합니다.
+    OAuth2LoginAuthenticationProvider는 openid가 포함된 요청에 대해 null을 반환하며, ProviderManager는 다음 Provider에 인증 처리를 위임합니다.
+    이후 OidcAuthorizationCodeAuthenticationProvider가 OIDC 인증을 처리하고, 반대로 openid가 없는 요청은 일반 OAuth 2.0 Login으로 처리됩니다.
 
-- question: OAuth2AuthorizedClient는 SecurityContext와 같은 목적의 객체인가요?
-  answer: 아니요. 사용자와 ClientRegistration 및 Access Token을 연결해 이후 외부 API 호출에 사용할 정보를 보관합니다.
-
+- question: OAuth2LoginAuthenticationFilter는 내부 인증 처리가 성공하면 반환받은 OAuth2LoginAuthenticationToken을 그대로 사용하지 않고, OAuth2AuthenticationToken으로 변환합니다. 왜 인증 과정에서 사용한 OAuth2LoginAuthenticationToken을 그대로 SecurityContext에 저장하지 않고, OAuth2AuthenticationToken으로 변환할까요?
+  answer: |
+    OAuth2LoginAuthenticationToken은 Authorization Code를 이용한 로그인 요청과 인증 결과를 표현하는 객체로, AuthorizationExchange와 Access Token 등 인증 과정에 필요한 정보를 포함합니다.
+    반면 OAuth2AuthenticationToken은 인증이 완료된 사용자의 Principal과 Authorities 등을 표현하며, SecurityContext에 저장되어 이후 인증 및 인가에 사용됩니다.
+    따라서 Spring Security는 인증 과정에서 필요한 정보와 로그인 이후 유지할 인증 정보를 구분하기 위해 OAuth2AuthenticationToken으로 변환합니다.
