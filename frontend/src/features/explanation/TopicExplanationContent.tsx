@@ -1,17 +1,14 @@
 import { MarkdownContent } from "./MarkdownContent"
-import { Button } from "@/components/ui/button"
 import type { ExplanationSelection } from "./explanation-selection"
 
 type TopicExplanationContentProps = {
   selection: ExplanationSelection
   markdown?: string
-  onBack: () => void
 }
-/** 선택한 Topic의 설명과 Scene 설명 복귀 버튼을 렌더링한다. */
+/** 선택한 Topic 또는 Area의 설명을 렌더링한다. */
 export function TopicExplanationContent({
   selection,
   markdown,
-  onBack,
 }: TopicExplanationContentProps) {
   return (
     <section className="space-y-5">
@@ -30,9 +27,6 @@ export function TopicExplanationContent({
           상세 설명이 없습니다.
         </p>
       )}
-      <Button type="button" variant="outline" onClick={onBack}>
-        현재 Scene 설명으로 돌아가기
-      </Button>
     </section>
   )
 }
